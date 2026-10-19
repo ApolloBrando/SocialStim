@@ -2,23 +2,27 @@
 
 ## Status and constraints
 
-Milestone 01 implements the five-role participant-loop candidate. Shared Rules,
+Milestone 01 implements the five-role participant-loop candidate. Milestone 02
+adds attributed evidence, trust, constrained heuristic estimates, visible
+self-exposure, coordinated team plans, and contextual dialogue. Shared Rules,
 Application, and engine-free dialogue import code compile and pass behavioral
 tests in GitHub Actions. Unity-specific adapters and the committed scene still
 need editor import, compilation, and play verification.
 
 Current code includes `RunFactory`, `RunSession`, `PhaseMachine`, `NightResolver`
-and its stages, `BasicNpcStrategy`, restricted `KnowledgeView` records,
+and its stages, `SocialNpcStrategy` (default), `BasicNpcStrategy` (baseline), restricted `KnowledgeView` records,
 `DialogueSelector`, `StarterWinCondition`, and `GameController`. Unity data assets
 and `GameBootstrap` wire these to `TextGameView` through `GamePresenter`.
-The original design contracts below also cover deferred systems: full role
-probabilities and exposure estimates (02), advanced roles (03), save snapshots
+The original design contracts below also cover deferred systems: advanced roles (03), save snapshots
 (04), and tension/visual effects (05). Those systems are not implemented yet.
 
 The game is single-player and text-only initially. The player is a participant
 with the same action legality rules as NPCs. Dialogue is prewritten data, with
 no runtime text-generation service. Gameplay randomness is seeded with capturable
 stream state; full run save/resume is milestone 04. No run state persists today.
+
+The owner authorized milestone 02 development in parallel with their milestone
+01 Unity verification. No editor success is inferred from that decision.
 
 ## Assembly dependencies
 
@@ -158,9 +162,31 @@ view and expect it to filter them correctly.
 
 ## Reasoning and dialogue
 
-Start with inspectable evidence weights, bounded suspicion/trust, and utility
-selection influenced by personality. Full role/faction probabilities come after
-the basic behavior is validated, and must respect known setup constraints.
+`BeliefState` stores attributed evidence, bounded suspicion/trust, and an exposure
+estimate for one observer. `BeliefDistribution` combines bounded evidence weights
+with publicly announced initial faction counts. It normalizes role and faction
+estimates to 10000 basis points, excludes known unique roles elsewhere, and never
+recalculates priors from unrevealed death alignments. These are heuristic beliefs,
+not calibrated Bayesian posteriors or exact joint role-list inference.
+
+Evidence distinguishes public assertions, public ballots/deaths/reveals, and
+legitimate private results. Self-exposure depends on visible reactions, never
+private knowledge alone. Both production strategies are stateless across observers;
+state belongs to each observer's model. A new strategy must not cache one NPC's
+private facts for another NPC. `KnownCharacter` contains observer estimates rather
+than authoritative assignments. See `Docs/SOCIAL_REASONING.md` for model policies.
+
+`TeamNightPlanner` accepts authorized proposals without cast-role objects. Target
+selection uses proposal count, permitted threat priority, and stable ID. A player
+killer controls the final target/pass. Plans enter antagonist-only knowledge and
+a living antagonist player's private transcript. Town/Neutral receive neither.
+
+Dialogue version 2 adds AND-combined predicates over public phase/day, speaker
+traits/own role, assertions, permitted evidence, and visible pressure. Context is
+captured before publishing a statement, so it cannot create its own eligibility.
+Generic fallbacks are mandatory; anti-repetition never relaxes conditions. Schema
+1 remains supported without conditions. No visual markup parser is introduced.
+
 Difficulty changes Strategy implementations, not access to secret truth.
 Antagonists share only role-authorized team facts and a deterministic target plan.
 Self-exposure estimates use observed reactions, not other characters' private
@@ -276,3 +302,4 @@ assert the scaffold's existence or mirror implementation details.
 - Neutral outcomes and parity: evaluate capabilities and competing threats;
   faction headcount alone is not sufficient in the full ruleset.
 - Premature visual scope: establish readable plain-text play before animation.
+

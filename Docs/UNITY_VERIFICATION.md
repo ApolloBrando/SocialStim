@@ -4,21 +4,24 @@ Status: requires a machine with Unity 6000.3.26f1. The creation environment has
 no Unity editor or license. Headless C# compilation/tests pass independently;
 they cannot establish scene import, TMP rendering, Input System behavior, or a
 working player build. Do not mark these boxes complete without running them.
+Milestone 01 is on main. Milestone 02 is being developed separately while the
+owner checks that baseline; its existence is not evidence of a successful import.
 
 ## Import and configuration
 
-- [ ] Check out `milestone/01-core-loop` in `ApolloBrando/SocialStim`.
+- [ ] Check out `main` for the milestone 01 baseline, or explicitly check out
+  `milestone/02-social-reasoning` when verifying its additions.
 - [ ] Open the repository root using Unity **6000.3.26f1**.
 - [ ] Resolve packages, inspect Console errors, and preserve all committed GUIDs.
 - [ ] Set Player Settings > Other Settings > Active Input Handling to **Input
-  System Package (New)**; allow the editor restart if prompted. This project
-  needs no legacy Input Manager. The package itself is already installed.
+  System Package (New)**; allow the editor restart if prompted. The package is
+  already included and this project does not need the legacy Input Manager.
 - [ ] Import Window > TextMeshPro > **TMP Essential Resources**, or assign an
   existing TMP font on `GameBootstrap`. Commit imported assets with metadata and
   review their license files. This delivery contains no third-party font bytes.
 - [ ] Confirm Force Text serialization and Visible Meta Files.
 - [ ] Run Tools > SocialStim > **Validate Starter Content**; expect 5 roles,
-  45 placeholder lines, and 20 names.
+  45 placeholder lines on milestone 01 or 51 on milestone 02, and 20 names.
 - [ ] Review and commit the generated `Packages/packages-lock.json` and missing
   default ProjectSettings files on this feature branch, excluding user/cache files.
 
@@ -52,5 +55,6 @@ working player build. Do not mark these boxes complete without running them.
 - [ ] Record actual results, editor/version, Console errors and reproduction steps
   in the PR. Copy the first error text and affected file/line if compilation fails.
 
-Passing this gate permits milestone 02 to proceed on a verified Unity foundation.
+The owner has allowed milestone 02 coding in parallel. Passing this gate is still
+required to call the Unity presentation verified and to close its open validation work.
 Merge or any direct publication to `main` still requires owner authorization.

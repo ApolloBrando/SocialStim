@@ -1,15 +1,21 @@
 # Milestone 01 validation
 
-## Unity NUnit compatibility correction
+## Milestone 02 branch
 
-The owner reported CS1503 at DialogueAndKnowledgeTests.cs line 73 during actual
-Unity import: a CharacterId was passed to an assertion overload expecting string.
-The original .NET suite used NUnit 3.14.0 and missed this Unity API difference.
-Both collection assertions now use Has.No.Member. CI compiles upstream NUnit 3.5.0
-on .NET Framework 4.7.2 as an older API baseline and runs 3.14.0 on .NET 8; neither is a substitute for Unity's
-custom integration. The project also validates that the new Input System is
-enabled before reporting starter content as ready. Editor compilation and
-scene checks remain pending until the owner reruns them after this fix.
+Milestone 02 is authorized in parallel with the owner's Unity baseline checks.
+Its initial CI run compiled the actual shared code and passed **58 tests**, with
+zero failures/skips, including the existing 100 seeded Town/antagonist runs:
+[run 39252479063](https://github.com/ApolloBrando/SocialStim/actions/runs/39252479063).
+Subsequent condition-reachability and unique-role checks are included in the
+final branch suite; the PR's final-head run is authoritative.
+
+New coverage includes attributed conflicting reports and credibility, duplicate
+report influence, private/public exposure isolation, revealed-role consequences,
+normalized estimates, hidden-assignment permutations, consistent bluffs, private
+team coordination/override, and schema 1/2 condition eligibility and validation.
+None of these results substitutes for Unity adapter or scene verification.
+
+## Milestone 01 baseline
 
 The first feature-branch GitHub Actions run compiled shared C# code and passed
 33 NUnit tests with zero failures/skips, including 100 complete seeded runs
@@ -63,3 +69,15 @@ The game scene is prewired to the starter catalog, and the role/catalog assets
 have committed metadata. Unity EditMode should discover the shared behavioral
 suite. The PlayMode assembly is reserved and has no UI tests yet. Full editor
 validation remains an open gate before calling the scene verified.
+
+## Unity NUnit compatibility correction
+
+The owner reported CS1503 at DialogueAndKnowledgeTests.cs line 73 during actual
+Unity import: a CharacterId was passed to an assertion overload expecting string.
+The original .NET suite used NUnit 3.14.0 and missed this Unity API difference.
+Both collection assertions now use Has.No.Member. CI compiles upstream NUnit 3.5.0
+on .NET Framework 4.7.2 as an older API baseline and runs 3.14.0 on .NET 8; neither is a substitute for Unity's
+custom integration. The project also validates that the new Input System is
+enabled before reporting starter content as ready. Editor compilation and
+scene checks remain pending until the owner reruns them after this fix.
+

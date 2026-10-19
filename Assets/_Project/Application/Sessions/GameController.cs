@@ -40,6 +40,9 @@ namespace SocialStim.Application.Sessions
                     {
                         add($"Accuse {target.Name}", "May increase suspicion on this person; repeated false accusations can backfire after a reveal.", GameCommand.Speak(SpeechIntent.Accuse, target.Id));
                         add($"Vouch for {target.Name}", "May lower suspicion on this person; your credibility affects the response.", GameCommand.Speak(SpeechIntent.Vouch, target.Id));
+                        add($"Call for a trial of {target.Name}", "Escalates public pressure before nomination.", GameCommand.Speak(SpeechIntent.CallForTrial, target.Id));
+                        add($"Agree with {target.Name}", "Expresses support and may modestly improve this person's credibility.", GameCommand.Speak(SpeechIntent.Agree, target.Id));
+                        add($"Disagree with {target.Name}", "Challenges this person's credibility without claiming secret evidence.", GameCommand.Speak(SpeechIntent.Disagree, target.Id));
                         add($"Deflect toward {target.Name}", "Redirects suspicion while making you appear evasive.", GameCommand.Speak(SpeechIntent.Deflect, target.Id));
                         if (view.Day > 1)
                             foreach (Faction faction in Enum.GetValues(typeof(Faction)))
