@@ -51,13 +51,24 @@ namespace SocialStim.Rules.Council
                     orders.Remove(killer);
                     orders.Add(new NightOrder(killer.Actor, killer.Actor == carrier.Actor ? chosen.Target : null));
                 }
+                foreach (var support in _world.Living.Where(a => a.Role.Faction == Faction.Antagonist && a.Role.Ability != AbilityKind.Attack))
+                {
+                    var existing = orders.Single(o => o.Actor == support.Id);
+                    var target = _strategy.NightTarget(_world.Knowledge(support).WithTeamTarget(chosen.Target), _world.Decisions);
+                    var proposed = new NightOrder(support.Id, target);
+                    orders.Remove(existing);
+                    orders.Add(NightLegality.IsLegal(support.Night(), proposed, actors, policy) ? proposed : new NightOrder(support.Id, null));
+                }
                 foreach (var teammate in _world.Living.Where(a => a.Role.Faction == Faction.Antagonist))
                     _world.Emit(CouncilEventKind.PrivateResult, "Team: " + _world.Actor(carrier.Actor).Name + " → "
                         + (chosen.Target.HasValue ? _world.Actor(chosen.Target.Value).Name : "Pass"), carrier.Actor, chosen.Target, recipient: teammate.Id);
             }
             foreach (var order in orders)
+            {
+                if (order.Actor != _world.Player.Id) _world.Trace(_world.Actor(order.Actor), "Night", order.Target);
                 _world.Emit(CouncilEventKind.NightOrder, _world.Actor(order.Actor).Name + " → "
                     + (order.Target.HasValue ? _world.Actor(order.Target.Value).Name : "Pass"), order.Actor, order.Target, recipient: order.Actor);
+            }
             var result = _resolver.Resolve(actors, orders);
             foreach (var actor in _world.Actors) actor.BacklashDue = false;
             foreach (var id in result.SpentCharges) _world.Actor(id).Charges--;

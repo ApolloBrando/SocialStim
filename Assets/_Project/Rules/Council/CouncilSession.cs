@@ -39,12 +39,15 @@ namespace SocialStim.Rules.Council
             bool ended = _world.Phase == CouncilPhase.Ended;
             return new CouncilSnapshot(_world.Revision, _world.Options.Seed, _world.Day, _world.Round, _world.Phase, knowledge,
                 _world.Options.Rounds, Math.Max(0, _world.Options.PlayerWindows - _day.WindowsUsed), _day.Respond, _day.RespondTo,
-                _world.Events.Where(e => e.Kind != CouncilEventKind.NightOrder && (e.Public || e.Recipient == _world.Player.Id)).Select((e, i) => e.Scoped(i)).ToList().AsReadOnly(),
+                _world.Events.Where(e => e.Kind != CouncilEventKind.NightOrder && e.Kind != CouncilEventKind.Decision && (e.Public || e.Recipient == _world.Player.Id)).Select((e, i) => e.Scoped(i)).ToList().AsReadOnly(),
                 nightTargets.AsReadOnly(), votes.AsReadOnly(), _world.Eliminated, ended ? _world.Outcome : OutcomeKind.Ongoing,
                 ended && _win.Won(_world.Player.Role, _world.Player.Alive, _world.Player.VotedOut, _world.Outcome),
                 new ReadOnlyDictionary<CharacterId, RoleId>(ended ? _world.Actors.ToDictionary(a => a.Id, a => a.StartingRole.Id)
                     : new Dictionary<CharacterId, RoleId>()), ended ? _world.Events.ToList().AsReadOnly() : new List<CouncilEvent>().AsReadOnly(), _world.Options.Abstain);
         }
+
+        /// <summary>Explicit developer inspection port. Presentation must expose this only in editor/development builds.</summary>
+        public CouncilKnowledge InspectForDeveloper(CharacterId observer) => _world.Knowledge(_world.Actor(observer));
 
         /// <summary>Phrase preview is read-only and uses an isolated stream.</summary>
         public IReadOnlyList<DialogueSelection> Phrases(CouncilAction action)

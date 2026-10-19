@@ -58,6 +58,7 @@ namespace SocialStim.Rules.Council
                     var action = _strategy.Speak(_world.Knowledge(actor), _world.Decisions);
                     if (CouncilActionValidator.Error(_world, actor, action, false) != null)
                         action = new CouncilAction(CouncilActionKind.Chat, intent: SpeechIntent.Banter);
+                    _world.Trace(actor, action.Kind.ToString(), action.Target, action.Reason);
                     if (action.Kind != CouncilActionKind.Pass) _speech.Say(actor, action);
                     bool directlyAddressed = action.Target == _world.Player.Id
                         && (action.Kind == CouncilActionKind.Accuse || action.Intent == SpeechIntent.Question);

@@ -15,6 +15,7 @@ namespace SocialStim.Rules.Council
         internal Personality Traits { get; }
         internal RoleSpec StartingRole { get; }
         internal RoleSpec Role { get; set; }
+        internal CharacterStats Stats { get; set; }
         internal int Charges { get; set; }
         internal bool Alive { get; set; } = true;
         internal bool SelfHealUsed { get; set; }

@@ -26,6 +26,7 @@ namespace SocialStim.Rules.Council
                 if (target.HasValue && !eligible(target.Value)) target = null;
                 if (!target.HasValue && !_world.Options.Abstain)
                     target = _world.Living.Where(a => eligible(a.Id)).OrderBy(a => a.Id.Value).Select(a => (CharacterId?)a.Id).FirstOrDefault();
+                if (actor.Id != _world.Player.Id) _world.Trace(actor, "Vote", target);
                 ballots.Add(new KeyValuePair<CharacterId, CharacterId?>(actor.Id, target));
             }
             // Public strategy contexts cannot observe earlier votes from this same round.

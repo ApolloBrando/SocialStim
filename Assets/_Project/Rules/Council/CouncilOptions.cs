@@ -11,7 +11,8 @@ namespace SocialStim.Rules.Council
             bool revealRoles = true, bool lastWords = true, bool freeTime = false, int freeTimeActions = 1,
             bool promoteEvil = true, bool backlash = true, bool selfHeal = true, bool notifyLull = true,
             int nullifierCharges = 2, bool forgerReadsClear = false, int maximumDays = 30,
-            SetupVisibility visibility = SetupVisibility.FactionCounts, NeutralParityMode parity = NeutralParityMode.Neither)
+            SetupVisibility visibility = SetupVisibility.FactionCounts, NeutralParityMode parity = NeutralParityMode.Neither, AiDifficulty difficulty = AiDifficulty.Normal,
+            StatsMode statsMode = StatsMode.Random, CharacterStats playerStats = null, int sampleBudget = 0)
         {
             if (rounds < 3 || rounds > 7 || playerWindows < 1 || playerWindows > 2 || freeTimeActions < 1 || freeTimeActions > 2
                 || nullifierCharges < 0 || nullifierCharges > 10 || maximumDays < 1) throw new ArgumentException("Run setting out of range.");
@@ -19,8 +20,13 @@ namespace SocialStim.Rules.Council
             RevealRoles = revealRoles; LastWords = lastWords; FreeTime = freeTime; FreeTimeActions = freeTimeActions;
             PromoteEvil = promoteEvil; Backlash = backlash; SelfHeal = selfHeal; NotifyLull = notifyLull;
             NullifierCharges = nullifierCharges; ForgerReadsClear = forgerReadsClear; MaximumDays = maximumDays;
-            Visibility = visibility; Parity = parity;
+            Visibility = visibility; Parity = parity; Ai = new AiPolicy(difficulty, sampleBudget); StatsMode = statsMode;
+            PlayerStats = playerStats ?? new CharacterStats();
+            if (statsMode == StatsMode.PointBuy && PlayerStats.Total != 30) throw new ArgumentException("Allocate exactly 30 stat points.");
         }
+        public AiPolicy Ai { get; }
+        public StatsMode StatsMode { get; }
+        public CharacterStats PlayerStats { get; }
         public uint Seed { get; }
         public int Rounds { get; }
         public int PlayerWindows { get; }

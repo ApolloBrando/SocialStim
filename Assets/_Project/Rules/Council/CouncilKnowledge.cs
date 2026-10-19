@@ -12,10 +12,20 @@ namespace SocialStim.Rules.Council
         internal CouncilKnowledge(CharacterId self, RoleSpec ownRole, Personality traits, int day, int round,
             int charges, bool selfHealUsed, IReadOnlyList<KnownCharacter> characters, IReadOnlyList<CouncilEvent> events,
             IReadOnlyList<NightReport> results, IReadOnlyList<RoleSpec> catalog, SetupKnowledge counts,
-            IReadOnlyDictionary<RoleId, int> roleCounts, IReadOnlyList<CharacterId> voteTargets = null)
+            IReadOnlyDictionary<RoleId, int> roleCounts, IReadOnlyList<CharacterId> voteTargets = null, IReadOnlyDictionary<CharacterId, CharacterStats> stats = null,
+            AiPolicy policy = null, uint seed = 0, CouncilInferenceResult inference = null, bool selfHealAllowed = true, CharacterId? teamTarget = null)
         { Self = self; OwnRole = ownRole; Traits = traits; Day = day; Round = round; Charges = charges;
             SelfHealUsed = selfHealUsed; Characters = characters; Events = events; Results = results;
-            Catalog = catalog; Counts = counts; RoleCounts = roleCounts; VoteTargets = voteTargets; }
+            Catalog = catalog; Counts = counts; RoleCounts = roleCounts; VoteTargets = voteTargets; Stats = stats; Policy = policy ?? new AiPolicy(); Seed = seed; Inference = inference; SelfHealAllowed = selfHealAllowed; TeamTarget = teamTarget; }
+        public IReadOnlyDictionary<CharacterId, CharacterStats> Stats { get; }
+        public AiPolicy Policy { get; }
+        public uint Seed { get; }
+        public CouncilInferenceResult Inference { get; }
+        public bool SelfHealAllowed { get; }
+        public CharacterId? TeamTarget { get; }
+        internal CouncilKnowledge WithTeamTarget(CharacterId? target) => new CouncilKnowledge(Self, OwnRole, Traits, Day, Round,
+            Charges, SelfHealUsed, Characters, Events, Results, Catalog, Counts, RoleCounts, VoteTargets, Stats, Policy, Seed, Inference, SelfHealAllowed, target);
+        public CharacterStats Skill(CharacterId actor) => Stats != null && Stats.TryGetValue(actor, out CharacterStats value) ? value : new CharacterStats();
         public CharacterId Self { get; }
         public RoleSpec OwnRole { get; }
         public Personality Traits { get; }

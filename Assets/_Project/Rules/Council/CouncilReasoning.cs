@@ -49,13 +49,10 @@ namespace SocialStim.Rules.Council
 
         public static int Suspicion(CouncilKnowledge knowledge, CharacterId target)
         {
-            int score = 35 + knowledge.Events.Count(e => e.Target == target && e.Intent == SpeechIntent.Accuse) * 7
-                - knowledge.Events.Count(e => e.Target == target && (e.Intent == SpeechIntent.Vouch || e.Intent == SpeechIntent.Defend)) * 5;
-            if (HasReason(knowledge, target, ReasonType.Contradiction)) score += 35;
-            if (HasReason(knowledge, target, ReasonType.ClaimConflict)) score += 20;
-            foreach (var report in knowledge.Results.Where(r => r.Target == target && r.Readout.HasValue))
-                score += report.Readout == Night.Readout.Corrupt ? 55 : report.Readout == Night.Readout.Anomaly ? 40 : -25;
-            return System.Math.Max(0, System.Math.Min(100, score));
+            if (knowledge.Inference != null && knowledge.Inference.Beliefs.TryGetValue(target, out CouncilBelief belief))
+                return (int)System.Math.Round(belief.Hostile * 100);
+            var known = knowledge.Characters.First(c => c.Id == target);
+            return known.RevealedFaction == Roles.Faction.Town ? 0 : known.RevealedFaction == Roles.Faction.Antagonist ? 100 : 35;
         }
     }
 }

@@ -62,7 +62,9 @@ namespace SocialStim.Application.Settings
             On(GameSetting.Revote), On(GameSetting.Abstain), On(GameSetting.RevealRoles), On(GameSetting.LastWords),
             On(GameSetting.FreeTime), Get(GameSetting.FreeTimeActions), On(GameSetting.PromoteEvil), On(GameSetting.Backlash),
             On(GameSetting.SelfHeal), On(GameSetting.NotifyLull), Get(GameSetting.NullifierCharges), On(GameSetting.ForgerReadsClear),
-            Get(GameSetting.MaximumDays), (SetupVisibility)Get(GameSetting.Visibility), (Rules.Victory.NeutralParityMode)Get(GameSetting.InfinitumParity));
+            Get(GameSetting.MaximumDays), (SetupVisibility)Get(GameSetting.Visibility), (Rules.Victory.NeutralParityMode)Get(GameSetting.InfinitumParity), (AiDifficulty)Get(GameSetting.Difficulty),
+            (StatsMode)Get(GameSetting.StatsMode), new CharacterStats(Get(GameSetting.Charisma), Get(GameSetting.Intuition),
+                Get(GameSetting.Logic), Get(GameSetting.Charm), Get(GameSetting.Performance), Get(GameSetting.Stealth)));
         private static RoleSlot ParseSlot(string code) => code == "Any" || string.IsNullOrWhiteSpace(code) ? new RoleSlot()
             : code == "Town" ? new RoleSlot(faction: Faction.Town) : code == "Evil" ? new RoleSlot(faction: Faction.Antagonist)
             : code == "Neutral" ? new RoleSlot(faction: Faction.Neutral) : new RoleSlot(new RoleId(code));
