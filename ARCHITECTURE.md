@@ -385,3 +385,7 @@ RoleSpec carries explicit claim flags, capability flags and a personal objective
 ## Mission phase 2
 
 The modern CouncilSession is decomposed into scoped world, day, speech, vote and night services. Public/recipient events are re-indexed after filtering to prevent private-count side channels. CouncilController owns engine-free three-step navigation and stale IDs; Unity adapters build a focused line/roster/action view. Original sessions remain an optional Trial Mode. Phrase preview uses a separate seeded stream and does not mutate revision or history. See docs/COUNCIL_UI.md.
+
+## Mission phase 3
+
+Application/Settings owns immutable display/game preferences, versioned JSON migration, clamping, setup validation and explicit game drafts. SettingsFileStore implements the engine-free persistence port. GameBootstrap supplies persistentDataPath, migrates old PlayerPrefs, subscribes live display changes and debounces writes. CouncilSettingsPanel creates grouped native controls; CouncilLayout reflows the roster, line and action regions when scale changes. No ongoing-run data persists. See docs/SETTINGS.md.
