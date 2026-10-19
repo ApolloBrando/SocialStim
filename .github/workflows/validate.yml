@@ -1,0 +1,29 @@
+name: Validate SocialStim
+
+on:
+  push:
+    branches: [main, 'milestone/**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Validate project structure
+        run: python3 Tools/validate_scaffold.py
+      - name: Compile and test shared rules and application code
+        run: dotnet test Tools/HeadlessTests/SocialStim.HeadlessTests.csproj --configuration Release --logger trx --results-directory TestResults
+      - name: Preserve test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: headless-test-results
+          path: TestResults/*.trx
+          if-no-files-found: warn

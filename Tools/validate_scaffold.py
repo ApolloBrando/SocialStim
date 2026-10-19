@@ -180,7 +180,8 @@ def validate() -> list[str]:
     for path in files:
         relative = path.relative_to(ROOT)
         require(not any(part in {".idea", ".vs", ".vscode"} for part in relative.parts), f"IDE state present: {relative}")
-        require(path.suffix.lower() not in {".sln", ".slnx", ".csproj", ".user", ".pem", ".key", ".pfx", ".p12", ".keystore", ".jks"}, f"Generated/credential file: {relative}")
+        require(path.suffix.lower() not in {".sln", ".slnx", ".user", ".pem", ".key", ".pfx", ".p12", ".keystore", ".jks"}
+            and (path.suffix.lower() != ".csproj" or relative.as_posix() == "Tools/HeadlessTests/SocialStim.HeadlessTests.csproj"), f"Generated/credential file: {relative}")
         require(not (path.name == ".env" or path.name.startswith(".env.") and path.name != ".env.example"), f"Environment credentials file: {relative}")
         if path.suffix in {".md", ".json", ".asmdef", ".meta", ".txt", ".asset", ".py"} or path.name in {".editorconfig", ".gitattributes", ".gitignore"}:
             data = path.read_bytes()
