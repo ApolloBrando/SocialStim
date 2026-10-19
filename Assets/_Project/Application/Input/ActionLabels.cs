@@ -1,5 +1,6 @@
 using SocialStim.Rules.Dialogue;
 using SocialStim.Rules.Roles;
+using SocialStim.Rules.Phases;
 
 namespace SocialStim.Application.Input
 {
@@ -21,6 +22,22 @@ namespace SocialStim.Application.Input
                 case SpeechIntent.LastWords: return "Last words";
                 case SpeechIntent.VoteJustification: return "Explain a vote";
                 default: return intent.ToString();
+            }
+        }
+        public static string Phase(GamePhase phase)
+        {
+            switch (phase)
+            {
+                case GamePhase.Discussion: return "Discussion";
+                case GamePhase.Nomination: return "Nominations";
+                case GamePhase.Defense: return "Defense";
+                case GamePhase.Judgement: return "Judgement";
+                case GamePhase.LastWords: return "Last words";
+                case GamePhase.Execution: return "Execution";
+                case GamePhase.NightSelection:
+                case GamePhase.NightResolution: return "Night";
+                case GamePhase.Dawn: return "Morning";
+                default: return "Run complete";
             }
         }
         public static string Ability(AbilityKind ability)

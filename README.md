@@ -8,8 +8,8 @@ Inspired by Town of Salem, Gnosia and Slaughter Horse 2.
 Milestones 01, 02 and 05 are merged. This branch adds milestone 03: eleven
 role definitions, an authored nine-participant setup with repeatable Citizens,
 advanced night interactions and outcomes, morning reporting, grouped choices,
-and the owner's playtest UI changes. Save/resume is reviewed separately in
-the stacked milestone 04 branch.
+and the owner's playtest UI changes. Runs are intended to be completed in one sitting;
+ongoing-run save/resume has been dropped.
 
 Dialogue is authored data marked PLACEHOLDER; no runtime generative AI is used.
 The player belongs to the cast and follows the same command legality as NPCs.
@@ -20,7 +20,7 @@ cards, grouped choices, labelled role claims and an unverified claim board keep
 the interface readable. Text reveals at 28 graphemes/second by default with
 stable speaker speeds and varied reading pauses. Choices wait for the player's
 turn. Skip, instant text, reduced motion, flashes, and intensity are available.
-Settings on this branch last for the current application session.
+Text speed and accessibility preferences persist between sessions; run state does not.
 
 New shared compilation and behavioral checks are pending in CI. Unity import,
 adapter compilation, actual rendering/input, and player builds remain a
@@ -152,3 +152,19 @@ Participants also have individual framed uGUI cards. Public status and cast
 updates wait for pending dialogue to finish, so upcoming deaths or reveals
 are not exposed ahead of their lines. The editor content validator checks that
 every selectable role fits the authored setup.
+
+## Cozy UI and one-sitting runs
+
+Ongoing-run save/resume has been cancelled. Draft PR #6 is closed; this branch
+contains no snapshot files, run slots, save/load toolbar, or continuation APIs.
+New run always starts fresh. Only UI preferences (speed, instant text, effects,
+reduced motion, flash and intensity) persist through Unity PlayerPrefs.
+
+The native uGUI interface now uses rounded paper-like panels, quiet warm frames,
+subtle shadows, a slate night palette, a sage focus tint, a clear title, compact
+participant cards, and smaller action descriptions. Daylight warmth and role
+claim emphasis remain. Surfaces are cached native UI geometry, with no added
+art/font/package download. Full HD rendering still requires Unity verification.
+
+Role setup is grouped by faction, and the footer keeps advanced display
+controls behind Display options. Skip, speed and keyboard focus remain visible.

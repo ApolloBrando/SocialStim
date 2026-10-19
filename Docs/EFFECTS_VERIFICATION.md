@@ -44,7 +44,7 @@ branch from the owner's main-branch test; do not overwrite that checkout.
 - [ ] Record exact editor version, results, profiler captures and any reproduction
   steps in the draft PR before calling the effects slice Unity-verified.
 
-## Additional playtest gates (03/04)
+## Additional playtest gates (03)
 
 - Confirm light warm day/dark night, progressive warmth during speech/trials,
   contrasting labels and static frames with effects on/off.
@@ -54,5 +54,9 @@ branch from the owner's main-branch test; do not overwrite that checkout.
   action-family, Back and page navigation without spending a turn.
 - Verify yield opening, death reaction, claimant morning reports, and the
   player's recorded-night-action report.
-- On 04, verify persistent speed/accessibility and Save/Load input-boundary
-  controls, resumed history, failed-load preservation and backup recovery.
+- Verify persistent speed/accessibility preferences after restarting Play mode.
+  New run must always start fresh; there must be no run save/load controls.
+
+- Inspect rounded surfaces, soft frames, action title/description hierarchy,
+  hover/keyboard focus and the slate night palette at Full HD. Check all text
+  against both normal and focused button colours; the focus marker remains text.

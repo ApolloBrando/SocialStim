@@ -12,6 +12,7 @@ namespace SocialStim.Presentation.Text
     {
         private TextMeshProUGUI _label;
         private Image _surface;
+        private bool _self;
         public CharacterId Id { get; private set; }
 
         public void Initialize(CharacterId id, TMP_FontAsset font)
@@ -27,6 +28,7 @@ namespace SocialStim.Presentation.Text
 
         public void Render(KnownCharacter participant, bool self, TextPalette palette)
         {
+            _self = self;
             _label.text = participant.Name + (self ? " (you)" : "")
                 + "\n" + (!participant.Alive ? "DEAD" : participant.IsTeammate ? "TEAMMATE" : "ALIVE");
             Theme(palette);
@@ -34,7 +36,8 @@ namespace SocialStim.Presentation.Text
 
         public void Theme(TextPalette palette)
         {
-            _surface.color = palette.Background;
+            _surface.color = _self ? palette.FocusBackground : palette.Panel;
+            GetComponent<Outline>().effectColor = palette.Frame;
             _label.color = palette.Foreground;
         }
     }

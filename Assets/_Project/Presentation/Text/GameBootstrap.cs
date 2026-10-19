@@ -41,8 +41,9 @@ namespace SocialStim.Presentation.Text
                 var events = new GameObject("Event System", typeof(EventSystem), typeof(InputSystemUIInputModule));
                 events.transform.SetParent(transform, false);
                 _view = gameObject.AddComponent<TextGameView>();
-                _view.Initialize(font, _effects != null ? _effects.Load() : null);
+                _view.Initialize(font, _effects != null ? _effects.Load() : null, UiPreferences.Load());
                 _view.RestartRequested += ShowSetup;
+                _view.SettingsChanged += SavePreferences;
                 ShowSetup();
             }
             catch (Exception exception) { Debug.LogException(exception, this); }
@@ -69,10 +70,20 @@ namespace SocialStim.Presentation.Text
             { _view.ShowInputError("Invalid setup: " + e.Message); }
         }
 
+        private void SavePreferences(SocialStim.Application.PresentationCues.EffectsSettings settings)
+        {
+            try { UiPreferences.Store(settings); }
+            catch (PlayerPrefsException exception) { _view.ShowInputError("Preferences could not be kept: " + exception.Message); }
+        }
+
         private void OnDestroy()
         {
             _presenter?.Dispose();
-            if (_view != null) _view.RestartRequested -= ShowSetup;
+            if (_view != null)
+            {
+                _view.RestartRequested -= ShowSetup;
+                _view.SettingsChanged -= SavePreferences;
+            }
         }
     }
 }

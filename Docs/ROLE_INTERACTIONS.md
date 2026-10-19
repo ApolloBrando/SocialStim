@@ -83,3 +83,10 @@ morning claims and reports, confirm palette transitions, inspect frames at
 Full HD, browse Back/pages with keyboard and mouse, and ensure choices stay
 hidden through typewriter and pause. Check Skip, instant text, effects off,
 restart, death, and end screens. No Windows build is claimed.
+
+## Latest presentation direction
+
+The UI is cozy and clean: warm paper-like day surfaces, slate night surfaces,
+rounded panels/cards, soft frames, restrained shadows and sage focus. Ongoing
+runs are played in one sitting and never saved; only presentation preferences
+persist. The save/resume draft is withdrawn.

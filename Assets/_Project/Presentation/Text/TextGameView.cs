@@ -22,6 +22,10 @@ namespace SocialStim.Presentation.Text
     {
         private TMP_FontAsset _font;
         private TextMeshProUGUI _status;
+        private TextMeshProUGUI _choiceHeading;
+        private TextMeshProUGUI _conversationHeading;
+        private bool _displayOptionsOpen;
+        private Image _canvasSurface;
         private TextMeshProUGUI _transcript;
         private RectTransform _choices;
         private ScrollRect _transcriptScroll;
@@ -51,6 +55,7 @@ namespace SocialStim.Presentation.Text
         private string _menuCategory;
         private string _menuFamily;
         private int _menuPage;
+        private int _choicesReadyFrame = -1;
         private int _displayDay = 1;
         private int _daySpeeches;
         private RectTransform _castPanel;
@@ -58,10 +63,12 @@ namespace SocialStim.Presentation.Text
         private readonly Dictionary<CharacterId, ParticipantCard> _cards = new Dictionary<CharacterId, ParticipantCard>();
         public event Action<string> OptionChosen;
         public event Action RestartRequested;
+        public event Action<EffectsSettings> SettingsChanged;
         public bool IsDisplaying => _playback.Busy || _request != null && _next < _request.View.Transcript.Count;
 
-        public void Initialize(TMP_FontAsset font, IReadOnlyDictionary<PresentationCue, EffectProfile> profiles = null)
+        public void Initialize(TMP_FontAsset font, IReadOnlyDictionary<PresentationCue, EffectProfile> profiles = null, EffectsSettings initialSettings = null)
         {
+            _settings = initialSettings ?? new EffectsSettings();
             _font = font; _profiles = profiles ?? DefaultCueProfiles.Create();
             _onAcknowledged = acknowledgement =>
             {
@@ -91,44 +98,64 @@ namespace SocialStim.Presentation.Text
             var scaler = canvas.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1280, 800); scaler.matchWidthOrHeight = 0.5f;
-            _surfaces.Add(canvas.AddComponent<Image>());
-            _status = TextUiFactory.Text("Status", canvas.transform, font, 17); _labels.Add(_status);
+            _canvasSurface = canvas.AddComponent<Image>();
+            var title = TextUiFactory.Text("Title", canvas.transform, font, 30); title.text = "SocialStim";
+            title.fontStyle = FontStyles.Bold; title.characterSpacing = 1.2f; _labels.Add(title);
+            TextUiFactory.Fill(title.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(32, -61), new Vector2(-200, -20));
+            _status = TextUiFactory.Text("Status", canvas.transform, font, 15); _labels.Add(_status);
             _castPanel = TextUiFactory.Rect("Participants", canvas.transform);
-            TextUiFactory.Fill(_castPanel, new Vector2(0, 1), Vector2.one, new Vector2(20, -116), new Vector2(-20, -74));
+            TextUiFactory.Fill(_castPanel, new Vector2(0, 1), Vector2.one, new Vector2(32, -163), new Vector2(-32, -113));
             var castLayout = _castPanel.gameObject.AddComponent<HorizontalLayoutGroup>();
-            castLayout.spacing = 5; castLayout.childControlWidth = true; castLayout.childControlHeight = true; castLayout.childForceExpandWidth = true;
+            castLayout.spacing = 8; castLayout.childControlWidth = true; castLayout.childControlHeight = true; castLayout.childForceExpandWidth = true;
             _castPanel.gameObject.SetActive(false);
             _claimSummary = TextUiFactory.Text("Role Claims Board", canvas.transform, font, 16); _labels.Add(_claimSummary);
-            TextUiFactory.Fill(_claimSummary.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(20, -170), new Vector2(-20, -122));
-            TextUiFactory.Fill(_status.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(20, -70), new Vector2(-150, -12));
+            TextUiFactory.Fill(_claimSummary.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(36, -218), new Vector2(-36, -178));
+            TextUiFactory.Fill(_status.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(34, -104), new Vector2(-34, -66));
             Button restart = TextUiFactory.Button(canvas.transform, font, "New run", 42);
             _controls.Add(restart);
-            TextUiFactory.Fill((RectTransform)restart.transform, Vector2.one, Vector2.one, new Vector2(-140, -55), new Vector2(-20, -12));
+            TextUiFactory.Fill((RectTransform)restart.transform, Vector2.one, Vector2.one, new Vector2(-158, -62), new Vector2(-32, -22));
             restart.onClick.AddListener(() => RestartRequested?.Invoke());
             _transcriptScroll = TextUiFactory.Scroll("Transcript", canvas.transform, out RectTransform transcriptContent);
             _surfaces.Add(_transcriptScroll.GetComponent<Image>());
-            TextUiFactory.Fill((RectTransform)_transcriptScroll.transform, Vector2.zero, new Vector2(0.64f, 1), new Vector2(20, 68), new Vector2(-8, -178));
+            TextUiFactory.Fill((RectTransform)_transcriptScroll.transform, Vector2.zero, new Vector2(0.64f, 1), new Vector2(32, 82), new Vector2(-10, -230));
+            var conversationHeading = TextUiFactory.Text("Conversation Heading", _transcriptScroll.transform, font, 13);
+            _conversationHeading = conversationHeading;
+            conversationHeading.text = "CONVERSATION"; conversationHeading.fontStyle = FontStyles.Bold; conversationHeading.characterSpacing = 1;
+            _labels.Add(conversationHeading);
+            TextUiFactory.Fill(conversationHeading.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(22, -36), new Vector2(-22, -16));
             _transcript = TextUiFactory.Text("Transcript Text", transcriptContent, font, 19);
+            _transcript.lineSpacing = 4;
             var transcriptLayout = transcriptContent.gameObject.AddComponent<VerticalLayoutGroup>();
             transcriptLayout.childControlHeight = true; transcriptLayout.childControlWidth = true; transcriptLayout.childForceExpandHeight = false;
             transcriptContent.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             _textEffects = gameObject.AddComponent<TextEffectRenderer>(); _textEffects.Initialize(_transcript);
+            _textEffects.SetSemanticColors(_settings.Enabled);
             _choiceScroll = TextUiFactory.Scroll("Choices", canvas.transform, out _choices);
             _surfaces.Add(_choiceScroll.GetComponent<Image>());
-            TextUiFactory.Fill((RectTransform)_choiceScroll.transform, new Vector2(0.64f, 0), Vector2.one, new Vector2(8, 68), new Vector2(-20, -178));
+            TextUiFactory.Fill((RectTransform)_choiceScroll.transform, new Vector2(0.64f, 0), Vector2.one, new Vector2(10, 82), new Vector2(-32, -230));
+            var choiceHeading = TextUiFactory.Text("Choice Heading", _choiceScroll.transform, font, 13);
+            _choiceHeading = choiceHeading;
+            choiceHeading.text = "YOUR TURN"; choiceHeading.fontStyle = FontStyles.Bold; choiceHeading.characterSpacing = 1;
+            _labels.Add(choiceHeading);
+            TextUiFactory.Fill(choiceHeading.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(22, -36), new Vector2(-22, -16));
             var choicesLayout = _choices.gameObject.AddComponent<VerticalLayoutGroup>();
-            choicesLayout.spacing = 8; choicesLayout.childControlWidth = true; choicesLayout.childControlHeight = true; choicesLayout.childForceExpandHeight = false;
+            choicesLayout.spacing = 10; choicesLayout.childControlWidth = true; choicesLayout.childControlHeight = true; choicesLayout.childForceExpandHeight = false;
             _choices.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             RectTransform footer = TextUiFactory.Rect("Accessibility", canvas.transform);
-            TextUiFactory.Fill(footer, Vector2.zero, new Vector2(1, 0), new Vector2(20, 14), new Vector2(-20, 52));
+            TextUiFactory.Fill(footer, Vector2.zero, new Vector2(1, 0), new Vector2(32, 20), new Vector2(-32, 60));
             var footerLayout = footer.gameObject.AddComponent<HorizontalLayoutGroup>();
-            footerLayout.spacing = 6; footerLayout.childControlWidth = true; footerLayout.childControlHeight = true; footerLayout.childForceExpandWidth = true;
+            footerLayout.spacing = 6; footerLayout.childControlWidth = true; footerLayout.childControlHeight = true; footerLayout.childForceExpandWidth = false;
             _skip = Control(footer, "Skip [Space]", SkipAll);
             Control(footer, "Effects: on", () => ChangeSettings(enabled: !_settings.Enabled));
             Control(footer, "Motion: reduced", () => ChangeSettings(reduced: !_settings.ReducedMotion));
             Control(footer, "Flash: off", () => ChangeSettings(flashes: !_settings.Flashes));
             Control(footer, "Text: animated", () => ChangeSettings(instant: !_settings.InstantText));
             Control(footer, "Intensity: 50%", () => ChangeSettings(intensity: _settings.Intensity >= 1 ? 0 : _settings.Intensity + 0.5f));
+            Control(footer, "Speed: " + _settings.ElementsPerSecond.ToString("0"), () =>
+                ChangeSettings(speed: _settings.ElementsPerSecond < 25 ? 28 : _settings.ElementsPerSecond < 35 ? 40 : 18));
+            Control(footer, "Display options", ToggleDisplayOptions);
+            for (int i = 2; i <= 6; i++) _controls[i].gameObject.SetActive(false);
+            RefreshSettingLabels();
             RectTransform overlay = TextUiFactory.Rect("Effects Overlay", canvas.transform);
             TextUiFactory.Fill(overlay, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             _screenEffects = overlay.gameObject.AddComponent<ScreenEffectOverlay>(); _screenEffects.raycastTarget = false;
@@ -139,18 +166,18 @@ namespace SocialStim.Presentation.Text
         {
             ResetDisplay(); ClearChoices(); ApplyPalette(false);
             _roleNames.Clear(); foreach (RoleSpec role in roles) _roleNames.Add(role.Id, role.Name);
-            _status.text = "SocialStim | New run | " + seedDescription;
-            _transcript.text = "You belong to the cast. Speak, claim, lie, nominate, judge, and choose a night action.\n\n"
-                + "Dialogue is marked PLACEHOLDER. Choose a role or random assignment.\n\n"
-                + "Day: warm light background. Night: dark background.\n\n"
-                + "Scroll either panel. Arrow keys and Enter select choices; > marks focus. "
-                + "Space or Skip reveals pending text. Accessibility controls apply immediately. A dead player may spectate.";
-            AddButton("Random role", "Generate a fresh cast and role assignment.", () => start(null));
-            foreach (RoleSpec role in roles)
-            {
-                RoleId id = role.Id;
-                AddButton("Play " + role.Name, role.Faction + " | Night: " + ActionLabels.Ability(role.Ability), () => start(id));
-            }
+            _status.text = "A new run · " + seedDescription;
+            _conversationHeading.text = "SETTLE IN";
+            _claimSummary.gameObject.SetActive(false);
+            TextUiFactory.Fill((RectTransform)_transcriptScroll.transform, Vector2.zero, new Vector2(0.64f, 1), new Vector2(32, 82), new Vector2(-10, -130));
+            TextUiFactory.Fill((RectTransform)_choiceScroll.transform, new Vector2(0.64f, 0), Vector2.one, new Vector2(10, 82), new Vector2(-32, -130));
+            _transcript.text = "Choose a role and settle in.\n\n"
+                + "Take the opening, listen to the group, and decide who to trust. Each run is played in one sitting.\n\n"
+                + "Dialogue is marked PLACEHOLDER while the prototype grows.\n\n"
+                + "Use the arrow keys and Enter, or choose with the mouse. Space reveals pending lines. "
+                + "Display options adjust pacing and effects. A dead player may continue spectating.";
+            _choiceHeading.text = "START A RUN";
+            ShowRoleGroups(roles, start, null);
             _textEffects.SetDocument(SemanticText.Literal(_transcript.text), 0, _palette);
             _textEffects.Apply(int.MaxValue, default, 0);
             _transcriptScroll.verticalNormalizedPosition = 1;
@@ -158,11 +185,44 @@ namespace SocialStim.Presentation.Text
             FocusFirstChoice();
         }
 
+        private void ShowRoleGroups(IReadOnlyList<RoleSpec> roles, Action<RoleId?> start, Faction? faction)
+        {
+            ClearChoices();
+            if (!faction.HasValue)
+            {
+                AddButton("Random role", "Meet a fresh cast with an unpredictable assignment.", () => start(null));
+                foreach (var group in roles.GroupBy(role => role.Faction))
+                {
+                    Faction side = group.Key;
+                    string description = side == Faction.Town ? "Work with the town to uncover the threats."
+                        : side == Faction.Antagonist ? "Keep your team hidden and mislead the town." : "Pursue your own objective.";
+                    AddButton(side + " roles", description, () => ShowRoleGroups(roles, start, side));
+                }
+            }
+            else
+            {
+                AddButton("Back", "Return to all factions.", () => ShowRoleGroups(roles, start, null));
+                foreach (RoleSpec role in roles.Where(role => role.Faction == faction.Value).OrderBy(role => role.Name, StringComparer.Ordinal))
+                {
+                    RoleId id = role.Id;
+                    AddButton(role.Name, ActionLabels.Ability(role.Ability)
+                        + (role.Charges > 0 ? " · " + role.Charges + " uses" : ""), () => start(id));
+                }
+            }
+            _choiceScroll.verticalNormalizedPosition = 1;
+            FocusFirstChoice();
+        }
+
         public void Render(PlayerInputRequest request)
         {
             _request = request;
+            _choiceHeading.text = "YOUR TURN";
+            _conversationHeading.text = "CONVERSATION";
+            _claimSummary.gameObject.SetActive(true);
+            TextUiFactory.Fill((RectTransform)_transcriptScroll.transform, Vector2.zero, new Vector2(0.64f, 1), new Vector2(32, 82), new Vector2(-10, -230));
+            TextUiFactory.Fill((RectTransform)_choiceScroll.transform, new Vector2(0.64f, 0), Vector2.one, new Vector2(10, 82), new Vector2(-32, -230));
             var view = request.View;
-            _pendingStatus = $"Day {view.Day} | {view.Phase} | {view.OwnRole.Name} ({view.OwnRole.Faction}) | {(view.Alive ? "Alive" : "Spectator")}"
+            _pendingStatus = $"Day {view.Day} · {ActionLabels.Phase(view.Phase)} · {view.OwnRole.Name} ({view.OwnRole.Faction}) | {(view.Alive ? "Alive" : "Spectator")}"
                 + $" | Uses: {(view.Charges < 0 ? "unlimited" : view.Charges.ToString())}\nSeed {view.Seed} | Trials {view.TrialsUsed}/{view.TrialsAllowed}";
             ClearChoices();
             _menuCategory = null; _menuFamily = null; _menuPage = 0;
@@ -239,18 +299,31 @@ namespace SocialStim.Presentation.Text
             if (_choiceScroll != null) _choiceScroll.gameObject.SetActive(true);
             if (_screenEffects != null) _screenEffects.Apply(default, _palette);
         }
-        private void ChangeSettings(bool? enabled = null, bool? reduced = null, bool? flashes = null, bool? instant = null, float? intensity = null)
+        private void ChangeSettings(bool? enabled = null, bool? reduced = null, bool? flashes = null, bool? instant = null, float? intensity = null, float? speed = null)
         {
             _settings = new EffectsSettings(enabled ?? _settings.Enabled, reduced ?? _settings.ReducedMotion,
-                flashes ?? _settings.Flashes, intensity ?? _settings.Intensity, instant ?? _settings.InstantText);
+                flashes ?? _settings.Flashes, intensity ?? _settings.Intensity, instant ?? _settings.InstantText, speed ?? _settings.ElementsPerSecond);
             _textEffects.SetSemanticColors(_settings.Enabled);
             SkipAll();
+            SettingsChanged?.Invoke(_settings);
+            RefreshSettingLabels();
+        }
+        private void RefreshSettingLabels()
+        {
             SetControl(2, "Effects: " + (_settings.Enabled ? "on" : "off"));
             SetControl(3, "Motion: " + (_settings.ReducedMotion ? "reduced" : "full"));
             SetControl(4, "Flash: " + (_settings.Flashes ? "on" : "off"));
             SetControl(5, "Text: " + (_settings.InstantText ? "instant" : "animated"));
             SetControl(6, "Intensity: " + (_settings.Intensity * 100).ToString("0") + "%");
+            SetControl(7, "Speed: " + _settings.ElementsPerSecond.ToString("0"));
         }
+        private void ToggleDisplayOptions()
+        {
+            _displayOptionsOpen = !_displayOptionsOpen;
+            for (int i = 2; i <= 6; i++) _controls[i].gameObject.SetActive(_displayOptionsOpen);
+            SetControl(8, _displayOptionsOpen ? "Hide options" : "Display options");
+        }
+
         private void SetControl(int index, string text) => _controls[index].GetComponent<ChoiceFocusIndicator>().SetText(text);
         private Button Control(Transform parent, string label, Action selected)
         {
@@ -260,7 +333,13 @@ namespace SocialStim.Presentation.Text
         private void ApplyPalette(bool night, float progress = 0)
         {
             _palette = new TextPalette(night, progress);
-            foreach (Image surface in _surfaces) surface.color = _palette.Background;
+            if (_canvasSurface != null) _canvasSurface.color = _palette.Background;
+            foreach (Image surface in _surfaces)
+            {
+                surface.color = _palette.Panel;
+                var outline = surface.GetComponent<Outline>();
+                if (outline != null) outline.effectColor = _palette.Frame;
+            }
             foreach (TextMeshProUGUI label in _labels) label.color = _palette.Foreground;
             foreach (Button button in _controls) ThemeButton(button);
             foreach (Button button in _buttons) ThemeButton(button);
@@ -269,7 +348,12 @@ namespace SocialStim.Presentation.Text
             if (_textEffects != null) _textEffects.SetPalette(_palette);
         }
         private void ThemeButton(Button button)
-        { button.GetComponent<Image>().color = _palette.Background; button.GetComponentInChildren<TextMeshProUGUI>().color = _palette.Foreground; }
+        {
+            button.GetComponent<ChoiceFocusIndicator>().SetSurfaceColors(_palette.ButtonBackground, _palette.FocusBackground);
+            button.GetComponent<Outline>().effectColor = _palette.Frame;
+            foreach (var label in button.GetComponentsInChildren<TextMeshProUGUI>(true))
+                label.color = label.name == "Detail" ? _palette.Muted : _palette.Foreground;
+        }
         private void AddButton(string label, string detail, Action selected)
         {
             Button button = TextUiFactory.Button(_choices, _font, label + "\n" + detail, 88);
@@ -306,6 +390,8 @@ namespace SocialStim.Presentation.Text
         }
         private void BuildMenu()
         {
+            // A skip/submit event must not choose a newly revealed option in the same frame.
+            _choicesReadyFrame = Time.frameCount;
             ClearChoices();
             var options = _request.Options.AsEnumerable();
             if (_menuCategory != null) options = options.Where(o => o.Category == _menuCategory);
@@ -335,7 +421,7 @@ namespace SocialStim.Presentation.Text
                 foreach (PlayerOption option in options)
                 {
                     string id = option.Id;
-                    entries.Add(Tuple.Create(option.Label, option.Interpretation, (Action)(() => { if (!IsDisplaying) OptionChosen?.Invoke(id); })));
+                    entries.Add(Tuple.Create(option.Label, option.Interpretation, (Action)(() => { if (!IsDisplaying && Time.frameCount > _choicesReadyFrame) OptionChosen?.Invoke(id); })));
                 }
             if (_menuCategory != null)
                 AddButton("Back", "Return without spending your turn.", () => {

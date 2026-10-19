@@ -3,8 +3,7 @@
 Presentation retains Screen Space - Overlay uGUI/TMP and the milestone 05
 effect contracts, extended by milestone 03's playtest changes below. No camera,
 URP, shader, post-processing, runtime generation service, or new package is
-needed. Milestone 04's save adapter restores completed history without advancing
-gameplay streams; see SAVE_RESUME.md.
+needed. Ongoing-run save/resume has been dropped. Only presentation preferences persist.
 
 ## Display and input contract
 
@@ -27,18 +26,19 @@ reused data. TMP layout/font atlas rebuilds and first-capacity growth are separa
 allocation boundaries. A headless allocation test covers the portable clock;
 Unity profiler validation after warm-up remains required.
 
-## Minimal palettes and controls
+## Cozy palettes and controls
 
-Day is soft white on near-black. Night is near-black on warm soft white. Setup
-uses day. The palette changes at the visible NightFalls/DawnBreaks observation,
-not from hidden night decisions. Panels and buttons share the phase background;
-focus uses `>` and follows keyboard selection into the scroll viewport.
+Day uses dark text on warm paper-like panels; night uses light text on slate
+panels. Visible delivered speech and trial progress warm the day background
+toward soft red. Hidden selections do not drive the palette. Rounded surfaces,
+subtle frames and shadows remain when effects are off. Focus uses both a sage
+tint and the textual > marker.
 
-The footer offers Skip [Space], Effects on/off, Motion reduced/full, Flash off/on,
-Text animated/instant, and Intensity 0/50/100%. Changes finish the pending batch
-before applying the next display policy. Settings survive New run in the current
-application session, with no disk persistence. Defaults are 50% intensity,
-reduced motion, flashes off, and 60 text elements/second.
+The footer normally shows Skip, Speed and Display options. The options toggle
+reveals effects, motion, flashes, instant text and intensity controls. Defaults
+are reduced motion, flashes off, 50% intensity and 28 text elements/second.
+Presentation preferences persist with PlayerPrefs; no run state is written.
+Changing a display policy finishes the pending batch first.
 
 Reduced motion suppresses shake and flash; gentle alpha cues remain. Effects off
 reveals text immediately, disables semantic accents, and clears every channel.
@@ -158,3 +158,7 @@ typing/reading holds while enabled cue effects retain their own duration.
 Role claims receive a ROLE CLAIM label, Evidence styling and an unverified
 claim board. Participant cards are ordinary uGUI objects. Choices and public
 status/cast updates wait for display completion.
+
+The cozy UI uses rounded native surfaces, soft frames/shadows, warm daylight,
+a slate night palette and a sage focus tint. Text speed and accessibility
+preferences persist independently of runs; there is no game save/load UI.
