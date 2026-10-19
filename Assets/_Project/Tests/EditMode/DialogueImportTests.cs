@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.IO;
 using NUnit.Framework;
 using SocialStim.Data.Dialogue;
 using SocialStim.Rules.Dialogue;
@@ -29,6 +30,22 @@ namespace SocialStim.Tests.EditMode
             Assert.Throws<ArgumentException>(() => DialogueDocument.Parse(Document().Replace("\"schemaVersion\":1", "\"schemaVersion\":2")));
             Assert.Throws<ArgumentException>(() => DialogueDocument.Parse("{\"schemaVersion\":1}"));
             Assert.Throws<ArgumentException>(() => DialogueDocument.Parse(Document(",{\"id\":\"bad\",\"intent\":\"omniscience\",\"text\":\"x\",\"weight\":1}")));
+            Assert.Throws<ArgumentException>(() => DialogueDocument.Parse(Document().Replace("\"schemaVersion\":1", "\"schemaVersion\":1,\"schemaVersion\":1")));
+            Assert.Throws<ArgumentException>(() => DialogueDocument.Parse(Document().Replace("\"weight\":1", "\"weight\":1,\"conditions\":[]")));
+        }
+
+        /// <summary>The actual committed starter content uses the same importer as the game.</summary>
+        [Test]
+        public void CommittedStarterDialogueLoads()
+        {
+#if UNITY_EDITOR
+            string path = Path.Combine(UnityEngine.Application.dataPath, "_Project/Data/Dialogue/StarterDialogue.json");
+#else
+            string path = Path.Combine(TestContext.CurrentContext.TestDirectory, "StarterDialogue.json");
+#endif
+            var lines = DialogueDocument.Parse(File.ReadAllText(path));
+            Assert.That(lines.Count, Is.EqualTo(45));
+            Assert.That(lines.All(line => line.Text.StartsWith("PLACEHOLDER:", StringComparison.Ordinal)), Is.True);
         }
     }
 }

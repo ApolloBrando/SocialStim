@@ -21,6 +21,7 @@ namespace SocialStim.Data.Dialogue
         public static IReadOnlyList<DialogueLine> Parse(string json)
         {
             if (string.IsNullOrWhiteSpace(json)) throw new ArgumentException("Dialogue JSON is empty.");
+            DialogueSchema.Validate(json);
             DialogueDocument document;
             try
             {
