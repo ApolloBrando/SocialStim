@@ -74,7 +74,7 @@ namespace SocialStim.Application.Sessions
                 case GamePhase.NightSelection:
                     add("Pass tonight", "Preserves limited resources and makes no visit.", GameCommand.Night(null));
                     foreach (var target in view.Characters.Where(c => view.LegalNightTargets.Contains(c.Id)))
-                        add($"{view.OwnRole.Ability}: {target.Name}", "Your selection is private. Blocks resolve before protection, attacks, and investigation.", GameCommand.Night(target.Id));
+                        add($"{ActionLabels.Ability(view.OwnRole.Ability)}: {target.Name}", "Your selection is private. Blocks resolve before protection, attacks, and investigation.", GameCommand.Night(target.Id));
                     break;
                 case GamePhase.Dawn: add("Begin discussion", "Review the public deaths and your private results first.", GameCommand.Continue()); break;
             }

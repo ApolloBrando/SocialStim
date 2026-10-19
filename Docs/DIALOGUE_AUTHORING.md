@@ -1,6 +1,6 @@
 # Dialogue authoring specification
 
-Status: milestone 02 supports version 2 below with 51 explicitly
+Status: milestone 03 supports version 2 below with 54 explicitly
 marked placeholder lines. Version 1 still loads without conditions. There is a runtime loader, schema validator and editor
 validation command. All final lines are written by the project owner; no runtime
 generative AI is permitted. Conditions are registered data predicates, never code.
@@ -168,3 +168,18 @@ less-than sign. Raw TMP/HTML tags are rejected. Rules and dialogue selection
 continue treating the text as opaque; markup never changes evidence or intent.
 The editor content validator checks syntax, and runtime has a literal fallback
 for malformed display text. See `Docs/EFFECTS.md` for the complete cheat sheet.
+
+## Recorded night-action reports
+
+Milestone 03 adds ReportAction alongside ReportInvestigation. ReportAction is
+available from Day 2 and substitutes the attributed report into {result}. A
+recorded pass has no target; a targeted action may refer to self or someone who
+died. hasTarget true/false conditions both work for this intent, and hasAssertion
+is true. Keep an unrestricted fallback. The committed catalog now has 54
+placeholder lines.
+
+The player chooses the automatic report through Report last night's action.
+This discloses their own recorded selection and legitimately received results.
+Morning role claimants speak before the next player opening; false claimants
+may fabricate from their public claimed role. Presentation labels and the
+unverified claim board do not certify an assertion as true.

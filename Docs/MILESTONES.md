@@ -1,7 +1,8 @@
 # Milestones
 
 Keep each milestone in its own branch and review scope. The owner explicitly
-authorized 02 and then 05 in parallel with main testing, deferring 03/04. Milestone 00 contains no gameplay.
+authorized 03 and 04 after merging 02 and 05, with the playtest changes described
+in ROLE_INTERACTIONS.md. Milestone 00 contains no gameplay.
 Each PR, or specifically confirmed direct publication to `main`, updates README
 and ARCHITECTURE, lists actual checks and unavailable checks, and contains only
 its milestone's scope. Do not merge automatically.
