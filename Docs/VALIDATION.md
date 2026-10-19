@@ -5,8 +5,8 @@
 The owner reported CS1503 at DialogueAndKnowledgeTests.cs line 73 during actual
 Unity import: a CharacterId was passed to an assertion overload expecting string.
 The original .NET suite used NUnit 3.14.0 and missed this Unity API difference.
-Both collection assertions now use Has.No.Member. CI tests upstream NUnit 3.5.0
-as an older API baseline alongside 3.14.0; neither is a substitute for Unity's
+Both collection assertions now use Has.No.Member. CI compiles upstream NUnit 3.5.0
+on .NET Framework 4.7.2 as an older API baseline and runs 3.14.0 on .NET 8; neither is a substitute for Unity's
 custom integration. The project also validates that the new Input System is
 enabled before reporting starter content as ready. Editor compilation and
 scene checks remain pending until the owner reruns them after this fix.

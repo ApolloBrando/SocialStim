@@ -60,7 +60,7 @@ import code and runs shared NUnit behavioral tests, including 100 seeded runs
 across Town and antagonist play. This intentional headless `.csproj` is the sole
 exception to the exclusion of Unity-generated IDE project files.
 
-CI runs the shared suite against NUnit 3.5.0 and 3.14.0. The older API check
+CI compiles against NUnit 3.5.0 and runs the suite against 3.14.0. The older API check
 catches assertion overloads missing from Unity's NUnit integration; it does not
 replace compiling the actual Unity test assemblies in the editor.
 
