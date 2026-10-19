@@ -54,6 +54,7 @@ namespace SocialStim.Presentation.Text
             var layout = rect.gameObject.AddComponent<LayoutElement>(); layout.preferredHeight = height; layout.minHeight = height;
             var text = Text("Label", rect, font, 16); text.text = label;
             Fill(text.rectTransform, Vector2.zero, Vector2.one, new Vector2(10, 8), new Vector2(-10, -8));
+            rect.gameObject.AddComponent<ChoiceFocusIndicator>().Initialize(text, label);
             return button;
         }
     }

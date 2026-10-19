@@ -6,6 +6,7 @@ using SocialStim.Application.PresentationCues;
 using SocialStim.Rules.Roles;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace SocialStim.Presentation.Text
@@ -67,7 +68,7 @@ namespace SocialStim.Presentation.Text
                 + "Every spoken line in this engineering slice is marked PLACEHOLDER.\n\n"
                 + "Choose a role or accept random assignment. The seed is recorded in the transcript. "
                 + "A dead player may spectate but cannot act.\n\nScroll either panel with the mouse wheel. "
-                + "Tab and Enter navigate/select standard UI buttons. No text or screen effects are enabled.";
+                + "Arrow keys and Enter navigate/select UI buttons. A > marker shows keyboard focus. No text or screen effects are enabled.";
             AddButton("Random role", "Generate a fresh cast and role assignment.", () => start(null));
             foreach (RoleSpec role in roles)
             {
@@ -75,6 +76,7 @@ namespace SocialStim.Presentation.Text
                 AddButton("Play " + role.Name, role.Faction + " | Night: " + role.Ability, () => start(id));
             }
             _choiceScroll.verticalNormalizedPosition = 1;
+            FocusFirstChoice();
         }
 
         /// <inheritdoc />
@@ -96,6 +98,7 @@ namespace SocialStim.Presentation.Text
             Canvas.ForceUpdateCanvases();
             _transcriptScroll.verticalNormalizedPosition = 0;
             _choiceScroll.verticalNormalizedPosition = 1;
+            FocusFirstChoice();
         }
 
         /// <inheritdoc />
@@ -113,6 +116,13 @@ namespace SocialStim.Presentation.Text
             foreach (Button button in _buttons)
             { button.interactable = false; button.gameObject.SetActive(false); Destroy(button.gameObject); }
             _buttons.Clear();
+        }
+
+        private void FocusFirstChoice()
+        {
+            Canvas.ForceUpdateCanvases();
+            if (_buttons.Count > 0 && EventSystem.current != null)
+                EventSystem.current.SetSelectedGameObject(_buttons[0].gameObject);
         }
     }
 }
