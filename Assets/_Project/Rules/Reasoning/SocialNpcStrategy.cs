@@ -86,7 +86,7 @@ namespace SocialStim.Rules.Reasoning
         public Verdict Judge(KnowledgeView knowledge, CharacterId defendant, IRandomSource random)
         {
             KnownCharacter target = knowledge.Characters.First(c => c.Id == defendant);
-            if (target.IsTeammate) return Verdict.Innocent;
+            if (target.IsTeammate || knowledge.OwnRole.Faction == Faction.Town && ConfirmedTown(target)) return Verdict.Innocent;
             int threshold = 35 + (knowledge.Personality.HasFlag(Personality.Cautious) ? _settings.CautiousThreshold : 0);
             if (knowledge.Personality.HasFlag(Personality.Loyal) && target.Trust > 60) threshold += _settings.LoyaltyBonus;
             if (knowledge.OwnRole.Faction == Faction.Antagonist) threshold -= 15;
@@ -105,8 +105,8 @@ namespace SocialStim.Rules.Reasoning
             {
                 if (knowledge.OwnRole.Faction == Faction.Town)
                 {
-                    KnownCharacter suspect = targets.OrderByDescending(Threat).ThenBy(c => c.Id.Value).First();
-                    return Threat(suspect) >= 60 ? suspect.Id : (CharacterId?)null;
+                    KnownCharacter suspect = targets.Where(c => !ConfirmedTown(c)).OrderByDescending(Threat).ThenBy(c => c.Id.Value).FirstOrDefault();
+                    return suspect != null && Threat(suspect) >= 60 ? suspect.Id : (CharacterId?)null;
                 }
                 return targets.OrderByDescending(c => PublicThreat(knowledge, c)).ThenBy(c => c.Id.Value).First().Id;
             }
@@ -129,7 +129,10 @@ namespace SocialStim.Rules.Reasoning
         private static bool HasReported(KnowledgeView knowledge, CharacterId target) => knowledge.Evidence.Any(e =>
             e.Actor == knowledge.Self && e.Kind == EvidenceKind.InvestigationClaim && e.Target == target && e.Night == knowledge.Day - 1);
         private static int Threat(KnownCharacter character) => (character.Suspicion * 2 + (character.FactionEstimate?.Antagonist ?? character.Suspicion * 100) / 100) / 3;
-        private static KnownCharacter Suspect(KnowledgeView knowledge) => knowledge.Characters.Where(c => c.Alive && c.Id != knowledge.Self && !c.IsTeammate)
+        private static bool ConfirmedTown(KnownCharacter character) => character.RevealedFaction == Faction.Town
+            || character.FactionEstimate != null && character.FactionEstimate.Town == 10000;
+        private static KnownCharacter Suspect(KnowledgeView knowledge) => knowledge.Characters.Where(c => c.Alive && c.Id != knowledge.Self && !c.IsTeammate
+                && (knowledge.OwnRole.Faction != Faction.Town || !ConfirmedTown(c)))
             .OrderByDescending(Threat).ThenBy(c => c.Id.Value).FirstOrDefault();
     }
 }
