@@ -48,3 +48,13 @@ MonoBehaviour:
   - Tomas
   _reasoning: {fileID: 11400000, guid: ec26a8253ef0549098b5aaabe6d59b29, type: 2}
   _setup: {fileID: 11400000, guid: 3ec9ce8bb57b81392638f82b39b7c4cf, type: 2}
+  _missionRoles:
+  - {fileID: 11400000, guid: 912f37342bdb1309585bbd8d1b3185b3, type: 2}
+  - {fileID: 11400000, guid: f269bdffc2144741aa8f1e892447953d, type: 2}
+  - {fileID: 11400000, guid: e3d3f3ffc723cb17d77681e7ab33c00c, type: 2}
+  - {fileID: 11400000, guid: 3f56434ea1bb2a7b773d3efda3d61bde, type: 2}
+  - {fileID: 11400000, guid: a82b121c4551739f8975aefe623678cc, type: 2}
+  - {fileID: 11400000, guid: df39ffeadf38f2c46ffb6cbe30fcfe9b, type: 2}
+  - {fileID: 11400000, guid: 8f116a430488a26f857de858c0406f47, type: 2}
+  - {fileID: 11400000, guid: 352122e6429021ff4689abd406fa20aa, type: 2}
+  - {fileID: 11400000, guid: 8d742343ab735b17252e539eee43c0d4, type: 2}

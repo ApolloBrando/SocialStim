@@ -15,6 +15,7 @@ namespace SocialStim.Data.Definitions
     public sealed class GameCatalog : ScriptableObject
     {
         [SerializeField] private RoleDefinition[] _roles;
+        [SerializeField] private RoleDefinition[] _missionRoles;
         [SerializeField] private TextAsset _dialogue;
         [SerializeField] private string[] _names;
         [SerializeField] private ReasoningDefinition _reasoning;
@@ -28,6 +29,16 @@ namespace SocialStim.Data.Definitions
             if (_roles == null || _roles.Length == 0 || _roles.Any(r => r == null)) throw new InvalidOperationException("Catalog needs role assets.");
             var roles = _roles.Select(r => r.ToSpec()).ToList();
             if (roles.Select(r => r.Id).Distinct().Count() != roles.Count) throw new InvalidOperationException("Duplicate role ID in catalog.");
+            return roles.AsReadOnly();
+        }
+
+        /// <summary>Loads the modern role set; old catalogs retain their explicitly referenced definitions.</summary>
+        public IReadOnlyList<RoleSpec> LoadMissionRoles()
+        {
+            if (_missionRoles == null || _missionRoles.Length == 0) return LoadRoles();
+            if (_missionRoles.Any(r => r == null)) throw new InvalidOperationException("Mission role reference missing.");
+            var roles = _missionRoles.Select(r => r.ToSpec()).ToList();
+            if (roles.Select(r => r.Id).Distinct().Count() != roles.Count) throw new InvalidOperationException("Duplicate mission role ID.");
             return roles.AsReadOnly();
         }
 

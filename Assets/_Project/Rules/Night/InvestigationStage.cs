@@ -14,7 +14,7 @@ namespace SocialStim.Rules.Night
             {
                 if (!context.Executes(order) || context.Actor(order.Actor).Role.Ability != AbilityKind.Investigate) continue;
                 context.Reports.Add(new NightReport(order.Actor, ReportKind.Investigation,
-                    order.Target, context.Appearance[order.Target.Value]));
+                    order.Target, context.Policy.Mission ? (Faction?)null : context.Appearance[order.Target.Value], readout: context.Policy.Mission ? context.Readouts[order.Target.Value] : (Readout?)null));
             }
         }
     }

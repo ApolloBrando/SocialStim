@@ -12,6 +12,8 @@ namespace SocialStim.Rules.Night
             Deaths = context.Deaths.OrderBy(id => id.Value).ToList().AsReadOnly();
             SpentCharges = context.SpentCharges.OrderBy(id => id.Value).ToList().AsReadOnly();
             Visits = context.Visits.AsReadOnly(); Reports = context.Reports.AsReadOnly();
+            SelfHealsSpent = context.SelfHealsSpent.OrderBy(id => id.Value).ToList().AsReadOnly();
+            BacklashScheduled = context.BacklashScheduled.OrderBy(id => id.Value).ToList().AsReadOnly();
         }
         /// <summary>Simultaneous casualties.</summary>
         public IReadOnlyList<CharacterId> Deaths { get; }
@@ -21,5 +23,7 @@ namespace SocialStim.Rules.Night
         public IReadOnlyList<Visit> Visits { get; }
         /// <summary>Reports to route only to living recipients.</summary>
         public IReadOnlyList<NightReport> Reports { get; }
+        public IReadOnlyList<CharacterId> SelfHealsSpent { get; }
+        public IReadOnlyList<CharacterId> BacklashScheduled { get; }
     }
 }

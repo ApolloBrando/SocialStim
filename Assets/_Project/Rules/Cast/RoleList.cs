@@ -17,7 +17,7 @@ namespace SocialStim.Rules.Cast
         }
         public IReadOnlyList<RoleSlot> Slots { get; }
 
-        public IReadOnlyList<RoleSpec> Resolve(IEnumerable<RoleSpec> roles, RoleId? chosen, IRandomSource random)
+        public IReadOnlyList<RoleSpec> Resolve(IEnumerable<RoleSpec> roles, RoleId? chosen, IRandomSource random, IEnumerable<RoleCountRule> countRules = null, Func<IReadOnlyList<RoleSpec>, bool> accepts = null)
         {
             if (roles == null) throw new ArgumentNullException(nameof(roles));
             if (random == null) throw new ArgumentNullException(nameof(random));
@@ -26,7 +26,11 @@ namespace SocialStim.Rules.Cast
                 throw new ArgumentException("Role catalog needs distinct, non-null definitions.");
             catalog = catalog.OrderBy(r => r.Id.Value, StringComparer.Ordinal).ToList();
             if (chosen.HasValue && !catalog.Any(r => r.Id == chosen.Value)) throw new ArgumentException("Chosen role is missing.");
-            var pools = Slots.Select(s => catalog.Where(s.Accepts).ToList()).ToList();
+            var rules = (countRules ?? Enumerable.Empty<RoleCountRule>()).ToList();
+            if (rules.Any(r => r == null) || rules.Select(r => r.Role).Distinct().Count() != rules.Count
+                || rules.Any(r => !catalog.Any(c => c.Id == r.Role))) throw new ArgumentException("Invalid role count rules.");
+            var limits = rules.ToDictionary(r => r.Role);
+            var pools = Slots.Select(s => catalog.Where(r => s.Accepts(r) && (!limits.TryGetValue(r.Id, out RoleCountRule limit) || limit.Maximum > 0)).ToList()).ToList();
             foreach (var pool in pools)
             {
                 if (pool.Count == 0) throw new ArgumentException("A role slot has no eligible definitions.");
@@ -34,7 +38,7 @@ namespace SocialStim.Rules.Cast
                 { int j = random.Next(i + 1); RoleSpec swap = pool[i]; pool[i] = pool[j]; pool[j] = swap; }
             }
             var assigned = new List<RoleSpec>();
-            if (!Fill(pools, assigned, chosen))
+            if (!Fill(pools, assigned, chosen, limits, accepts))
                 throw new ArgumentException("Role list cannot satisfy chosen role and uniqueness constraints.");
             return assigned.AsReadOnly();
         }
@@ -66,11 +70,12 @@ namespace SocialStim.Rules.Cast
             return new RoleList(slots);
         }
 
-        private static bool Fill(List<List<RoleSpec>> pools, List<RoleSpec> assigned, RoleId? chosen)
+        private static bool Fill(List<List<RoleSpec>> pools, List<RoleSpec> assigned, RoleId? chosen, IReadOnlyDictionary<RoleId, RoleCountRule> limits, Func<IReadOnlyList<RoleSpec>, bool> accepts)
         {
             // Iterative backtracking keeps large authored casts off the call stack.
             var next = new int[pools.Count];
             var usedUnique = new HashSet<RoleId>();
+            var counts = new Dictionary<RoleId, int>();
             var canChoose = new bool[pools.Count + 1];
             for (int i = pools.Count - 1; i >= 0; i--)
                 canChoose[i] = canChoose[i + 1] || chosen.HasValue && pools[i].Any(r => r.Id == chosen.Value);
@@ -78,7 +83,8 @@ namespace SocialStim.Rules.Cast
             while (slot >= 0)
             {
                 if (++attempts > 100000) throw new ArgumentException("Role list search limit exceeded; narrow its slot constraints.");
-                if (slot == pools.Count && (!chosen.HasValue || chosenCount > 0)) return true;
+                if (slot == pools.Count && (!chosen.HasValue || chosenCount > 0)
+                    && limits.Values.All(r => counts.TryGetValue(r.Role, out int count) ? count >= r.Minimum : r.Minimum == 0) && (accepts == null || accepts(assigned))) return true;
                 bool exhausted = slot == pools.Count || next[slot] >= pools[slot].Count
                     || chosen.HasValue && chosenCount == 0 && !canChoose[slot];
                 if (exhausted)
@@ -87,12 +93,16 @@ namespace SocialStim.Rules.Cast
                     if (--slot < 0) return false;
                     RoleSpec removed = assigned[assigned.Count - 1];
                     assigned.RemoveAt(assigned.Count - 1);
+                    counts[removed.Id]--;
                     if (removed.Unique) usedUnique.Remove(removed.Id);
                     if (chosen.HasValue && removed.Id == chosen.Value) chosenCount--;
                     continue;
                 }
                 RoleSpec role = pools[slot][next[slot]++];
+                counts.TryGetValue(role.Id, out int count);
+                if (limits.TryGetValue(role.Id, out RoleCountRule limit) && count >= limit.Maximum) continue;
                 if (role.Unique && !usedUnique.Add(role.Id)) continue;
+                counts[role.Id] = count + 1;
                 assigned.Add(role);
                 if (chosen.HasValue && role.Id == chosen.Value) chosenCount++;
                 slot++;

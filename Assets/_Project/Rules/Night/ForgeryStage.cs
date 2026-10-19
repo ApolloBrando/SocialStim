@@ -12,6 +12,12 @@ namespace SocialStim.Rules.Night
             {
                 if (!context.Executes(order) || context.Actor(order.Actor).Role.Ability != AbilityKind.Forge) continue;
                 context.Appearance[order.Target.Value] = Faction.Antagonist;
+                if (context.Policy.Mission)
+                {
+                    Readout prior = context.Readouts[order.Target.Value];
+                    context.Readouts[order.Target.Value] = prior == Readout.Clear ? Readout.Corrupt
+                        : prior == Readout.Corrupt ? Readout.Clear : Readout.Anomaly;
+                }
                 context.Reports.Add(new NightReport(order.Actor, ReportKind.ForgeryApplied, order.Target));
             }
         }

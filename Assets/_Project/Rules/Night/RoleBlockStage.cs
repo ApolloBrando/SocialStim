@@ -18,7 +18,7 @@ namespace SocialStim.Rules.Night
                 if (context.Actor(order.Actor).Charges > 0) context.SpentCharges.Add(order.Actor);
             }
             foreach (NightActor actor in context.Actors)
-                if (context.Blocked.Contains(actor.Id)) context.Reports.Add(new NightReport(actor.Id, ReportKind.Blocked));
+                if (context.Blocked.Contains(actor.Id) && (!context.Policy.Mission || context.Policy.NotifyLull)) context.Reports.Add(new NightReport(actor.Id, ReportKind.Blocked));
         }
     }
 }

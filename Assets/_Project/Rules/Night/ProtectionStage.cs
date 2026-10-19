@@ -16,6 +16,14 @@ namespace SocialStim.Rules.Night
                 if (!context.Executes(order)) continue;
                 RoleSpec role = context.Actor(order.Actor).Role;
                 if (role.Ability != AbilityKind.Protect && role.Ability != AbilityKind.SelfProtect) continue;
+                if (context.Policy.Mission && role.Ability == AbilityKind.Protect)
+                {
+                    context.Heals.TryGetValue(order.Target.Value, out int tokens);
+                    context.Heals[order.Target.Value] = tokens + 1;
+                    context.Patients.Add(order.Actor, order.Target.Value);
+                    if (order.Actor == order.Target.Value) context.SelfHealsSpent.Add(order.Actor);
+                    continue;
+                }
                 context.Defense[order.Target.Value] = Math.Max(context.Defense[order.Target.Value], role.Protection);
                 context.Reports.Add(new NightReport(order.Actor, ReportKind.ProtectionApplied, order.Target));
             }

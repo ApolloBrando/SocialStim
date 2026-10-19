@@ -377,3 +377,7 @@ is introduced.
 ## Mission phase 0
 
 See [the complete source audit](docs/AUDIT.md) and [read inventory](docs/AUDIT_INVENTORY.md). Immediate display preference changes preserve the active reveal instead of skipping queued observations. Continuous fear motion uses an independent presentation clock; finite screen cue envelopes retain their current safety limits. The mission supersedes earlier phase/role planning; new work remains on phase branches.
+
+## Mission phase 1
+
+RoleSpec carries explicit claim flags, capability flags and a personal objective. Mission readouts are a separate type from faction. NightPolicy selects modern one-attack healing/readout/backlash semantics without breaking optional legacy trial contracts. Pipeline stages remain small; cleanup owns delayed penalties and notices. MissionWinCondition evaluates only complete stable batches; SetupBuilder shares validation and constrained assignment across presets/custom lists. See docs/ROLES.md.
