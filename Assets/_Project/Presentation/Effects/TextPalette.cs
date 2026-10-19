@@ -14,6 +14,7 @@ namespace SocialStim.Presentation.Effects
         {
             switch (style)
             {
+                case SemanticStyle.Emphasis: return Night ? new Color(0.01f, 0.01f, 0.02f) : Color.white;
                 case SemanticStyle.Fear: return Night ? new Color(0.38f, 0.18f, 0.48f) : new Color(0.83f, 0.7f, 0.95f);
                 case SemanticStyle.Calm: return Night ? new Color(0.07f, 0.3f, 0.26f) : new Color(0.6f, 0.86f, 0.77f);
                 case SemanticStyle.Evidence: return Night ? new Color(0.1f, 0.27f, 0.45f) : new Color(0.63f, 0.8f, 0.98f);

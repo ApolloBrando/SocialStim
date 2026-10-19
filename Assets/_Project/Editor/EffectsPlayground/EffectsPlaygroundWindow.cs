@@ -78,8 +78,9 @@ namespace SocialStim.Editor.EffectsPlayground
         private void Update()
         {
             double now = EditorApplication.timeSinceStartup;
+            bool wasBusy = _playback.Busy;
             _playback.Tick((float)Math.Min(0.1, Math.Max(0, now - _last))); _last = now;
-            if (_playback.Busy) Repaint();
+            if (wasBusy || _playback.Busy) Repaint();
         }
         private void OnDisable() { _playback.Cancel(); }
     }

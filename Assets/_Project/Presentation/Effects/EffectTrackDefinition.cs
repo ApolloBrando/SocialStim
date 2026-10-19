@@ -13,6 +13,7 @@ namespace SocialStim.Presentation.Effects
         [Range(0, 10)] public float delay;
         public int priority;
         public EffectBlend blend;
-        public EffectStep ToStep() => new EffectStep(channel, duration, amount, priority, blend, delay);
+        public EffectEnvelope envelope;
+        public EffectStep ToStep() => new EffectStep(channel, duration, amount, priority, blend, delay, envelope);
     }
 }

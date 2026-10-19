@@ -41,7 +41,9 @@ namespace SocialStim.Application.PresentationCues
                 float local = time - step.Delay;
                 if (step.Channel != channel || local < 0 || local >= step.Duration) continue;
                 float progress = local / step.Duration;
-                float envelope = (float)Math.Sin(progress * Math.PI);
+                float pulse = 1 - Math.Abs(progress * 2 - 1);
+                float envelope = step.Envelope == EffectEnvelope.Sine ? (float)Math.Sin(progress * Math.PI)
+                    : step.Envelope == EffectEnvelope.Smooth ? pulse * pulse * (3 - 2 * pulse) : pulse;
                 float value = step.Amount * envelope;
                 if (step.Blend == EffectBlend.Add) addition += value;
                 else if (step.Priority >= priority) { replacement = value; priority = step.Priority; }

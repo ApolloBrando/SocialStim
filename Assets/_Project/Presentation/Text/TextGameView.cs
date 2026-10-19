@@ -166,7 +166,7 @@ namespace SocialStim.Presentation.Text
                 _currentStart = _shown.Length;
                 _shown.Append(line.Text);
                 foreach (SemanticSpan span in line.Spans) _spans.Add(new SemanticSpan(span.Start + _currentStart, span.Length, span.Style));
-                _textEffects.SetDocument(new SemanticText(_shown.ToString(), new List<SemanticSpan>(_spans)), _currentStart, _palette);
+                _textEffects.SetDocument(new SemanticText(_shown.ToString(), _spans), _currentStart, _palette);
                 EffectProfile profile = _profiles[_cues.Resolve(observation, _request.View)];
                 _playback.Begin(observation.Sequence, line, profile, _settings, _onAcknowledged);
                 Canvas.ForceUpdateCanvases();
@@ -190,6 +190,7 @@ namespace SocialStim.Presentation.Text
         {
             _settings = new EffectsSettings(enabled ?? _settings.Enabled, reduced ?? _settings.ReducedMotion,
                 flashes ?? _settings.Flashes, intensity ?? _settings.Intensity, instant ?? _settings.InstantText);
+            _textEffects.SetSemanticColors(_settings.Enabled);
             SkipAll();
             SetControl(2, "Effects: " + (_settings.Enabled ? "on" : "off"));
             SetControl(3, "Motion: " + (_settings.ReducedMotion ? "reduced" : "full"));

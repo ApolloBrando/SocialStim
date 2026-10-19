@@ -17,6 +17,7 @@ namespace SocialStim.Presentation.Effects
         private int _animatedStart;
         private EffectFrame _frame;
         private float _time;
+        private bool _semanticColors = true;
         public void Initialize(TextMeshProUGUI label)
         { _label = label; _label.OnPreRenderText += Capture; }
         public void SetDocument(SemanticText document, int animatedStart, TextPalette palette)
@@ -27,6 +28,7 @@ namespace SocialStim.Presentation.Effects
             _label.ForceMeshUpdate();
         }
         public void SetPalette(TextPalette palette) { _palette = palette; }
+        public void SetSemanticColors(bool enabled) { _semanticColors = enabled; }
         public void Apply(int visibleUtf16, EffectFrame frame, float time)
         {
             if (_label == null || _document == null) return;
@@ -57,7 +59,7 @@ namespace SocialStim.Presentation.Effects
                 int mesh = character.materialReferenceIndex, vertex = character.vertexIndex;
                 Vector3[] baseline = _vertices[mesh];
                 if (baseline == null || vertex + 3 >= baseline.Length) continue;
-                Color32 color = _palette.Accent(_styles[i]);
+                Color32 color = _palette.Accent(_semanticColors ? _styles[i] : SemanticStyle.Default);
                 if (character.index >= _visible) color.a = 0;
                 float strength = character.index >= _animatedStart ? _frame.Shake : 0;
                 Vector3 offset = new Vector3(Mathf.Sin(_time * 27 + i * 1.7f), Mathf.Cos(_time * 31 + i * 1.3f), 0) * (strength * 3);

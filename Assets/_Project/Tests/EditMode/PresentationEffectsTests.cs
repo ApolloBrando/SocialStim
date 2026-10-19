@@ -69,6 +69,16 @@ namespace SocialStim.Tests.EditMode
             var clamped = new EffectProfile(new[] { new EffectStep(EffectChannel.Border, 2, 0.8f), new EffectStep(EffectChannel.Border, 2, 0.8f, blend: EffectBlend.Add) });
             Assert.That(clamped.Sample(1, Full).Border, Is.EqualTo(1));
         }
+        [TestCase(EffectEnvelope.Sine)]
+        [TestCase(EffectEnvelope.Triangle)]
+        [TestCase(EffectEnvelope.Smooth)]
+        public void EnvelopesRestoreBothEndpointsAndPeakAtTheMidpoint(EffectEnvelope envelope)
+        {
+            var profile = new EffectSequence().Then(new EffectStep(EffectChannel.Border, 2, 1, envelope: envelope)).Build();
+            Assert.That(profile.Sample(0, Full).Border, Is.Zero);
+            Assert.That(profile.Sample(1, Full).Border, Is.EqualTo(1).Within(0.0001));
+            Assert.That(profile.Sample(2, Full).Border, Is.Zero);
+        }
         [Test]
         public void ReducedMotionAndDisabledEffectsSuppressOwnedChannels()
         {

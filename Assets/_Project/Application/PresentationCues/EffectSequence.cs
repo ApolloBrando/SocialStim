@@ -13,7 +13,7 @@ namespace SocialStim.Application.PresentationCues
             float end = _cursor;
             foreach (EffectStep step in steps)
             {
-                _steps.Add(new EffectStep(step.Channel, step.Duration, step.Amount, step.Priority, step.Blend, _cursor + step.Delay));
+                _steps.Add(new EffectStep(step.Channel, step.Duration, step.Amount, step.Priority, step.Blend, _cursor + step.Delay, step.Envelope));
                 end = Math.Max(end, _cursor + step.Delay + step.Duration);
             }
             _cursor = end;

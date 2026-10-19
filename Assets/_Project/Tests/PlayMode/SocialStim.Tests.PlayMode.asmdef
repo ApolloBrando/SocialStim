@@ -5,7 +5,9 @@
     "GUID:72ccf8c35bef578a93f9ae7229076667",
     "GUID:5105898954795d598fdb50841e576be6",
     "GUID:cabe4a88afda5ac893854d9b44e4f96c",
-    "GUID:5297d539b8915ab99a2c478cef8fdd3c"
+    "GUID:5297d539b8915ab99a2c478cef8fdd3c",
+    "UnityEngine.UI",
+    "Unity.TextMeshPro"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
