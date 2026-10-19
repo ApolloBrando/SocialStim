@@ -406,7 +406,7 @@ namespace SocialStim.Rules.Phases
                 observer.Role.Faction == Faction.Antagonist && c.Role.Faction == Faction.Antagonist && c.Id != observer.Id,
                 _revealed.TryGetValue(c.Id, out RoleSpec revealed) ? revealed.Id : (RoleId?)null,
                 _revealed.TryGetValue(c.Id, out RoleSpec faction) ? faction.Faction : (Faction?)null, _beliefs[observer.Id].Claim(c.Id),
-                _beliefs[observer.Id].Trust(c.Id), _beliefs[observer.Id].Factions(c.Id), _beliefs[observer.Id].Roles(c.Id)));
+                _beliefs[observer.Id].Trust(c.Id), _beliefs[observer.Id].Factions(c.Id), _beliefs[observer.Id].Roles(c.Id), _beliefs[observer.Id].KnownFaction(c.Id)));
             return new KnowledgeView(observer.Id, observer.Role, observer.Personality, observer.Charges, _phases.Day,
                 characters, _results[observer.Id], _beliefs[observer.Id].Evidence, _beliefs[observer.Id].Exposure, _catalog, _lastTeamPlan);
         }

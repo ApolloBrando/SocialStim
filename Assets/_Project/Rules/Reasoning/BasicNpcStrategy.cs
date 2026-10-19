@@ -71,8 +71,7 @@ namespace SocialStim.Rules.Reasoning
             return targets.OrderByDescending(c => c.Suspicion).ThenBy(c => c.Id.Value).First().Id;
         }
 
-        private static bool ConfirmedTown(KnownCharacter character) => character.RevealedFaction == Faction.Town
-            || character.FactionEstimate != null && character.FactionEstimate.Town == 10000;
+        private static bool ConfirmedTown(KnownCharacter character) => character.KnownFaction == Faction.Town;
         private static KnownCharacter Suspect(KnowledgeView knowledge) => knowledge.Characters
             .Where(c => c.Alive && c.Id != knowledge.Self && !c.IsTeammate
                 && (knowledge.OwnRole.Faction != Faction.Town || !ConfirmedTown(c)))

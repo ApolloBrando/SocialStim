@@ -129,8 +129,7 @@ namespace SocialStim.Rules.Reasoning
         private static bool HasReported(KnowledgeView knowledge, CharacterId target) => knowledge.Evidence.Any(e =>
             e.Actor == knowledge.Self && e.Kind == EvidenceKind.InvestigationClaim && e.Target == target && e.Night == knowledge.Day - 1);
         private static int Threat(KnownCharacter character) => (character.Suspicion * 2 + (character.FactionEstimate?.Antagonist ?? character.Suspicion * 100) / 100) / 3;
-        private static bool ConfirmedTown(KnownCharacter character) => character.RevealedFaction == Faction.Town
-            || character.FactionEstimate != null && character.FactionEstimate.Town == 10000;
+        private static bool ConfirmedTown(KnownCharacter character) => character.KnownFaction == Faction.Town;
         private static KnownCharacter Suspect(KnowledgeView knowledge) => knowledge.Characters.Where(c => c.Alive && c.Id != knowledge.Self && !c.IsTeammate
                 && (knowledge.OwnRole.Faction != Faction.Town || !ConfirmedTown(c)))
             .OrderByDescending(Threat).ThenBy(c => c.Id.Value).FirstOrDefault();
