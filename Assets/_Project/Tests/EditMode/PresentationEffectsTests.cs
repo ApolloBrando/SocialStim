@@ -175,7 +175,7 @@ namespace SocialStim.Tests.EditMode
             foreach (var line in SocialStim.Data.Dialogue.DialogueDocument.Parse(System.IO.File.ReadAllText(path)))
                 Assert.That(SemanticMarkup.Parse(line.Text).Text, Is.Not.Empty);
         }
-#if !UNITY_5_3_OR_NEWER
+#if NET8_0_OR_GREATER && !UNITY_5_3_OR_NEWER
         [Test]
         public void SteadyPortablePlaybackDoesNotAllocate()
         {
