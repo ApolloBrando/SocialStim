@@ -241,6 +241,19 @@ allocation profiling, editor import, and real UI verification remain open gates.
 
 ## Tests and limitations
 
+Shared test source must remain compatible with Unity's NUnit API. A reported
+editor CS1503 error exposed a collection assertion using a newer `Contain`
+overload. Collection membership now uses `Has.No.Member`; string containment
+keeps `Does.Contain`. Headless CI compiles against upstream NUnit 3.5.0 on .NET Framework 4.7.2
+and runs the suite with NUnit 3.14.0 on .NET 8 to detect this API gap. Unity's custom NUnit integration and real editor
+compilation remain a distinct gate.
+
+The Input System package is already a dependency, but package installation does
+not select the project's active input backend. Choose Input System Package (New)
+in Player settings and restart the editor. The content validation menu now
+rejects an inactive Input System with that exact setup instruction. No generated
+PlayerSettings asset is synthesized or used to overwrite local editor settings.
+
 Milestone 00's static validator checks file/metadata pairing, GUID uniqueness,
 assembly references and dependency cycles, layer constraints, package/version
 pins, and unwanted files. Unity import and compilation remain unverified until
@@ -272,12 +285,3 @@ assert the scaffold's existence or mirror implementation details.
   faction headcount alone is not sufficient in the full ruleset.
 - Premature visual scope: establish readable plain-text play before animation.
 
-## NUnit and input compatibility correction
-
-Unity import exposed a newer-NUnit collection Contain overload in the shared tests.
-Collection membership assertions now use Has.No.Member. CI compiles against NUnit 3.5.0
-on .NET Framework 4.7.2 and runs NUnit 3.14.0 tests on .NET 8; neither reproduces Unity's custom integration.
-The starter validator also checks ENABLE_INPUT_SYSTEM and reports the exact
-Player Settings path if inactive. Enable Input System Package (New), then restart
-Unity; installing the package alone does not select that backend. No generated
-PlayerSettings asset is overwritten.
