@@ -174,6 +174,11 @@ namespace SocialStim.Presentation.Council
             }
             Canvas.ForceUpdateCanvases(); _layout.Resize(); _layout.ActionScroll.verticalNormalizedPosition = 1;
             if (_layout.Actions.childCount > 0) Focus(_layout.Actions.GetChild(0).gameObject);
+            else
+            {
+                var target = _layout.Roster.GetComponentsInChildren<Button>().FirstOrDefault(b => b.interactable);
+                if (target != null) Focus(target.gameObject);
+            }
         }
         private void RenderRoster(bool selectable)
         {
