@@ -237,7 +237,7 @@ namespace SocialStim.Rules.Phases
                 else
                 {
                     // False reports use the public claim and visible cast, never another actor's private results.
-                    var targets = Living().Where(c => c.Id != actor.Id).Select(c => c.Id).ToList();
+                    var targets = Knowledge(actor).Characters.Where(c => c.Alive && c.Id != actor.Id && !c.IsTeammate).Select(c => c.Id).ToList();
                     if (asserted.Ability == AbilityKind.Investigate && targets.Count > 0)
                         Say(actor, GameCommand.Speak(SpeechIntent.ReportInvestigation, targets[_decisions.Next(targets.Count)], faction: Faction.Antagonist));
                     else
@@ -320,7 +320,7 @@ namespace SocialStim.Rules.Phases
                 var order = new NightOrder(actor.Id, target);
                 orders.Add(NightLegality.IsLegal(actors.First(a => a.Id == actor.Id), order, actors) ? order : new NightOrder(actor.Id, null));
             }
-            var killers = orders.Where(o => Actor(o.Actor).Role.Faction == Faction.Antagonist && Actor(o.Actor).Role.Ability == AbilityKind.Attack)
+            var killers = orders.Where(o => Actor(o.Actor).Role.Faction == Faction.Antagonist && Actor(o.Actor).Role.Ability == AbilityKind.Attack && Actor(o.Actor).Charges != 0)
                 .OrderBy(o => o.Actor.Value).ToList();
             var proposals = killers.Select(order =>
             {

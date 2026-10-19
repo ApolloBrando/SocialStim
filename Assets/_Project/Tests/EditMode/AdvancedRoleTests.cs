@@ -216,6 +216,47 @@ namespace SocialStim.Tests.EditMode
             Assert.That(run.GetPlayerView().Won, Is.False);
         }
 
+        [Test]
+        public void FabricatedMorningReportsDoNotAccidentallyExposeKnownTeammates()
+        {
+            var run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1),
+                new[] { "citizen", "forger", "assassin", "physician", "inspector", "survivor" }
+                    .Select((id, i) => new CastMemberSpec("Person" + i, new RoleId(id))),
+                Roles(), TestContent.Lines(), new FalseInvestigators());
+            Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(null));
+            Submit(run, GameCommand.Night(null)); Submit(run, GameCommand.Continue());
+            var reports = run.GetPlayerView().Transcript.Where(e => e.Day == 2 && e.Intent == SpeechIntent.ReportInvestigation
+                && (e.Speaker == new CharacterId(1) || e.Speaker == new CharacterId(2))).ToList();
+            Assert.That(reports.Count, Is.EqualTo(2));
+            Assert.That(reports.All(e => e.Target != new CharacterId(1) && e.Target != new CharacterId(2)), Is.True);
+        }
+
+        [Test]
+        public void ExhaustedAntagonistCannotStealAnActiveTeammatesKill()
+        {
+            var roles = Roles().Concat(new[] {
+                TestContent.Role("spent-assassin", Faction.Antagonist, RoleCategory.AntagonistKilling, AbilityKind.Attack, attack: 1, charges: 0)
+            }).ToList();
+            var strategy = new ScenarioStrategy { Target = k => k.OwnRole.Ability == AbilityKind.Attack && k.Charges != 0
+                ? new CharacterId(4) : (CharacterId?)null };
+            var run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1),
+                new[] { "inspector", "spent-assassin", "assassin", "physician", "citizen", "interrupter", "survivor" }
+                    .Select((id, i) => new CastMemberSpec("Person" + i, new RoleId(id))),
+                roles, TestContent.Lines(), strategy);
+            Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(null)); Submit(run, GameCommand.Night(null));
+            Assert.That(run.GetPlayerView().Characters.Single(c => c.Id == new CharacterId(4)).Alive, Is.False);
+            Assert.That(run.GetPlayerView().Characters.Count(c => !c.Alive), Is.EqualTo(1));
+        }
+
+        private sealed class FalseInvestigators : INpcStrategy
+        {
+            public GameCommand Speak(KnowledgeView k, IRandomSource r) => k.OwnRole.Faction == Faction.Antagonist
+                ? GameCommand.Speak(SpeechIntent.ClaimRole, role: new RoleId("inspector")) : GameCommand.Speak(SpeechIntent.StaySilent);
+            public CharacterId? Nominate(KnowledgeView k, IRandomSource r) => null;
+            public Verdict Judge(KnowledgeView k, CharacterId d, IRandomSource r) => Verdict.Innocent;
+            public CharacterId? NightTarget(KnowledgeView k, IRandomSource r) => null;
+        }
+
         private sealed class ClaimingStrategy : INpcStrategy
         {
             private readonly ScenarioStrategy _inner;

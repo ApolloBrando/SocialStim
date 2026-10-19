@@ -47,6 +47,7 @@ namespace SocialStim.Presentation.Text
         private bool _wasDisplaying;
         private TextMeshProUGUI _claimSummary;
         private readonly Dictionary<CharacterId, string> _visibleClaims = new Dictionary<CharacterId, string>();
+        private readonly Dictionary<RoleId, string> _roleNames = new Dictionary<RoleId, string>();
         private string _menuCategory;
         private string _menuFamily;
         private int _menuPage;
@@ -84,7 +85,9 @@ namespace SocialStim.Presentation.Text
                     if (observation.Intent == SpeechIntent.ClaimRole && observation.Speaker.HasValue && observation.ClaimedRole.HasValue)
                     {
                         string name = _request.View.Characters.First(c => c.Id == observation.Speaker.Value).Name;
-                        _visibleClaims[observation.Speaker.Value] = name + ": " + observation.ClaimedRole.Value.Value;
+                        RoleId role = observation.ClaimedRole.Value;
+                        string roleName = _roleNames.TryGetValue(role, out string display) ? display : role.Value;
+                        _visibleClaims[observation.Speaker.Value] = name + ": " + roleName;
                         _claimSummary.text = "ROLE CLAIMS (unverified)  |  " + string.Join("  |  ", _visibleClaims.OrderBy(c => c.Key.Value).Select(c => c.Value));
                     }
                 }
@@ -156,6 +159,7 @@ namespace SocialStim.Presentation.Text
         public void ShowSetup(IReadOnlyList<RoleSpec> roles, string seedDescription, Action<RoleId?> start)
         {
             ResetDisplay(); ClearChoices(); ApplyPalette(false);
+            _roleNames.Clear(); foreach (RoleSpec role in roles) _roleNames.Add(role.Id, role.Name);
             _status.text = "SocialStim | New run | " + seedDescription;
             _transcript.text = "You belong to the cast. Speak, claim, lie, nominate, judge, and choose a night action.\n\n"
                 + "Dialogue is marked PLACEHOLDER. Choose a role or random assignment.\n\n"
