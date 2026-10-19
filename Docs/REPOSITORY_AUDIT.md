@@ -16,6 +16,7 @@ still require the editor.
 | --- | --- |
 | Main CI failed the Provocateur execution scenario | The fixture used a one-day cap while expecting play to continue after a day-one execution. Test with two days; assert faction play continues and the personal achievement survives to the actual terminal result. |
 | Fixed 20-participant / 64-role limits | Remove the upper bounds; scale faction slots from an inspector participant count and authored shares. Validate names, chosen roles and uniqueness. |
+| Recursive slot search could exhaust the call stack once cast limits were removed | Use bounded iterative backtracking, including a 4096-slot regression. |
 | Two independent assignment algorithms | Route the seven-person fallback and authored/scaled setups through RoleList.Resolve. |
 | Horizontal participant and claim rows could overflow | Use horizontal scroll strips with stable card widths. |
 | Callback could synchronously submit a second command mid-turn | Reject reentrant submissions; retain finally-based release of the guard. |

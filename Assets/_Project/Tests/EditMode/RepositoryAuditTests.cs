@@ -52,6 +52,14 @@ namespace SocialStim.Tests.EditMode
         }
 
         [Test]
+        public void LargeAuthoredListsDoNotDependOnRecursiveCallDepth()
+        {
+            var citizen = AdvancedRoleTests.Roles().Single(r => r.Id.Value == "citizen");
+            var setup = new RoleList(Enumerable.Repeat(new RoleSlot(citizen.Id), 4096));
+            Assert.That(setup.Resolve(new[] { citizen }, citizen.Id, new SeededRandom(1)).Count, Is.EqualTo(4096));
+        }
+
+        [Test]
         public void SharesAreAuthoredAndImpossibleSetupsFailClearly()
         {
             var roles = AdvancedRoleTests.Roles();

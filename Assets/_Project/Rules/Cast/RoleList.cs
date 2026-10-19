@@ -34,8 +34,7 @@ namespace SocialStim.Rules.Cast
                 { int j = random.Next(i + 1); RoleSpec swap = pool[i]; pool[i] = pool[j]; pool[j] = swap; }
             }
             var assigned = new List<RoleSpec>();
-            int attempts = 0;
-            if (!Fill(0, pools, assigned, chosen, ref attempts))
+            if (!Fill(pools, assigned, chosen))
                 throw new ArgumentException("Role list cannot satisfy chosen role and uniqueness constraints.");
             return assigned.AsReadOnly();
         }
@@ -67,18 +66,36 @@ namespace SocialStim.Rules.Cast
             return new RoleList(slots);
         }
 
-        private static bool Fill(int slot, List<List<RoleSpec>> pools, List<RoleSpec> assigned, RoleId? chosen, ref int attempts)
+        private static bool Fill(List<List<RoleSpec>> pools, List<RoleSpec> assigned, RoleId? chosen)
         {
-            if (++attempts > 100000) throw new ArgumentException("Role list search limit exceeded; narrow its slot constraints.");
-            if (slot == pools.Count) return !chosen.HasValue || assigned.Any(r => r.Id == chosen.Value);
-            if (chosen.HasValue && !assigned.Any(r => r.Id == chosen.Value)
-                && !pools.Skip(slot).Any(p => p.Any(r => r.Id == chosen.Value))) return false;
-            foreach (RoleSpec role in pools[slot])
+            // Iterative backtracking keeps large authored casts off the call stack.
+            var next = new int[pools.Count];
+            var usedUnique = new HashSet<RoleId>();
+            var canChoose = new bool[pools.Count + 1];
+            for (int i = pools.Count - 1; i >= 0; i--)
+                canChoose[i] = canChoose[i + 1] || chosen.HasValue && pools[i].Any(r => r.Id == chosen.Value);
+            int slot = 0, attempts = 0, chosenCount = 0;
+            while (slot >= 0)
             {
-                if (role.Unique && assigned.Any(r => r.Id == role.Id)) continue;
+                if (++attempts > 100000) throw new ArgumentException("Role list search limit exceeded; narrow its slot constraints.");
+                if (slot == pools.Count && (!chosen.HasValue || chosenCount > 0)) return true;
+                bool exhausted = slot == pools.Count || next[slot] >= pools[slot].Count
+                    || chosen.HasValue && chosenCount == 0 && !canChoose[slot];
+                if (exhausted)
+                {
+                    if (slot < pools.Count) next[slot] = 0;
+                    if (--slot < 0) return false;
+                    RoleSpec removed = assigned[assigned.Count - 1];
+                    assigned.RemoveAt(assigned.Count - 1);
+                    if (removed.Unique) usedUnique.Remove(removed.Id);
+                    if (chosen.HasValue && removed.Id == chosen.Value) chosenCount--;
+                    continue;
+                }
+                RoleSpec role = pools[slot][next[slot]++];
+                if (role.Unique && !usedUnique.Add(role.Id)) continue;
                 assigned.Add(role);
-                if (Fill(slot + 1, pools, assigned, chosen, ref attempts)) return true;
-                assigned.RemoveAt(assigned.Count - 1);
+                if (chosen.HasValue && role.Id == chosen.Value) chosenCount++;
+                slot++;
             }
             return false;
         }

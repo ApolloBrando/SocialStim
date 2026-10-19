@@ -12,13 +12,13 @@ namespace SocialStim.Rules.Dialogue
             if (target == null) return "I stayed in last night.";
             switch (ability)
             {
-                case AbilityKind.Investigate: return "I checked on " + target + " last night.";
+                case AbilityKind.Investigate: return "I tried to check on " + target + " last night.";
                 case AbilityKind.Protect: return "I tried to protect " + target + " last night.";
                 case AbilityKind.Block: return "I tried to block " + target + " last night.";
-                case AbilityKind.Attack: return "I went after " + target + " last night.";
+                case AbilityKind.Attack: return "I tried to attack " + target + " last night.";
                 case AbilityKind.SelfProtect: return "I tried to keep myself safe last night.";
-                case AbilityKind.Forge: return "I planted evidence against " + target + " last night.";
-                case AbilityKind.Watch: return "I watched " + target + " last night.";
+                case AbilityKind.Forge: return "I tried to plant evidence against " + target + " last night.";
+                case AbilityKind.Watch: return "I tried to watch " + target + " last night.";
                 default: return "I tried to use my ability on " + target + " last night.";
             }
         }
