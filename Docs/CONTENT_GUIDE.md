@@ -77,8 +77,8 @@ Registered intents: Accuse, Defend, ClaimRole, ReportInvestigation, Vouch,
 CallForTrial, Agree, Disagree, Deflect, StaySilent, ExpressFear, ReactToDeath,
 ReactToRoleReveal, LastWords, VoteJustification, ReportAction.
 
-Supported styles are <emphasis>, <fear>, <calm>, <evidence> and <danger>, each
-with a matching closing tag. Use << for a literal less-than sign. Do not use
+Supported styles are `<emphasis>`, `<fear>`, `<calm>`, `<evidence>` and `<danger>`, each
+with a matching closing tag. Use `<<` for a literal less-than sign. Do not use
 TMP/HTML tags. A line's meaning must remain clear with effects disabled.
 
 Conditions combine with AND. speakerRole tests the speaker's real known role;

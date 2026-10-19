@@ -57,3 +57,7 @@ Population flexibility does not guarantee balance or performance at arbitrary
 sizes. Constraint search is bounded and fails clearly for incompatible setups.
 The default catalog provides 20 names; add names before requesting a larger
 cast. No Windows player build or Unity profiler result is claimed.
+
+Verified code commit: f6f2b7a76e7bb9799281b6dc72edb06510d0a439.
+GitHub Actions run 39295451222 passed the scaffold validator, NUnit 3.5 API
+compilation and all 124 NUnit 3.14 behavioral cases. No Unity checks ran.
