@@ -1,5 +1,22 @@
 # Milestone 01 validation
 
+## Milestone 02 branch
+
+Milestone 02 is authorized in parallel with the owner's Unity baseline checks.
+Its initial CI run compiled the actual shared code and passed **58 tests**, with
+zero failures/skips, including the existing 100 seeded Town/antagonist runs:
+[run 39252479063](https://github.com/ApolloBrando/SocialStim/actions/runs/39252479063).
+Subsequent condition-reachability and unique-role checks are included in the
+final branch suite; the PR's final-head run is authoritative.
+
+New coverage includes attributed conflicting reports and credibility, duplicate
+report influence, private/public exposure isolation, revealed-role consequences,
+normalized estimates, hidden-assignment permutations, consistent bluffs, private
+team coordination/override, and schema 1/2 condition eligibility and validation.
+None of these results substitutes for Unity adapter or scene verification.
+
+## Milestone 01 baseline
+
 The first feature-branch GitHub Actions run compiled shared C# code and passed
 33 NUnit tests with zero failures/skips, including 100 complete seeded runs
 across Town and antagonist player roles:
