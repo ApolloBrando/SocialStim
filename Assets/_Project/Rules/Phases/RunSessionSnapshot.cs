@@ -25,6 +25,8 @@ namespace SocialStim.Rules.Phases
         public byte[] Save()
         {
             if (_applyingCommand) throw new InvalidOperationException("Save only after the current command has completed.");
+            if (_cast.Count > 20 || _cast.Any(a => ((int)a.Personality & ~31) != 0))
+                throw new NotSupportedException("Save supports up to 20 participants with registered personality flags.");
             if (!(_strategy is SocialNpcStrategy) && !(_strategy is BasicNpcStrategy))
                 throw new NotSupportedException("Saving custom NPC strategies requires an explicit persistence implementation.");
             if (!(_winCondition is StarterWinCondition) && !(_winCondition is CapabilityWinCondition))
@@ -151,7 +153,7 @@ namespace SocialStim.Rules.Phases
             var members = new List<CastMemberSpec>(); var alive = new List<bool>(); var charges = new List<int>();
             for (int i = 0; i < count; i++)
             {
-                string name = SnapshotIO.Text(r, 256);
+                string name = SnapshotIO.Text(r);
                 RoleId? role = SnapshotRecords.Role(r, catalog);
                 if (!role.HasValue) throw new InvalidDataException("Missing cast role.");
                 var personality = (Personality)SnapshotIO.Int(r, 0, 31);
@@ -204,6 +206,10 @@ namespace SocialStim.Rules.Phases
                 DialogueMetadata metadata = SnapshotIO.Bool(r) ? new DialogueMetadata(SnapshotIO.Text(r), SnapshotIO.Text(r), SnapshotIO.Text(r)) : null;
                 CharacterId? target = SnapshotRecords.Id(r, count); var intent = SnapshotIO.OptionalEnum<SpeechIntent>(r);
                 RoleId? claim = SnapshotRecords.Role(r, catalog);
+                if (cue == GameCue.SpeechDelivered && (!speaker.HasValue || !intent.HasValue)
+                    || intent == SpeechIntent.ClaimRole && !claim.HasValue
+                    || intent != SpeechIntent.ClaimRole && claim.HasValue)
+                    throw new InvalidDataException("Invalid public speech metadata.");
                 session._transcript.Add(new GameObservation(i, observedDay, cue, text, speaker, metadata, target, intent, claim));
             }
             return session;

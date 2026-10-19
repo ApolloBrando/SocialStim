@@ -1,9 +1,10 @@
 # Presentation effects: milestone 05
 
-This branch starts from main's milestone 01, independently of 02, 03 and 04.
-It retains Screen Space - Overlay uGUI/TMP. No camera, URP, shader, post-processing,
-runtime generation service, or new package is needed. A later save adapter must
-restore completed text without advancing any gameplay stream; saving is not here.
+Presentation retains Screen Space - Overlay uGUI/TMP and the milestone 05
+effect contracts, extended by milestone 03's playtest changes below. No camera,
+URP, shader, post-processing, runtime generation service, or new package is
+needed. Milestone 04's save adapter restores completed history without advancing
+gameplay streams; see SAVE_RESUME.md.
 
 ## Display and input contract
 
@@ -141,3 +142,19 @@ glyph styling, profile asset overrides and layout require Play Mode.
 Follow [EFFECTS_VERIFICATION.md](EFFECTS_VERIFICATION.md). Headless compilation and
 tests establish portable behavior, not Unity import, adapter compilation, actual
 screen appearance, font resources, navigation, builds, or runtime allocation results.
+
+## Latest playtest palette and pacing
+
+The owner's latest correction supersedes the original inverse palette: daytime
+has a light background with dark text, and nighttime a dark background with
+light text. Daytime warmth progresses from pale yellow toward soft red as
+public spoken lines and trial stages accumulate; it uses no real gameplay
+clock or secret tension. Fixed frames remain visible with effects disabled.
+
+Default reveal speed is 28 graphemes/second, with a stable per-speaker tempo and
+0.65–1.65 second per-line reading holds. These derive from public observation
+IDs and do not use rules RNG. Skip bypasses the holds. Instant text bypasses
+typing/reading holds while enabled cue effects retain their own duration.
+Role claims receive a ROLE CLAIM label, Evidence styling and an unverified
+claim board. Participant cards are ordinary uGUI objects. Choices and public
+status/cast updates wait for display completion.

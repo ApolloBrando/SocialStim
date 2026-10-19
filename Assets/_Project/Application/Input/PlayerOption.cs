@@ -21,7 +21,7 @@ namespace SocialStim.Application.Input
             : Command.Intent == SpeechIntent.Accuse || Command.Intent == SpeechIntent.CallForTrial || Command.Intent == SpeechIntent.Deflect ? "Pressure"
             : Command.Intent == SpeechIntent.Vouch || Command.Intent == SpeechIntent.Agree || Command.Intent == SpeechIntent.Disagree ? "Support and challenge"
             : "Personal";
-        public string Family => Command.Kind == CommandKind.Speak ? Command.Intent.ToString() : Command.Kind.ToString();
+        public string Family => Command.Kind == CommandKind.Speak ? ActionLabels.Speech(Command.Intent) : Command.Kind == CommandKind.ReportLastAction ? "Report last night" : "Actions";
         internal GameCommand Command { get; }
     }
 }

@@ -68,7 +68,7 @@ Claims retain a textual ROLE CLAIM label and a persistent unverified claim
 board. Display timing does not change rules or random streams.
 
 Day uses a light warm background with dark text. Night uses a dark background
-with light text. Day warmth follows public trial progress, not real elapsed
+with light text. Day warmth follows delivered speech and public trial progress, not real elapsed
 time. Panel/button frames remain when effects are disabled.
 
 ## Verification gate

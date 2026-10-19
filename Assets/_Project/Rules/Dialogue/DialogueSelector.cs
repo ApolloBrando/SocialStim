@@ -39,7 +39,7 @@ namespace SocialStim.Rules.Dialogue
                 var history = new Queue<string>();
                 for (int j = 0; j < length; j++)
                 {
-                    string id = SnapshotIO.Text(reader, 256);
+                    string id = SnapshotIO.Text(reader);
                     if (!_lines.Any(l => l.Id == id) || history.Contains(id)) throw new InvalidDataException("Invalid dialogue history.");
                     history.Enqueue(id);
                 }

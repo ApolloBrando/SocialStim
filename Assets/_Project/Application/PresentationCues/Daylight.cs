@@ -11,7 +11,7 @@ namespace SocialStim.Application.PresentationCues
         {
             if (phase == GamePhase.Dawn || phase == GamePhase.Discussion) return 0;
             float trial = Math.Min(1f, Math.Max(0f, (float)usedTrials / Math.Max(1, allowedTrials)));
-            return phase == GamePhase.LastWords || phase == GamePhase.Execution ? 1f : 0.35f + 0.55f * trial;
+            return phase == GamePhase.LastWords || phase == GamePhase.Execution ? 1f : 0.65f + 0.3f * trial;
         }
     }
 }

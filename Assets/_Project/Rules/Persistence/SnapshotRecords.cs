@@ -18,7 +18,7 @@ namespace SocialStim.Rules.Persistence
         internal static void Role(BinaryWriter w, RoleId? role) => SnapshotIO.Text(w, role?.Value ?? "");
         internal static RoleId? Role(BinaryReader r, IReadOnlyList<RoleSpec> catalog)
         {
-            string id = SnapshotIO.Text(r, 256);
+            string id = SnapshotIO.Text(r);
             if (id.Length == 0) return null;
             RoleSpec role = catalog.FirstOrDefault(x => x.Id.Value == id);
             if (role == null) throw new InvalidDataException("Snapshot references missing role content.");

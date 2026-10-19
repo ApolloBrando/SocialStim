@@ -51,6 +51,7 @@ namespace SocialStim.Presentation.Text
         private string _menuFamily;
         private int _menuPage;
         private int _displayDay = 1;
+        private int _daySpeeches;
         private RectTransform _castPanel;
         private string _pendingStatus;
         private readonly Dictionary<CharacterId, ParticipantCard> _cards = new Dictionary<CharacterId, ParticipantCard>();
@@ -74,6 +75,12 @@ namespace SocialStim.Presentation.Text
                 if (_request != null && _next < _request.View.Transcript.Count)
                 {
                     GameObservation observation = _request.View.Transcript[_next];
+                    if (observation.Cue == GameCue.SpeechDelivered && !_palette.Night)
+                    {
+                        _daySpeeches++;
+                        float expected = Mathf.Max(1, _request.View.Characters.Count * 3);
+                        ApplyPalette(false, Mathf.Max(_palette.DayProgress, 0.6f * Mathf.Clamp01(_daySpeeches / expected)));
+                    }
                     if (observation.Intent == SpeechIntent.ClaimRole && observation.Speaker.HasValue && observation.ClaimedRole.HasValue)
                     {
                         string name = _request.View.Characters.First(c => c.Id == observation.Speaker.Value).Name;
@@ -159,7 +166,7 @@ namespace SocialStim.Presentation.Text
             foreach (RoleSpec role in roles)
             {
                 RoleId id = role.Id;
-                AddButton("Play " + role.Name, role.Faction + " | Night: " + role.Ability, () => start(id));
+                AddButton("Play " + role.Name, role.Faction + " | Night: " + ActionLabels.Ability(role.Ability), () => start(id));
             }
             _textEffects.SetDocument(SemanticText.Literal(_transcript.text), 0, _palette);
             _textEffects.Apply(int.MaxValue, default, 0);
@@ -206,7 +213,7 @@ namespace SocialStim.Presentation.Text
             while (_request != null && !_playback.Busy && _next < _request.View.Transcript.Count)
             {
                 var observation = _request.View.Transcript[_next];
-                if (observation.Day != _displayDay) { _displayDay = observation.Day; ApplyPalette(false); }
+                if (observation.Day != _displayDay) { _displayDay = observation.Day; _daySpeeches = 0; ApplyPalette(false); }
                 if (observation.Cue == GameCue.NightFalls) ApplyPalette(true);
                 if (observation.Cue == GameCue.DawnBreaks) ApplyPalette(false);
                 if (!_palette.Night && observation.Cue == GameCue.TrialStarted)
@@ -243,7 +250,7 @@ namespace SocialStim.Presentation.Text
         {
             _playback.Cancel(); _request = null; _next = 0; _currentStart = 0;
             _shown.Clear(); _spans.Clear(); _cues = new VisibleCueResolver(); _wasDisplaying = false;
-            _visibleClaims.Clear(); _displayDay = 1; _pendingStatus = null;
+            _visibleClaims.Clear(); _displayDay = 1; _daySpeeches = 0; _pendingStatus = null;
             foreach (ParticipantCard card in _cards.Values) { card.gameObject.SetActive(false); Destroy(card.gameObject); }
             _cards.Clear();
             if (_castPanel != null) _castPanel.gameObject.SetActive(false);
@@ -310,7 +317,7 @@ namespace SocialStim.Presentation.Text
             if (ready && _request != null)
             {
                 if (_request.View.Phase != GamePhase.Ended)
-                    ApplyPalette(Daylight.IsNight(_request.View.Phase), Daylight.Progress(_request.View.Phase, _request.View.TrialsUsed, _request.View.TrialsAllowed));
+                    ApplyPalette(Daylight.IsNight(_request.View.Phase), Mathf.Max(_palette.DayProgress, Daylight.Progress(_request.View.Phase, _request.View.TrialsUsed, _request.View.TrialsAllowed)));
                 _status.text = _pendingStatus;
                 _castPanel.gameObject.SetActive(true);
                 foreach (var participant in _request.View.Characters)
@@ -333,7 +340,7 @@ namespace SocialStim.Presentation.Text
             if (_menuCategory != null) options = options.Where(o => o.Category == _menuCategory);
             if (_menuFamily != null) options = options.Where(o => o.Family == _menuFamily);
             var entries = new List<Tuple<string, string, Action>>();
-            if (_menuCategory == null && options.Count() > 8)
+            if (_menuCategory == null && options.Count() > 8 && options.Select(o => o.Category).Distinct().Count() > 1)
             {
                 foreach (var group in options.GroupBy(o => o.Category))
                 {
