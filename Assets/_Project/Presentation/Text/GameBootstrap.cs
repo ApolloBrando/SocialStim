@@ -23,6 +23,8 @@ namespace SocialStim.Presentation.Text
         [SerializeField, Range(1, 10)] private int _trialsPerDay = 2;
         [SerializeField, Range(1, 10)] private int _discussionRounds = 3;
         [SerializeField] private bool _revealOnDeath = true;
+        [Tooltip("Total participants, including you. Zero uses the exact authored role slots.")]
+        [SerializeField, Min(0)] private int _participantCount = 9;
         private TextGameView _view;
         private GamePresenter _presenter;
 
@@ -53,7 +55,8 @@ namespace SocialStim.Presentation.Text
         private void ShowSetup()
         {
             _presenter?.Dispose(); _presenter = null;
-            _view.ShowSetup(_catalog.LoadRoles(), _randomSeed ? "Random seed per run" : "Fixed seed " + unchecked((uint)_fixedSeed), Begin);
+            _view.ShowSetup(_catalog.LoadRoles(), (_participantCount > 0 ? _participantCount.ToString() : _catalog.LoadSetup()?.Slots.Count.ToString() ?? "7")
+                + " participants · " + (_randomSeed ? "Random seed" : "Seed " + unchecked((uint)_fixedSeed)), Begin);
         }
 
         private void Begin(RoleId? chosenRole)
@@ -63,7 +66,7 @@ namespace SocialStim.Presentation.Text
                 uint seed = _randomSeed ? BitConverter.ToUInt32(Guid.NewGuid().ToByteArray(), 0) : unchecked((uint)_fixedSeed);
                 var roles = _catalog.LoadRoles();
                 var options = new RunOptions(seed, chosenRole, _trialsPerDay, _discussionRounds, _revealOnDeath);
-                var session = RunFactory.Create(options, roles, _catalog.LoadNames(), _catalog.LoadDialogue(), reasoning: _catalog.LoadReasoning(), setup: _catalog.LoadSetup());
+                var session = RunFactory.Create(options, roles, _catalog.LoadNames(), _catalog.LoadDialogue(), reasoning: _catalog.LoadReasoning(), setup: _catalog.LoadSetup(_participantCount));
                 _presenter = new GamePresenter(new GameController(session, roles), _view, _view);
             }
             catch (Exception e) when (e is ArgumentException || e is InvalidOperationException || e is OverflowException)

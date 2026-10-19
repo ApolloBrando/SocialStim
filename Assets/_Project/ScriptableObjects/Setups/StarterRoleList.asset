@@ -58,3 +58,6 @@ MonoBehaviour:
     Faction: 2
     FilterCategory: 0
     Category: 0
+  _townShare: 6
+  _antagonistShare: 2
+  _neutralShare: 1

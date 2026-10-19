@@ -69,7 +69,8 @@ owner authorizes merge.
 
 ## Content and accessibility
 
-Final dialogue belongs to the project owner. Any engineering example text must
-be clearly marked `PLACEHOLDER`. Do not introduce runtime generative AI services.
-Effects are a later milestone. They must support skipping, reduced motion,
+The owner has requested natural prototype dialogue and may freely revise it.
+Keep conversation in StarterDialogue.json and report wording in the documented
+templates. Keep non-gameplay copy brief. Do not introduce runtime generative AI
+services. Effects must support skipping, reduced motion,
 adjustable intensity, limited/disabled flashes, and non-color-only information.

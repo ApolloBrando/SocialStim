@@ -22,8 +22,9 @@ namespace SocialStim.Presentation.Text
             TextUiFactory.Border((RectTransform)transform);
             _label = TextUiFactory.Text("Identity", transform, font, 14);
             _label.alignment = TextAlignmentOptions.Center;
+            _label.overflowMode = TextOverflowModes.Ellipsis;
             TextUiFactory.Fill(_label.rectTransform, Vector2.zero, Vector2.one, new Vector2(4, 2), new Vector2(-4, -2));
-            var layout = gameObject.AddComponent<LayoutElement>(); layout.minWidth = 72; layout.preferredHeight = 40;
+            var layout = gameObject.AddComponent<LayoutElement>(); layout.minWidth = 104; layout.preferredWidth = 104; layout.preferredHeight = 40;
         }
 
         public void Render(KnownCharacter participant, bool self, TextPalette palette)

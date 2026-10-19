@@ -35,6 +35,7 @@ namespace SocialStim.Rules.Phases
         private OutcomeKind _outcome;
         private TeamNightPlan _lastTeamPlan;
         private bool _opening = true;
+        private bool _submitting;
         private readonly Dictionary<CharacterId, NightOrder> _lastActions = new Dictionary<CharacterId, NightOrder>();
         private readonly HashSet<CharacterId> _executionObjectives = new HashSet<CharacterId>();
 
@@ -54,8 +55,8 @@ namespace SocialStim.Rules.Phases
                     actor.Id, actor.Role, setup, catalog, teammates, reasoning));
                 _results.Add(actor.Id, new List<NightReport>());
             }
-            Emit(GameCue.PhaseChanged, $"Day 1. You are {Player.Name}, the {Player.Role.Name} ({Player.Role.Faction}). Seed: {options.Seed}.");
-            Emit(GameCue.PhaseChanged, $"Public setup: {setup.Town} Town, {setup.Antagonist} Antagonist, {setup.Neutral} Neutral. These are initial counts, not surviving secret alignments.");
+            Emit(GameCue.PhaseChanged, $"You are {Player.Name}, the {Player.Role.Name} ({Player.Role.Faction}).");
+            Emit(GameCue.PhaseChanged, $"Starting cast: {setup.Town} Town · {setup.Antagonist} Antagonist · {setup.Neutral} Neutral.");
         }
 
         /// <summary>Only public/player-private observations are ever emitted on this event.</summary>
@@ -70,14 +71,22 @@ namespace SocialStim.Rules.Phases
                 new NightOrder(Player.Id, a.Id), actors)).Select(a => a.Id).ToList() : new List<CharacterId>();
             return new PlayerView(_revision, _options.Seed, _phases.Day, _phases.Phase, _trials, _options.TrialsPerDay,
                 Player.Alive, Player.Role, Player.Charges, _defendant, _outcome, PlayerWon(),
-                knowledge.Characters, legal.AsReadOnly(), _transcript.ToList().AsReadOnly(), _opening, _lastActions.ContainsKey(Player.Id));
+                knowledge.Characters, legal.AsReadOnly(), _transcript.ToList().AsReadOnly(), _opening, _lastActions.ContainsKey(Player.Id), _options.DiscussionRounds);
         }
 
         /// <summary>Applies one legal player command; invalid input leaves state and RNG untouched.</summary>
         public bool TrySubmit(GameCommand command, out string error)
         {
+            if (_submitting) { error = "A turn is already resolving."; return false; }
             error = ValidatePlayerCommand(command);
             if (error != null) return false;
+            _submitting = true;
+            try { ApplyCommand(command); return true; }
+            finally { _submitting = false; }
+        }
+
+        private void ApplyCommand(GameCommand command)
+        {
             switch (_phases.Phase)
             {
                 case GamePhase.Discussion:
@@ -116,7 +125,6 @@ namespace SocialStim.Rules.Phases
                     _trials = 0; _discussionRounds = 0; _opening = true; Move(GamePhase.Discussion); MorningReports(); break;
             }
             _revision++;
-            return true;
         }
 
         private Participant Player => _cast[0];
@@ -189,8 +197,7 @@ namespace SocialStim.Rules.Phases
         private void SayActionReport(Participant actor)
         {
             NightOrder order = _lastActions[actor.Id];
-            string report = !order.Target.HasValue ? "I passed last night."
-                : "I selected " + actor.Role.Ability + " on " + Actor(order.Target.Value).Name + " last night.";
+            string report = NightActionText.Selection(actor.Role.Ability, order.Target.HasValue ? Actor(order.Target.Value).Name : null);
             foreach (NightReport result in _results[actor.Id].Where(r => r.Night == _phases.Day - 1))
                 report += " " + DescribeReport(result);
             Say(actor, GameCommand.Speak(SpeechIntent.ReportAction, order.Target), report);
@@ -201,13 +208,13 @@ namespace SocialStim.Rules.Phases
             switch (report.Kind)
             {
                 case ReportKind.Investigation: return Actor(report.Target.Value).Name + " appeared " + report.Alignment + ".";
-                case ReportKind.Blocked: return "My ability was blocked; I do not know who blocked it.";
-                case ReportKind.AttackFailed: return "My attack did not kill the target.";
-                case ReportKind.ProtectionApplied: return "Protection was applied, which does not prove an attack.";
+                case ReportKind.Blocked: return "Someone blocked me. I don\'t know who.";
+                case ReportKind.AttackFailed: return "My attack failed.";
+                case ReportKind.ProtectionApplied: return "My protection took effect; I can\'t tell if anyone attacked.";
                 case ReportKind.VisitorSeen: return Actor(report.Target.Value).Name + " visited " + Actor(report.Subject.Value).Name + ".";
                 case ReportKind.NoVisitors: return "I saw no other visitors to " + Actor(report.Target.Value).Name + ".";
-                case ReportKind.ForgeryApplied: return "I changed the target's investigative appearance for that night.";
-                default: return "I was attacked and survived; I do not know the attacker.";
+                case ReportKind.ForgeryApplied: return "I made the target look like an Antagonist for the night.";
+                default: return "I survived an attack. I don\'t know who it was.";
             }
         }
 
@@ -233,8 +240,7 @@ namespace SocialStim.Rules.Phases
                         Say(actor, GameCommand.Speak(SpeechIntent.ReportInvestigation, targets[_decisions.Next(targets.Count)], faction: Faction.Antagonist));
                     else
                         Say(actor, GameCommand.Speak(SpeechIntent.ReportAction),
-                            asserted.Ability == AbilityKind.None ? "I had no night action."
-                                : "I claim I used " + asserted.Ability + " last night.");
+                            NightActionText.Claimed(asserted.Ability));
                 }
             }
         }
@@ -258,7 +264,7 @@ namespace SocialStim.Rules.Phases
             }
             _defendant = VoteResolver.Nominee(votes, Living().Count());
             if (!_defendant.HasValue)
-            { Emit(GameCue.VoteTied, "No nominee reached a strict majority. The day ends without a trial."); StartNight(); return; }
+            { Emit(GameCue.VoteTied, "No majority. No trial today."); StartNight(); return; }
             _trials++;
             Move(GamePhase.Defense);
             if (_defendant != Player.Id) Say(Actor(_defendant.Value), GameCommand.Speak(SpeechIntent.Defend));
@@ -286,7 +292,7 @@ namespace SocialStim.Rules.Phases
             }
             else
             {
-                Emit(GameCue.VerdictInnocent, $"{Actor(_defendant.Value).Name} is acquitted. Guilty must exceed Innocent; abstentions are excluded.");
+                Emit(GameCue.VerdictInnocent, $"{Actor(_defendant.Value).Name} is acquitted.");
                 _defendant = null;
                 if (_trials < _options.TrialsPerDay) Move(GamePhase.Nomination); else StartNight();
             }
@@ -327,7 +333,7 @@ namespace SocialStim.Rules.Phases
                 orders.Add(new NightOrder(killer.Actor, _lastTeamPlan.Killer == killer.Actor ? _lastTeamPlan.Target : null));
             }
             if (Player.Alive && Player.Role.Faction == Faction.Antagonist && _lastTeamPlan != null)
-                Emit(GameCue.PhaseChanged, $"PRIVATE TEAM: {Actor(_lastTeamPlan.Killer).Name} will {( _lastTeamPlan.Target.HasValue ? "attack " + Actor(_lastTeamPlan.Target.Value).Name : "pass tonight")}.");
+                Emit(GameCue.PhaseChanged, $"Team: {Actor(_lastTeamPlan.Killer).Name} will {( _lastTeamPlan.Target.HasValue ? "attack " + Actor(_lastTeamPlan.Target.Value).Name : "pass tonight")}.");
             _lastActions.Clear();
             foreach (NightOrder order in orders) _lastActions.Add(order.Actor, order);
             Move(GamePhase.NightResolution);
@@ -348,19 +354,16 @@ namespace SocialStim.Rules.Phases
 
         private void DeliverReport(NightReport report)
         {
+            GameCue cue;
             switch (report.Kind)
             {
-                case ReportKind.VisitorSeen:
-                case ReportKind.NoVisitors:
-                case ReportKind.ForgeryApplied:
-                    Emit(GameCue.PhaseChanged, "PRIVATE: " + DescribeReport(report)); break;
-                case ReportKind.Investigation:
-                    Emit(GameCue.InvestigationResultReceived, $"PRIVATE: {Actor(report.Target.Value).Name} appeared {report.Alignment} to your investigation."); break;
-                case ReportKind.Blocked: Emit(GameCue.AbilityBlocked, "PRIVATE: Your night ability was blocked. The visitor is unknown."); break;
-                case ReportKind.Targeted: Emit(GameCue.PlayerTargetedAtNight, "PRIVATE: You were attacked and survived. The attacker is unknown."); break;
-                case ReportKind.AttackFailed: Emit(GameCue.PhaseChanged, $"PRIVATE: Your attack on {Actor(report.Target.Value).Name} failed."); break;
-                case ReportKind.ProtectionApplied: Emit(GameCue.ProtectionApplied, $"PRIVATE: You applied protection to {Actor(report.Target.Value).Name}. This does not prove an attack occurred."); break;
+                case ReportKind.Investigation: cue = GameCue.InvestigationResultReceived; break;
+                case ReportKind.Blocked: cue = GameCue.AbilityBlocked; break;
+                case ReportKind.Targeted: cue = GameCue.PlayerTargetedAtNight; break;
+                case ReportKind.ProtectionApplied: cue = GameCue.ProtectionApplied; break;
+                default: cue = GameCue.PhaseChanged; break;
             }
+            Emit(cue, "Private: " + DescribeReport(report));
         }
 
         private void Kill(Participant actor, bool execution)
@@ -375,7 +378,7 @@ namespace SocialStim.Rules.Phases
                 foreach (Participant observer in _cast) _beliefs[observer.Id].Reveal(actor.Id, actor.Role, _phases.Day);
                 Emit(GameCue.RoleRevealed, $"Revealed: {actor.Name} was {actor.Role.Name} ({actor.Role.Faction}).");
             }
-            if (actor.Id == Player.Id) Emit(GameCue.PhaseChanged, "You are dead. Continue to spectate; you can no longer speak, vote, or target anyone.");
+            if (actor.Id == Player.Id) Emit(GameCue.PhaseChanged, "You died. You can keep watching.");
         }
 
         private bool FinishIfTerminal()
@@ -386,7 +389,9 @@ namespace SocialStim.Rules.Phases
             if (_outcome == OutcomeKind.Ongoing) return false;
             Move(GamePhase.Ended);
             GameCue cue = _outcome == OutcomeKind.Draw ? GameCue.RunDrawn : PlayerWon() ? GameCue.VictoryAchieved : GameCue.DefeatSuffered;
-            Emit(cue, $"Run ended: {_outcome}. Your objective: {(PlayerWon() ? "achieved" : "not achieved")}. Survival: {(Player.Alive ? "alive" : "dead")}.");
+            string result = _outcome == OutcomeKind.TownVictory ? "Town wins." : _outcome == OutcomeKind.AntagonistVictory
+                ? "Antagonists win." : _outcome == OutcomeKind.LoneKillerVictory ? "The Lone Killer wins." : "Draw.";
+            Emit(cue, $"Run ended: {result} Objective {(PlayerWon() ? "achieved" : "missed")}.");
             return true;
         }
 
@@ -411,10 +416,22 @@ namespace SocialStim.Rules.Phases
         private void Move(GamePhase phase)
         {
             _phases.MoveTo(phase);
+            if (phase == GamePhase.Execution || phase == GamePhase.NightResolution || phase == GamePhase.Ended) return;
             GameCue cue = phase == GamePhase.NightSelection ? GameCue.NightFalls : phase == GamePhase.Dawn ? GameCue.DawnBreaks
                 : phase == GamePhase.Defense ? GameCue.TrialStarted : GameCue.PhaseChanged;
-            Emit(cue, phase == GamePhase.Defense ? $"Trial {_trials}/{_options.TrialsPerDay}: {Actor(_defendant.Value).Name} may defend."
-                : $"Day {_phases.Day}: {phase}.", target: phase == GamePhase.Defense ? _defendant : null);
+            string text;
+            switch (phase)
+            {
+                case GamePhase.Defense: text = $"Trial {_trials}/{_options.TrialsPerDay}: {Actor(_defendant.Value).Name}."; break;
+                case GamePhase.Discussion: text = "Discussion begins."; break;
+                case GamePhase.Nomination: text = "Nominations open."; break;
+                case GamePhase.Judgement: text = "Time to vote."; break;
+                case GamePhase.LastWords: text = "Last words."; break;
+                case GamePhase.NightSelection: text = $"Night {_phases.Day}."; break;
+                case GamePhase.Dawn: text = $"Day {_phases.Day}."; break;
+                default: text = phase.ToString(); break;
+            }
+            Emit(cue, text, target: phase == GamePhase.Defense ? _defendant : null);
         }
 
         private void Emit(GameCue cue, string text, CharacterId? speaker = null, DialogueMetadata metadata = null,

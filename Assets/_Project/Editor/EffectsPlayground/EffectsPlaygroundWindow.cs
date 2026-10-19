@@ -10,7 +10,7 @@ namespace SocialStim.Editor.EffectsPlayground
     {
         private readonly DisplayPlayback _playback = new DisplayPlayback();
         private PresentationCue _cue = PresentationCue.Accusation;
-        private string _source = "PLACEHOLDER: <emphasis>I heard you.</emphasis> <fear>Something is wrong.</fear>";
+        private string _source = "<emphasis>I heard you.</emphasis> <fear>Something is wrong.</fear>";
         private bool _night, _reduced = true, _flash, _instant;
         private float _intensity = 0.5f;
         private string _result = "No display started.";
@@ -39,8 +39,8 @@ namespace SocialStim.Editor.EffectsPlayground
             if (GUILayout.Button("Cancel")) _playback.Cancel();
             EditorGUILayout.EndHorizontal();
             Rect rect = GUILayoutUtility.GetRect(100, 220, GUILayout.ExpandWidth(true));
-            Color background = _night ? new Color(0.96f, 0.95f, 0.93f) : new Color(0.035f, 0.035f, 0.04f);
-            Color ink = _night ? new Color(0.07f, 0.07f, 0.08f) : new Color(0.92f, 0.92f, 0.9f);
+            Color background = _night ? new Color(0.075f, 0.09f, 0.105f) : new Color(0.975f, 0.955f, 0.87f);
+            Color ink = _night ? new Color(0.94f, 0.92f, 0.86f) : new Color(0.16f, 0.14f, 0.13f);
             EditorGUI.DrawRect(rect, background);
             EffectFrame frame = _playback.Frame;
             Color edge = Color.Lerp(background, ink, frame.Border);
@@ -54,13 +54,13 @@ namespace SocialStim.Editor.EffectsPlayground
                 EditorGUI.DrawRect(new Rect(rect.x + i * 2, rect.y + i * 2, rect.width - i * 4, 2), vignette);
                 EditorGUI.DrawRect(new Rect(rect.x + i * 2, rect.yMax - 2 - i * 2, rect.width - i * 4, 2), vignette);
             }
-            string text = _playback.Text == null ? "PLACEHOLDER: preview" : _playback.Text.Text.Substring(0, _playback.VisibleUtf16);
+            string text = _playback.Text == null ? "Preview" : _playback.Text.Text.Substring(0, _playback.VisibleUtf16);
             _style.normal.textColor = ink;
             float shake = Mathf.Sin(_playback.Elapsed * 27) * frame.Shake * 3;
             GUI.Label(new Rect(rect.x + 16 + shake, rect.y + 16, rect.width - 32, rect.height - 32), text, _style);
             Color flash = ink; flash.a = frame.Flash; EditorGUI.DrawRect(rect, flash);
             EditorGUILayout.LabelField(_result);
-            EditorGUILayout.HelpBox("Default profiles and portable timing preview. Validate TMP geometry, scene profile overrides, navigation, and allocations in Play Mode.", MessageType.Info);
+            EditorGUILayout.HelpBox("Default profiles. Check scene overrides and TMP rendering in Play Mode.", MessageType.Info);
         }
         private void Play()
         {

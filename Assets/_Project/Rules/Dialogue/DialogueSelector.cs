@@ -14,7 +14,7 @@ namespace SocialStim.Rules.Dialogue
         private readonly IReadOnlyList<DialogueLine> _lines;
         private readonly IRandomSource _random;
         private readonly Dictionary<CharacterId, Queue<string>> _recent = new Dictionary<CharacterId, Queue<string>>();
-        private static readonly Regex Variables = new Regex(@"\{([a-zA-Z]+)\}");
+        private static readonly Regex Variables = new Regex(@"\{([^{}]*)\}");
         private static readonly HashSet<string> AllowedVariables = new HashSet<string> { "speaker", "target", "role", "result", "day" };
 
         /// <summary>Validates content and generic fallback coverage for every registered intent.</summary>

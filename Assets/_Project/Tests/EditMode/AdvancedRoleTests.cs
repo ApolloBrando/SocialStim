@@ -192,7 +192,7 @@ namespace SocialStim.Tests.EditMode
         {
             var strategy = new ScenarioStrategy { Nominee = new CharacterId(0), Verdict = Verdict.Guilty };
             var members = new[] { "provocateur", "inspector", "physician", "interrupter", "assassin", "citizen" };
-            RunSession run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1, maximumDays: 1),
+            RunSession run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1, maximumDays: 2),
                 members.Select((id, i) => new CastMemberSpec("Person" + i, new RoleId(id))), Roles(), TestContent.Lines(), strategy);
             Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(null));
             Submit(run, GameCommand.Speak(SpeechIntent.Defend)); Submit(run, GameCommand.Continue());
@@ -200,6 +200,9 @@ namespace SocialStim.Tests.EditMode
             Assert.That(run.GetPlayerView().Alive, Is.False);
             Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.NightSelection));
             Submit(run, GameCommand.Continue());
+            Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.Dawn));
+            for (int step = 0; step < 10 && run.GetPlayerView().Phase != GamePhase.Ended; step++)
+                Submit(run, GameCommand.Continue());
             Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.Ended));
             Assert.That(run.GetPlayerView().Won, Is.True);
         }

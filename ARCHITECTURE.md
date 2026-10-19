@@ -125,9 +125,8 @@ Endless runs need a later documented stalemate/turn-cap policy, not an accidenta
 "Town wins" fallback.
 
 Roles compose ability definitions, resources, immunities, appearances, and win
-policies. New role assets reuse existing ability implementations. A genuinely
-new mechanic adds a small ability/handler and explicit registration at the
-composition root, without editing the resolver or state machine. IDs and handler
+policies. New role assets reuse existing ability implementations. A new mechanic adds an ability/stage and explicit registration in NightResolver,
+with corresponding legality, result, strategy and outcome changes as needed. IDs and handler
 compatibility are validated before a run. Do not rely on reflection-based type
 discovery that may fail under build stripping.
 
@@ -179,7 +178,7 @@ Dialogue version 2 adds AND-combined predicates over public phase/day, speaker
 traits/own role, assertions, permitted evidence, and visible pressure. Context is
 captured before publishing a statement, so it cannot create its own eligibility.
 Generic fallbacks are mandatory; anti-repetition never relaxes conditions. Schema
-1 remains supported without conditions. No visual markup parser is introduced.
+1 remains supported without conditions. Presentation parses supported semantic markup independently of the rules.
 
 Difficulty changes Strategy implementations, not access to secret truth.
 Antagonists share only role-authorized team facts and a deterministic target plan.
@@ -352,3 +351,25 @@ public-identity object. Titles and action descriptions have separate hierarchy;
 ChoiceFocusIndicator supports hover plus a textual keyboard marker and sage
 focus tint. The palette distinguishes canvas, panel, button, text and subdued
 frames. No generated scene objects or runtime textures are committed assets.
+
+## Repository audit and configurable casts
+
+The content editing entry point is [Docs/CONTENT_GUIDE.md](Docs/CONTENT_GUIDE.md).
+StarterDialogue contains 70 authored natural variants. NightActionText holds
+first-person selection wording; RunSession shares result descriptions between
+private delivery and attributed action reports. Short UI copy remains in the
+application controller and Unity view.
+
+GameBootstrap supplies a participant count. Positive counts ask RoleListDefinition
+to scale authored faction shares through RoleList.ForPopulation; zero loads
+exact slots. Both paths use the same constrained role resolver and validate a
+chosen role, unique definitions and name availability. The old 20-participant
+and 64-definition limits are removed; bounded search still prevents runaway
+constraint resolution. The legacy seven-person factory fallback now uses the
+same resolver instead of a second assignment algorithm.
+
+Turn submission rejects synchronous callback reentry. PlayerView exposes the
+configured discussion length so presentation warmth does not assume three rounds.
+Participant and claim strips have horizontal ScrollRects. The editor preview
+uses the same day-light/night-dark direction as gameplay. No save/resume system
+is introduced.

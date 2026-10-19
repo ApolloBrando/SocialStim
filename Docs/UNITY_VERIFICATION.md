@@ -21,7 +21,7 @@ owner checks that baseline; its existence is not evidence of a successful import
   review their license files. This delivery contains no third-party font bytes.
 - [ ] Confirm Force Text serialization and Visible Meta Files.
 - [ ] Run Tools > SocialStim > **Validate Starter Content**; expect 5 roles,
-  45 placeholder lines on milestone 01 or 51 on milestone 02, and 20 names.
+  70 dialogue lines on the audit branch, and 20 names.
 - [ ] Review and commit the generated `Packages/packages-lock.json` and missing
   default ProjectSettings files on this feature branch, excluding user/cache files.
 

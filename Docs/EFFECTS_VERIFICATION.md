@@ -3,12 +3,12 @@
 All boxes remain pending until executed in Unity 6000.3.26f1. This is a separate
 branch from the owner's main-branch test; do not overwrite that checkout.
 
-- [ ] Open `milestone/03-role-interactions` (or stacked `milestone/04-save-resume`) in a separate checkout. Resolve
+- [ ] Open the audit feature branch in a separate checkout. Resolve
   packages and TMP Essential Resources as in `UNITY_VERIFICATION.md`.
 - [ ] Confirm no compile errors in runtime, editor or test assemblies. The
   PlayMode test assembly references uGUI/TMP for its actual adapter checks.
-- [ ] Run Tools > SocialStim > Validate Starter Content. Expect 11 roles, 54
-  placeholder lines and 20 names; malformed semantic markup must fail clearly.
+- [ ] Run Tools > SocialStim > Validate Starter Content. Expect 11 roles, 70
+  dialogue lines and 20 names; malformed semantic markup must fail clearly.
 - [ ] Inspect Game.unity: StarterCatalog and StarterEffects assigned; no manual
   camera, material, URP or shader setup needed.
 - [ ] Run EditMode and PlayMode suites. TMP adapter tests require imported fonts;
@@ -60,3 +60,12 @@ branch from the owner's main-branch test; do not overwrite that checkout.
 - Inspect rounded surfaces, soft frames, action title/description hierarchy,
   hover/keyboard focus and the slate night palette at Full HD. Check all text
   against both normal and focused button colours; the focus marker remains text.
+
+- Set Participant Count to 3, 9, 12 and 20; verify matching cast/role totals.
+  Add more names and test 21 or more participants. Pan the participant and claim
+  strips horizontally and confirm no overlap with gameplay panels.
+- Set Participant Count to zero and edit exact slots. Check impossible unique
+  role selections and insufficient names report a clear setup error.
+- Import a malformed metadata value or unknown variable; confirm validation fails.
+- Check each action report attributes the speaker once and describes attempts
+  without asserting a blocked/failed ability succeeded.

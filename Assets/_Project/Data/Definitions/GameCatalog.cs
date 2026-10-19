@@ -19,7 +19,8 @@ namespace SocialStim.Data.Definitions
         [SerializeField] private string[] _names;
         [SerializeField] private ReasoningDefinition _reasoning;
         [SerializeField] private RoleListDefinition _setup;
-        public RoleList LoadSetup() => _setup != null ? _setup.Load() : null;
+        public RoleList LoadSetup(int participants = 0) => _setup != null ? _setup.Load(participants)
+            : participants > 0 ? RoleList.ForPopulation(participants) : null;
 
         /// <summary>Loads detached role definitions, rejecting missing/duplicate assets.</summary>
         public IReadOnlyList<RoleSpec> LoadRoles()
@@ -49,9 +50,9 @@ namespace SocialStim.Data.Definitions
         /// <summary>Copies the cast-name pool so sessions cannot mutate asset state.</summary>
         public IReadOnlyList<string> LoadNames()
         {
-            if (_names == null || _names.Length < 7 || _names.Any(string.IsNullOrWhiteSpace)
+            if (_names == null || _names.Length < 3 || _names.Any(string.IsNullOrWhiteSpace)
                 || _names.Distinct(StringComparer.Ordinal).Count() != _names.Length)
-                throw new InvalidOperationException("Catalog needs seven or more distinct nonempty names.");
+                throw new InvalidOperationException("Catalog needs at least three distinct nonempty names.");
             return _names.ToList().AsReadOnly();
         }
 

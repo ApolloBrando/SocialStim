@@ -22,6 +22,13 @@ namespace SocialStim.Data.Definitions
                 FilterFaction ? Faction : (Faction?)null, FilterCategory ? Category : (RoleCategory?)null);
         }
         [SerializeField] private Slot[] _slots;
-        public RoleList Load() => new RoleList(_slots?.Select(s => s?.Load()) ?? throw new InvalidOperationException("Role list slots missing."));
+        [SerializeField, Min(1)] private int _townShare = 6;
+        [SerializeField, Min(1)] private int _antagonistShare = 2;
+        [SerializeField, Min(0)] private int _neutralShare = 1;
+
+        /// <summary>Zero uses exact slots; a positive count uses the authored faction shares.</summary>
+        public RoleList Load(int participants = 0) => participants == 0
+            ? new RoleList(_slots?.Select(s => s?.Load()) ?? throw new InvalidOperationException("Role list slots missing."))
+            : RoleList.ForPopulation(participants, _townShare, _antagonistShare, _neutralShare);
     }
 }
