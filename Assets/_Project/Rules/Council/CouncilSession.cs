@@ -43,7 +43,7 @@ namespace SocialStim.Rules.Council
                 nightTargets.AsReadOnly(), votes.AsReadOnly(), _world.Eliminated, ended ? _world.Outcome : OutcomeKind.Ongoing,
                 ended && _win.Won(_world.Player.Role, _world.Player.Alive, _world.Player.VotedOut, _world.Outcome),
                 new ReadOnlyDictionary<CharacterId, RoleId>(ended ? _world.Actors.ToDictionary(a => a.Id, a => a.StartingRole.Id)
-                    : new Dictionary<CharacterId, RoleId>()), ended ? _world.Events.ToList().AsReadOnly() : new List<CouncilEvent>().AsReadOnly());
+                    : new Dictionary<CharacterId, RoleId>()), ended ? _world.Events.ToList().AsReadOnly() : new List<CouncilEvent>().AsReadOnly(), _world.Options.Abstain);
         }
 
         /// <summary>Phrase preview is read-only and uses an isolated stream.</summary>

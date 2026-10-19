@@ -13,11 +13,11 @@ namespace SocialStim.Rules.Council
             int rounds, int windowsLeft, bool respond, CharacterId? respondTo, IReadOnlyList<CouncilEvent> events,
             IReadOnlyList<CharacterId> nightTargets, IReadOnlyList<CharacterId> voteTargets,
             CharacterId? eliminated, OutcomeKind outcome, bool won, IReadOnlyDictionary<CharacterId, RoleId> finalRoles,
-            IReadOnlyList<CouncilEvent> afterAction)
+            IReadOnlyList<CouncilEvent> afterAction, bool canAbstain = true)
         { Revision = revision; Seed = seed; Day = day; Round = round; Phase = phase; Knowledge = knowledge;
             Rounds = rounds; WindowsLeft = windowsLeft; Respond = respond; RespondTo = respondTo; Events = events;
             NightTargets = nightTargets; VoteTargets = voteTargets; Eliminated = eliminated; Outcome = outcome;
-            Won = won; FinalRoles = finalRoles; AfterAction = afterAction; }
+            Won = won; FinalRoles = finalRoles; AfterAction = afterAction; CanAbstain = canAbstain; }
         public int Revision { get; }
         public uint Seed { get; }
         public int Day { get; }
@@ -34,6 +34,7 @@ namespace SocialStim.Rules.Council
         public CharacterId? Eliminated { get; }
         public OutcomeKind Outcome { get; }
         public bool Won { get; }
+        public bool CanAbstain { get; }
         public IReadOnlyDictionary<CharacterId, RoleId> FinalRoles { get; }
         public IReadOnlyList<CouncilEvent> AfterAction { get; }
     }

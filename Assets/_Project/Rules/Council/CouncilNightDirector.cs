@@ -68,7 +68,7 @@ namespace SocialStim.Rules.Council
                 var actor = _world.Actor(id); actor.Alive = false;
                 _world.Emit(CouncilEventKind.Death, actor.Name + " died overnight.", target: id);
                 if (_world.Options.RevealRoles)
-                    _world.Emit(CouncilEventKind.RoleReveal, actor.Name + " · " + actor.Role.Name, target: id, claim: actor.Role.Id);
+                    _world.Emit(CouncilEventKind.RoleReveal, actor.Name + " · " + actor.Role.Name, target: id, reason: Dialogue.ReasonType.NightPattern, claim: actor.Role.Id);
             }
             if (result.Deaths.Count == 0) _world.Emit(CouncilEventKind.Morning, "Everyone made it through.");
             foreach (var report in result.Reports)

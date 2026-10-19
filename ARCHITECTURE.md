@@ -381,3 +381,7 @@ See [the complete source audit](docs/AUDIT.md) and [read inventory](docs/AUDIT_I
 ## Mission phase 1
 
 RoleSpec carries explicit claim flags, capability flags and a personal objective. Mission readouts are a separate type from faction. NightPolicy selects modern one-attack healing/readout/backlash semantics without breaking optional legacy trial contracts. Pipeline stages remain small; cleanup owns delayed penalties and notices. MissionWinCondition evaluates only complete stable batches; SetupBuilder shares validation and constrained assignment across presets/custom lists. See docs/ROLES.md.
+
+## Mission phase 2
+
+The modern CouncilSession is decomposed into scoped world, day, speech, vote and night services. Public/recipient events are re-indexed after filtering to prevent private-count side channels. CouncilController owns engine-free three-step navigation and stale IDs; Unity adapters build a focused line/roster/action view. Original sessions remain an optional Trial Mode. Phrase preview uses a separate seeded stream and does not mutate revision or history. See docs/COUNCIL_UI.md.

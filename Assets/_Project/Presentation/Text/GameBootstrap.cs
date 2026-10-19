@@ -1,5 +1,7 @@
 using System;
 using SocialStim.Application.Sessions;
+using SocialStim.Presentation.Council;
+using SocialStim.Rules.Council;
 using SocialStim.Presentation.Effects;
 using SocialStim.Data.Definitions;
 using SocialStim.Rules.Cast;
@@ -25,6 +27,10 @@ namespace SocialStim.Presentation.Text
         [SerializeField] private bool _revealOnDeath = true;
         [Tooltip("Total participants, including you. Zero uses the exact authored role slots.")]
         [SerializeField, Min(0)] private int _participantCount = 9;
+        [SerializeField] private bool _trialMode;
+        [SerializeField, Range(3, 7)] private int _councilRounds = 5;
+        [SerializeField, Range(1, 2)] private int _playerWindows = 1;
+        private CouncilScreen _council;
         private TextGameView _view;
         private GamePresenter _presenter;
 
@@ -42,6 +48,14 @@ namespace SocialStim.Presentation.Text
                 _catalog.LoadRoles(); _catalog.LoadDialogue(); _catalog.LoadNames(); _catalog.LoadReasoning();
                 var events = new GameObject("Event System", typeof(EventSystem), typeof(InputSystemUIInputModule));
                 events.transform.SetParent(transform, false);
+                if (!_trialMode)
+                {
+                    _catalog.LoadMissionRoles();
+                    _council = gameObject.AddComponent<CouncilScreen>();
+                    _council.NewRunRequested += ShowCouncilSetup;
+                    _council.Initialize(font, UiPreferences.Load(), _effects != null ? _effects.Load() : null);
+                    return;
+                }
                 _view = gameObject.AddComponent<TextGameView>();
                 _view.Initialize(font, _effects != null ? _effects.Load() : null, UiPreferences.Load());
                 _view.RestartRequested += ShowSetup;
@@ -50,6 +64,26 @@ namespace SocialStim.Presentation.Text
             }
             catch (Exception exception) { Debug.LogException(exception, this); }
 #endif
+        }
+
+        private void ShowCouncilSetup()
+        {
+            int count = Mathf.Max(5, _participantCount);
+            _council.ShowSetup(_catalog.LoadMissionRoles(), count + " participants · " + _councilRounds + " rounds", BeginCouncil);
+        }
+
+        private void BeginCouncil(RoleId? chosenRole, Faction? chosenFaction)
+        {
+            try
+            {
+                uint seed = _randomSeed ? BitConverter.ToUInt32(Guid.NewGuid().ToByteArray(), 0) : unchecked((uint)_fixedSeed);
+                var options = new CouncilOptions(seed, _councilRounds, _playerWindows, revealRoles: _revealOnDeath);
+                var setup = new SetupConfiguration(Mathf.Max(5, _participantCount), playerRole: chosenRole, playerFaction: chosenFaction);
+                var session = CouncilFactory.Create(options, setup, _catalog.LoadMissionRoles(), _catalog.LoadNames(), _catalog.LoadDialogue());
+                _council.Begin(session);
+            }
+            catch (Exception exception) when (exception is ArgumentException || exception is InvalidOperationException)
+            { Debug.LogException(exception, this); }
         }
 
         private void ShowSetup()
@@ -82,6 +116,7 @@ namespace SocialStim.Presentation.Text
         private void OnDestroy()
         {
             _presenter?.Dispose();
+            if (_council != null) _council.NewRunRequested -= ShowCouncilSetup;
             if (_view != null)
             {
                 _view.RestartRequested -= ShowSetup;
