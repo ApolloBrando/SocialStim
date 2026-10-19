@@ -20,6 +20,7 @@ still require the editor.
 | Two independent assignment algorithms | Route the seven-person fallback and authored/scaled setups through RoleList.Resolve. |
 | Horizontal participant and claim rows could overflow | Use horizontal scroll strips with stable card widths. |
 | Callback could synchronously submit a second command mid-turn | Reject reentrant submissions; retain finally-based release of the guard. |
+| A mismatched role faction/category could select an unintended personal objective | Reject mismatched definitions before assigning roles. |
 | Scenario names/traits and null inputs failed late | Validate identities, personality flags and construction inputs before building a session. |
 | Dialogue variable typos containing underscores escaped validation | Validate every braced variable against the whitelist. |
 | Metadata values lacked strict string type checks | Reject malformed values with the line ID. |

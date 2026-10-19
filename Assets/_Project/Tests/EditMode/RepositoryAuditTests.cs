@@ -97,6 +97,14 @@ namespace SocialStim.Tests.EditMode
             Assert.Throws<ArgumentException>(() => new CastMemberSpec("Ada", new RoleId("citizen"), (Personality)128));
         }
 
+        [TestCase(Faction.Town, RoleCategory.NeutralEvil)]
+        [TestCase(Faction.Antagonist, RoleCategory.TownBenign)]
+        [TestCase(Faction.Neutral, RoleCategory.AntagonistKilling)]
+        public void MisconfiguredRoleCategoriesCannotSelectAnotherFactionsObjectives(Faction faction, RoleCategory category)
+        {
+            Assert.Throws<ArgumentException>(() => TestContent.Role("invalid", faction, category, AbilityKind.None));
+        }
+
         [Test]
         public void MalformedMetadataAndVariableTyposFailAtImport()
         {
