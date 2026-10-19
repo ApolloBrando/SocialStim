@@ -24,6 +24,10 @@ namespace SocialStim.Rules.Council
             PlayerStats = playerStats ?? new CharacterStats();
             if (statsMode == StatsMode.PointBuy && PlayerStats.Total != 30) throw new ArgumentException("Allocate exactly 30 stat points.");
         }
+        /// <summary>Copies the complete configuration for an independent deterministic batch run.</summary>
+        public CouncilOptions WithSeed(uint seed) => new CouncilOptions(seed, Rounds, PlayerWindows, Revote, Abstain,
+            RevealRoles, LastWords, FreeTime, FreeTimeActions, PromoteEvil, Backlash, SelfHeal, NotifyLull,
+            NullifierCharges, ForgerReadsClear, MaximumDays, Visibility, Parity, Ai.Difficulty, StatsMode, PlayerStats, Ai.Samples);
         public AiPolicy Ai { get; }
         public StatsMode StatsMode { get; }
         public CharacterStats PlayerStats { get; }

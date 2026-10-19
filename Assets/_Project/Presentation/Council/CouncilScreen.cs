@@ -221,8 +221,33 @@ namespace SocialStim.Presentation.Council
             PanelButton("Player marks", ShowMarks);
             PanelButton("Help", () => { OpenPanel("Help", "Chat, accuse or defend, then choose a roster target and phrasing.\nSpace: reveal the current line, then advance.\nClaims are assertions; readouts can be forged. Vote to eliminate one person per day."); PanelButton("Back", ShowDrawer); });
             if (SettingsRequested != null) PanelButton("Settings", () => SettingsRequested?.Invoke());
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            PanelButton("AI inspector", ShowAiInspector);
+#endif
             PanelButton("Main menu", ShowMainMenu); PanelButton("Close", Resume);
         }
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        private void ShowAiInspector()
+        {
+            var view = _controller.Snapshot; OpenPanel("AI inspector · developer", "Private beliefs; do not use while testing player deduction.");
+            foreach (var actor in view.Knowledge.Characters)
+            { var id = actor.Id; PanelButton(actor.Name, () => {
+                var k = _controller.InspectForDeveloper(id);
+                var body = new StringBuilder("Samples " + k.Inference.Samples + " · effective " + k.Inference.EffectiveSamples.ToString("0.0")
+                    + " · pressure " + k.Inference.Exposure.ToString("0%") + "\n");
+                foreach (var other in k.Characters.Where(c => c.Id != id))
+                {
+                    var b = k.Inference.Beliefs[other.Id];
+                    string top = string.Join(", ", b.Roles.OrderByDescending(r => r.Value).Take(2)
+                        .Select(r => k.Catalog.Single(role => role.Id == r.Key).Name + " " + r.Value.ToString("0%")));
+                    body.Append("\n").Append(other.Name).Append(": ").Append(top)
+                        .Append(" · credibility ").Append(b.Credibility.ToString("0%")).Append(" · affinity ").Append(b.Affinity.ToString("+0.00;-0.00"));
+                }
+                OpenPanel(actor.Name + " · AI", body.ToString()); PanelButton("Back", ShowAiInspector);
+            }); }
+            PanelButton("Back", ShowDrawer);
+        }
+#endif
         private void ShowRecords(string title, IEnumerable<CouncilEvent> records)
         {
             var view = _controller.Snapshot;
@@ -237,6 +262,9 @@ namespace SocialStim.Presentation.Council
                 : role.Objective == RoleObjective.StealParity ? "Survive until Evil reaches parity."
                 : role.Faction == Faction.Town ? "Eliminate Evil and Anarchy." : "Reach parity and eliminate Anarchy.";
             OpenPanel(role.Name, (role.Faction == Faction.Antagonist ? "Evil" : role.Faction.ToString()) + "\n" + objective
+                + "\n\n" + string.Join(" · ", Enum.GetValues(typeof(StatKind)).Cast<StatKind>().Select(s => s + " " + view.Knowledge.Skill(view.Knowledge.Self).Get(s)))
+                + (view.Knowledge.RoleCounts != null ? "\nRole list: " + string.Join(" · ", view.Knowledge.RoleCounts.Select(p => view.Knowledge.Catalog.Single(r => r.Id == p.Key).Name + " " + p.Value))
+                    : view.Knowledge.Counts != null ? "\nRoles: " + view.Knowledge.Counts.Town + " Town · " + view.Knowledge.Counts.Antagonist + " Evil · " + view.Knowledge.Counts.Neutral + " Neutral" : "\nRole list hidden.")
                 + "\n\nUses: " + (view.Knowledge.Charges < 0 ? "Unlimited" : view.Knowledge.Charges.ToString()) + "\nSeed: " + view.Seed);
             PanelButton("Copy seed", () => GUIUtility.systemCopyBuffer = view.Seed.ToString()); PanelButton("Back", ShowDrawer);
         }
@@ -260,7 +288,7 @@ namespace SocialStim.Presentation.Council
             foreach (var role in view.FinalRoles)
                 text.Append(view.Knowledge.Characters.Single(c => c.Id == role.Key).Name).Append(" · ")
                     .Append(view.Knowledge.Catalog.Single(r => r.Id == role.Value).Name).Append('\n');
-            foreach (var record in view.AfterAction.Where(e => e.Kind == CouncilEventKind.NightOrder || e.Kind == CouncilEventKind.Vote))
+            foreach (var record in view.AfterAction.Where(e => e.Kind == CouncilEventKind.NightOrder || e.Kind == CouncilEventKind.Vote || e.Kind == CouncilEventKind.Decision))
                 text.Append("\nDay ").Append(record.Day).Append(" · ").Append(record.Text);
             OpenPanel("After-action report", text.ToString()); PanelButton("Close", Resume);
         }

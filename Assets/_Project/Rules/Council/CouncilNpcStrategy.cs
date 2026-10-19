@@ -38,7 +38,7 @@ namespace SocialStim.Rules.Council
             if (targets.Count == 0) return new CouncilAction(CouncilActionKind.Pass);
             var ranked = targets.OrderByDescending(c => VoteUtility(k, c)).ThenBy(c => c.Id.Value).ToList();
             var suspect = ranked[0];
-            if (random.Next(100) < k.Policy.MistakePercent && ranked.Count > 1) suspect = ranked[random.Next(Math.Min(3, ranked.Count))];
+            if (random.Next(100) < k.Policy.MistakePercent * (1.3 - k.Skill(k.Self).Get(StatKind.Intuition) / 20.0) && ranked.Count > 1) suspect = ranked[random.Next(Math.Min(3, ranked.Count))];
             if (!claimed && k.OwnRole.CanBluff && (exposure > 0.45 || k.Round >= 2 && random.Next(100) < 14))
             {
                 var bluffs = k.Catalog.Where(r => r.Faction == Faction.Town && r.CanClaimTruthfully
@@ -67,9 +67,11 @@ namespace SocialStim.Rules.Council
         /// <inheritdoc />
         public CharacterId? Vote(CouncilKnowledge k, IRandomSource random)
         {
-            var targets = Targets(k, true).OrderByDescending(c => VoteUtility(k, c)).ThenBy(c => c.Id.Value).ToList();
+            var forecast = new CouncilVoteForecast(k);
+            var targets = Targets(k, true).OrderByDescending(c => VoteUtility(k, c) + forecast.Utility(c.Id) * k.Policy.Coordination)
+                .ThenBy(c => c.Id.Value).ToList();
             if (targets.Count == 0) return null;
-            int index = random.Next(100) < k.Policy.MistakePercent ? random.Next(Math.Min(3, targets.Count)) : 0;
+            int index = random.Next(100) < k.Policy.MistakePercent * (1.3 - k.Skill(k.Self).Get(StatKind.Intuition) / 20.0) ? random.Next(Math.Min(3, targets.Count)) : 0;
             return targets[index].Id;
         }
 
@@ -119,7 +121,7 @@ namespace SocialStim.Rules.Council
                 .OrderByDescending(c => Threat(k, c) * (1 - InfinitumChance(k, c.Id)))
                 .ThenBy(c => c.Id.Value).ToList();
             if (ordered.Count == 0) return null;
-            int mistake = random.Next(100) < k.Policy.MistakePercent ? random.Next(Math.Min(3, ordered.Count)) : 0;
+            int mistake = random.Next(100) < k.Policy.MistakePercent * (1.3 - k.Skill(k.Self).Get(StatKind.Intuition) / 20.0) ? random.Next(Math.Min(3, ordered.Count)) : 0;
             return ordered[mistake].Id;
         }
 

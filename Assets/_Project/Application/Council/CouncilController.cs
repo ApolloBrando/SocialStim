@@ -20,6 +20,8 @@ namespace SocialStim.Application.Council
         public InteractionStep Step { get; private set; }
         public bool QuickMode { get; set; }
         public CouncilSnapshot Snapshot => _session.View();
+        /// <summary>Developer-only adapter port; never offered in a release UI.</summary>
+        public CouncilKnowledge InspectForDeveloper(CharacterId actor) => _session.InspectForDeveloper(actor);
 
         public IReadOnlyList<CharacterId> Targets
         {

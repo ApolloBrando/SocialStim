@@ -16,6 +16,7 @@ namespace SocialStim.Rules.Council
         public CouncilInferenceResult Evaluate(CouncilKnowledge knowledge)
         {
             if (knowledge == null) throw new ArgumentNullException(nameof(knowledge));
+            if (knowledge.Results.Any(r => r.Recipient != knowledge.Self)) throw new ArgumentException("Foreign private result.");
             var social = new CouncilSocialEvidence(knowledge);
             uint seed = unchecked(knowledge.Seed ^ (uint)(knowledge.Self.Value + 1) * 2654435761u
                 ^ (uint)knowledge.Events.Count * 2246822519u ^ (uint)knowledge.Results.Count * 3266489917u);
