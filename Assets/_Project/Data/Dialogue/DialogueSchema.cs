@@ -20,17 +20,35 @@ namespace SocialStim.Data.Dialogue
             catch (XmlException exception) { throw new ArgumentException("Malformed dialogue JSON.", exception); }
             XmlElement root = document.DocumentElement;
             CheckObject(root, new[] { "schemaVersion", "lines" }, "document");
+            if (root["schemaVersion"] == null || root["schemaVersion"].GetAttribute("type") != "number"
+                || !int.TryParse(root["schemaVersion"].InnerText, out int version) || (version != 1 && version != 2))
+                throw new ArgumentException("schemaVersion must be 1 or 2.");
             XmlElement lines = root["lines"];
             if (lines == null || lines.GetAttribute("type") != "array") throw new ArgumentException("lines must be an array.");
             foreach (XmlElement line in lines.ChildNodes.OfType<XmlElement>())
             {
                 string id = line["id"]?.InnerText ?? "unknown line";
-                CheckObject(line, new[] { "id", "intent", "text", "weight", "requiredTrait", "speakerRole", "metadata" }, id);
+                var allowed = new List<string> { "id", "intent", "text", "weight", "requiredTrait", "speakerRole", "metadata" };
+                if (version == 2) allowed.Add("conditions");
+                CheckObject(line, allowed, id);
+                if (line["weight"] == null || line["weight"].GetAttribute("type") != "number") throw new ArgumentException($"{id}: weight must be a number.");
                 foreach (string field in new[] { "id", "intent", "text", "requiredTrait", "speakerRole" })
                     if (line[field] != null && line[field].GetAttribute("type") != "string")
                         throw new ArgumentException($"{id}: {field} must be a string.");
                 if (line["metadata"] != null)
                     CheckObject(line["metadata"], new[] { "emotionKey", "portraitKey", "audioKey" }, id + ".metadata");
+                if (line["conditions"] != null)
+                {
+                    if (line["conditions"].GetAttribute("type") != "array") throw new ArgumentException($"{id}: conditions must be an array.");
+                    foreach (XmlElement condition in line["conditions"].ChildNodes.OfType<XmlElement>())
+                    {
+                        CheckObject(condition, new[] { "kind", "value", "number", "flag" }, id + ".conditions");
+                        foreach (string field in new[] { "kind", "value" })
+                            if (condition[field] != null && condition[field].GetAttribute("type") != "string") throw new ArgumentException($"{id}: condition {field} must be a string.");
+                        if (condition["number"] != null && condition["number"].GetAttribute("type") != "number") throw new ArgumentException($"{id}: condition number must be numeric.");
+                        if (condition["flag"] != null && condition["flag"].GetAttribute("type") != "boolean") throw new ArgumentException($"{id}: condition flag must be boolean.");
+                    }
+                }
             }
         }
 

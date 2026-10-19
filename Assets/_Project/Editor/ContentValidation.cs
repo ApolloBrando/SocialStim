@@ -17,6 +17,7 @@ namespace SocialStim.Editor
             int roles = catalog.LoadRoles().Count;
             int lines = catalog.LoadDialogue().Count;
             int names = catalog.LoadNames().Count;
+            catalog.LoadReasoning();
             Debug.Log($"SocialStim content valid: {roles} roles, {lines} placeholder lines, {names} names.");
         }
 

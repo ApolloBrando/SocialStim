@@ -35,7 +35,7 @@ namespace SocialStim.Presentation.Text
                 if (_catalog == null) throw new InvalidOperationException("Assign the starter game catalog.");
                 TMP_FontAsset font = _font != null ? _font : TMP_Settings.defaultFontAsset;
                 if (font == null) throw new InvalidOperationException("Import TMP Essential Resources using Window > TextMeshPro, or assign a TMP font asset on GameBootstrap.");
-                _catalog.LoadRoles(); _catalog.LoadDialogue(); _catalog.LoadNames();
+                _catalog.LoadRoles(); _catalog.LoadDialogue(); _catalog.LoadNames(); _catalog.LoadReasoning();
                 var events = new GameObject("Event System", typeof(EventSystem), typeof(InputSystemUIInputModule));
                 events.transform.SetParent(transform, false);
                 _view = gameObject.AddComponent<TextGameView>();
@@ -58,7 +58,7 @@ namespace SocialStim.Presentation.Text
             uint seed = _randomSeed ? BitConverter.ToUInt32(Guid.NewGuid().ToByteArray(), 0) : unchecked((uint)_fixedSeed);
             var roles = _catalog.LoadRoles();
             var options = new RunOptions(seed, chosenRole, _trialsPerDay, _discussionRounds, _revealOnDeath);
-            var session = RunFactory.Create(options, roles, _catalog.LoadNames(), _catalog.LoadDialogue());
+            var session = RunFactory.Create(options, roles, _catalog.LoadNames(), _catalog.LoadDialogue(), reasoning: _catalog.LoadReasoning());
             _presenter = new GamePresenter(new GameController(session, roles), _view, _view);
         }
 

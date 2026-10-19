@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "lines": [
     {
       "id": "placeholder.Accuse.001",
@@ -166,7 +166,7 @@
     {
       "id": "placeholder.Agree.001",
       "intent": "Agree",
-      "text": "PLACEHOLDER: I agree with that stance.",
+      "text": "PLACEHOLDER: I agree with {target}.",
       "weight": 1,
       "metadata": {
         "emotionKey": "neutral"
@@ -175,7 +175,7 @@
     {
       "id": "placeholder.Agree.002",
       "intent": "Agree",
-      "text": "PLACEHOLDER: That argument seems plausible.",
+      "text": "PLACEHOLDER: I agree with {target}.",
       "weight": 1,
       "metadata": {
         "emotionKey": "neutral"
@@ -184,7 +184,7 @@
     {
       "id": "placeholder.Agree.003",
       "intent": "Agree",
-      "text": "PLACEHOLDER: I can support that.",
+      "text": "PLACEHOLDER: I agree with {target}.",
       "weight": 1,
       "metadata": {
         "emotionKey": "neutral"
@@ -193,7 +193,7 @@
     {
       "id": "placeholder.Disagree.001",
       "intent": "Disagree",
-      "text": "PLACEHOLDER: I do not accept that argument.",
+      "text": "PLACEHOLDER: I disagree with {target}.",
       "weight": 1,
       "metadata": {
         "emotionKey": "neutral"
@@ -202,7 +202,7 @@
     {
       "id": "placeholder.Disagree.002",
       "intent": "Disagree",
-      "text": "PLACEHOLDER: There is another explanation.",
+      "text": "PLACEHOLDER: I disagree with {target}.",
       "weight": 1,
       "metadata": {
         "emotionKey": "neutral"
@@ -211,7 +211,7 @@
     {
       "id": "placeholder.Disagree.003",
       "intent": "Disagree",
-      "text": "PLACEHOLDER: I disagree with that stance.",
+      "text": "PLACEHOLDER: I disagree with {target}.",
       "weight": 1,
       "metadata": {
         "emotionKey": "neutral"
@@ -404,6 +404,121 @@
       "weight": 1,
       "metadata": {
         "emotionKey": "neutral"
+      }
+    },
+    {
+      "id": "placeholder.social.accuse.aggressive",
+      "intent": "Accuse",
+      "text": "PLACEHOLDER: {target}, the accusations against you need an answer.",
+      "weight": 3,
+      "conditions": [
+        {
+          "kind": "speakerTrait",
+          "value": "Aggressive"
+        },
+        {
+          "kind": "phase",
+          "value": "Discussion"
+        },
+        {
+          "kind": "targetAccused"
+        }
+      ],
+      "metadata": {
+        "emotionKey": "tense"
+      }
+    },
+    {
+      "id": "placeholder.social.defend.pressure",
+      "intent": "Defend",
+      "text": "PLACEHOLDER: I hear the pressure on me. Let me defend myself.",
+      "weight": 3,
+      "conditions": [
+        {
+          "kind": "speakerUnderPressure",
+          "number": 45
+        }
+      ],
+      "metadata": {
+        "emotionKey": "tense"
+      }
+    },
+    {
+      "id": "placeholder.social.claim.trial",
+      "intent": "ClaimRole",
+      "text": "PLACEHOLDER: Before you judge me, my claim is {role}.",
+      "weight": 3,
+      "conditions": [
+        {
+          "kind": "phase",
+          "value": "Defense"
+        },
+        {
+          "kind": "hasAssertion",
+          "flag": true
+        }
+      ],
+      "metadata": {
+        "emotionKey": "tense"
+      }
+    },
+    {
+      "id": "placeholder.social.death.observed",
+      "intent": "ReactToDeath",
+      "text": "PLACEHOLDER: This death changes the discussion.",
+      "weight": 3,
+      "conditions": [
+        {
+          "kind": "observedDeath"
+        },
+        {
+          "kind": "phase",
+          "value": "Discussion"
+        }
+      ],
+      "metadata": {
+        "emotionKey": "tense"
+      }
+    },
+    {
+      "id": "placeholder.social.report.dawn",
+      "intent": "ReportInvestigation",
+      "text": "PLACEHOLDER: My report is that {target} appeared {result}.",
+      "weight": 3,
+      "conditions": [
+        {
+          "kind": "minimumDay",
+          "number": 2
+        },
+        {
+          "kind": "hasTarget",
+          "flag": true
+        },
+        {
+          "kind": "hasAssertion",
+          "flag": true
+        }
+      ],
+      "metadata": {
+        "emotionKey": "tense"
+      }
+    },
+    {
+      "id": "placeholder.social.vouch.claim",
+      "intent": "Vouch",
+      "text": "PLACEHOLDER: I will give {target} a chance to support that claim.",
+      "weight": 3,
+      "conditions": [
+        {
+          "kind": "speakerTrait",
+          "value": "Loyal"
+        },
+        {
+          "kind": "targetHasClaim"
+        }
+      ],
+      "metadata": {
+        "emotionKey": "tense"
       }
     }
   ]
