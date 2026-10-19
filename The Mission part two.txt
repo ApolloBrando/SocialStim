@@ -1,0 +1,236 @@
+# MISSION
+You are continuing work on my single-player, text-based social deduction game (Unity/C#) in my linked GitHub repository. You already know which repo. In this pass you will:
+1. Read the ENTIRE codebase and audit it.
+2. Overhaul the interaction system and UI, using Gnosia as the primary model.
+3. Rework the roles and win conditions, and add full game customization.
+4. Fix and clean up the settings menu.
+5. Rewrite the NPC AI to be genuinely smart.
+6. Write an extremely large pool of pre-made dialogue.
+7. Expand the text effects and fix the broken ones.
+
+The game is basically a clone/rip-off of Gnosia (biggest inspiration, especially for day-to-day flow and UI), Slaughter Horse 2, and Town of Salem 1 and 2 (role system and night-action resolution). Be decisive. Make design decisions yourself, document them, and don't ask permission for details. You may ask at most 3 blocking questions, all at the very start.
+
+# 0. STANDING RULES (still in force from the original brief)
+- Unity + C#. Presentation is text-only for now, but game rules stay separate from the view so a 2D/2.5D front end can be added later without touching the rules.
+- Strong OOP: SOLID, no god classes, game rules in plain C# classes separate from MonoBehaviours (MonoBehaviours are thin adapters), composition over inheritance, patterns only where they fit (State, Strategy, Command, Factory, Observer, Pipeline), [SerializeField] private fields, enums/typed IDs instead of magic strings. Use Unity-native tools fully where they help (ScriptableObjects, Input System, TextMeshPro/UI Toolkit, Test Framework, etc.), and justify the choice.
+- Randomness: NEVER use UnityEngine.Random in game logic. Use the seeded IRandomSource. Same seed + same settings + same player inputs = identical game.
+- NO generative AI at runtime, no LLM or text-generation APIs. NPC "AI" means deterministic, seeded, rule-based/probabilistic logic. All dialogue is static data committed to the repo.
+- CHANGED RULE: I used to say I would write the dialogue. You now write it (see section 8). It is still static, pre-made, reviewable data.
+- Tidy workspace: asmdefs enforcing layer boundaries (rules/application must not reference presentation or scene objects), one top-level type per file, filename = type name, namespaces mirror folders, .editorconfig naming conventions, XML docs on public APIs, no dead code, no unused usings, no leftover test scripts.
+- Git: work in my linked repo. Never commit to main. One feature branch + one PR per phase (e.g. phase/1-ui-interaction). Conventional Commits, small focused commits. Always commit .meta files with their assets. Never commit secrets. No force-push or history rewriting. Deleting dead/duplicate code that your audit identified is expected, but list every deletion in the PR description, and don't delete anything you're unsure is unused.
+- Safety/accessibility: max 3 flashes per second, a setting to disable flashes entirely, a reduced-motion setting, never rely on color alone, a colorblind-friendly palette.
+- HONESTY: you cannot run Unity. Never claim something compiled, passed tests, or was committed unless it actually was. Read code carefully as if you were the compiler. Check ProjectSettings/ProjectVersion.txt and Packages/manifest.json and only use APIs that exist for those versions. Don't invent APIs; if unsure, say so. When renaming serialized fields use [FormerlySerializedAs]. Don't hand-edit scene/prefab YAML unless unavoidable (and then minimally and carefully). Prefer building UI from code or from text-based assets consistent with the UI technology already in the project. Keep .meta GUIDs intact. Give me a manual test checklist per phase for things I must verify in the editor.
+
+# 1. PHASE 0: FULL CODEBASE AUDIT (do this first)
+Open and read every file in the repo (scripts, asmdefs, ScriptableObjects, data files, UI assets, scenes/prefab references, tests, docs). Then write docs/AUDIT.md containing:
+- An architecture map: assemblies, key classes, how events and data flow, where rules/presentation boundaries are or aren't respected.
+- A bug list with file, line, root cause, and fix plan.
+- Dead, duplicate, or overly complex code. Layering violations.
+- UI problems (clutter, overlap, redundant buttons, inconsistent styles, dead screens).
+- Settings-menu bugs (see section 6).
+- Every piece of pointless or filler text: redundant system messages, repeated confirmations, narration that gives the player no new information or flavor.
+- Performance hazards (per-frame allocations, redundant mesh rebuilds in text effects).
+- Current values I'll want changed: the typewriter speed, how the shake effect is implemented, and the current action/menu flow.
+- Missing tests.
+Fix clear-cut bugs immediately in a small first PR, then continue to the later phases.
+
+# 2. DAY-TO-DAY GAMEPLAY: COPY GNOSIA'S STRUCTURE
+Replace the current day structure with a Gnosia-style loop. If you can browse, consult Gnosia references to match its pacing and feel as closely as you can. Core facts to replicate:
+- Each day is a group DISCUSSION made of several rounds (default 5, configurable 3 to 7). Each round is a sequence of NPC statements and exchanges. The player gets at least one "player window" per round (configurable 1 to 2) in which they can act. They may also simply let the round pass.
+- NPCs react to each other and to the player: accusations get answered, defenses get challenged, agreement chains and pile-ons happen. When someone directly accuses or questions the player, the player gets a priority "Respond" prompt (see section 4).
+- After the final round comes a VOTE. Every character votes. Reveal votes one by one for tension, show the tally, and the plurality target is eliminated (this replaces the nomination > defense > judgement trial as the default; keep the existing trial flow only as an optional "Trial Mode" voting setting if it already works, otherwise don't spend time on it). Handle ties (configurable: one revote, then no elimination) and abstentions (configurable).
+- One elimination per day, then a role reveal for the eliminated character (configurable on/off) and last words.
+- FREE TIME (optional, toggleable in settings; implement after the core is solid): in Gnosia you explore the ship and talk to individual characters after the debates. Text-only equivalent: after the vote, the player picks a character (or a location) to spend time with, 1 to 2 actions per day. This builds the relationship, may trigger private exchanges (a private tip, a private claim, or, for evil players, secret coordination with teammates), and may carry risk or information. NPCs do the same in the background, so some of their relationships and knowledge shift off-screen.
+- NIGHT: roles with night abilities choose targets. The player uses a clean target menu, and NPCs decide via AI. Resolve actions through the priority pipeline (section 5). Then a MORNING REPORT: who died, how it's phrased, and which results/notices each player receives.
+- Per-run character STATS, like Gnosia: Charisma, Intuition, Logic, Charm, Performance, Stealth. They affect how strongly someone's statements sway others, how well-reasoned statements land, inference accuracy, relationship gain, how believable a lie is, and how likely someone is to be suspected/targeted. They are generated per run (seeded) for every character, including the player, and optionally point-buy for the player at setup (setting: Random / Balanced / Point-buy). Stats NEVER persist between runs. Some player dialogue options may be stat-gated (e.g. "[Logic 6+]").
+- Relationships/affinity between characters (bonds and grudges) that evolve and influence votes, defenses, and who believes whom.
+
+Remember: no time loops, no cross-run progression, every run self-contained.
+
+# 3. UI OVERHAUL (Gnosia-inspired, text-only, MASSIVELY cleaned up)
+Principles: minimal chrome, strong hierarchy, one clear focus at any moment, nothing overlapping, consistent spacing/colors/button styles, visible focus/hover states, full keyboard/mouse/touch navigation (via the Input System already in the project, or add it), readable at the project's target platform(s)/resolutions. Remove every redundant button, label, panel, and message found in the audit.
+
+Discussion screen layout (adapt as needed, but keep this structure):
+```
+┌──────────────────────────────────────────────────────────────┐
+│ DAY 3 · DISCUSSION · ROUND 2/5                 ALIVE 9 · ≡   │
+├──────────────────────────────────────────────────────────────┤
+│  ROSTER: one compact card per character in a row/grid:       │
+│  name · alive/dead · suspicion marker ▲▼ · last-stance glyph │
+│  · player marks (Trust / Suspect / Confirmed) · claim badge  │
+│  The current speaker's card is highlighted.                  │
+├──────────────────────────────────────────────────────────────┤
+│  SPEAKER NAME                                                │
+│  "Dialogue text, with text effects, fast typewriter."        │
+├──────────────────────────────────────────────────────────────┤
+│  [ Chat ]  [ Accuse ]  [ Defend ]        [ Claim Role ]      │
+└──────────────────────────────────────────────────────────────┘
+```
+- Secondary things (log/history, claims ledger, player marks, settings, help) live behind the single "≡" drawer and never clutter the main screen.
+- The claims ledger is public information: who claimed which role and which results they reported, per day. It lists facts only and never auto-solves contradictions for the player.
+- Distinct, uncluttered screens: Main Menu (Continue / New Run / Settings / Quit), New Run setup (section 6), Discussion, Vote reveal, Night action, Morning report, Elimination/reveal, Free Time, Game Over with an AFTER-ACTION REPORT (true roles, who did what each night, how the votes went, and a short "why" line for notable NPC decisions).
+- Show the player's own role, faction, and win condition in a small, always-reachable (but unobtrusive) place.
+- Kill pointless text. For every string the UI shows, ask "does this give the player new information or flavor?" If not, delete it.
+
+# 4. INTERACTION SYSTEM (the current action system is CLUTTERED; replace it entirely)
+The core flow is exactly:
+   Chat > Target     |     Accuse > Target     |     Defend > Target
+- Top level during a player window: exactly three always-visible buttons: CHAT, ACCUSE, DEFEND. Plus contextual buttons that appear ONLY when valid (never greyed-out clutter): CLAIM ROLE (see below) and, when the player is directly addressed or accused, a priority RESPOND prompt that collapses the options into: Defend yourself / Counter-accuse / Claim role / Stay silent. There's also a "Stay silent / Pass" option for letting the round pass.
+- Step 1: pick the action. Step 2: pick the target on the roster (only valid targets are selectable; CHAT also offers "Everyone"). Step 3 (phrasing): show up to 3 line options, each with a short tone tag ([Logic], [Gut], [Evidence], [Emotional], [Blunt], [Humor], etc.), sampled from the large dialogue pools and filtered by context and stat gates. Add a "Quick mode" setting that skips step 3 by auto-picking the best-fitting line. Every step has a Back/Cancel. No menus deeper than this.
+- CHAT: general conversation with a target or everyone. Line types sampled across categories such as: ask a question, share an observation, agree with a previous statement, disagree with a previous statement, banter, ask for their opinion, change the subject.
+- ACCUSE / DEFEND: the line options correspond to REASON types (vote history, claim conflict, behavior, gut feeling, silence, "they defended someone evil", and so on). Whatever reason the player picks is the reason NPCs hear and evaluate. Evil players can pick reasons that are lies, and NPCs can catch contradictions.
+- Each action shifts NPC beliefs using the influence model in section 7. Never apply a flat bonus.
+
+## Role claiming rules
+- A player (including the player character) whose role has an ACTION (night ability) can CLAIM it truthfully at ANY time they hold the floor: any player window, when directly addressed, and while defending themselves. A claim can include a result report (e.g. a Decryptor reporting a reading, a Physician reporting a save). The player chooses from the results they actually have.
+- Role BLUFFING (claiming a role you don't have) is available ONLY to evil roles (and other roles flagged as allowed to bluff in the role data, see section 5). Bluffing can be proactive or a counter-claim against someone who already claimed that role, and a bluffer can attach fabricated results.
+- A role with no ability (Solarian) cannot claim anything, as it has no claim button.
+- Make this permission data-driven with two per-role flags: CanClaimTruthfully and CanBluff.
+- Claims are recorded in the public claims ledger. Duplicate claims of a unique role are an immediate logical conflict that NPC AI must reason about. Changing a claim or contradicting a previous result is allowed (for bluffers) but is heavily penalized in NPC suspicion.
+- NPCs use the exact same rules and the same menu logic (they can't claim or bluff when the player couldn't).
+
+# 5. ROLES, WIN CONDITIONS, AND NIGHT RESOLUTION
+All roles are data-driven definitions (ScriptableObjects or the existing data approach) plus small ability classes. Adding a role must never require edits to core systems. Not all roles appear in every game (see section 6).
+
+## Core role set (implement all; use these as defaults, then document the final tuned table in docs/ROLES.md)
+| Role | Faction / Category | Night ability | Notes |
+|---|---|---|---|
+| Solarian | Town, Basic | None | No ability, so no claim. Wins with Town. |
+| Physician | Town, Healing | Heal one target: negates one night attack on them. Learns whether the patient was attacked. | Self-heal once per game (configurable). Can claim truthfully. |
+| Decryptor | Town, Investigative | Investigate one target and receive a READOUT: CLEAR / CORRUPT / ANOMALY | Town and Infinitum read CLEAR, Evil reads CORRUPT, Anarchy reads ANOMALY. Aperture's forge can invert CLEAR/CORRUPT. Can claim truthfully. |
+| Nullifier | Town, Killing | Shoot one target (attack 1) | Limited charges (default 2, configurable). Optional BACKLASH: if they kill a Town-aligned player they die the next night (default on, configurable). Can claim truthfully. |
+| Archon | Evil, Killing | Leads the evil team's night kill (attack 1) | Evil team chooses the target together. If the Archon dies, a living evil member is promoted to carry the kill ability (configurable). Can bluff. |
+| Singer | Evil, Distraction | LULL one target: their night action is blocked (a blocked attack fails too). | The target is notified they were lulled (configurable). Can bluff. |
+| Aperture | Evil, Information forger | FORGE one target: any investigation of that target tonight returns the inverted readout (CLEAR to CORRUPT or CORRUPT to CLEAR). ANOMALY is unaffected. | Optional passive (default OFF): reads CLEAR to the Decryptor. Can bluff. |
+| Anarchy | Neutral, Killing | Attack one target each night (attack 1) | Wins as the last survivor (see below). Reads ANOMALY. Can bluff. |
+| Infinitum | Neutral, Special | None (passive) | Night-immune: no night attack can kill it, but it CAN be eliminated by vote. Reads CLEAR. STEALS THE WIN: if it is alive at the moment the Evil faction's normal win condition triggers (Town count <= Evil count), Infinitum wins instead and Evil loses. Can bluff. |
+
+## Win conditions (implement, document, and unit test all of these, plus the edge cases)
+- Town wins when all Evil and all hostile Neutral killers (Anarchy) are eliminated. If Infinitum is still alive at that moment it does NOT win (Infinitum only steals the Evil parity win).
+- Evil wins when living Evil count >= living Town-aligned count, AND no Anarchy is alive. If Infinitum is alive at that moment, it steals the win instead.
+- Anarchy wins as the last survivor. Define precisely what happens when only Anarchy + Infinitum remain.
+- By default, Infinitum counts as neither Town nor Evil for the parity check (configurable).
+- Enumerate and test edge cases: simultaneous deaths, Archon killed with promotion, Nullifier backlash timing, a win condition that triggers at night versus after the vote, Infinitum targeted by multiple attackers, Singer lulling a killer, Aperture forging a Physician's result, and so on. If any of my rules contradict each other, tell me and propose a fix.
+
+## Night-action resolution
+Priority-ordered pipeline (document the final order in docs/ROLES.md): Lull (block) > Forge > Heal/protect > Attack > Investigate > Cleanup/notifications. Handle multiple attackers on one target, multiple visitors, attack vs. defense levels (0 none, 1 basic, 2 powerful, 3 invincible, with Infinitum treated as night-immune), blocked actions, and visit tracking. Easy to reorder. Death reports state the facts of who died, and the cause is ambiguous when appropriate (e.g. multiple kill attempts).
+
+## Extra roles (implement after the core nine are stable, and keep each one toggleable)
+Propose and implement 4 to 6 more roles drawn from the inspirations, for example:
+- Archivist (Town, informative: examines a dead player and learns their true role, Gnosia's "Doctor" idea).
+- Warden (Town, protective/blocking).
+- Watcher (Town, Investigative: sees who visited a target).
+- Disciple (Evil, Support, from Slaughter Horse 2: knows who the Archon is, has no kill, reads CLEAR).
+- Fool (Neutral Evil: wins if eliminated by vote).
+Document each in docs/ROLES.md and tell me anything that's risky or hard to balance.
+
+# 6. SETTINGS, CUSTOMIZATION, AND THE SETTINGS MENU
+## New Run setup (before the game starts)
+- PLAYER COUNT: a slider with a sensible range (e.g. 5 to the size of the cast pool, which must be at least 16 named characters, see section 8). Default is a middle value.
+- ROLE LIST: presets (Classic auto-balanced, Chaos, Minimal, Custom) and a full custom editor:
+  - Enable/disable each role globally, and set per-role min/max counts.
+  - Slot-based lists (specific role, or "Random Town / Random Evil / Random Neutral / Any") like Town of Salem's role list.
+  - Not every special role appears each game: auto-balance picks a valid subset using a balance table by player count.
+  - Live validation with clear, short error messages (e.g. "No evil killing role enabled", "Evil count too high for this player count"). A game cannot start with an invalid list.
+  - Visibility mode: show the full role list to the player / only faction counts / hidden.
+- PLAYER ROLE: Random / Choose a role / Choose a faction (Town / Evil / Neutral), the player can be any role.
+- Number of evil and neutral players (Auto / Manual).
+- Discussion rounds (3 to 7), player windows per round (1 to 2), voting mode (Gnosia vote / optional Trial Mode), tie rule, abstain allowed, role reveal on death, last words, Free Time on/off, Nullifier charges and backlash, self-heal rules, AI difficulty, stats mode (Random / Balanced / Point-buy), seed (blank = random).
+
+## Settings menu (CLEAN UP and FIX ITS BUGS)
+Audit the existing settings menu line by line. Find every bug (common ones to look for: settings not applying until restart, not persisting, resetting incorrectly, sliders out of range or desynced from saved values, toggles not reflecting loaded state, Back losing or silently committing changes, overlapping/misaligned UI, broken keyboard/controller navigation, scaling issues). List each bug and its root cause in docs/AUDIT.md, fix them, and add regression tests where practical.
+- Group settings clearly (Game / Text & Display / Accessibility / Audio and Controls if they exist / Data). Apply immediately where possible, otherwise a clear Apply/Cancel. Per-setting and global Reset to Defaults.
+- Settings persist in a versioned file (separate from the saved run state, e.g. JSON in persistentDataPath) with validation/clamping and migration for older files.
+- Settings include: text speed, auto-advance, text size, effects intensity, reduced motion, flash safety, colorblind palette, UI scale, Quick mode, and all the game settings above.
+
+## Text speed
+Make text scroll MUCH faster. Report the current reveal speed, then set the new default to roughly 3x it. Offer a speed setting (including Instant). First press/click completes the current line instantly, the second advances. Optional auto-advance with a delay that scales with line length. Shorten punctuation pauses. Also make sure the log/auto-scroll doesn't lag behind the text.
+
+# 7. NPC AI (make it actually smart, to your fullest capability)
+Goal: NPCs that infer, deceive, coordinate, and make human-feeling mistakes, without ever being omniscient. NPCs only know what their role legitimately grants them. Document the design in docs/AI_DESIGN.md.
+
+## 7.1 Information model
+- Public event log (every statement, claim, reported result, vote, death, role reveal, and morning report), private knowledge (own role, teammates for evil, own investigation/heal results), and per-NPC beliefs.
+- Beliefs: a probability distribution over roles/factions for every other character (not a single "trust" number), plus a separate credibility score and a relationship/affinity value.
+- Role-list knowledge follows the visibility setting. NPCs reason with exactly the information the player would have.
+
+## 7.2 Inference engine
+- Constraint/hypothesis reasoning: sample or enumerate role assignments consistent with all public information (claims, results, reveals, deaths, the role list) and weight them by likelihood (determinization / Monte Carlo sampling over consistent worlds, with the sample count tied to difficulty and a performance budget). Marginalize the sampled worlds into beliefs.
+- Evidence types with sensible likelihood weights: votes (especially votes for characters later revealed to be Town/Evil), accusations and who made them, defending a later-revealed evil, claims and claim timing, duplicate claims of unique roles, reported results versus ground truth revealed on death, claim contradictions, night death patterns (who the killers chose to kill, who was spared), silence or over-eagerness, and behavior consistency over days.
+- Ground truth from role reveals instantly re-weights the past: everyone's earlier votes, defenses, and claims involving that character are re-evaluated.
+- Theory of mind: each NPC estimates how suspicious it looks to others and picks defend/deflect/counter-accuse behavior accordingly.
+
+## 7.3 Behavior by faction
+- TOWN: share information at good times; power roles claim when threatened, when information is critical, or when a counter-claim forces it. Weigh claim credibility (a duplicate claim means someone lies). Protect likely/confirmed power roles (Physician). Nullifier shoots only above a confidence threshold. Avoid wasting votes, reason about vote math and tie risk, and avoid being the lone voter unless confident.
+- EVIL: coordinate as a team (shared night target choice, shared narrative). Targeting prioritizes threats (claimed or likely Decryptor/Physician/Nullifier, strong persuaders) over random picks. Choose plausible bluff roles based on who has already claimed what and the role list. Counter-claim when profitable. Aperture and Singer actions are chosen to support a plan (e.g. frame a Town member, cleanse a teammate, block a likely investigator). "Bus" a teammate only when it clearly helps. Blend into the majority vote, build alibis, avoid obvious patterns, and avoid exposing teammates.
+- ANARCHY: kill sparingly enough to avoid exposure, avoid being the vote target, and track the last-survivor endgame math.
+- INFINITUM: stay alive, deflect votes, keep a low profile, and subtly benefit from the Evil parity clock (it wants Evil to reach parity while it is alive). Track the parity count explicitly.
+- Voting: expected-utility vote choice that includes tally prediction, tie handling, last-vote effects, and the risk of becoming the vote sink.
+- Night targeting: expected-value choice using threat assessment and role-list awareness.
+
+## 7.4 Social/persuasion layer
+When any character (player or NPC) speaks, other NPCs update beliefs with a weight computed from: speaker credibility and affinity, speaker stats (Charisma, Logic, Performance if lying), the strength of the stated reason, consistency with prior statements, and the listener's traits (gullibility, aggression, loyalty). Relationships evolve from defending, accusing, agreeing, and Free Time. Never use flat bonuses.
+
+## 7.5 Personality and human-ness
+Personality traits shape risk tolerance, aggression, trust, talkativeness, bandwagon tendency, and logic skill. Add deliberate bounded imperfection: biases (anchoring, bandwagoning, grudges), occasional mistakes scaled by difficulty, and an in-world tension model (rising paranoia as bodies pile up) that makes NPCs more aggressive and erratic over time. NPCs must feel like individuals and not like clones. A beginner should be able to win and an expert should be challenged.
+
+## 7.6 Difficulty
+Easy / Normal / Hard / Brutal. Difficulty changes inference depth, mistake rate, coordination quality, and clue-sharing honesty (not cheating). All difficulties must respect the information rules above.
+
+## 7.7 Link between AI and dialogue (critical)
+The AI decides (intent, target, REASON TYPE, truthful vs. deceptive). The dialogue system then selects a pre-made line that matches those tags. A line may only mention a reason that matches the AI's actual reason (or its declared lie, for deceivers). No incoherent lines.
+
+## 7.8 Debugging and balance tooling
+- A developer-only debug overlay showing, for any NPC: top beliefs, chosen intent, reason code, and plan.
+- A headless simulation harness (EditMode test or batch tool) that runs thousands of AI-only games with chosen settings and reports: win rates by faction, average game length, Infinitum steal rate, role impact, vote accuracy, and crashes or stalled games. Use it to tune the balance table and difficulty. Commit a baseline report to docs/.
+- Performance budget: AI computation per turn stays well within a frame budget on the target platform. Sample counts must be configurable.
+- Deterministic by seed.
+
+# 8. DIALOGUE (generate an EXTREME amount of pre-made dialogue)
+You now write the dialogue. It must all be static data in the repo, in the existing format where one exists (extend it; only migrate to a new format if the old one can't cope, and then migrate the existing lines). At runtime nothing is generated.
+
+## 8.1 Cast pool
+A curated roster of at least 16 named characters, each with: a distinct VOICE, one or two ARCHETYPES, default trait ranges, a few verbal tics, and at least 8 SIGNATURE lines. Each run selects the cast from this pool (seeded), according to the player-count setting, with trait variation. Archetypes (at least 10), for example: Analyst, Hothead, Peacemaker, Skeptic, Charmer, Coward, Stoic, Jester, Idealist, Schemer. Match the game's existing setting/theme and terminology (role names like Solarian, Archon, etc. suggest a sci-fi station/ship setting, so use it if the repo has none).
+
+## 8.2 What must be covered
+All of these for NPCs AND as player options, each with MANY variants:
+- Accuse (per reason type: VoteHistory, ClaimConflict, ClaimTiming, NightPattern, Silence, OverEagerness, DefendedEvil, Contradiction, ResultMismatch, GutFeeling, Retaliation, Bandwagon, PowerRoleKilled), Defend (self and others: alibi, role claim, logic, emotional appeal, counter-accusation), Claim role (truthful and bluff), Counter-claim, Report result (every readout and heal outcome), Question, Answer, Agree, Disagree, Doubt, Vouch, Deflect, Stall, Bandwagon, Change vote, Announce vote, Plead, Banter/small talk, React to death, React to elimination reveal (was Town / was Evil / was Neutral), Last words (per faction), Respond when directly accused, Gloat/slip (subtle evil tells), Thank/Apologize, Free Time chat (per relationship level), private/whisper lines.
+- NARRATOR/SYSTEM lines: morning report, no-death report, vote reveal, tally, tie, elimination, night notices (lulled, attacked, healed, forged-indistinguishable, etc.), victory and defeat for each faction (including Infinitum's win steal and Anarchy's win), tension escalations. At least 12 variants per event type.
+
+## 8.3 Volume targets (minimums; more is better)
+- At least 15 distinct lines per (core intent x archetype). Core intents: accuse, defend, claim, counter-claim, report result, question, agree, disagree, deflect, vote justification, react to death, last words.
+- At least 6 per (minor intent x archetype).
+- At least 8 signature lines per named character.
+- At least 500 player-option lines across Chat/Accuse/Defend/Claim, with tone tags and some stat-gated.
+- Overall target: at least ~3,500 unique, high-quality lines. Write them in batches across multiple commits/PRs (by intent category), and keep going until the targets are met. Don't pad with near-duplicates.
+
+## 8.4 Quality rules
+- Each line is short and punchy (mostly 4 to 25 words, a few up to 40). Strong individual voices per archetype and per character. Vary syntax, vocabulary, and rhythm, and avoid repeated templates and filler. No meta/fourth-wall lines. PG-13, dark humor allowed, no slurs.
+- Placeholder variables: {target}, {speaker}, {role}, {day}, {evidence}, etc. Every line declares the placeholders it needs. The system must never show an unresolved placeholder.
+- Semantic effect markup is allowed in at most ~30% of lines, using semantic tags only (e.g. <fear>, <shout>, <whisper>, <glitch>), never raw effect parameters.
+- Per-line metadata: stable unique id, text, intent, archetypes, tone, reasonType, truthfulness (honest/deceptive), requires/forbids (role, faction, relationship level, day range, stat gate, tension level), weight, cooldown, optional emotion/portrait/audio keys for future presentation.
+- Selection: filter by tags and context, then weighted random with anti-repetition (per-character recent-line memory and global cooldowns), prefer lines not seen this run, and gracefully fall back to broader pools. Never return an empty result.
+- Tooling: an editor validator plus a unit test that checks: duplicate or near-duplicate lines, unknown tags/placeholders, over-length lines, malformed effect markup, and coverage versus the targets above. Generate a coverage report to docs/DIALOGUE_COVERAGE.md. Write docs/DIALOGUE_GUIDE.md explaining how I can add lines and which tags exist.
+
+# 9. TEXT EFFECTS
+Make text effects far more varied and fix the broken ones.
+- BUG TO FIX: text shaking currently lasts only a split second. Every looping effect must persist for the entire lifetime of its text span, from reveal until the text is dismissed or replaced, and keep animating after the typewriter finishes. Find the root cause in the existing code (likely candidates: the effect treated as a one-shot burst, a timer or coroutine ending with the reveal, or the text mesh/vertex data not being refreshed every frame), fix it, and explain it in AUDIT.md.
+- Effect duration modes: Continuous (whole span), Timed (N seconds), Burst (one-shot), Envelope (attack/sustain/release). Effects stack and combine, with per-character phase offsets so text doesn't move in lockstep.
+- Catalog (at least 25; add more if you can), parameterized by intensity/speed/amplitude: shake, tremble, quake, jitter, wave, wobble, bounce, float, sway, pulse, throb/heartbeat, breathe, flicker, blink, fade in/out, glitch/corrupt, static noise, decrypt (scramble-to-reveal), stutter, whisper (small and fading), shout/slam, drip, melt, crumble/fall, rise, ripple, zoom, squash/stretch, rainbow/gradient sweep, color pulse, redact (bars that reveal), strikethrough, echo/ghost, spotlight sweep, strobe (safety-limited). Typewriter variants: burst, ramp, drag, hesitant.
+- Semantic style tags mapped to effect stacks in data (e.g. <fear>, <rage>, <whisper>, <shout>, <lie-tell>, <dread>, <glitch>), so I can restyle everything without editing lines. Also support explicit parameterized tags for authoring, e.g. <shake i=2 d=3>.
+- Per-speaker/personality defaults (a coward's lines tremble, a hothead's slam), and the tension model can intensify ambient effects.
+- Performance: no per-frame allocations; refresh vertex data correctly each frame (check the TMP API for the project's package version); cap effect work per frame; pool where it helps. Reduced motion swaps movement effects for color/opacity alternatives. Strobe obeys flash safety.
+- A robust markup parser that validates at import (unknown or unclosed tags, bad parameters, with line ids). The rules layers treat marked-up text as opaque.
+- An editor "effects playground" window/scene to preview every effect and style at any intensity.
+- Screen effects (borders, vignettes, color shifts, flashes) are a STRETCH goal: keep existing ones working, and add cue-driven basics (phase tint, trial/vote vignette, kill flash, border pulse) only after everything else here is done, all obeying the safety rules.
+
+# 10. EXTRA POLISH (stretch goals, each toggleable, after the core is stable)
+- Player marks on the roster (Trust / Suspect / Confirmed) and a short tutorial/help drawer for first-time players.
+- Slaughter Horse 2 flavor (propose before building, keep each behind a toggle): gaslighting-style abilities that erode a target's credibility, a "detain" option for the Archon, a Disciple-style helper, an escalating town-paranoia tension model that visibly changes AI behavior and text effects.
+- Seed display and copy so interesting runs can be reproduced.
+
+# 11. TESTING
+Add or extend unit tests for: win conditions and all edge cases, the night-action pipeline (including Infinitum immunity, Singer blocks, Aperture forging, Physician healing, Nullifier backlash, Anarchy), role-list validation and auto-balance, claim permissions (CanClaimTruthfully / CanBluff for player and NPCs), settings save/load/migration/clamping, the markup parser, dialogue selection (never empty, no unresolved placeholders, anti-repetition), AI sanity (Town doesn't vote for confirmed Town; evil doesn't kill teammates; NPCs never read hidden roles; determinism by seed), and a simulation regression test with win-rate bounds.
+
+# 12. WORK PLAN
+Work phase by phase, one branch + PR per phase (split a phase into several PRs if it's large).
