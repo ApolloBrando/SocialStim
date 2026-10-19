@@ -44,8 +44,13 @@ namespace SocialStim.Tests.EditMode
             string path = Path.Combine(TestContext.CurrentContext.TestDirectory, "StarterDialogue.json");
 #endif
             var lines = DialogueDocument.Parse(File.ReadAllText(path));
-            Assert.That(lines.Count, Is.EqualTo(54));
-            Assert.That(lines.All(line => line.Text.StartsWith("PLACEHOLDER:", StringComparison.Ordinal)), Is.True);
+            Assert.That(lines.Count, Is.GreaterThanOrEqualTo(64));
+            Assert.That(lines.Any(line => line.Text.Contains("PLACEHOLDER")), Is.False);
+            Assert.That(lines.Any(line => line.Intent == SpeechIntent.ReportAction && line.Text.Contains("{speaker}")), Is.False,
+                "Speaker attribution is added once by the session.");
+            foreach (SpeechIntent intent in Enum.GetValues(typeof(SpeechIntent)))
+                Assert.That(lines.Where(l => l.Intent == intent && l.Conditions.Count == 0 && !l.SpeakerRole.HasValue)
+                    .Select(l => l.Text).Distinct().Count(), Is.GreaterThanOrEqualTo(4), intent.ToString());
         }
     }
 }

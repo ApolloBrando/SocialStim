@@ -36,7 +36,12 @@ namespace SocialStim.Data.Dialogue
                     if (line[field] != null && line[field].GetAttribute("type") != "string")
                         throw new ArgumentException($"{id}: {field} must be a string.");
                 if (line["metadata"] != null)
+                {
                     CheckObject(line["metadata"], new[] { "emotionKey", "portraitKey", "audioKey" }, id + ".metadata");
+                    foreach (XmlElement field in line["metadata"].ChildNodes.OfType<XmlElement>())
+                        if (field.GetAttribute("type") != "string")
+                            throw new ArgumentException($"{id}: metadata {field.Name} must be a string.");
+                }
                 if (line["conditions"] != null)
                 {
                     if (line["conditions"].GetAttribute("type") != "array") throw new ArgumentException($"{id}: conditions must be an array.");

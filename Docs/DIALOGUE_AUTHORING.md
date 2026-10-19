@@ -1,9 +1,10 @@
 # Dialogue authoring specification
 
-Status: milestone 03 supports version 2 below with 54 explicitly
-marked placeholder lines. Version 1 still loads without conditions. There is a runtime loader, schema validator and editor
-validation command. All final lines are written by the project owner; no runtime
-generative AI is permitted. Conditions are registered data predicates, never code.
+The current starter document has 70 natural, editable prototype lines.
+Version 2 supports the conditions below; version 1 still loads without conditions.
+A runtime loader, schema validator and editor menu validate content. No runtime
+generative AI is used. Conditions are registered predicates, never code.
+See [CONTENT_GUIDE.md](CONTENT_GUIDE.md) for the full editing map and role workflow.
 
 ## Format
 
@@ -42,9 +43,9 @@ fallback for every intent; copy the starter document before adding variants:
   "schemaVersion": 2,
   "lines": [
     {
-      "id": "placeholder.accuse.direct.001",
+      "id": "accuse.direct.005",
       "intent": "accuse",
-      "text": "PLACEHOLDER: {target}, explain your vote.",
+      "text": "{target}, can we hear your side?",
       "weight": 1,
       "conditions": [
         { "kind": "phase", "value": "Discussion" },
@@ -129,7 +130,7 @@ The same intent can support sincere, mistaken, and deceptive assertions.
 
 The reasoning strategy first chooses an intent, target, and assertion. Selection
 filters lines by permitted context, then uses integer weights and a dedicated
-seeded dialogue stream. Save recent IDs per speaker. When all eligible lines
+seeded dialogue stream. Track recent IDs per speaker during the run. When all eligible lines
 are recent, relax the oldest repetition exclusion before using a valid fallback.
 Never relax a condition that protects knowledge or factual eligibility.
 
@@ -140,21 +141,14 @@ fallback coverage. Document-level errors cannot always identify a line. An inval
 asset fails loading rather than silently creating an empty pool. Run the editor
 validation command before play. Weights are integers in [1, 1000].
 
-Every engineering starter line visibly begins `PLACEHOLDER:`. Replacing these
-with final dialogue is owner-authored content work; a final-content build gate
-forbidding leftover placeholders is deferred. Selection does not parse markup.
+The starter lines are editable prototype prose. Speaker attribution is added
+once by RunSession; omit a name prefix from each line. Selection does not parse markup.
 
 ## Presentation boundary
 
-Milestone 00/01 treated all markup as opaque text. The independent milestone 05
-branch adds the exact supported syntax below. Planning names such as shout,
-whisper and accuse are not supported tags. Rules keep text opaque; rendering
-syntax never modifies intent or evidence.
-No custom markup parser or text effects ship in milestone 00/01/02. Milestone 05
-will define a cheat sheet for semantic tags such as `fear`, `shout`, `whisper`,
-and `accuse`, mapped to style assets. The presentation importer validates unknown
-tags, nesting, closure, and parameters with line identifiers. Rules keep text
-opaque. Reserved tags are planning names, not currently supported syntax.
+Presentation supports the exact semantic syntax below. Rules keep text opaque;
+style never changes an intent, evidence or eligibility. Planning names such as
+shout and whisper are not supported tags.
 
 All key information must remain readable with effects, motion, flashes, and
 color distinctions disabled. Effect profiles must never change a line's factual
@@ -162,7 +156,7 @@ meaning or reveal a secret through style selection.
 
 ## Milestone 05 semantic markup
 
-On the independent 05 branch, presentation parses `<emphasis>`, `<fear>`, `<calm>`,
+Presentation parses `<emphasis>`, `<fear>`, `<calm>`,
 `<evidence>`, and `<danger>` with matching closing tags. Use `<<` for a literal
 less-than sign. Raw TMP/HTML tags are rejected. Rules and dialogue selection
 continue treating the text as opaque; markup never changes evidence or intent.
@@ -175,8 +169,7 @@ Milestone 03 adds ReportAction alongside ReportInvestigation. ReportAction is
 available from Day 2 and substitutes the attributed report into {result}. A
 recorded pass has no target; a targeted action may refer to self or someone who
 died. hasTarget true/false conditions both work for this intent, and hasAssertion
-is true. Keep an unrestricted fallback. The committed catalog now has 54
-placeholder lines.
+is true. Keep an unrestricted fallback. The committed catalog has 70 lines.
 
 The player chooses the automatic report through Report last night's action.
 This discloses their own recorded selection and legitimately received results.

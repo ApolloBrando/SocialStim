@@ -17,6 +17,11 @@ namespace SocialStim.Rules.Roles
             if (!Enum.IsDefined(typeof(Faction), faction) || !Enum.IsDefined(typeof(Faction), appearance)
                 || !Enum.IsDefined(typeof(RoleCategory), category) || !Enum.IsDefined(typeof(AbilityKind), ability))
                 throw new ArgumentException("Unknown role enum value.");
+            Faction categoryFaction = category == RoleCategory.TownInvestigative || category == RoleCategory.TownProtective
+                || category == RoleCategory.TownSupport || category == RoleCategory.TownKilling || category == RoleCategory.TownBenign
+                ? Faction.Town : category == RoleCategory.AntagonistKilling || category == RoleCategory.AntagonistDeception
+                || category == RoleCategory.AntagonistSupport ? Faction.Antagonist : Faction.Neutral;
+            if (faction != categoryFaction) throw new ArgumentException("Role faction and category must agree.");
             Id = id; Name = name; Faction = faction; Category = category; Ability = ability;
             Attack = attack; Defense = defense; Protection = protection; Charges = charges;
             Appearance = appearance; Unique = unique;

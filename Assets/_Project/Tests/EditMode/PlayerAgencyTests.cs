@@ -42,7 +42,7 @@ namespace SocialStim.Tests.EditMode
             Assert.That(run.TrySubmit(GameCommand.Speak(SpeechIntent.Defend), out _), Is.False);
             var options = new GameController(run, TestContent.Roles()).Request().Options;
             Assert.That(options.Count, Is.EqualTo(1));
-            Assert.That(options[0].Label, Does.Contain("spectating"));
+            Assert.That(new GameController(run, TestContent.Roles()).TryChoose(options[0].Id, out _), Is.True);
         }
 
         /// <summary>A night kill makes the player a spectator without leaking private NPC results.</summary>

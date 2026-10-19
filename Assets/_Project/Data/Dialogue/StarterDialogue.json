@@ -2,414 +2,279 @@
   "schemaVersion": 2,
   "lines": [
     {
-      "id": "placeholder.Accuse.001",
+      "id": "starter.Accuse.001",
       "intent": "Accuse",
-      "text": "PLACEHOLDER: <danger>{target}, your story does not add up.</danger>",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "<danger>{target}, I don't trust you yet.</danger>",
+      "weight": 1
     },
     {
-      "id": "placeholder.Accuse.002",
+      "id": "starter.Accuse.002",
       "intent": "Accuse",
-      "text": "PLACEHOLDER: I suspect {target}.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "Something about {target} worries me.",
+      "weight": 1
     },
     {
-      "id": "placeholder.Accuse.003",
+      "id": "starter.Accuse.003",
       "intent": "Accuse",
-      "text": "PLACEHOLDER: We should question {target} closely.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "Can we hear more from {target}?",
+      "weight": 1
     },
     {
-      "id": "placeholder.Defend.001",
+      "id": "starter.Defend.001",
       "intent": "Defend",
-      "text": "PLACEHOLDER: <calm>Suspicion is not proof. Hear me out.</calm>",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "<calm>Give me a moment to explain.</calm>",
+      "weight": 1
     },
     {
-      "id": "placeholder.Defend.002",
+      "id": "starter.Defend.002",
       "intent": "Defend",
-      "text": "PLACEHOLDER: I have nothing to hide from this accusation.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "You're making a mistake about me.",
+      "weight": 1
     },
     {
-      "id": "placeholder.Defend.003",
+      "id": "starter.Defend.003",
       "intent": "Defend",
-      "text": "PLACEHOLDER: Judge the evidence before judging me.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "I know you're worried. So am I.",
+      "weight": 1
     },
     {
-      "id": "placeholder.ClaimRole.001",
+      "id": "starter.ClaimRole.001",
       "intent": "ClaimRole",
-      "text": "PLACEHOLDER: I am the {role}.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "<evidence>I'm the {role}.</evidence>",
+      "weight": 1
     },
     {
-      "id": "placeholder.ClaimRole.002",
+      "id": "starter.ClaimRole.002",
       "intent": "ClaimRole",
-      "text": "PLACEHOLDER: My claim is {role}.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "I should tell you: I'm the {role}.",
+      "weight": 1
     },
     {
-      "id": "placeholder.ClaimRole.003",
+      "id": "starter.ClaimRole.003",
       "intent": "ClaimRole",
-      "text": "PLACEHOLDER: Put me down as {role}.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "For the record, my role is {role}.",
+      "weight": 1
     },
     {
-      "id": "placeholder.ReportInvestigation.001",
+      "id": "starter.ReportInvestigation.001",
       "intent": "ReportInvestigation",
-      "text": "PLACEHOLDER: <evidence>My report puts {target} with {result}.</evidence>",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "<evidence>I checked {target} last night. The result was {result}.</evidence>",
+      "weight": 1
     },
     {
-      "id": "placeholder.ReportInvestigation.002",
+      "id": "starter.ReportInvestigation.002",
       "intent": "ReportInvestigation",
-      "text": "PLACEHOLDER: I found {target} appearing {result}.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "My check on {target} came back {result}.",
+      "weight": 1
     },
     {
-      "id": "placeholder.ReportInvestigation.003",
+      "id": "starter.ReportInvestigation.003",
       "intent": "ReportInvestigation",
-      "text": "PLACEHOLDER: I am reporting {result} for {target}.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "I got {result} for {target}. That's what I have.",
+      "weight": 1
     },
     {
-      "id": "placeholder.Vouch.001",
+      "id": "starter.Vouch.001",
       "intent": "Vouch",
-      "text": "PLACEHOLDER: I trust {target} for now.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "I trust {target} for now.",
+      "weight": 1
     },
     {
-      "id": "placeholder.Vouch.002",
+      "id": "starter.Vouch.002",
       "intent": "Vouch",
-      "text": "PLACEHOLDER: {target} deserves another chance.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "I'd give {target} another chance.",
+      "weight": 1
     },
     {
-      "id": "placeholder.Vouch.003",
+      "id": "starter.Vouch.003",
       "intent": "Vouch",
-      "text": "PLACEHOLDER: I would not rush to condemn {target}.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "Let's not rush to condemn {target}.",
+      "weight": 1
     },
     {
-      "id": "placeholder.CallForTrial.001",
+      "id": "starter.CallForTrial.001",
       "intent": "CallForTrial",
-      "text": "PLACEHOLDER: Put {target} on trial.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "I want {target} on trial.",
+      "weight": 1
     },
     {
-      "id": "placeholder.CallForTrial.002",
+      "id": "starter.CallForTrial.002",
       "intent": "CallForTrial",
-      "text": "PLACEHOLDER: Let {target} answer before everyone.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "{target}, we need some answers.",
+      "weight": 1
     },
     {
-      "id": "placeholder.CallForTrial.003",
+      "id": "starter.CallForTrial.003",
       "intent": "CallForTrial",
-      "text": "PLACEHOLDER: I nominate {target} for a hearing.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "Let's put {target} on trial and hear them out.",
+      "weight": 1
     },
     {
-      "id": "placeholder.Agree.001",
+      "id": "starter.Agree.001",
       "intent": "Agree",
-      "text": "PLACEHOLDER: I agree with {target}.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "I'm with {target} on this.",
+      "weight": 1
     },
     {
-      "id": "placeholder.Agree.002",
+      "id": "starter.Agree.002",
       "intent": "Agree",
-      "text": "PLACEHOLDER: I agree with {target}.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "{target} has a point.",
+      "weight": 1
     },
     {
-      "id": "placeholder.Agree.003",
+      "id": "starter.Agree.003",
       "intent": "Agree",
-      "text": "PLACEHOLDER: I agree with {target}.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "That makes sense to me, {target}.",
+      "weight": 1
     },
     {
-      "id": "placeholder.Disagree.001",
+      "id": "starter.Disagree.001",
       "intent": "Disagree",
-      "text": "PLACEHOLDER: I disagree with {target}.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "I'm not convinced, {target}.",
+      "weight": 1
     },
     {
-      "id": "placeholder.Disagree.002",
+      "id": "starter.Disagree.002",
       "intent": "Disagree",
-      "text": "PLACEHOLDER: I disagree with {target}.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "I see it differently, {target}.",
+      "weight": 1
     },
     {
-      "id": "placeholder.Disagree.003",
+      "id": "starter.Disagree.003",
       "intent": "Disagree",
-      "text": "PLACEHOLDER: I disagree with {target}.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "I can't go along with {target} on this.",
+      "weight": 1
     },
     {
-      "id": "placeholder.Deflect.001",
+      "id": "starter.Deflect.001",
       "intent": "Deflect",
-      "text": "PLACEHOLDER: Why are we ignoring {target}?",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "Why aren't we asking {target}?",
+      "weight": 1
     },
     {
-      "id": "placeholder.Deflect.002",
+      "id": "starter.Deflect.002",
       "intent": "Deflect",
-      "text": "PLACEHOLDER: Ask {target} those questions too.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "Ask {target} those questions too.",
+      "weight": 1
     },
     {
-      "id": "placeholder.Deflect.003",
+      "id": "starter.Deflect.003",
       "intent": "Deflect",
-      "text": "PLACEHOLDER: {target} has more to explain than I do.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "{target} has some explaining to do as well.",
+      "weight": 1
     },
     {
-      "id": "placeholder.StaySilent.001",
+      "id": "starter.StaySilent.001",
       "intent": "StaySilent",
-      "text": "PLACEHOLDER: I am listening.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "(listens)",
+      "weight": 1
     },
     {
-      "id": "placeholder.StaySilent.002",
+      "id": "starter.StaySilent.002",
       "intent": "StaySilent",
-      "text": "PLACEHOLDER: I will wait before making a claim.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "(stays quiet)",
+      "weight": 1
     },
     {
-      "id": "placeholder.StaySilent.003",
+      "id": "starter.StaySilent.003",
       "intent": "StaySilent",
-      "text": "PLACEHOLDER: I have nothing to add yet.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "(says nothing)",
+      "weight": 1
     },
     {
-      "id": "placeholder.ExpressFear.001",
+      "id": "starter.ExpressFear.001",
       "intent": "ExpressFear",
-      "text": "PLACEHOLDER: <fear>We are running out of people to trust.</fear>",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "<fear>I don't know who to trust.</fear>",
+      "weight": 1
     },
     {
-      "id": "placeholder.ExpressFear.002",
+      "id": "starter.ExpressFear.002",
       "intent": "ExpressFear",
-      "text": "PLACEHOLDER: I fear what another night will bring.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "I'm dreading tonight.",
+      "weight": 1
     },
     {
-      "id": "placeholder.ExpressFear.003",
+      "id": "starter.ExpressFear.003",
       "intent": "ExpressFear",
-      "text": "PLACEHOLDER: Every choice feels dangerous now.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "What if we get this wrong?",
+      "weight": 1
     },
     {
-      "id": "placeholder.ReactToDeath.001",
+      "id": "starter.ReactToDeath.001",
       "intent": "ReactToDeath",
-      "text": "PLACEHOLDER: Another person gone.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "I was hoping we'd all make it.",
+      "weight": 1
     },
     {
-      "id": "placeholder.ReactToDeath.002",
+      "id": "starter.ReactToDeath.002",
       "intent": "ReactToDeath",
-      "text": "PLACEHOLDER: We need to understand this death.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "We can't let this keep happening.",
+      "weight": 1
     },
     {
-      "id": "placeholder.ReactToDeath.003",
+      "id": "starter.ReactToDeath.003",
       "intent": "ReactToDeath",
-      "text": "PLACEHOLDER: Nobody should feel safe after this.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "It's hard to talk with someone missing.",
+      "weight": 1
     },
     {
-      "id": "placeholder.ReactToRoleReveal.001",
+      "id": "starter.ReactToRoleReveal.001",
       "intent": "ReactToRoleReveal",
-      "text": "PLACEHOLDER: That reveal changes my reading of events.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "That changes things.",
+      "weight": 1
     },
     {
-      "id": "placeholder.ReactToRoleReveal.002",
+      "id": "starter.ReactToRoleReveal.002",
       "intent": "ReactToRoleReveal",
-      "text": "PLACEHOLDER: We should reconsider their claims.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "We should go back over what they told us.",
+      "weight": 1
     },
     {
-      "id": "placeholder.ReactToRoleReveal.003",
+      "id": "starter.ReactToRoleReveal.003",
       "intent": "ReactToRoleReveal",
-      "text": "PLACEHOLDER: Remember what they said before this reveal.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "Think about who believed their claim.",
+      "weight": 1
     },
     {
-      "id": "placeholder.LastWords.001",
+      "id": "starter.LastWords.001",
       "intent": "LastWords",
-      "text": "PLACEHOLDER: <emphasis>Remember what led you to this decision.</emphasis>",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "<emphasis>Remember who pushed for this.</emphasis>",
+      "weight": 1
     },
     {
-      "id": "placeholder.LastWords.002",
+      "id": "starter.LastWords.002",
       "intent": "LastWords",
-      "text": "PLACEHOLDER: I have said what I can.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "I've said all I can.",
+      "weight": 1
     },
     {
-      "id": "placeholder.LastWords.003",
+      "id": "starter.LastWords.003",
       "intent": "LastWords",
-      "text": "PLACEHOLDER: The next choice belongs to you.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "Be careful with your next choice.",
+      "weight": 1
     },
     {
-      "id": "placeholder.VoteJustification.001",
+      "id": "starter.VoteJustification.001",
       "intent": "VoteJustification",
-      "text": "PLACEHOLDER: My vote follows the evidence I believe.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "I voted for what seemed right.",
+      "weight": 1
     },
     {
-      "id": "placeholder.VoteJustification.002",
+      "id": "starter.VoteJustification.002",
       "intent": "VoteJustification",
-      "text": "PLACEHOLDER: I must make a decision with what I know.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "It was the best call I could make.",
+      "weight": 1
     },
     {
-      "id": "placeholder.VoteJustification.003",
+      "id": "starter.VoteJustification.003",
       "intent": "VoteJustification",
-      "text": "PLACEHOLDER: I accept responsibility for my vote.",
-      "weight": 1,
-      "metadata": {
-        "emotionKey": "neutral"
-      }
+      "text": "I know my vote matters.",
+      "weight": 1
     },
     {
-      "id": "placeholder.social.accuse.aggressive",
+      "id": "starter.social.accuse.aggressive",
       "intent": "Accuse",
-      "text": "PLACEHOLDER: {target}, the accusations against you need an answer.",
+      "text": "{target}, people are asking questions. Answer them.",
       "weight": 3,
       "conditions": [
         {
@@ -429,9 +294,9 @@
       }
     },
     {
-      "id": "placeholder.social.defend.pressure",
+      "id": "starter.social.defend.pressure",
       "intent": "Defend",
-      "text": "PLACEHOLDER: I hear the pressure on me. Let me defend myself.",
+      "text": "I can feel everyone turning on me. Please, let me explain.",
       "weight": 3,
       "conditions": [
         {
@@ -444,9 +309,9 @@
       }
     },
     {
-      "id": "placeholder.social.claim.trial",
+      "id": "starter.social.claim.trial",
       "intent": "ClaimRole",
-      "text": "PLACEHOLDER: Before you judge me, my claim is {role}.",
+      "text": "Before you decide, you should know I'm the {role}.",
       "weight": 3,
       "conditions": [
         {
@@ -463,9 +328,9 @@
       }
     },
     {
-      "id": "placeholder.social.death.observed",
+      "id": "starter.social.death.observed",
       "intent": "ReactToDeath",
-      "text": "PLACEHOLDER: This death changes the discussion.",
+      "text": "There's an empty place here today. We need to get this right.",
       "weight": 3,
       "conditions": [
         {
@@ -481,9 +346,9 @@
       }
     },
     {
-      "id": "placeholder.social.report.dawn",
+      "id": "starter.social.report.dawn",
       "intent": "ReportInvestigation",
-      "text": "PLACEHOLDER: My report is that {target} appeared {result}.",
+      "text": "I checked {target} last night. They appeared {result}.",
       "weight": 3,
       "conditions": [
         {
@@ -504,9 +369,9 @@
       }
     },
     {
-      "id": "placeholder.social.vouch.claim",
+      "id": "starter.social.vouch.claim",
       "intent": "Vouch",
-      "text": "PLACEHOLDER: I will give {target} a chance to support that claim.",
+      "text": "Let's give {target} a chance to back that up.",
       "weight": 3,
       "conditions": [
         {
@@ -524,19 +389,115 @@
     {
       "id": "report-action.1",
       "intent": "ReportAction",
-      "text": "PLACEHOLDER: {speaker}: {result}",
+      "text": "{result}",
       "weight": 1
     },
     {
       "id": "report-action.2",
       "intent": "ReportAction",
-      "text": "PLACEHOLDER: {speaker}: {result}",
+      "text": "About last night: {result}",
       "weight": 1
     },
     {
       "id": "report-action.3",
       "intent": "ReportAction",
-      "text": "PLACEHOLDER: {speaker}: {result}",
+      "text": "Here's what happened: {result}",
+      "weight": 1
+    },
+    {
+      "id": "starter.Accuse.004",
+      "intent": "Accuse",
+      "text": "I think we should take a closer look at {target}.",
+      "weight": 1
+    },
+    {
+      "id": "starter.Defend.004",
+      "intent": "Defend",
+      "text": "Please hear me out before you decide.",
+      "weight": 1
+    },
+    {
+      "id": "starter.ClaimRole.004",
+      "intent": "ClaimRole",
+      "text": "I've kept this quiet, but I'm the {role}.",
+      "weight": 1
+    },
+    {
+      "id": "starter.ReportInvestigation.004",
+      "intent": "ReportInvestigation",
+      "text": "I looked into {target}. They appeared {result}.",
+      "weight": 1
+    },
+    {
+      "id": "starter.Vouch.004",
+      "intent": "Vouch",
+      "text": "I'm willing to back {target}.",
+      "weight": 1
+    },
+    {
+      "id": "starter.CallForTrial.004",
+      "intent": "CallForTrial",
+      "text": "I think it's time to question {target} properly.",
+      "weight": 1
+    },
+    {
+      "id": "starter.Agree.004",
+      "intent": "Agree",
+      "text": "I think {target} is right.",
+      "weight": 1
+    },
+    {
+      "id": "starter.Disagree.004",
+      "intent": "Disagree",
+      "text": "Hold on, {target}. I'm not sure about that.",
+      "weight": 1
+    },
+    {
+      "id": "starter.Deflect.004",
+      "intent": "Deflect",
+      "text": "We've barely heard from {target}.",
+      "weight": 1
+    },
+    {
+      "id": "starter.StaySilent.004",
+      "intent": "StaySilent",
+      "text": "(waits)",
+      "weight": 1
+    },
+    {
+      "id": "starter.ExpressFear.004",
+      "intent": "ExpressFear",
+      "text": "I wish I felt safer here.",
+      "weight": 1
+    },
+    {
+      "id": "starter.ReactToDeath.004",
+      "intent": "ReactToDeath",
+      "text": "I keep expecting them to speak.",
+      "weight": 1
+    },
+    {
+      "id": "starter.ReactToRoleReveal.004",
+      "intent": "ReactToRoleReveal",
+      "text": "Now we know a little more.",
+      "weight": 1
+    },
+    {
+      "id": "starter.LastWords.004",
+      "intent": "LastWords",
+      "text": "I hope this helps you see things clearly.",
+      "weight": 1
+    },
+    {
+      "id": "starter.VoteJustification.004",
+      "intent": "VoteJustification",
+      "text": "I wasn't certain. I had to choose.",
+      "weight": 1
+    },
+    {
+      "id": "starter.ReportAction.004",
+      "intent": "ReportAction",
+      "text": "My report: {result}",
       "weight": 1
     }
   ]

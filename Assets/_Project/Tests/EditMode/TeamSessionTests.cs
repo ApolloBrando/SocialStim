@@ -31,7 +31,7 @@ namespace SocialStim.Tests.EditMode
             var view = run.GetPlayerView();
             Assert.That(view.Characters.Count(c => !c.Alive), Is.EqualTo(1));
             Assert.That(view.Characters.Single(c => !c.Alive).Id, Is.EqualTo(new CharacterId(2)));
-            Assert.That(view.Transcript.Any(e => e.Text.StartsWith("PRIVATE TEAM:", System.StringComparison.Ordinal)), Is.False);
+            Assert.That(view.Transcript.Any(e => e.Text.StartsWith("Team:", System.StringComparison.Ordinal)), Is.False);
         }
 
         /// <summary>A player killer's pass cancels the team's kill rather than allowing an NPC to override it.</summary>
@@ -42,7 +42,7 @@ namespace SocialStim.Tests.EditMode
             ReachAndResolveNight(run);
             var view = run.GetPlayerView();
             Assert.That(view.Characters.All(c => c.Alive), Is.True);
-            Assert.That(view.Transcript.Any(e => e.Text.StartsWith("PRIVATE TEAM:", System.StringComparison.Ordinal) && e.Text.Contains("pass tonight")), Is.True);
+            Assert.That(view.Transcript.Any(e => e.Text.StartsWith("Team:", System.StringComparison.Ordinal) && e.Text.Contains("pass tonight")), Is.True);
         }
     }
 }

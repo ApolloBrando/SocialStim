@@ -32,7 +32,7 @@ namespace SocialStim.Editor
             int lines = dialogue.Count;
             int names = catalog.LoadNames().Count;
             catalog.LoadReasoning();
-            Debug.Log($"SocialStim content valid: {roles} roles, {lines} placeholder lines, {names} names.");
+            Debug.Log($"SocialStim content valid: {roles} roles, {lines} dialogue lines, {names} names.");
 #endif
         }
 

@@ -13,35 +13,23 @@ namespace SocialStim.Rules.Cast
     /// <summary>Resolves the initial constrained role list and builds isolated run instances.</summary>
     public static class RunFactory
     {
-        /// <summary>Creates the seven-character setup; rejects unsupported chosen roles and exhausted categories.</summary>
+        /// <summary>Creates the requested setup; the legacy seven-person template is used when none is supplied.</summary>
         public static RunSession Create(RunOptions options, IEnumerable<RoleSpec> roles, IEnumerable<string> names,
             IEnumerable<DialogueLine> dialogue, INpcStrategy strategy = null, ReasoningSettings reasoning = null, RoleList setup = null)
         {
+            if (options == null) throw new ArgumentNullException(nameof(options));
             var catalog = ValidateCatalog(roles);
-            var availableNames = names.ToList();
+            var availableNames = names?.ToList() ?? throw new ArgumentNullException(nameof(names));
             int castSize = setup?.Slots.Count ?? 7;
             if (availableNames.Count < castSize || availableNames.Any(string.IsNullOrWhiteSpace) || availableNames.Distinct(StringComparer.Ordinal).Count() != availableNames.Count)
                 throw new ArgumentException("Provide enough distinct, nonempty names for the role list.");
             var random = new SeededRandom(options.Seed);
-            var assigned = setup == null ? new List<RoleSpec>() : setup.Resolve(catalog, options.PlayerRole, random).ToList();
-            if (setup == null)
-            {
-            foreach (RoleCategory category in new[] { RoleCategory.TownInvestigative, RoleCategory.TownProtective,
-                RoleCategory.TownSupport, RoleCategory.AntagonistKilling, RoleCategory.NeutralBenign })
-                assigned.Add(Pick(catalog.Where(r => r.Category == category), assigned, random));
-            for (int i = 0; i < 2; i++) assigned.Add(Pick(catalog.Where(r => r.Faction == Faction.Town), assigned, random));
-            if (options.PlayerRole.HasValue)
-            {
-                RoleSpec chosen = catalog.FirstOrDefault(r => r.Id == options.PlayerRole.Value)
-                    ?? throw new ArgumentException("Chosen player role is not in the catalog.");
-                if (assigned.All(r => r.Id != chosen.Id))
-                {
-                    int slot = assigned.FindIndex(r => r.Category == chosen.Category);
-                    if (slot < 0) throw new ArgumentException("Chosen role cannot fit this role list.");
-                    assigned[slot] = chosen;
-                }
-            }
-            }
+            var roleList = setup ?? new RoleList(new[] {
+                new RoleSlot(category: RoleCategory.TownInvestigative), new RoleSlot(category: RoleCategory.TownProtective),
+                new RoleSlot(category: RoleCategory.TownSupport), new RoleSlot(category: RoleCategory.AntagonistKilling),
+                new RoleSlot(category: RoleCategory.NeutralBenign), new RoleSlot(faction: Faction.Town), new RoleSlot(faction: Faction.Town)
+            });
+            var assigned = roleList.Resolve(catalog, options.PlayerRole, random).ToList();
             Shuffle(assigned, random); Shuffle(availableNames, random);
             if (options.PlayerRole.HasValue)
             {
@@ -59,8 +47,11 @@ namespace SocialStim.Rules.Cast
             IEnumerable<RoleSpec> roles, IEnumerable<DialogueLine> dialogue, INpcStrategy strategy = null, IWinCondition winCondition = null,
             ReasoningSettings reasoning = null)
         {
+            if (options == null) throw new ArgumentNullException(nameof(options));
             var catalog = ValidateCatalog(roles);
-            var cast = members.Select((m, index) => new Participant(new CharacterId(index), m.Name,
+            var specifications = members?.ToList() ?? throw new ArgumentNullException(nameof(members));
+            if (specifications.Any(m => m == null)) throw new ArgumentException("Scenario members cannot be null.");
+            var cast = specifications.Select((m, index) => new Participant(new CharacterId(index), m.Name,
                 catalog.FirstOrDefault(r => r.Id == m.Role) ?? throw new ArgumentException($"Unknown role: {m.Role}."), m.Personality)).ToList();
             if (cast.Count < 3 || cast.Select(c => c.Name).Distinct(StringComparer.Ordinal).Count() != cast.Count)
                 throw new ArgumentException("A scenario needs at least three uniquely named participants.");
@@ -77,17 +68,10 @@ namespace SocialStim.Rules.Cast
 
         private static List<RoleSpec> ValidateCatalog(IEnumerable<RoleSpec> roles)
         {
-            var catalog = roles.OrderBy(r => r.Id.Value, StringComparer.Ordinal).ToList();
-            if (catalog.Count == 0 || catalog.Select(r => r.Id).Distinct().Count() != catalog.Count)
+            var catalog = roles?.ToList() ?? throw new ArgumentNullException(nameof(roles));
+            if (catalog.Count == 0 || catalog.Any(r => r == null) || catalog.Select(r => r.Id).Distinct().Count() != catalog.Count)
                 throw new ArgumentException("Catalog must have unique role IDs.");
-            return catalog;
-        }
-
-        private static RoleSpec Pick(IEnumerable<RoleSpec> candidates, IReadOnlyList<RoleSpec> assigned, IRandomSource random)
-        {
-            var eligible = candidates.Where(r => !r.Unique || assigned.All(a => a.Id != r.Id)).ToList();
-            if (eligible.Count == 0) throw new ArgumentException("Role list cannot satisfy a category or uniqueness constraint.");
-            return eligible[random.Next(eligible.Count)];
+            return catalog.OrderBy(r => r.Id.Value, StringComparer.Ordinal).ToList();
         }
 
         private static void Shuffle<T>(IList<T> values, IRandomSource random)

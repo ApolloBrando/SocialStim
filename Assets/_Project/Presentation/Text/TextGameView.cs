@@ -59,6 +59,8 @@ namespace SocialStim.Presentation.Text
         private int _displayDay = 1;
         private int _daySpeeches;
         private RectTransform _castPanel;
+        private ScrollRect _castScroll;
+        private ScrollRect _claimsScroll;
         private string _pendingStatus;
         private readonly Dictionary<CharacterId, ParticipantCard> _cards = new Dictionary<CharacterId, ParticipantCard>();
         public event Action<string> OptionChosen;
@@ -78,7 +80,7 @@ namespace SocialStim.Presentation.Text
                     if (observation.Cue == GameCue.SpeechDelivered && !_palette.Night)
                     {
                         _daySpeeches++;
-                        float expected = Mathf.Max(1, _request.View.Characters.Count * 3);
+                        float expected = Mathf.Max(1, _request.View.Characters.Count * _request.View.DiscussionRoundsAllowed);
                         ApplyPalette(false, Mathf.Max(_palette.DayProgress, 0.6f * Mathf.Clamp01(_daySpeeches / expected)));
                     }
                     if (observation.Intent == SpeechIntent.ClaimRole && observation.Speaker.HasValue && observation.ClaimedRole.HasValue)
@@ -87,7 +89,7 @@ namespace SocialStim.Presentation.Text
                         RoleId role = observation.ClaimedRole.Value;
                         string roleName = _roleNames.TryGetValue(role, out string display) ? display : role.Value;
                         _visibleClaims[observation.Speaker.Value] = name + ": " + roleName;
-                        _claimSummary.text = "ROLE CLAIMS (unverified)  |  " + string.Join("  |  ", _visibleClaims.OrderBy(c => c.Key.Value).Select(c => c.Value));
+                        _claimSummary.text = "Claims · unverified  |  " + string.Join("  |  ", _visibleClaims.OrderBy(c => c.Key.Value).Select(c => c.Value));
                     }
                 }
                 _next++;
@@ -103,13 +105,22 @@ namespace SocialStim.Presentation.Text
             title.fontStyle = FontStyles.Bold; title.characterSpacing = 1.2f; _labels.Add(title);
             TextUiFactory.Fill(title.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(32, -61), new Vector2(-200, -20));
             _status = TextUiFactory.Text("Status", canvas.transform, font, 15); _labels.Add(_status);
-            _castPanel = TextUiFactory.Rect("Participants", canvas.transform);
-            TextUiFactory.Fill(_castPanel, new Vector2(0, 1), Vector2.one, new Vector2(32, -163), new Vector2(-32, -113));
+            _castScroll = TextUiFactory.Scroll("Participants", canvas.transform, out _castPanel);
+            _surfaces.Add(_castScroll.GetComponent<Image>());
+            TextUiFactory.Fill((RectTransform)_castScroll.transform, new Vector2(0, 1), Vector2.one, new Vector2(32, -165), new Vector2(-32, -111));
+            ConfigureHorizontalStrip(_castScroll, _castPanel);
             var castLayout = _castPanel.gameObject.AddComponent<HorizontalLayoutGroup>();
-            castLayout.spacing = 8; castLayout.childControlWidth = true; castLayout.childControlHeight = true; castLayout.childForceExpandWidth = true;
-            _castPanel.gameObject.SetActive(false);
-            _claimSummary = TextUiFactory.Text("Role Claims Board", canvas.transform, font, 16); _labels.Add(_claimSummary);
-            TextUiFactory.Fill(_claimSummary.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(36, -218), new Vector2(-36, -178));
+            castLayout.spacing = 8; castLayout.childControlWidth = true; castLayout.childControlHeight = true; castLayout.childForceExpandWidth = false;
+            _castScroll.gameObject.SetActive(false);
+            _claimsScroll = TextUiFactory.Scroll("Role Claims Board", canvas.transform, out RectTransform claimContent);
+            _surfaces.Add(_claimsScroll.GetComponent<Image>());
+            TextUiFactory.Fill((RectTransform)_claimsScroll.transform, new Vector2(0, 1), Vector2.one, new Vector2(32, -218), new Vector2(-32, -175));
+            ConfigureHorizontalStrip(_claimsScroll, claimContent);
+            var claimLayout = claimContent.gameObject.AddComponent<HorizontalLayoutGroup>();
+            claimLayout.childForceExpandWidth = false; claimLayout.childControlWidth = true; claimLayout.childControlHeight = true;
+            _claimSummary = TextUiFactory.Text("Claims", claimContent, font, 16); _labels.Add(_claimSummary);
+            _claimSummary.textWrappingMode = TextWrappingModes.NoWrap;
+            _claimSummary.alignment = TextAlignmentOptions.MidlineLeft;
             TextUiFactory.Fill(_status.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(34, -104), new Vector2(-34, -66));
             Button restart = TextUiFactory.Button(canvas.transform, font, "New run", 42);
             _controls.Add(restart);
@@ -150,7 +161,7 @@ namespace SocialStim.Presentation.Text
             Control(footer, "Motion: reduced", () => ChangeSettings(reduced: !_settings.ReducedMotion));
             Control(footer, "Flash: off", () => ChangeSettings(flashes: !_settings.Flashes));
             Control(footer, "Text: animated", () => ChangeSettings(instant: !_settings.InstantText));
-            Control(footer, "Intensity: 50%", () => ChangeSettings(intensity: _settings.Intensity >= 1 ? 0 : _settings.Intensity + 0.5f));
+            Control(footer, "Intensity: 50%", () => ChangeSettings(intensity: _settings.Intensity >= 1 ? 0 : Mathf.Min(1, _settings.Intensity + 0.5f)));
             Control(footer, "Speed: " + _settings.ElementsPerSecond.ToString("0"), () =>
                 ChangeSettings(speed: _settings.ElementsPerSecond < 25 ? 28 : _settings.ElementsPerSecond < 35 ? 40 : 18));
             Control(footer, "Display options", ToggleDisplayOptions);
@@ -168,14 +179,12 @@ namespace SocialStim.Presentation.Text
             _roleNames.Clear(); foreach (RoleSpec role in roles) _roleNames.Add(role.Id, role.Name);
             _status.text = "A new run · " + seedDescription;
             _conversationHeading.text = "SETTLE IN";
-            _claimSummary.gameObject.SetActive(false);
+            _claimsScroll.gameObject.SetActive(false);
             TextUiFactory.Fill((RectTransform)_transcriptScroll.transform, Vector2.zero, new Vector2(0.64f, 1), new Vector2(32, 82), new Vector2(-10, -130));
             TextUiFactory.Fill((RectTransform)_choiceScroll.transform, new Vector2(0.64f, 0), Vector2.one, new Vector2(10, 82), new Vector2(-32, -130));
-            _transcript.text = "Choose a role and settle in.\n\n"
-                + "Take the opening, listen to the group, and decide who to trust. Each run is played in one sitting.\n\n"
-                + "Dialogue is marked PLACEHOLDER while the prototype grows.\n\n"
-                + "Use the arrow keys and Enter, or choose with the mouse. Space reveals pending lines. "
-                + "Display options adjust pacing and effects. A dead player may continue spectating.";
+            _transcript.text = "Listen closely. Choose who to trust.\n\n"
+                + "Mouse or arrows + Enter to choose. Space to skip text.\n\n"
+                + "Display options control text speed and effects.";
             _choiceHeading.text = "START A RUN";
             ShowRoleGroups(roles, start, null);
             _textEffects.SetDocument(SemanticText.Literal(_transcript.text), 0, _palette);
@@ -190,18 +199,18 @@ namespace SocialStim.Presentation.Text
             ClearChoices();
             if (!faction.HasValue)
             {
-                AddButton("Random role", "Meet a fresh cast with an unpredictable assignment.", () => start(null));
+                AddButton("Random role", "Let chance decide.", () => start(null));
                 foreach (var group in roles.GroupBy(role => role.Faction))
                 {
                     Faction side = group.Key;
-                    string description = side == Faction.Town ? "Work with the town to uncover the threats."
-                        : side == Faction.Antagonist ? "Keep your team hidden and mislead the town." : "Pursue your own objective.";
+                    string description = side == Faction.Town ? "Find the threats."
+                        : side == Faction.Antagonist ? "Protect your team. Mislead the town." : "Follow your own goal.";
                     AddButton(side + " roles", description, () => ShowRoleGroups(roles, start, side));
                 }
             }
             else
             {
-                AddButton("Back", "Return to all factions.", () => ShowRoleGroups(roles, start, null));
+                AddButton("Back", "Choose a faction.", () => ShowRoleGroups(roles, start, null));
                 foreach (RoleSpec role in roles.Where(role => role.Faction == faction.Value).OrderBy(role => role.Name, StringComparer.Ordinal))
                 {
                     RoleId id = role.Id;
@@ -218,7 +227,7 @@ namespace SocialStim.Presentation.Text
             _request = request;
             _choiceHeading.text = "YOUR TURN";
             _conversationHeading.text = "CONVERSATION";
-            _claimSummary.gameObject.SetActive(true);
+            _claimsScroll.gameObject.SetActive(true);
             TextUiFactory.Fill((RectTransform)_transcriptScroll.transform, Vector2.zero, new Vector2(0.64f, 1), new Vector2(32, 82), new Vector2(-10, -230));
             TextUiFactory.Fill((RectTransform)_choiceScroll.transform, new Vector2(0.64f, 0), Vector2.one, new Vector2(10, 82), new Vector2(-32, -230));
             var view = request.View;
@@ -226,7 +235,7 @@ namespace SocialStim.Presentation.Text
                 + $" | Uses: {(view.Charges < 0 ? "unlimited" : view.Charges.ToString())}\nSeed {view.Seed} | Trials {view.TrialsUsed}/{view.TrialsAllowed}";
             ClearChoices();
             _menuCategory = null; _menuFamily = null; _menuPage = 0;
-            _status.text = "Listening… Choices return when it is your turn.";
+            _status.text = "Listening…";
             _choiceScroll.gameObject.SetActive(false);
             _wasDisplaying = true;
             Pump(); UpdateChoiceState();
@@ -266,8 +275,8 @@ namespace SocialStim.Presentation.Text
                 try { line = SemanticMarkup.Parse(observation.Text); }
                 catch (ArgumentException) { line = SemanticText.Literal(observation.Text); }
                 bool roleClaim = observation.Intent == SpeechIntent.ClaimRole;
-                if (roleClaim) line = new SemanticText("[ROLE CLAIM] " + line.Text,
-                    new[] { new SemanticSpan(0, 13 + line.Text.Length, SemanticStyle.Evidence) });
+                if (roleClaim) line = new SemanticText("[CLAIM] " + line.Text,
+                    new[] { new SemanticSpan(0, 8 + line.Text.Length, SemanticStyle.Evidence) });
                 if (_shown.Length > 0) _shown.Append("\n\n");
                 _currentStart = _shown.Length;
                 _shown.Append(line.Text);
@@ -294,8 +303,8 @@ namespace SocialStim.Presentation.Text
             _visibleClaims.Clear(); _displayDay = 1; _daySpeeches = 0; _pendingStatus = null;
             foreach (ParticipantCard card in _cards.Values) { card.gameObject.SetActive(false); Destroy(card.gameObject); }
             _cards.Clear();
-            if (_castPanel != null) _castPanel.gameObject.SetActive(false);
-            if (_claimSummary != null) _claimSummary.text = "ROLE CLAIMS (unverified)  |  Nobody has claimed yet.";
+            if (_castScroll != null) _castScroll.gameObject.SetActive(false);
+            if (_claimSummary != null) _claimSummary.text = "Claims · none yet";
             if (_choiceScroll != null) _choiceScroll.gameObject.SetActive(true);
             if (_screenEffects != null) _screenEffects.Apply(default, _palette);
         }
@@ -374,7 +383,7 @@ namespace SocialStim.Presentation.Text
                 if (_request.View.Phase != GamePhase.Ended)
                     ApplyPalette(Daylight.IsNight(_request.View.Phase), Mathf.Max(_palette.DayProgress, Daylight.Progress(_request.View.Phase, _request.View.TrialsUsed, _request.View.TrialsAllowed)));
                 _status.text = _pendingStatus;
-                _castPanel.gameObject.SetActive(true);
+                _castScroll.gameObject.SetActive(true);
                 foreach (var participant in _request.View.Characters)
                 {
                     if (!_cards.TryGetValue(participant.Id, out ParticipantCard card))
@@ -402,7 +411,7 @@ namespace SocialStim.Presentation.Text
                 foreach (var group in options.GroupBy(o => o.Category))
                 {
                     string category = group.Key;
-                    entries.Add(Tuple.Create(category, group.Count() + " available choices", (Action)(() => {
+                    entries.Add(Tuple.Create(category, group.Count() + " choices", (Action)(() => {
                         _menuCategory = category; _menuPage = 0; BuildMenu();
                     })));
                 }
@@ -412,7 +421,7 @@ namespace SocialStim.Presentation.Text
                 foreach (var group in options.GroupBy(o => o.Family))
                 {
                     string family = group.Key;
-                    entries.Add(Tuple.Create(family, "Choose a target or statement", (Action)(() => {
+                    entries.Add(Tuple.Create(family, "Choose", (Action)(() => {
                         _menuFamily = family; _menuPage = 0; BuildMenu();
                     })));
                 }
@@ -424,7 +433,7 @@ namespace SocialStim.Presentation.Text
                     entries.Add(Tuple.Create(option.Label, option.Interpretation, (Action)(() => { if (!IsDisplaying && Time.frameCount > _choicesReadyFrame) OptionChosen?.Invoke(id); })));
                 }
             if (_menuCategory != null)
-                AddButton("Back", "Return without spending your turn.", () => {
+                AddButton("Back", "Keeps your turn.", () => {
                     if (_menuFamily != null) _menuFamily = null; else _menuCategory = null;
                     _menuPage = 0; BuildMenu();
                 });
@@ -433,6 +442,15 @@ namespace SocialStim.Presentation.Text
             if ((_menuPage + 1) * 6 < entries.Count) AddButton("Next page", "", () => { _menuPage++; BuildMenu(); });
             _choiceScroll.verticalNormalizedPosition = 1;
             FocusFirstChoice();
+        }
+
+        private static void ConfigureHorizontalStrip(ScrollRect scroll, RectTransform content)
+        {
+            scroll.horizontal = true; scroll.vertical = false;
+            TextUiFactory.Fill(scroll.viewport, Vector2.zero, Vector2.one, new Vector2(8, 4), new Vector2(-8, -4));
+            content.anchorMin = Vector2.zero; content.anchorMax = new Vector2(0, 1); content.pivot = new Vector2(0, 0.5f);
+            content.sizeDelta = Vector2.zero;
+            content.gameObject.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
         }
 
         private void FocusFirstChoice()

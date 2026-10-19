@@ -5,13 +5,14 @@ Inspired by Town of Salem, Gnosia and Slaughter Horse 2.
 
 ## Current status
 
-Milestones 01, 02 and 05 are merged. This branch adds milestone 03: eleven
-role definitions, an authored nine-participant setup with repeatable Citizens,
-advanced night interactions and outcomes, morning reporting, grouped choices,
-and the owner's playtest UI changes. Runs are intended to be completed in one sitting;
-ongoing-run save/resume has been dropped.
+Milestones 01, 02, 03 and 05 are merged. This audit adds configurable participant
+counts, matching role assignment, 70 natural dialogue variants, shorter UI copy
+and fixes for content validation, turn submission and presentation. The default
+cast has nine participants. Runs are played in one sitting.
 
-Dialogue is authored data marked PLACEHOLDER; no runtime generative AI is used.
+Dialogue is editable authored data; no runtime generative AI is used.
+Start with [the content editing guide](Docs/CONTENT_GUIDE.md) for dialogue,
+names, roles, setup counts, UI copy and tuning.
 The player belongs to the cast and follows the same command legality as NPCs.
 
 Day uses a light background that warms from pale yellow toward soft red through
@@ -22,7 +23,7 @@ stable speaker speeds and varied reading pauses. Choices wait for the player's
 turn. Skip, instant text, reduced motion, flashes, and intensity are available.
 Text speed and accessibility preferences persist between sessions; run state does not.
 
-New shared compilation and behavioral checks are pending in CI. Unity import,
+Shared compilation and behavioral checks run in CI. Unity import,
 adapter compilation, actual rendering/input, and player builds remain a
 separate verification gate; the current changes are review candidates.
 
@@ -45,7 +46,9 @@ It builds the Canvas, transcript, choices and Input System EventSystem at startu
 No manual catalog/component wiring is needed. Missing input mode or font resources
 are reported in the Console. Disable **Random Seed** on the scene's `SocialStim`
 object and set **Fixed Seed** (for example `147`) for reproducible play. Trial
-count, discussion rounds, and role reveal are also inspector options.
+count, discussion rounds, role reveal and Participant Count are inspector options.
+Participant Count includes the player. Positive values scale faction slots;
+zero uses the exact authored slot list. Add names to the catalog for larger casts.
 `StarterEffects.asset` is assigned to the scene for inspector-authored overrides.
 Open **Tools > SocialStim > Effects Playground** to preview the portable timing
 and palette without playing a game. See [Docs/EFFECTS.md](Docs/EFFECTS.md).
@@ -84,7 +87,7 @@ remain out of the normal text UI.
 Tune `Assets/_Project/ScriptableObjects/Reasoning/DefaultReasoning.asset` and start
 a new run to apply changes. The catalog already references it; no extra scene
 wiring is required. Dialogue JSON version 2 supports declarative conditions and
-contains 54 PLACEHOLDER lines. Version 1 content still loads. See
+contains 70 natural prototype lines. Version 1 content still loads. See
 [Docs/SOCIAL_REASONING.md](Docs/SOCIAL_REASONING.md) for policies and checks.
 
 ## Verification
@@ -122,8 +125,10 @@ three contracts.
 
 ## Playtest flow and milestone 03
 
-The authored starter list now has nine participants, a guaranteed repeatable
-Citizen slot, six Town slots, two Antagonist slots, and one Neutral slot.
+The default scaled cast has nine participants: six Town, two Antagonists and
+one Neutral. StarterRoleList holds editable faction shares for scaling and an
+optional exact nine-slot list with a guaranteed Citizen. Set Participant Count
+to zero to use those exact slots.
 The catalog adds Citizen, Vigilante, Forger, Coordinator, Provocateur, and Lone
 Killer. Roles are definitions, not mandatory unique characters. See
 [role interaction policies](Docs/ROLE_INTERACTIONS.md).

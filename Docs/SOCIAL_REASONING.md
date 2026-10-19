@@ -108,8 +108,8 @@ existing run. Older catalogs without a tuning reference use documented defaults.
 
 Dialogue schema 2 adds registered AND-combined predicates described in
 `DIALOGUE_AUTHORING.md`; schema 1 remains supported without them. The starter file
-has 45 generic and 6 conditional PLACEHOLDER lines. Final dialogue still belongs
-to the owner. Add eligible variants through data only, keep generic fallbacks,
+has 64 generic and 6 conditional natural prototype lines. The owner may edit or
+add variants through data only; keep generic fallbacks,
 then run Tools > SocialStim > Validate Starter Content. No scene rewiring is needed.
 
 ## Verification and remaining work
@@ -124,6 +124,6 @@ agency tests and 100 seeded Town/antagonist runs continue to execute.
 Unity import, asset authoring experience, input/layout behavior, and play/build
 checks remain part of the owner's open editor gate. Passing model tests does not
 establish balanced behavior, dialogue variety, or convincing social interaction;
-those require authored content and human playtesting. Full belief/save snapshots
-are milestone 04 work and will need evidence history, tuning/version identity,
-distribution weights, private results, exposure, team plan and repetition state.
+those require authored content and human playtesting. Ongoing-run saving was
+cancelled; observer memory exists only for the current run. See
+[CONTENT_GUIDE.md](CONTENT_GUIDE.md) for editing dialogue, roles and setups.

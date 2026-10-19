@@ -17,6 +17,9 @@ namespace SocialStim.Rules.Dialogue
         {
             if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(text) || weight < 1 || weight > 1000)
                 throw new ArgumentException("Dialogue requires an ID, text, and weight in [1, 1000].");
+            if (!Enum.IsDefined(typeof(SpeechIntent), intent)
+                || (requiredTrait & ~(Personality.Aggressive | Personality.Cautious | Personality.Gullible | Personality.Loyal | Personality.Deceptive)) != 0)
+                throw new ArgumentException($"{id}: unknown intent or personality flags.");
             Id = id; Intent = intent; Text = text; Weight = weight;
             RequiredTrait = requiredTrait; SpeakerRole = speakerRole; Metadata = metadata ?? new DialogueMetadata();
             Conditions = (conditions ?? Enumerable.Empty<DialogueCondition>()).ToList().AsReadOnly();
@@ -30,6 +33,9 @@ namespace SocialStim.Rules.Dialogue
                 || Conditions.Any(c => c.Kind == DialogueConditionKind.HasAssertion && c.Flag.Value != SpeechContract.HasAssertion(intent))
                 || Conditions.Any(c => (c.Kind == DialogueConditionKind.TargetAccused || c.Kind == DialogueConditionKind.TargetHasClaim) && !SpeechContract.RequiresTarget(intent) && !SpeechContract.AllowsOptionalTarget(intent)))
                 throw new ArgumentException($"{id}: impossible selection conditions.");
+            foreach (DialogueConditionKind presence in new[] { DialogueConditionKind.HasTarget, DialogueConditionKind.HasAssertion })
+                if (Conditions.Where(c => c.Kind == presence).Select(c => c.Flag).Distinct().Count() > 1)
+                    throw new ArgumentException($"{id}: contradictory presence conditions.");
             var ownRoles = Conditions.Where(c => c.Kind == DialogueConditionKind.SpeakerRole).Select(c => c.Value).ToList();
             if (speakerRole.HasValue) ownRoles.Add(speakerRole.Value.Value);
             if (ownRoles.Distinct(StringComparer.Ordinal).Count() > 1) throw new ArgumentException($"{id}: contradictory own-role conditions.");

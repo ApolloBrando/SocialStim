@@ -6,7 +6,7 @@ namespace SocialStim.Rules.Phases
     /// <summary>Run-local configuration; a seed is chosen before constructing this record.</summary>
     public sealed class RunOptions
     {
-        /// <summary>Creates the initial seven-participant setup options.</summary>
+        /// <summary>Creates run options independently of the authored participant count.</summary>
         public RunOptions(uint seed, RoleId? playerRole = null, int trialsPerDay = 2,
             int discussionRounds = 3, bool revealOnDeath = true, int maximumDays = 30)
         {

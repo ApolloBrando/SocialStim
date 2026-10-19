@@ -90,3 +90,12 @@ The UI is cozy and clean: warm paper-like day surfaces, slate night surfaces,
 rounded panels/cards, soft frames, restrained shadows and sage focus. Ongoing
 runs are played in one sitting and never saved; only presentation preferences
 persist. The save/resume draft is withdrawn.
+
+## Configurable populations
+
+GameBootstrap Participant Count defaults to nine. Positive counts scale the
+StarterRoleList faction shares (6 Town : 2 Antagonist : 1 Neutral); zero uses
+the exact slots described above. The same deterministic resolver handles both,
+without a fixed participant/catalog cap. Name availability, category constraints,
+unique roles and chosen-role eligibility still apply. See
+[CONTENT_GUIDE.md](CONTENT_GUIDE.md) for quotas, small-cast behavior and examples.
