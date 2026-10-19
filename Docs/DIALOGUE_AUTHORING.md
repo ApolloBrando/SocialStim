@@ -1,9 +1,9 @@
 # Dialogue authoring specification
 
-Status: design contract for milestone 02. No runtime loader/importer or final
-dialogue content exists in milestone 00. Milestone 01 may use a small explicitly
-marked placeholder dataset to prove the playable loop. All final lines are
-written by the project owner; no runtime generative AI is permitted.
+Status: milestone 01 implements the version 1 format below with 45 explicitly
+marked placeholder lines. There is a runtime loader, schema validator and editor
+validation command. All final lines are written by the project owner; no runtime
+generative AI is permitted. Richer condition expressions remain milestone 02 work.
 
 ## Format
 
@@ -22,20 +22,19 @@ Each file has a `schemaVersion` and `lines` array. Each line has:
 | `intent` | Registered speech intent identifier |
 | `text` | Authored text; opaque to Rules |
 | `weight` | Positive integer selection weight |
-| `placeholder` | True for engineering sample text; false for final authored lines |
-| `conditions` | Registered declarative conditions, combined with AND |
-| `variables` | Explicit permitted substitutions used by this line |
+| `requiredTrait` | Optional speaker flag or comma-separated flags; all are required |
+| `speakerRole` | Optional speaker's own known role ID for eligibility |
 | `metadata` | Optional emotion/expression, portrait and audio keys; text UI ignores them |
 
-Condition objects use a registered `kind` plus typed fields, never arbitrary
-executable expressions. Initial kinds are `phase`, `speakerTrait`,
-`speakerKnownRole`, `hasTarget`, `hasAssertion`, and `observedFact`.
-`observedFact` tests only facts available to the speaker. Private target-role
-conditions are forbidden unless the speaker legitimately knows that fact.
-The importer rejects unknown intent/condition/definition IDs.
+Version 1 supports only the two optional eligibility fields above. Missing
+`requiredTrait` means no trait restriction; missing `speakerRole` means any role.
+Unknown and duplicate JSON properties are rejected, including the planned
+`conditions` and `variables` arrays. Do not add unsupported conditions and expect
+them to take effect. Intent, target and assertion validity are checked by the
+session before selecting text. No target's hidden role enters line selection.
 
-This sample demonstrates the proposed schema only. It is not production content
-or an implemented importer contract yet:
+This is the implemented format. A complete document also needs an unrestricted
+fallback for every intent; copy the starter document before adding variants:
 
 ```json
 {
@@ -46,22 +45,17 @@ or an implemented importer contract yet:
       "intent": "accuse",
       "text": "PLACEHOLDER: {target}, explain your vote.",
       "weight": 1,
-      "placeholder": true,
-      "conditions": [
-        { "kind": "phase", "value": "discussion" },
-        { "kind": "hasTarget" }
-      ],
-      "variables": ["target"],
       "metadata": { "emotionKey": "suspicious" }
     }
   ]
 }
 ```
 
-Supported initial variables are `{speaker}`, `{target}`, `{role}`, and `{day}`;
+Supported variables are `{speaker}`, `{target}`, `{role}`, `{result}`, and `{day}`;
 `{role}` means the role being asserted in this speech context, not necessarily a
 true secret role. Other contexts expose explicit values only when allowed.
-Names and substitutions must be escaped for presentation markup. No reflected
+The current text view has rich text disabled. Future markup views must escape
+substitutions before interpreting styles. No reflected
 property access or arbitrary string-to-code evaluation is permitted.
 
 ## Writing by intent
@@ -102,11 +96,16 @@ seeded dialogue stream. Save recent IDs per speaker. When all eligible lines
 are recent, relax the oldest repetition exclusion before using a valid fallback.
 Never relax a condition that protects knowledge or factual eligibility.
 
-Importer errors include filename and line ID: duplicate IDs, unknown intents,
-conditions or assets, missing/unused variables, invalid weights, malformed JSON,
-impossible conditions, and missing fallback coverage. An invalid asset must not
-silently ship as an empty dialogue pool. Plain text selection does not parse
-future markup, and importing final content must reject leftover placeholders.
+Importer errors include line IDs when available: duplicate IDs/properties,
+unknown intents, unsupported fields, unknown role conditions, unknown variables,
+invalid weights, malformed JSON, unsupported schema versions, and missing
+fallback coverage. Document-level errors cannot always identify a line. An invalid
+asset fails loading rather than silently creating an empty pool. Run the editor
+validation command before play. Weights are integers in [1, 1000].
+
+Every engineering starter line visibly begins `PLACEHOLDER:`. Replacing these
+with final dialogue is owner-authored content work; a final-content build gate
+forbidding leftover placeholders is deferred. Selection does not parse markup.
 
 ## Future semantic markup
 

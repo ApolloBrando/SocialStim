@@ -14,8 +14,8 @@ actual assembly names: `UnityEngine.UI`, `Unity.TextMeshPro`, and
 `Unity.InputSystem`. Package IDs are not assembly names. No separate deprecated
 `com.unity.textmeshpro` dependency is added.
 
-Initial rendering is Built-in with a planned uGUI text view. No URP, Cinemachine,
-Addressables, or post-processing package is needed for a scaffold without scenes.
+Initial rendering is Built-in with an authored uGUI text view. No URP, Cinemachine,
+Addressables, or post-processing package is needed for the plain-text scene.
 Future text effects use TMP mesh data and screen effects begin with UI overlays.
 Changing the pipeline later must not affect Rules or Application.
 

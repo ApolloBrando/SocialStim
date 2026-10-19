@@ -19,6 +19,7 @@
 .idea/
 .gradle/
 *.csproj
+!Tools/HeadlessTests/SocialStim.HeadlessTests.csproj
 *.sln
 *.slnx
 *.suo
@@ -61,3 +62,5 @@ sysinfo.txt
 # Local Python validation state
 __pycache__/
 *.pyc
+/Tools/HeadlessTests/bin/
+/Tools/HeadlessTests/obj/

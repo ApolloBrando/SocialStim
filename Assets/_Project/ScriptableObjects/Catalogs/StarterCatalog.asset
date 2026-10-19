@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 777e5340eb2652e180020b0dec565dd5, type: 3}
+  m_Name: StarterCatalog
+  m_EditorClassIdentifier:
+  _roles:
+  - {fileID: 11400000, guid: 618b5bd393f5561ab6ee72671d864068, type: 2}
+  - {fileID: 11400000, guid: 9e79dd293a045adb8c0cbcbaac60f307, type: 2}
+  - {fileID: 11400000, guid: 9dd6c78870ac5042a1bd87ac43d6767d, type: 2}
+  - {fileID: 11400000, guid: 45042c5e73b5507381e52882f25df181, type: 2}
+  - {fileID: 11400000, guid: 17d6406e950f56d4aec389fbf80d98d3, type: 2}
+  _dialogue: {fileID: 4900000, guid: 6fd77ad880715fdab8117758bb098e9a, type: 3}
+  _names:
+  - Ada
+  - Bram
+  - Celia
+  - Dorian
+  - Elena
+  - Felix
+  - Greta
+  - Hector
+  - Iris
+  - Jonas
+  - Kira
+  - Lucian
+  - Mara
+  - Nico
+  - Orla
+  - Petra
+  - Quinn
+  - Radu
+  - Sabina
+  - Tomas

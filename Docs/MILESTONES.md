@@ -17,6 +17,17 @@ its milestone's scope. Do not merge automatically.
 
 ## Milestone 00 verification
 
+Milestone 00 was published to `main`. Milestone 01 now has a feature branch with
+the loop, assets, scene, editor content validation, and behavioral tests. Shared
+C# code compiled and 33 tests passed in its first GitHub Actions run, including
+100 seeded runs across Town and antagonist player roles. Subsequent test/schema
+updates are recorded in `Docs/VALIDATION.md` and the PR checks.
+
+The next required external gate is Unity import and real scene play, using
+`Docs/UNITY_VERIFICATION.md`. Complete this before moving to milestone 02 or
+claiming a verified Unity build. No Unity editor/license is available in the
+creation environment; headless tests cannot check TMP resources or uGUI input.
+
 - Run `python3 Tools/validate_scaffold.py`.
 - Review `.asmdef` dependencies and metadata pairs.
 - Check `git diff --check` and ignored Unity/IDE/credential files.
@@ -34,9 +45,10 @@ protected target. The player can be accused, tried, killed, and spectate after
 death. A simple evidence-based NPC strategy suffices initially; it must use
 restricted knowledge from the start.
 
-Create one game scene with composition root, a uGUI transcript/choice panel,
-Input System UI wiring, authored role/setup assets and an explicit content
-catalog. Import TMP essential resources through Unity when creating that UI;
+The branch contains one game scene with composition root, a uGUI transcript/choice panel,
+Input System UI wiring, authored role assets and an explicit content
+catalog. Its initial role-list constraints are code, with general setup assets
+deferred to milestone 03. Import TMP essential resources through Unity;
 preserve its generated metadata and font licensing. Route every displayed line
 through the text presenter. No typewriter, animated text, flash, shader, or
 post-processing work belongs in this slice.

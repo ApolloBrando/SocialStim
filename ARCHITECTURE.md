@@ -2,15 +2,23 @@
 
 ## Status and constraints
 
-Milestone 00 establishes boundaries and design contracts. All runtime classes,
-interfaces, policies, and behavior described below are **planned**, not existing
-implementations. The committed `.asmdef` files establish the assembly layout;
-there are no placeholder manager classes or gameplay scripts.
+Milestone 01 implements the five-role participant-loop candidate. Shared Rules,
+Application, and engine-free dialogue import code compile and pass behavioral
+tests in GitHub Actions. Unity-specific adapters and the committed scene still
+need editor import, compilation, and play verification.
+
+Current code includes `RunFactory`, `RunSession`, `PhaseMachine`, `NightResolver`
+and its stages, `BasicNpcStrategy`, restricted `KnowledgeView` records,
+`DialogueSelector`, `StarterWinCondition`, and `GameController`. Unity data assets
+and `GameBootstrap` wire these to `TextGameView` through `GamePresenter`.
+The original design contracts below also cover deferred systems: full role
+probabilities and exposure estimates (02), advanced roles (03), save snapshots
+(04), and tension/visual effects (05). Those systems are not implemented yet.
 
 The game is single-player and text-only initially. The player is a participant
 with the same action legality rules as NPCs. Dialogue is prewritten data, with
-no runtime text-generation service. All gameplay randomness is seeded and
-saveable. Only settings persist across runs.
+no runtime text-generation service. Gameplay randomness is seeded with capturable
+stream state; full run save/resume is milestone 04. No run state persists today.
 
 ## Assembly dependencies
 
@@ -66,7 +74,7 @@ Scenes, authored JSON, and asset instances live outside code namespace roots.
 | `Assets/_Project/Rules/Reasoning` | Beliefs, evidence records, strategy implementations |
 | `Assets/_Project/Rules/Dialogue` | Intent selection inputs, weighted lines, anti-repetition |
 | `Assets/_Project/Rules/Victory` | Faction outcomes and personal achievements |
-| `Assets/_Project/Rules/Randomness` | Specified PRNG and independently saved streams |
+| `Assets/_Project/Rules/Randomness` | Specified PRNG with capturable stream state |
 | `Assets/_Project/Application` | Session coordination, observations, input, saves, cues |
 | `Assets/_Project/Data/Definitions` | Definition types and validated runtime conversion |
 | `Assets/_Project/Data/Dialogue` | Authored dialogue files; no generated runtime prose |
@@ -191,10 +199,11 @@ settings. Persistence is behind an adapter; snapshot creation stays engine-free.
 
 ## Future presentation and effects
 
-Planned ports are `IGameView`, `IDialogueView`, `IPlayerInputProvider`, and a
-recipient-scoped presentation cue source. Avoid empty abstractions until the
-corresponding behavior exists. UI-specific objects never appear in their payloads.
-A future 2D/2.5D front end implements these ports and maps the same semantic cues.
+Current ports are `IGameView` and `IPlayerInputProvider`. `GamePresenter` routes
+portable option IDs to `GameController` and scoped requests back to the view.
+`RunSession.Observation` emits only public/player-private records. Additional
+dialogue or cue ports wait for a distinct consumer. UI objects never appear in
+these payloads. A future front end implements the same ports and semantic cues.
 
 One presenter routes all text and cues. Later it delegates to one effect director
 using ScriptableObject cue profiles and semantic style mappings. Text geometry,
@@ -227,13 +236,16 @@ milestone 05, including a markup validator and editor playground.
 Milestone 00's static validator checks file/metadata pairing, GUID uniqueness,
 assembly references and dependency cycles, layer constraints, package/version
 pins, and unwanted files. Unity import and compilation remain unverified until
-the pinned editor is available. Empty assemblies/test folders are intentional.
+the pinned editor is available. The PlayMode assembly remains reserved.
 
-Milestone 01 tests will target legal transitions, trial limits and ties, command
+Milestone 01 tests cover legal transitions, trial limits and ties, command
 parity for player/NPCs, blocked actions, protection/attack interactions, simultaneous
 deaths, victory boundaries, deterministic replay, and secret-information isolation.
-Later tests cover dialogue eligibility/repetition, save continuation equivalence,
-role interaction tables, and effect parsing/sequencing. Do not add tests that only
+Dialogue tests also cover eligibility/repetition and actual JSON loading. A
+headless .NET test project compiles actual shared sources with warnings treated
+as errors and completes 50 seeds for each of Town and antagonist play. This
+verifies consistency and termination, not balance or enjoyment. Later tests cover
+save continuation, advanced role interactions, and effects. Do not add tests that only
 assert the scaffold's existence or mirror implementation details.
 
 ## Design risks
