@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Collections.Generic;
 using NUnit.Framework;
 using SocialStim.Application.Sessions;
 using SocialStim.Rules.Cast;
@@ -77,6 +78,30 @@ namespace SocialStim.Tests.EditMode
             }
             Assert.That(run.GetPlayerView().TrialsUsed, Is.EqualTo(2));
             Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.NightSelection));
+        }
+
+        /// <summary>Listeners treat claims as uncertain but penalize a speaker contradicting their prior claim.</summary>
+        [Test]
+        public void SwitchingRoleClaimsRaisesEachObserversSuspicion()
+        {
+            var observed = new Dictionary<CharacterId, int>();
+            var strategy = new ScenarioStrategy
+            {
+                OnSpeech = knowledge => observed[knowledge.Self] = knowledge.Characters.Single(c => c.Id.Value == 0).Suspicion,
+            };
+            var run = RunFactory.CreateScenario(new RunOptions(123, discussionRounds: 3), new[]
+            {
+                new CastMemberSpec("Player", new RoleId("interrupter")),
+                new CastMemberSpec("Listener1", new RoleId("inspector")),
+                new CastMemberSpec("Listener2", new RoleId("physician")),
+                new CastMemberSpec("Listener3", new RoleId("assassin")),
+                new CastMemberSpec("Listener4", new RoleId("survivor")),
+            }, TestContent.Roles(), TestContent.Lines(), strategy);
+            Submit(run, GameCommand.Speak(SpeechIntent.ClaimRole, role: new RoleId("inspector")));
+            var before = observed.ToDictionary(pair => pair.Key, pair => pair.Value);
+            Submit(run, GameCommand.Speak(SpeechIntent.ClaimRole, role: new RoleId("survivor")));
+            Assert.That(observed.Count, Is.EqualTo(4));
+            foreach (var pair in before) Assert.That(observed[pair.Key], Is.GreaterThan(pair.Value));
         }
     }
 }

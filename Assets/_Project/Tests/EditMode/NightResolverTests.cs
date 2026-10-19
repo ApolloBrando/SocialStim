@@ -97,5 +97,16 @@ namespace SocialStim.Tests.EditMode
         [Test]
         public void MultipleTeamKillsAreRejected() => Assert.Throws<ArgumentException>(() => new NightResolver().Resolve(
             new[] { Actor(0, "assassin"), Actor(1, "assassin"), Actor(2, "inspector") }, new[] { Order(0, 2), Order(1, 2) }));
+
+        /// <summary>An attacker killed in the same batch still completes their locked attack.</summary>
+        [Test]
+        public void SimultaneousAttacksCanKillEachOther()
+        {
+            RoleSpec independent = TestContent.Role("test-killer", Faction.Neutral, RoleCategory.NeutralBenign, AbilityKind.Attack, attack: 1);
+            NightResolution result = new NightResolver().Resolve(new[] { new NightActor(new CharacterId(0), independent, -1), Actor(1, "assassin") },
+                new[] { Order(0, 1), Order(1, 0) });
+            Assert.That(result.Deaths.Select(id => id.Value), Is.EqualTo(new[] { 0, 1 }));
+            Assert.That(result.Visits.Count, Is.EqualTo(2));
+        }
     }
 }
