@@ -57,11 +57,16 @@ namespace SocialStim.Presentation.Text
 
         private void Begin(RoleId? chosenRole)
         {
-            uint seed = _randomSeed ? BitConverter.ToUInt32(Guid.NewGuid().ToByteArray(), 0) : unchecked((uint)_fixedSeed);
-            var roles = _catalog.LoadRoles();
-            var options = new RunOptions(seed, chosenRole, _trialsPerDay, _discussionRounds, _revealOnDeath);
-            var session = RunFactory.Create(options, roles, _catalog.LoadNames(), _catalog.LoadDialogue(), reasoning: _catalog.LoadReasoning(), setup: _catalog.LoadSetup());
-            _presenter = new GamePresenter(new GameController(session, roles), _view, _view);
+            try
+            {
+                uint seed = _randomSeed ? BitConverter.ToUInt32(Guid.NewGuid().ToByteArray(), 0) : unchecked((uint)_fixedSeed);
+                var roles = _catalog.LoadRoles();
+                var options = new RunOptions(seed, chosenRole, _trialsPerDay, _discussionRounds, _revealOnDeath);
+                var session = RunFactory.Create(options, roles, _catalog.LoadNames(), _catalog.LoadDialogue(), reasoning: _catalog.LoadReasoning(), setup: _catalog.LoadSetup());
+                _presenter = new GamePresenter(new GameController(session, roles), _view, _view);
+            }
+            catch (Exception e) when (e is ArgumentException || e is InvalidOperationException || e is OverflowException)
+            { _view.ShowInputError("Invalid setup: " + e.Message); }
         }
 
         private void OnDestroy()
