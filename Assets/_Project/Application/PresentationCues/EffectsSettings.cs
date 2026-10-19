@@ -6,7 +6,7 @@ namespace SocialStim.Application.PresentationCues
     public sealed class EffectsSettings
     {
         public EffectsSettings(bool enabled = true, bool reducedMotion = true, bool flashes = false, float intensity = 0.5f,
-            bool instantText = false, float elementsPerSecond = 60)
+            bool instantText = false, float elementsPerSecond = 28)
         {
             if (!EffectStep.Finite(intensity) || intensity < 0 || intensity > 1 || !EffectStep.Finite(elementsPerSecond)
                 || elementsPerSecond < 1 || elementsPerSecond > 240) throw new ArgumentOutOfRangeException(nameof(intensity));

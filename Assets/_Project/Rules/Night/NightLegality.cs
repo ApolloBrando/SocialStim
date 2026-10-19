@@ -12,7 +12,7 @@ namespace SocialStim.Rules.Night
         {
             if (actor == null || order == null || order.Actor != actor.Id) return false;
             if (!order.Target.HasValue) return true;
-            if (actor.Charges == 0) return false;
+            if (actor.Charges == 0 || actor.Role.Ability == AbilityKind.None) return false;
             NightActor target = actors.FirstOrDefault(a => a.Id == order.Target.Value);
             if (target == null) return false;
             if (actor.Role.Ability == AbilityKind.SelfProtect) return target.Id == actor.Id;

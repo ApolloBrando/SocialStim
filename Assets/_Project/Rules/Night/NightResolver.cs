@@ -13,8 +13,8 @@ namespace SocialStim.Rules.Night
         /// <summary>Creates the initial pipeline or a custom set with unique priorities.</summary>
         public NightResolver(IEnumerable<INightStage> stages = null)
         {
-            var ordered = (stages ?? new INightStage[] { new RoleBlockStage(), new VisitStage(),
-                new ProtectionStage(), new AttackStage(), new InvestigationStage() }).OrderBy(s => s.Priority).ToList();
+            var ordered = (stages ?? new INightStage[] { new RoleBlockStage(), new ForgeryStage(), new VisitStage(),
+                new ProtectionStage(), new AttackStage(), new WatchStage(), new InvestigationStage() }).OrderBy(s => s.Priority).ToList();
             if (ordered.Count == 0 || ordered.Select(s => s.Priority).Distinct().Count() != ordered.Count)
                 throw new ArgumentException("Night stages require unique priorities.", nameof(stages));
             _stages = ordered.AsReadOnly();

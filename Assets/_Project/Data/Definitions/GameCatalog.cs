@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SocialStim.Data.Dialogue;
 using SocialStim.Rules.Dialogue;
+using SocialStim.Rules.Cast;
 using SocialStim.Rules.Roles;
 using SocialStim.Rules.Reasoning;
 using UnityEngine;
@@ -17,6 +18,8 @@ namespace SocialStim.Data.Definitions
         [SerializeField] private TextAsset _dialogue;
         [SerializeField] private string[] _names;
         [SerializeField] private ReasoningDefinition _reasoning;
+        [SerializeField] private RoleListDefinition _setup;
+        public RoleList LoadSetup() => _setup != null ? _setup.Load() : null;
 
         /// <summary>Loads detached role definitions, rejecting missing/duplicate assets.</summary>
         public IReadOnlyList<RoleSpec> LoadRoles()

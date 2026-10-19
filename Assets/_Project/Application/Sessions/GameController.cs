@@ -32,6 +32,8 @@ namespace SocialStim.Application.Sessions
             switch (view.Phase)
             {
                 case GamePhase.Discussion:
+                    if (view.Opening) add("Let someone else open", "Yield the opening to one random participant without spending a discussion round.", GameCommand.Continue());
+                    if (view.CanReportAction) add("Report last night's action", "Share your recorded selection and legitimate results as your own public statement.", GameCommand.ReportLastAction());
                     add("Defend yourself", "A modest denial can reduce suspicion; it is not proof.", GameCommand.Speak(SpeechIntent.Defend));
                     add("Express fear", "Adds a social stance without asserting evidence.", GameCommand.Speak(SpeechIntent.ExpressFear));
                     add("Stay silent", "Uses this discussion turn without making a claim.", GameCommand.Speak(SpeechIntent.StaySilent));

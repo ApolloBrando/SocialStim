@@ -12,12 +12,16 @@ namespace SocialStim.Rules.Phases
         internal PlayerView(int revision, uint seed, int day, GamePhase phase, int trialsUsed, int trialsAllowed,
             bool alive, RoleSpec ownRole, int charges, CharacterId? defendant, OutcomeKind outcome, bool won,
             IReadOnlyList<KnownCharacter> characters, IReadOnlyList<CharacterId> legalNightTargets,
-            IReadOnlyList<GameObservation> transcript)
+            IReadOnlyList<GameObservation> transcript, bool opening = false, bool canReportAction = false)
         {
             Revision = revision; Seed = seed; Day = day; Phase = phase; TrialsUsed = trialsUsed; TrialsAllowed = trialsAllowed;
             Alive = alive; OwnRole = ownRole; Charges = charges; Defendant = defendant; Outcome = outcome; Won = won;
             Characters = characters; LegalNightTargets = legalNightTargets; Transcript = transcript;
+            Opening = opening; CanReportAction = canReportAction;
         }
+        /// <summary>The player may take the opening or yield it to one random NPC.</summary>
+        public bool Opening { get; }
+        public bool CanReportAction { get; }
         /// <summary>Request generation, used to reject stale input.</summary>
         public int Revision { get; }
         /// <summary>Reproducibility seed, never a cast reveal.</summary>

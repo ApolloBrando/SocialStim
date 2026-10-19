@@ -100,3 +100,14 @@ The latest code CI passed 61 tests with zero failures/skips, including the 100
 seeded runs. Final checks are recorded in `Docs/VALIDATION.md`. Unity adapter compilation, real preview, renderer
 behavior, and steady-update allocation profiling remain explicitly pending in
 `Docs/EFFECTS_VERIFICATION.md`. No main write or merge is authorized by this branch.
+
+## Current authorization and milestone 03
+
+Milestones 02 and 05 are merged by the owner. The owner authorized 03 and 04
+and requested the playtest changes recorded in Docs/ROLE_INTERACTIONS.md.
+Milestone 03 now includes the remaining role catalog, constrained authored
+setup, role interactions, conservative capability outcomes, repeatable Citizen,
+morning reporting, grouped choices, and paced turn-aware presentation.
+Milestone 04 remains a separate stacked review scope. Neither authorizes an
+automatic merge or direct main update. Earlier inverse palette notes above
+are historical; the latest light-day/dark-night correction takes precedence.

@@ -18,6 +18,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9dd6c78870ac5042a1bd87ac43d6767d, type: 2}
   - {fileID: 11400000, guid: 45042c5e73b5507381e52882f25df181, type: 2}
   - {fileID: 11400000, guid: 17d6406e950f56d4aec389fbf80d98d3, type: 2}
+  - {fileID: 11400000, guid: 78af82b83c1b9290c976d29f0052ba65, type: 2}
+  - {fileID: 11400000, guid: 1112b5a300619d9b00ba8e8709f0e00a, type: 2}
+  - {fileID: 11400000, guid: 107baeabbb7aa806be551064f188273c, type: 2}
+  - {fileID: 11400000, guid: 8aab25e15341bcf76768c81cbcfadd15, type: 2}
+  - {fileID: 11400000, guid: f89f6dd8a81f2649119c5e0af191d689, type: 2}
+  - {fileID: 11400000, guid: b9e8fe6ef3e23b1a8878783ef4137236, type: 2}
   _dialogue: {fileID: 4900000, guid: 6fd77ad880715fdab8117758bb098e9a, type: 3}
   _names:
   - Ada
@@ -41,3 +47,4 @@ MonoBehaviour:
   - Sabina
   - Tomas
   _reasoning: {fileID: 11400000, guid: ec26a8253ef0549098b5aaabe6d59b29, type: 2}
+  _setup: {fileID: 11400000, guid: 3ec9ce8bb57b81392638f82b39b7c4cf, type: 2}

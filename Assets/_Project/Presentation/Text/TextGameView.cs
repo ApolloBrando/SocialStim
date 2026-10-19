@@ -5,6 +5,8 @@ using System.Text;
 using SocialStim.Application.Input;
 using SocialStim.Application.PresentationCues;
 using SocialStim.Rules.Phases;
+using SocialStim.Rules.Dialogue;
+using SocialStim.Rules.Cast;
 using SocialStim.Rules.Roles;
 using SocialStim.Presentation.Effects;
 using TMPro;
@@ -43,6 +45,12 @@ namespace SocialStim.Presentation.Text
         private Action<DisplayAcknowledgement> _onAcknowledged;
         private Button _skip;
         private bool _wasDisplaying;
+        private TextMeshProUGUI _claimSummary;
+        private readonly Dictionary<CharacterId, string> _visibleClaims = new Dictionary<CharacterId, string>();
+        private string _menuCategory;
+        private string _menuFamily;
+        private int _menuPage;
+        private int _displayDay = 1;
         public event Action<string> OptionChosen;
         public event Action RestartRequested;
         public bool IsDisplaying => _playback.Busy || _request != null && _next < _request.View.Transcript.Count;
@@ -50,7 +58,20 @@ namespace SocialStim.Presentation.Text
         public void Initialize(TMP_FontAsset font, IReadOnlyDictionary<PresentationCue, EffectProfile> profiles = null)
         {
             _font = font; _profiles = profiles ?? DefaultCueProfiles.Create();
-            _onAcknowledged = acknowledgement => _next++;
+            _onAcknowledged = acknowledgement =>
+            {
+                if (_request != null && _next < _request.View.Transcript.Count)
+                {
+                    GameObservation observation = _request.View.Transcript[_next];
+                    if (observation.Intent == SpeechIntent.ClaimRole && observation.Speaker.HasValue && observation.ClaimedRole.HasValue)
+                    {
+                        string name = _request.View.Characters.First(c => c.Id == observation.Speaker.Value).Name;
+                        _visibleClaims[observation.Speaker.Value] = name + ": " + observation.ClaimedRole.Value.Value;
+                        _claimSummary.text = "ROLE CLAIMS (unverified)  |  " + string.Join("  |  ", _visibleClaims.OrderBy(c => c.Key.Value).Select(c => c.Value));
+                    }
+                }
+                _next++;
+            };
             var canvas = new GameObject("Text Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             canvas.transform.SetParent(transform, false);
             canvas.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
@@ -59,6 +80,8 @@ namespace SocialStim.Presentation.Text
             scaler.referenceResolution = new Vector2(1280, 800); scaler.matchWidthOrHeight = 0.5f;
             _surfaces.Add(canvas.AddComponent<Image>());
             _status = TextUiFactory.Text("Status", canvas.transform, font, 17); _labels.Add(_status);
+            _claimSummary = TextUiFactory.Text("Role Claims Board", canvas.transform, font, 16); _labels.Add(_claimSummary);
+            TextUiFactory.Fill(_claimSummary.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(20, -166), new Vector2(-20, -112));
             TextUiFactory.Fill(_status.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(20, -128), new Vector2(-150, -12));
             Button restart = TextUiFactory.Button(canvas.transform, font, "New run", 42);
             _controls.Add(restart);
@@ -66,7 +89,7 @@ namespace SocialStim.Presentation.Text
             restart.onClick.AddListener(() => RestartRequested?.Invoke());
             _transcriptScroll = TextUiFactory.Scroll("Transcript", canvas.transform, out RectTransform transcriptContent);
             _surfaces.Add(_transcriptScroll.GetComponent<Image>());
-            TextUiFactory.Fill((RectTransform)_transcriptScroll.transform, Vector2.zero, new Vector2(0.64f, 1), new Vector2(20, 68), new Vector2(-8, -140));
+            TextUiFactory.Fill((RectTransform)_transcriptScroll.transform, Vector2.zero, new Vector2(0.64f, 1), new Vector2(20, 68), new Vector2(-8, -178));
             _transcript = TextUiFactory.Text("Transcript Text", transcriptContent, font, 19);
             var transcriptLayout = transcriptContent.gameObject.AddComponent<VerticalLayoutGroup>();
             transcriptLayout.childControlHeight = true; transcriptLayout.childControlWidth = true; transcriptLayout.childForceExpandHeight = false;
@@ -74,7 +97,7 @@ namespace SocialStim.Presentation.Text
             _textEffects = gameObject.AddComponent<TextEffectRenderer>(); _textEffects.Initialize(_transcript);
             _choiceScroll = TextUiFactory.Scroll("Choices", canvas.transform, out _choices);
             _surfaces.Add(_choiceScroll.GetComponent<Image>());
-            TextUiFactory.Fill((RectTransform)_choiceScroll.transform, new Vector2(0.64f, 0), Vector2.one, new Vector2(8, 68), new Vector2(-20, -140));
+            TextUiFactory.Fill((RectTransform)_choiceScroll.transform, new Vector2(0.64f, 0), Vector2.one, new Vector2(8, 68), new Vector2(-20, -178));
             var choicesLayout = _choices.gameObject.AddComponent<VerticalLayoutGroup>();
             choicesLayout.spacing = 8; choicesLayout.childControlWidth = true; choicesLayout.childControlHeight = true; choicesLayout.childForceExpandHeight = false;
             _choices.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
@@ -100,7 +123,7 @@ namespace SocialStim.Presentation.Text
             _status.text = "SocialStim | New run | " + seedDescription;
             _transcript.text = "You belong to the cast. Speak, claim, lie, nominate, judge, and choose a night action.\n\n"
                 + "Dialogue is marked PLACEHOLDER. Choose a role or random assignment.\n\n"
-                + "Day: light text on dark. Night: dark text on light.\n\n"
+                + "Day: warm light background. Night: dark background.\n\n"
                 + "Scroll either panel. Arrow keys and Enter select choices; > marks focus. "
                 + "Space or Skip reveals pending text. Accessibility controls apply immediately. A dead player may spectate.";
             AddButton("Random role", "Generate a fresh cast and role assignment.", () => start(null));
@@ -126,11 +149,8 @@ namespace SocialStim.Presentation.Text
             _status.text = $"Day {view.Day} | {view.Phase} | {view.OwnRole.Name} ({view.OwnRole.Faction}) | {(view.Alive ? "Alive" : "Spectator")}"
                 + $" | Uses: {(view.Charges < 0 ? "unlimited" : view.Charges.ToString())}\nSeed {view.Seed} | Trials {view.TrialsUsed}/{view.TrialsAllowed}\n{cast}";
             ClearChoices();
-            foreach (PlayerOption option in request.Options)
-            {
-                string id = option.Id;
-                AddButton(option.Label, option.Interpretation, () => { if (!IsDisplaying) OptionChosen?.Invoke(id); });
-            }
+            _menuCategory = null; _menuFamily = null; _menuPage = 0;
+            _choiceScroll.gameObject.SetActive(false);
             _wasDisplaying = true;
             Pump(); UpdateChoiceState();
             _choiceScroll.verticalNormalizedPosition = 1;
@@ -157,18 +177,28 @@ namespace SocialStim.Presentation.Text
             while (_request != null && !_playback.Busy && _next < _request.View.Transcript.Count)
             {
                 var observation = _request.View.Transcript[_next];
+                if (observation.Day != _displayDay) { _displayDay = observation.Day; ApplyPalette(false); }
                 if (observation.Cue == GameCue.NightFalls) ApplyPalette(true);
                 if (observation.Cue == GameCue.DawnBreaks) ApplyPalette(false);
+                if (!_palette.Night && observation.Cue == GameCue.TrialStarted)
+                    ApplyPalette(false, Mathf.Max(_palette.DayProgress, 0.65f));
+                if (!_palette.Night && (observation.Cue == GameCue.VerdictGuilty || observation.Cue == GameCue.VerdictInnocent))
+                    ApplyPalette(false, 0.85f);
+                if (observation.Cue == GameCue.ExecutionCarriedOut) ApplyPalette(false, 1f);
                 SemanticText line;
                 try { line = SemanticMarkup.Parse(observation.Text); }
                 catch (ArgumentException) { line = SemanticText.Literal(observation.Text); }
+                bool roleClaim = observation.Intent == SpeechIntent.ClaimRole;
+                if (roleClaim) line = new SemanticText("[ROLE CLAIM] " + line.Text,
+                    new[] { new SemanticSpan(0, 13 + line.Text.Length, SemanticStyle.Evidence) });
                 if (_shown.Length > 0) _shown.Append("\n\n");
                 _currentStart = _shown.Length;
                 _shown.Append(line.Text);
                 foreach (SemanticSpan span in line.Spans) _spans.Add(new SemanticSpan(span.Start + _currentStart, span.Length, span.Style));
                 _textEffects.SetDocument(new SemanticText(_shown.ToString(), _spans), _currentStart, _palette);
                 EffectProfile profile = _profiles[_cues.Resolve(observation, _request.View)];
-                _playback.Begin(observation.Sequence, line, profile, _settings, _onAcknowledged);
+                var pacing = new SpeechPacing(observation);
+                _playback.Begin(observation.Sequence, line, profile, _settings, _onAcknowledged, pacing.Pause, pacing.Speed);
                 Canvas.ForceUpdateCanvases();
                 _transcriptScroll.verticalNormalizedPosition = 0;
             }
@@ -184,6 +214,9 @@ namespace SocialStim.Presentation.Text
         {
             _playback.Cancel(); _request = null; _next = 0; _currentStart = 0;
             _shown.Clear(); _spans.Clear(); _cues = new VisibleCueResolver(); _wasDisplaying = false;
+            _visibleClaims.Clear(); _displayDay = 1;
+            if (_claimSummary != null) _claimSummary.text = "ROLE CLAIMS (unverified)  |  Nobody has claimed yet.";
+            if (_choiceScroll != null) _choiceScroll.gameObject.SetActive(true);
             if (_screenEffects != null) _screenEffects.Apply(default, _palette);
         }
         private void ChangeSettings(bool? enabled = null, bool? reduced = null, bool? flashes = null, bool? instant = null, float? intensity = null)
@@ -204,9 +237,9 @@ namespace SocialStim.Presentation.Text
             Button button = TextUiFactory.Button(parent, _font, label, 38);
             button.onClick.AddListener(() => selected()); _controls.Add(button); return button;
         }
-        private void ApplyPalette(bool night)
+        private void ApplyPalette(bool night, float progress = 0)
         {
-            _palette = new TextPalette(night);
+            _palette = new TextPalette(night, progress);
             foreach (Image surface in _surfaces) surface.color = _palette.Background;
             foreach (TextMeshProUGUI label in _labels) label.color = _palette.Foreground;
             foreach (Button button in _controls) ThemeButton(button);
@@ -218,7 +251,7 @@ namespace SocialStim.Presentation.Text
         { button.GetComponent<Image>().color = _palette.Background; button.GetComponentInChildren<TextMeshProUGUI>().color = _palette.Foreground; }
         private void AddButton(string label, string detail, Action selected)
         {
-            Button button = TextUiFactory.Button(_choices, _font, label + "\n" + detail, 112);
+            Button button = TextUiFactory.Button(_choices, _font, label + "\n" + detail, 88);
             button.onClick.AddListener(() => selected()); _buttons.Add(button); ThemeButton(button);
         }
         private void ClearChoices()
@@ -229,10 +262,59 @@ namespace SocialStim.Presentation.Text
         private void UpdateChoiceState()
         {
             bool ready = !IsDisplaying;
-            foreach (Button button in _buttons) button.interactable = ready;
+            _choiceScroll.gameObject.SetActive(ready);
             _wasDisplaying = !ready;
-            if (ready) FocusFirstChoice();
+            if (ready && _request != null)
+            {
+                ApplyPalette(Daylight.IsNight(_request.View.Phase), Daylight.Progress(_request.View.Phase, _request.View.TrialsUsed, _request.View.TrialsAllowed));
+                BuildMenu();
+            }
         }
+        private void BuildMenu()
+        {
+            ClearChoices();
+            var options = _request.Options.AsEnumerable();
+            if (_menuCategory != null) options = options.Where(o => o.Category == _menuCategory);
+            if (_menuFamily != null) options = options.Where(o => o.Family == _menuFamily);
+            var entries = new List<Tuple<string, string, Action>>();
+            if (_menuCategory == null && options.Count() > 8)
+            {
+                foreach (var group in options.GroupBy(o => o.Category))
+                {
+                    string category = group.Key;
+                    entries.Add(Tuple.Create(category, group.Count() + " available choices", (Action)(() => {
+                        _menuCategory = category; _menuPage = 0; BuildMenu();
+                    })));
+                }
+            }
+            else if (_menuCategory != null && _menuFamily == null && options.Select(o => o.Family).Distinct().Count() > 1 && options.Count() > 8)
+            {
+                foreach (var group in options.GroupBy(o => o.Family))
+                {
+                    string family = group.Key;
+                    entries.Add(Tuple.Create(family, "Choose a target or statement", (Action)(() => {
+                        _menuFamily = family; _menuPage = 0; BuildMenu();
+                    })));
+                }
+            }
+            else
+                foreach (PlayerOption option in options)
+                {
+                    string id = option.Id;
+                    entries.Add(Tuple.Create(option.Label, option.Interpretation, (Action)(() => { if (!IsDisplaying) OptionChosen?.Invoke(id); })));
+                }
+            if (_menuCategory != null)
+                AddButton("Back", "Return without spending your turn.", () => {
+                    if (_menuFamily != null) _menuFamily = null; else _menuCategory = null;
+                    _menuPage = 0; BuildMenu();
+                });
+            foreach (var entry in entries.Skip(_menuPage * 6).Take(6)) AddButton(entry.Item1, entry.Item2, entry.Item3);
+            if (_menuPage > 0) AddButton("Previous page", "", () => { _menuPage--; BuildMenu(); });
+            if ((_menuPage + 1) * 6 < entries.Count) AddButton("Next page", "", () => { _menuPage++; BuildMenu(); });
+            _choiceScroll.verticalNormalizedPosition = 1;
+            FocusFirstChoice();
+        }
+
         private void FocusFirstChoice()
         {
             Canvas.ForceUpdateCanvases();

@@ -60,7 +60,7 @@ namespace SocialStim.Presentation.Text
             uint seed = _randomSeed ? BitConverter.ToUInt32(Guid.NewGuid().ToByteArray(), 0) : unchecked((uint)_fixedSeed);
             var roles = _catalog.LoadRoles();
             var options = new RunOptions(seed, chosenRole, _trialsPerDay, _discussionRounds, _revealOnDeath);
-            var session = RunFactory.Create(options, roles, _catalog.LoadNames(), _catalog.LoadDialogue(), reasoning: _catalog.LoadReasoning());
+            var session = RunFactory.Create(options, roles, _catalog.LoadNames(), _catalog.LoadDialogue(), reasoning: _catalog.LoadReasoning(), setup: _catalog.LoadSetup());
             _presenter = new GamePresenter(new GameController(session, roles), _view, _view);
         }
 

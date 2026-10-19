@@ -33,6 +33,7 @@ namespace SocialStim.Presentation.Text
             RectTransform root = Rect(name, parent);
             var backdrop = root.gameObject.AddComponent<Image>();
             backdrop.color = new Color(0.055f, 0.065f, 0.08f);
+            Border(root);
             var scroll = root.gameObject.AddComponent<ScrollRect>();
             scroll.horizontal = false; scroll.scrollSensitivity = 32; scroll.movementType = ScrollRect.MovementType.Clamped;
             RectTransform viewport = Rect("Viewport", root);
@@ -45,10 +46,25 @@ namespace SocialStim.Presentation.Text
             return scroll;
         }
 
+        internal static void Border(RectTransform root)
+        {
+            for (int edge = 0; edge < 4; edge++)
+            {
+                RectTransform line = Rect("Frame " + edge, root);
+                var image = line.gameObject.AddComponent<Image>();
+                image.color = new Color(0.45f, 0.42f, 0.46f, 0.85f); image.raycastTarget = false;
+                if (edge < 2)
+                    Fill(line, new Vector2(0, edge), new Vector2(1, edge), new Vector2(0, edge == 0 ? 0 : -2), new Vector2(0, edge == 0 ? 2 : 0));
+                else
+                    Fill(line, new Vector2(edge - 2, 0), new Vector2(edge - 2, 1), new Vector2(edge == 2 ? 0 : -2, 0), new Vector2(edge == 2 ? 2 : 0, 0));
+            }
+        }
+
         internal static Button Button(Transform parent, TMP_FontAsset font, string label, int height)
         {
             RectTransform rect = Rect("Choice", parent);
             var image = rect.gameObject.AddComponent<Image>(); image.color = new Color(0.13f, 0.16f, 0.20f);
+            Border(rect);
             var button = rect.gameObject.AddComponent<Button>(); button.targetGraphic = image;
             button.transition = Selectable.Transition.None;
             var layout = rect.gameObject.AddComponent<LayoutElement>(); layout.preferredHeight = height; layout.minHeight = height;

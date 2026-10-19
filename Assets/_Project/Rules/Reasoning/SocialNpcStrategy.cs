@@ -26,6 +26,13 @@ namespace SocialStim.Rules.Reasoning
             KnownCharacter trusted = knowledge.Characters.Where(c => c.Alive && c.Id != knowledge.Self)
                 .OrderByDescending(c => c.Trust).ThenBy(c => c.Id.Value).FirstOrDefault();
             bool deceptive = knowledge.OwnRole.Faction == Faction.Antagonist || knowledge.Personality.HasFlag(Personality.Deceptive);
+            if (knowledge.OwnRole.Category == RoleCategory.NeutralEvil)
+            {
+                RoleSpec hostile = knowledge.RoleCatalog.FirstOrDefault(r => r.Faction == Faction.Antagonist);
+                if (hostile != null && !self.ClaimedRole.HasValue)
+                    return GameCommand.Speak(SpeechIntent.ClaimRole, role: hostile.Id);
+                if (suspect != null) return GameCommand.Speak(SpeechIntent.Deflect, suspect.Id);
+            }
             RoleSpec decoy = knowledge.RoleCatalog.Where(r => r.Faction == Faction.Town)
                 .OrderByDescending(r => r.Ability == AbilityKind.Investigate).ThenBy(r => r.Id.Value, System.StringComparer.Ordinal).FirstOrDefault();
             RoleId claim = self.ClaimedRole ?? (deceptive && decoy != null ? decoy.Id : knowledge.OwnRole.Id);
@@ -89,13 +96,20 @@ namespace SocialStim.Rules.Reasoning
         /// <inheritdoc />
         public CharacterId? NightTarget(KnowledgeView knowledge, IRandomSource random)
         {
-            if (knowledge.Charges == 0) return null;
+            if (knowledge.Charges == 0 || knowledge.OwnRole.Ability == AbilityKind.None) return null;
             if (knowledge.OwnRole.Ability == AbilityKind.SelfProtect)
                 return knowledge.SelfExposure >= _settings.ExposureThreshold || random.Next(100) < 45 ? knowledge.Self : (CharacterId?)null;
             var targets = knowledge.Characters.Where(c => c.Alive && c.Id != knowledge.Self && !c.IsTeammate).ToList();
             if (targets.Count == 0) return null;
             if (knowledge.OwnRole.Ability == AbilityKind.Attack)
+            {
+                if (knowledge.OwnRole.Faction == Faction.Town)
+                {
+                    KnownCharacter suspect = targets.OrderByDescending(Threat).ThenBy(c => c.Id.Value).First();
+                    return Threat(suspect) >= 60 ? suspect.Id : (CharacterId?)null;
+                }
                 return targets.OrderByDescending(c => PublicThreat(knowledge, c)).ThenBy(c => c.Id.Value).First().Id;
+            }
             if (knowledge.OwnRole.Ability == AbilityKind.Protect)
                 return targets.OrderByDescending(c => c.Trust + (100 - Threat(c))).ThenBy(c => c.Id.Value).First().Id;
             if (knowledge.OwnRole.Ability == AbilityKind.Investigate)

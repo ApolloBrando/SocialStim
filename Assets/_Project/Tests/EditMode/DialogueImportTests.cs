@@ -44,7 +44,7 @@ namespace SocialStim.Tests.EditMode
             string path = Path.Combine(TestContext.CurrentContext.TestDirectory, "StarterDialogue.json");
 #endif
             var lines = DialogueDocument.Parse(File.ReadAllText(path));
-            Assert.That(lines.Count, Is.EqualTo(51));
+            Assert.That(lines.Count, Is.EqualTo(54));
             Assert.That(lines.All(line => line.Text.StartsWith("PLACEHOLDER:", StringComparison.Ordinal)), Is.True);
         }
     }

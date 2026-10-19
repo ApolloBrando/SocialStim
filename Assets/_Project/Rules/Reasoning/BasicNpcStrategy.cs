@@ -54,7 +54,7 @@ namespace SocialStim.Rules.Reasoning
         /// <inheritdoc />
         public CharacterId? NightTarget(KnowledgeView knowledge, IRandomSource random)
         {
-            if (knowledge.Charges == 0) return null;
+            if (knowledge.Charges == 0 || knowledge.OwnRole.Ability == AbilityKind.None) return null;
             if (knowledge.OwnRole.Ability == AbilityKind.SelfProtect)
                 return random.Next(100) < 65 ? knowledge.Self : (CharacterId?)null;
             var targets = knowledge.Characters.Where(c => c.Alive && c.Id != knowledge.Self).ToList();
