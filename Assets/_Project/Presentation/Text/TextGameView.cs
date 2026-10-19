@@ -51,6 +51,9 @@ namespace SocialStim.Presentation.Text
         private string _menuFamily;
         private int _menuPage;
         private int _displayDay = 1;
+        private RectTransform _castPanel;
+        private string _pendingStatus;
+        private readonly Dictionary<CharacterId, ParticipantCard> _cards = new Dictionary<CharacterId, ParticipantCard>();
         public event Action<string> OptionChosen;
         public event Action RestartRequested;
         public bool IsDisplaying => _playback.Busy || _request != null && _next < _request.View.Transcript.Count;
@@ -80,9 +83,14 @@ namespace SocialStim.Presentation.Text
             scaler.referenceResolution = new Vector2(1280, 800); scaler.matchWidthOrHeight = 0.5f;
             _surfaces.Add(canvas.AddComponent<Image>());
             _status = TextUiFactory.Text("Status", canvas.transform, font, 17); _labels.Add(_status);
+            _castPanel = TextUiFactory.Rect("Participants", canvas.transform);
+            TextUiFactory.Fill(_castPanel, new Vector2(0, 1), Vector2.one, new Vector2(20, -116), new Vector2(-20, -74));
+            var castLayout = _castPanel.gameObject.AddComponent<HorizontalLayoutGroup>();
+            castLayout.spacing = 5; castLayout.childControlWidth = true; castLayout.childControlHeight = true; castLayout.childForceExpandWidth = true;
+            _castPanel.gameObject.SetActive(false);
             _claimSummary = TextUiFactory.Text("Role Claims Board", canvas.transform, font, 16); _labels.Add(_claimSummary);
-            TextUiFactory.Fill(_claimSummary.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(20, -166), new Vector2(-20, -112));
-            TextUiFactory.Fill(_status.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(20, -128), new Vector2(-150, -12));
+            TextUiFactory.Fill(_claimSummary.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(20, -170), new Vector2(-20, -122));
+            TextUiFactory.Fill(_status.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(20, -70), new Vector2(-150, -12));
             Button restart = TextUiFactory.Button(canvas.transform, font, "New run", 42);
             _controls.Add(restart);
             TextUiFactory.Fill((RectTransform)restart.transform, Vector2.one, Vector2.one, new Vector2(-140, -55), new Vector2(-20, -12));
@@ -143,13 +151,11 @@ namespace SocialStim.Presentation.Text
         {
             _request = request;
             var view = request.View;
-            string cast = string.Join(" | ", view.Characters.Select(c => c.Name + (c.Id == view.PlayerId ? " (you)" : "")
-                + (!c.Alive ? " [dead]" : "") + (c.IsTeammate ? " [teammate]" : "")
-                + (c.RevealedRole.HasValue ? " [" + c.RevealedRole.Value + "]" : "")));
-            _status.text = $"Day {view.Day} | {view.Phase} | {view.OwnRole.Name} ({view.OwnRole.Faction}) | {(view.Alive ? "Alive" : "Spectator")}"
-                + $" | Uses: {(view.Charges < 0 ? "unlimited" : view.Charges.ToString())}\nSeed {view.Seed} | Trials {view.TrialsUsed}/{view.TrialsAllowed}\n{cast}";
+            _pendingStatus = $"Day {view.Day} | {view.Phase} | {view.OwnRole.Name} ({view.OwnRole.Faction}) | {(view.Alive ? "Alive" : "Spectator")}"
+                + $" | Uses: {(view.Charges < 0 ? "unlimited" : view.Charges.ToString())}\nSeed {view.Seed} | Trials {view.TrialsUsed}/{view.TrialsAllowed}";
             ClearChoices();
             _menuCategory = null; _menuFamily = null; _menuPage = 0;
+            _status.text = "Listening… Choices return when it is your turn.";
             _choiceScroll.gameObject.SetActive(false);
             _wasDisplaying = true;
             Pump(); UpdateChoiceState();
@@ -214,7 +220,10 @@ namespace SocialStim.Presentation.Text
         {
             _playback.Cancel(); _request = null; _next = 0; _currentStart = 0;
             _shown.Clear(); _spans.Clear(); _cues = new VisibleCueResolver(); _wasDisplaying = false;
-            _visibleClaims.Clear(); _displayDay = 1;
+            _visibleClaims.Clear(); _displayDay = 1; _pendingStatus = null;
+            foreach (ParticipantCard card in _cards.Values) { card.gameObject.SetActive(false); Destroy(card.gameObject); }
+            _cards.Clear();
+            if (_castPanel != null) _castPanel.gameObject.SetActive(false);
             if (_claimSummary != null) _claimSummary.text = "ROLE CLAIMS (unverified)  |  Nobody has claimed yet.";
             if (_choiceScroll != null) _choiceScroll.gameObject.SetActive(true);
             if (_screenEffects != null) _screenEffects.Apply(default, _palette);
@@ -244,6 +253,7 @@ namespace SocialStim.Presentation.Text
             foreach (TextMeshProUGUI label in _labels) label.color = _palette.Foreground;
             foreach (Button button in _controls) ThemeButton(button);
             foreach (Button button in _buttons) ThemeButton(button);
+            foreach (ParticipantCard card in _cards.Values) card.Theme(_palette);
             if (_transcript != null) _transcript.color = _palette.Foreground;
             if (_textEffects != null) _textEffects.SetPalette(_palette);
         }
@@ -266,7 +276,20 @@ namespace SocialStim.Presentation.Text
             _wasDisplaying = !ready;
             if (ready && _request != null)
             {
-                ApplyPalette(Daylight.IsNight(_request.View.Phase), Daylight.Progress(_request.View.Phase, _request.View.TrialsUsed, _request.View.TrialsAllowed));
+                if (_request.View.Phase != GamePhase.Ended)
+                    ApplyPalette(Daylight.IsNight(_request.View.Phase), Daylight.Progress(_request.View.Phase, _request.View.TrialsUsed, _request.View.TrialsAllowed));
+                _status.text = _pendingStatus;
+                _castPanel.gameObject.SetActive(true);
+                foreach (var participant in _request.View.Characters)
+                {
+                    if (!_cards.TryGetValue(participant.Id, out ParticipantCard card))
+                    {
+                        RectTransform root = TextUiFactory.Rect("Participant " + participant.Id.Value, _castPanel);
+                        card = root.gameObject.AddComponent<ParticipantCard>();
+                        card.Initialize(participant.Id, _font); _cards.Add(participant.Id, card);
+                    }
+                    card.Render(participant, participant.Id == _request.View.PlayerId, _palette);
+                }
                 BuildMenu();
             }
         }
