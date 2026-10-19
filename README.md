@@ -9,3 +9,5 @@ Core mission contracts and authoring: [roles/setup/night rules](docs/ROLES.md).
 [Council interaction and Unity checklist](docs/COUNCIL_UI.md).
 
 [Settings and new-run editor](docs/SETTINGS.md).
+
+[NPC reasoning and simulation](docs/AI_DESIGN.md).

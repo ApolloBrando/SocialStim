@@ -389,3 +389,7 @@ The modern CouncilSession is decomposed into scoped world, day, speech, vote and
 ## Mission phase 3
 
 Application/Settings owns immutable display/game preferences, versioned JSON migration, clamping, setup validation and explicit game drafts. SettingsFileStore implements the engine-free persistence port. GameBootstrap supplies persistentDataPath, migrates old PlayerPrefs, subscribes live display changes and debounces writes. CouncilSettingsPanel creates grouped native controls; CouncilLayout reflows the roster, line and action regions when scale changes. No ongoing-run data persists. See docs/SETTINGS.md.
+
+## Mission phase 4
+
+CouncilKnowledge carries only observer-authorized inputs and public run-local skills. CouncilHypothesisSampler builds constrained assignments; CouncilInference marginalizes importance-weighted likelihoods from CouncilSocialEvidence. Cached distributions, credibility and affinity feed CouncilNpcStrategy and a public-stance vote forecast. The session owns no UI clock. Private diagnostic decisions appear only in completed after-action reports or explicit development inspection. CouncilSimulation drives the same validated player port and aggregates completed-run metrics. See docs/AI_DESIGN.md.

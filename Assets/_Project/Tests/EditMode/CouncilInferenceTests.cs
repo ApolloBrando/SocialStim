@@ -16,10 +16,10 @@ namespace SocialStim.Tests.EditMode
     public sealed class CouncilInferenceTests
     {
         private static CouncilKnowledge Knowledge(IEnumerable<CouncilEvent> events = null, IEnumerable<NightReport> results = null,
-            IReadOnlyDictionary<RoleId, int> roleCounts = null, int skill = 5)
+            IReadOnlyDictionary<RoleId, int> roleCounts = null, int skill = 5, bool disclosed = true)
         {
             var cast = Enumerable.Range(0, 5).Select(i => new KnownCharacter(new CharacterId(i), "P" + i, true, 35,
-                revealedRole: i == 4 ? new RoleId("solarian") : (RoleId?)null, revealedFaction: i == 4 ? Faction.Town : (Faction?)null)).ToList();
+                revealedRole: i == 4 && disclosed ? new RoleId("solarian") : (RoleId?)null, revealedFaction: i == 4 && disclosed ? Faction.Town : (Faction?)null)).ToList();
             return new CouncilKnowledge(new CharacterId(0), MissionTestContent.Role("decryptor"), Personality.Cautious, 2, 3, -1, false,
                 cast, (events ?? Enumerable.Empty<CouncilEvent>()).ToList(), (results ?? Enumerable.Empty<NightReport>()).ToList(),
                 MissionTestContent.Roles(), new SetupKnowledge(3, 1, 1), roleCounts,
@@ -83,6 +83,32 @@ namespace SocialStim.Tests.EditMode
                 Assert.That(new CouncilNpcStrategy().Vote(k, new SeededRandom(seed)), Is.Not.EqualTo(new CharacterId(4)));
         }
         [Test]
+        public void HiddenAssignmentsCannotChangeAnOtherwiseIdenticalObserversBeliefs()
+        {
+            var options = new CouncilOptions(147, visibility: SetupVisibility.Hidden);
+            CouncilSession create(string[] roles) => CouncilFactory.CreateScenario(options,
+                roles.Select((r, i) => new CastMemberSpec("P" + i, new RoleId(r))),
+                MissionTestContent.Roles(), TestContent.Lines(), new SilentStrategy());
+            var first = create(new[] { "solarian", "decryptor", "physician", "archon", "infinitum" }).View().Knowledge;
+            var second = create(new[] { "solarian", "physician", "singer", "archon", "solarian" }).View().Knowledge;
+            Assert.That(first.Counts, Is.Null); Assert.That(second.RoleCounts, Is.Null);
+            foreach (var actor in first.Characters)
+                Assert.That(first.Inference.Beliefs[actor.Id].Roles.Values,
+                    Is.EqualTo(second.Inference.Beliefs[actor.Id].Roles.Values));
+        }
+        [Test]
+        public void LateRevealsReevaluatePriorVotesAndForeignPrivateResultsAreRejected()
+        {
+            var vote = new[] { new CouncilEvent(0, 1, 3, CouncilEventKind.Vote, "A ballot.",
+                new CharacterId(2), new CharacterId(4)) };
+            var before = new CouncilInference().Evaluate(Knowledge(vote, disclosed: false));
+            var after = new CouncilInference().Evaluate(Knowledge(vote));
+            Assert.That(after.Beliefs[new CharacterId(2)].Credibility,
+                Is.LessThan(before.Beliefs[new CharacterId(2)].Credibility));
+            Assert.Throws<ArgumentException>(() => new CouncilInference().Evaluate(Knowledge(results: new[] {
+                new NightReport(new CharacterId(3), ReportKind.Investigation, new CharacterId(1), readout: Readout.Corrupt) })));
+        }
+        [Test]
         public void SkillsUseEqualBudgetsAndReproduceBySeed()
         {
             var first = CharacterStats.Generate(new SeededRandom(147)); var second = CharacterStats.Generate(new SeededRandom(147));
@@ -90,6 +116,12 @@ namespace SocialStim.Tests.EditMode
             foreach (StatKind kind in Enum.GetValues(typeof(StatKind)))
                 Assert.That(first.Get(kind), Is.EqualTo(second.Get(kind)));
             Assert.That(new AiPolicy(AiDifficulty.Brutal).Samples, Is.GreaterThan(new AiPolicy(AiDifficulty.Easy).Samples));
+        }
+        private sealed class SilentStrategy : ICouncilStrategy
+        {
+            public CouncilAction Speak(CouncilKnowledge knowledge, IRandomSource random) => new CouncilAction(CouncilActionKind.Pass);
+            public CharacterId? Vote(CouncilKnowledge knowledge, IRandomSource random) => null;
+            public CharacterId? NightTarget(CouncilKnowledge knowledge, IRandomSource random) => null;
         }
     }
 }

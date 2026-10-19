@@ -27,6 +27,9 @@ namespace SocialStim.Tests.EditMode
             Assert.That(report.Outcomes.Where(p => p.Key != OutcomeKind.Ongoing && p.Value > 0).Count(), Is.GreaterThanOrEqualTo(2));
             Assert.That(report.VoteAccuracy, Is.InRange(0.05, 0.99));
             Assert.That(report.AverageDays, Is.InRange(1, 15));
+            Assert.That(report.Outcomes[OutcomeKind.TownVictory] / (double)games, Is.InRange(0.10, 0.80));
+            Assert.That(report.Outcomes[OutcomeKind.AntagonistVictory] / (double)games, Is.InRange(0.10, 0.80));
+            Assert.That(report.StealRate, Is.InRange(0.05, 0.80));
         }
     }
 }
