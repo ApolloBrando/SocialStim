@@ -183,7 +183,7 @@ def validate() -> list[str]:
         require(path.suffix.lower() not in {".sln", ".slnx", ".user", ".pem", ".key", ".pfx", ".p12", ".keystore", ".jks"}
             and (path.suffix.lower() != ".csproj" or relative.as_posix() == "Tools/HeadlessTests/SocialStim.HeadlessTests.csproj"), f"Generated/credential file: {relative}")
         require(not (path.name == ".env" or path.name.startswith(".env.") and path.name != ".env.example"), f"Environment credentials file: {relative}")
-        if path.suffix in {".md", ".json", ".asmdef", ".meta", ".txt", ".asset", ".py"} or path.name in {".editorconfig", ".gitattributes", ".gitignore"}:
+        if path.suffix in {".cs", ".md", ".json", ".asmdef", ".meta", ".txt", ".asset", ".py", ".unity"} or path.name in {".editorconfig", ".gitattributes", ".gitignore"}:
             data = path.read_bytes()
             require(b"\r" not in data, f"Expected LF line endings: {relative}")
             require(not data or data.endswith(b"\n"), f"Missing final newline: {relative}")
@@ -216,7 +216,7 @@ def main() -> int:
             print(f"FAIL: {failure}", file=sys.stderr)
         return 1
     print("PASS: 7 assembly definitions; metadata, dependency boundaries, JSON, pins, and hygiene.")
-    print("Unity editor import, package resolution, compilation, and gameplay tests: NOT RUN.")
+    print("Unity import, package resolution, adapter compilation, and editor/player tests: NOT RUN by this tool.")
     return 0
 
 
