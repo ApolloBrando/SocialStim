@@ -373,3 +373,22 @@ configured discussion length so presentation warmth does not assume three rounds
 Participant and claim strips have horizontal ScrollRects. The editor preview
 uses the same day-light/night-dark direction as gameplay. No save/resume system
 is introduced.
+
+## Mission part two: audit baseline and first repairs
+
+The controlling phase plan is [Docs/AUDIT.md](Docs/AUDIT.md). Future discussion,
+role, settings, inference, dialogue and effect systems described there are planned,
+not implemented. Work uses phase branches/PRs and never writes directly to main.
+
+DisplayPlayback now separates acknowledgement completion from retained text-motion
+lifetime. Explicit continuous TextShake tracks keep ticking after reveal/skip;
+Cancel or replacement removes them. Screen channels remain bounded, and continuous
+flash is rejected. EffectSequence and inspector conversion preserve this policy.
+The existing timed pulse contract is unchanged for non-continuous tracks.
+
+TextGameView groups all display settings in a separate panel with reset defaults.
+Default reveal speed is 84 text elements/second; existing saved choices remain
+valid. Policy changes clear any retained animation. Day/night palettes are unchanged.
+Both NPC strategies veto hostile Town choices against hard observer-known Town
+alignment, independent of stale suspicion. These repairs do not implement the
+mission's joint-world inference or new role catalog.
