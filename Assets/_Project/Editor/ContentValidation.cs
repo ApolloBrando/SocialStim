@@ -1,4 +1,5 @@
 using SocialStim.Data.Definitions;
+using SocialStim.Application.PresentationCues;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -15,7 +16,9 @@ namespace SocialStim.Editor
             var catalog = AssetDatabase.LoadAssetAtPath<GameCatalog>("Assets/_Project/ScriptableObjects/Catalogs/StarterCatalog.asset");
             if (catalog == null) throw new System.InvalidOperationException("StarterCatalog.asset is missing.");
             int roles = catalog.LoadRoles().Count;
-            int lines = catalog.LoadDialogue().Count;
+            var dialogue = catalog.LoadDialogue();
+            foreach (var line in dialogue) SemanticMarkup.Parse(line.Text);
+            int lines = dialogue.Count;
             int names = catalog.LoadNames().Count;
             Debug.Log($"SocialStim content valid: {roles} roles, {lines} placeholder lines, {names} names.");
         }

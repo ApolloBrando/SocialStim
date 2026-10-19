@@ -25,6 +25,7 @@ namespace SocialStim.Presentation.Text
 
         private void Choose(string id)
         {
+            if (_view.IsDisplaying) return;
             if (!_controller.TryChoose(id, out string error)) { _view.ShowInputError(error); return; }
             _view.Render(_controller.Request());
         }

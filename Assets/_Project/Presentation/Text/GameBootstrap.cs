@@ -1,5 +1,6 @@
 using System;
 using SocialStim.Application.Sessions;
+using SocialStim.Presentation.Effects;
 using SocialStim.Data.Definitions;
 using SocialStim.Rules.Cast;
 using SocialStim.Rules.Phases;
@@ -16,6 +17,7 @@ namespace SocialStim.Presentation.Text
     {
         [SerializeField] private GameCatalog _catalog;
         [SerializeField] private TMP_FontAsset _font;
+        [SerializeField] private CueProfileDefinition _effects;
         [SerializeField] private bool _randomSeed = true;
         [SerializeField] private int _fixedSeed = 147;
         [SerializeField, Range(1, 10)] private int _trialsPerDay = 2;
@@ -39,7 +41,7 @@ namespace SocialStim.Presentation.Text
                 var events = new GameObject("Event System", typeof(EventSystem), typeof(InputSystemUIInputModule));
                 events.transform.SetParent(transform, false);
                 _view = gameObject.AddComponent<TextGameView>();
-                _view.Initialize(font);
+                _view.Initialize(font, _effects != null ? _effects.Load() : null);
                 _view.RestartRequested += ShowSetup;
                 ShowSetup();
             }

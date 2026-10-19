@@ -4,7 +4,7 @@
     {
       "id": "placeholder.Accuse.001",
       "intent": "Accuse",
-      "text": "PLACEHOLDER: {target}, your story does not add up.",
+      "text": "PLACEHOLDER: <danger>{target}, your story does not add up.</danger>",
       "weight": 1,
       "metadata": {
         "emotionKey": "neutral"
@@ -31,7 +31,7 @@
     {
       "id": "placeholder.Defend.001",
       "intent": "Defend",
-      "text": "PLACEHOLDER: Suspicion is not proof. Hear me out.",
+      "text": "PLACEHOLDER: <calm>Suspicion is not proof. Hear me out.</calm>",
       "weight": 1,
       "metadata": {
         "emotionKey": "neutral"
@@ -85,7 +85,7 @@
     {
       "id": "placeholder.ReportInvestigation.001",
       "intent": "ReportInvestigation",
-      "text": "PLACEHOLDER: My report puts {target} with {result}.",
+      "text": "PLACEHOLDER: <evidence>My report puts {target} with {result}.</evidence>",
       "weight": 1,
       "metadata": {
         "emotionKey": "neutral"
@@ -274,7 +274,7 @@
     {
       "id": "placeholder.ExpressFear.001",
       "intent": "ExpressFear",
-      "text": "PLACEHOLDER: We are running out of people to trust.",
+      "text": "PLACEHOLDER: <fear>We are running out of people to trust.</fear>",
       "weight": 1,
       "metadata": {
         "emotionKey": "neutral"
@@ -355,7 +355,7 @@
     {
       "id": "placeholder.LastWords.001",
       "intent": "LastWords",
-      "text": "PLACEHOLDER: Remember what led you to this decision.",
+      "text": "PLACEHOLDER: <emphasis>Remember what led you to this decision.</emphasis>",
       "weight": 1,
       "metadata": {
         "emotionKey": "neutral"
