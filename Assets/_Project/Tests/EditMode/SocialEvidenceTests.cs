@@ -120,5 +120,19 @@ namespace SocialStim.Tests.EditMode
             Assert.That(history, Is.Empty);
             Assert.That(model.Evidence.Single().Role, Is.EqualTo(new RoleId("physician")));
         }
+
+        /// <summary>A known unique role cannot remain a candidate for a different participant.</summary>
+        [Test]
+        public void KnownUniqueRoleIsExcludedFromOtherCandidates()
+        {
+            RoleSpec inspector = TestContent.Roles()[0];
+            var unique = new RoleSpec(inspector.Id, inspector.Name, inspector.Faction, inspector.Category, inspector.Ability,
+                inspector.Attack, inspector.Defense, inspector.Protection, inspector.Charges, inspector.Appearance, unique: true);
+            var catalog = TestContent.Roles().Select(r => r.Id == unique.Id ? unique : r).ToList().AsReadOnly();
+            var model = new BeliefState(Enumerable.Range(0, 5).Select(i => new CharacterId(i)), Personality.None, new SeededRandom(10),
+                new CharacterId(0), unique, new SetupKnowledge(3, 1, 1), catalog, Array.Empty<CharacterId>(), new ReasoningSettings());
+            Assert.That(model.Roles(new CharacterId(1)).Single(r => r.Role == unique.Id).BasisPoints, Is.Zero);
+            Assert.That(model.Roles(new CharacterId(1)).Sum(r => r.BasisPoints), Is.EqualTo(10000));
+        }
     }
 }

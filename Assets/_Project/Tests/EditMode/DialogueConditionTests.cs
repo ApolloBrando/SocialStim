@@ -40,6 +40,10 @@ namespace SocialStim.Tests.EditMode
                 new DialogueCondition(DialogueConditionKind.MinimumDay, number: 5), new DialogueCondition(DialogueConditionKind.MaximumDay, number: 2) }));
             Assert.Throws<ArgumentException>(() => new DialogueLine("bad", SpeechIntent.StaySilent, "x", conditions: new[] {
                 new DialogueCondition(DialogueConditionKind.HasTarget, flag: true) }));
+            Assert.Throws<ArgumentException>(() => new DialogueLine("bad", SpeechIntent.Accuse, "x", conditions: new[] {
+                new DialogueCondition(DialogueConditionKind.Phase, "NightSelection") }));
+            Assert.Throws<ArgumentException>(() => new DialogueLine("bad", SpeechIntent.ReportInvestigation, "x", conditions: new[] {
+                new DialogueCondition(DialogueConditionKind.MaximumDay, number: 1) }));
         }
 
         /// <summary>Anti-repetition never relaxes contextual predicates to select an ineligible line.</summary>

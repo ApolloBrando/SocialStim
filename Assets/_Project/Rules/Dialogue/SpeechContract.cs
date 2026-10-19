@@ -1,3 +1,5 @@
+using SocialStim.Rules.Phases;
+
 namespace SocialStim.Rules.Dialogue
 {
     /// <summary>Shared semantic requirements for command validation and authored conditions.</summary>
@@ -10,5 +12,11 @@ namespace SocialStim.Rules.Dialogue
 
         /// <summary>Whether the intent necessarily asserts a role or investigation result.</summary>
         public static bool HasAssertion(SpeechIntent intent) => intent == SpeechIntent.ClaimRole || intent == SpeechIntent.ReportInvestigation;
+
+        /// <summary>Actual authored-speech entry phases supported by the current participant loop.</summary>
+        public static bool AllowsPhase(SpeechIntent intent, GamePhase phase) => phase == GamePhase.Discussion
+            ? intent != SpeechIntent.LastWords : phase == GamePhase.Defense
+            ? intent == SpeechIntent.Defend || intent == SpeechIntent.ClaimRole
+            : phase == GamePhase.LastWords && intent == SpeechIntent.LastWords;
     }
 }

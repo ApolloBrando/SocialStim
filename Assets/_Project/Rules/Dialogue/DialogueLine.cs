@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SocialStim.Rules.Phases;
 using SocialStim.Rules.Cast;
 using SocialStim.Rules.Roles;
 
@@ -20,9 +21,11 @@ namespace SocialStim.Rules.Dialogue
             RequiredTrait = requiredTrait; SpeakerRole = speakerRole; Metadata = metadata ?? new DialogueMetadata();
             Conditions = (conditions ?? Enumerable.Empty<DialogueCondition>()).ToList().AsReadOnly();
             if (Conditions.Any(c => c == null)) throw new ArgumentException($"{id}: null condition.");
-            int minimum = Conditions.Where(c => c.Kind == DialogueConditionKind.MinimumDay).Select(c => c.Number.Value).DefaultIfEmpty(1).Max();
+            int firstDay = intent == SpeechIntent.ReportInvestigation ? 2 : 1;
+            int minimum = Math.Max(firstDay, Conditions.Where(c => c.Kind == DialogueConditionKind.MinimumDay).Select(c => c.Number.Value).DefaultIfEmpty(firstDay).Max());
             int maximum = Conditions.Where(c => c.Kind == DialogueConditionKind.MaximumDay).Select(c => c.Number.Value).DefaultIfEmpty(int.MaxValue).Min();
             if (minimum > maximum || Conditions.Where(c => c.Kind == DialogueConditionKind.Phase).Select(c => c.Value.ToLowerInvariant()).Distinct().Count() > 1
+                || Conditions.Any(c => c.Kind == DialogueConditionKind.Phase && !SpeechContract.AllowsPhase(intent, (GamePhase)Enum.Parse(typeof(GamePhase), c.Value, true)))
                 || Conditions.Any(c => c.Kind == DialogueConditionKind.HasTarget && c.Flag.Value != SpeechContract.RequiresTarget(intent))
                 || Conditions.Any(c => c.Kind == DialogueConditionKind.HasAssertion && c.Flag.Value != SpeechContract.HasAssertion(intent))
                 || Conditions.Any(c => (c.Kind == DialogueConditionKind.TargetAccused || c.Kind == DialogueConditionKind.TargetHasClaim) && !SpeechContract.RequiresTarget(intent)))
