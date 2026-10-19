@@ -1,0 +1,40 @@
+* text=auto
+*.cs text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.asmdef text eol=lf
+*.asmref text eol=lf
+*.meta text eol=lf
+*.unity text eol=lf
+*.prefab text eol=lf
+*.asset text eol=lf
+*.mat text eol=lf
+*.controller text eol=lf
+*.overrideController text eol=lf
+*.anim text eol=lf
+*.inputactions text eol=lf
+*.uxml text eol=lf
+*.uss text eol=lf
+*.shader text eol=lf
+*.hlsl text eol=lf
+*.compute text eol=lf
+*.py text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.txt text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.wav binary
+*.ogg binary
+*.mp3 binary
+*.mp4 binary
+*.fbx binary
+*.psd binary
+*.ttf binary
+*.otf binary
+
+# No LFS filters until actual large binary assets justify them. See CONTRIBUTING.md.

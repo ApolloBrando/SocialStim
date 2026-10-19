@@ -1,0 +1,63 @@
+# Unity-generated state
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Bb]uild/
+/[Bb]uilds/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+/[Aa]rtifacts/
+/TestResults/
+/[Cc]overage/
+/[Ee]xported[Oo]bj/
+
+# IDE and operating-system files
+.vs/
+.vscode/
+.idea/
+.gradle/
+*.csproj
+*.sln
+*.slnx
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.DotSettings.user
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.bak
+*~
+
+# Generated Unity asset state
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+sysinfo.txt
+/Assets/AssetStoreTools*
+/Assets/Plugins/Editor/JetBrains*
+
+# Local credentials and signing material
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.pem
+*.key
+
+# Local Python validation state
+__pycache__/
+*.pyc

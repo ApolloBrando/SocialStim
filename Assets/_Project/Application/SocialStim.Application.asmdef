@@ -1,0 +1,16 @@
+{
+  "name": "SocialStim.Application",
+  "rootNamespace": "SocialStim.Application",
+  "references": [
+    "GUID:72ccf8c35bef578a93f9ae7229076667"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": true
+}
