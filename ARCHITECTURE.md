@@ -233,6 +233,19 @@ milestone 05, including a markup validator and editor playground.
 
 ## Tests and limitations
 
+Shared test source must remain compatible with Unity's NUnit API. A reported
+editor CS1503 error exposed a collection assertion using a newer `Contain`
+overload. Collection membership now uses `Has.No.Member`; string containment
+keeps `Does.Contain`. Headless CI compiles against upstream NUnit 3.5.0 on .NET Framework 4.7.2
+and runs the suite with NUnit 3.14.0 on .NET 8 to detect this API gap. Unity's custom NUnit integration and real editor
+compilation remain a distinct gate.
+
+The Input System package is already a dependency, but package installation does
+not select the project's active input backend. Choose Input System Package (New)
+in Player settings and restart the editor. The content validation menu now
+rejects an inactive Input System with that exact setup instruction. No generated
+PlayerSettings asset is synthesized or used to overwrite local editor settings.
+
 Milestone 00's static validator checks file/metadata pairing, GUID uniqueness,
 assembly references and dependency cycles, layer constraints, package/version
 pins, and unwanted files. Unity import and compilation remain unverified until

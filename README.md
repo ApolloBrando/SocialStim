@@ -16,7 +16,8 @@ PLACEHOLDER. Save/resume, advanced reasoning, and visual effects are later work.
 
 1. Open the project in **Unity 6000.3.26f1** and let Package Manager resolve it.
 2. Set **Project Settings > Player > Other Settings > Active Input Handling** to
-   **Input System Package (New)** or **Both**, then restart Unity if prompted.
+   **Input System Package (New)**, then restart Unity if prompted. The package is
+   already included; this setting disables the deprecated legacy Input Manager.
 3. Import **Window > TextMeshPro > Import TMP Essential Resources**, or assign
    a TMP font asset to the scene's `GameBootstrap` component.
 4. Run **Tools > SocialStim > Validate Starter Content**, then
@@ -58,6 +59,10 @@ GitHub Actions compiles the actual Rules, Application, and engine-free dialogue
 import code and runs shared NUnit behavioral tests, including 100 seeded runs
 across Town and antagonist play. This intentional headless `.csproj` is the sole
 exception to the exclusion of Unity-generated IDE project files.
+
+CI compiles against NUnit 3.5.0 and runs the suite against 3.14.0. The older API check
+catches assertion overloads missing from Unity's NUnit integration; it does not
+replace compiling the actual Unity test assemblies in the editor.
 
 **Unity import, adapter compilation, UI behavior, and player builds remain
 unverified.** Follow [Docs/UNITY_VERIFICATION.md](Docs/UNITY_VERIFICATION.md) before

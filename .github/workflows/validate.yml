@@ -10,7 +10,12 @@ permissions:
 
 jobs:
   rules:
+    name: Shared checks (NUnit ${{ matrix.nunit }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        nunit: ['3.5.0', '3.14.0']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -18,12 +23,16 @@ jobs:
           dotnet-version: '8.0.x'
       - name: Validate project structure
         run: python3 Tools/validate_scaffold.py
+      - name: Compile against the older NUnit assertion API
+        if: matrix.nunit == '3.5.0'
+        run: dotnet build Tools/HeadlessTests/SocialStim.HeadlessTests.csproj --configuration Release -p:NUnitVersion=3.5.0
       - name: Compile and test shared rules and application code
-        run: dotnet test Tools/HeadlessTests/SocialStim.HeadlessTests.csproj --configuration Release --logger trx --results-directory TestResults
+        if: matrix.nunit == '3.14.0'
+        run: dotnet test Tools/HeadlessTests/SocialStim.HeadlessTests.csproj --configuration Release -p:NUnitVersion=${{ matrix.nunit }} --logger trx --results-directory TestResults
       - name: Preserve test results
-        if: always()
+        if: always() && matrix.nunit == '3.14.0'
         uses: actions/upload-artifact@v4
         with:
-          name: headless-test-results
+          name: headless-test-results-nunit-${{ matrix.nunit }}
           path: TestResults/*.trx
           if-no-files-found: warn
