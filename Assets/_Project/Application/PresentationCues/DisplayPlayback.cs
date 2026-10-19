@@ -11,6 +11,7 @@ namespace SocialStim.Application.PresentationCues
         private int _sequence;
         private float _elapsed;
         private float _duration;
+        private float _speed;
         private double _clock;
         private double _nextFlash;
         private bool _permitFlash;
@@ -21,15 +22,21 @@ namespace SocialStim.Application.PresentationCues
         public float Elapsed => _elapsed;
         public EffectFrame Frame { get; private set; }
 
-        public void Begin(int sequence, SemanticText text, EffectProfile profile, EffectsSettings settings, Action<DisplayAcknowledgement> acknowledge)
+        public void Begin(int sequence, SemanticText text, EffectProfile profile, EffectsSettings settings, Action<DisplayAcknowledgement> acknowledge,
+            float pauseAfter = 0, float speedMultiplier = 1)
         {
+            if (!EffectStep.Finite(pauseAfter) || pauseAfter < 0 || pauseAfter > 10
+                || !EffectStep.Finite(speedMultiplier) || speedMultiplier < 0.25f || speedMultiplier > 4)
+                throw new ArgumentOutOfRangeException(nameof(pauseAfter));
             if (Busy) throw new InvalidOperationException("Cancel or complete the active display first.");
             Text = text ?? throw new ArgumentNullException(nameof(text));
             _profile = profile ?? throw new ArgumentNullException(nameof(profile));
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
             _sequence = sequence; _acknowledge = acknowledge; _elapsed = 0; Frame = default; VisibleUtf16 = 0; Busy = true;
             _permitFlash = _clock >= _nextFlash; _flashStarted = false;
-            _duration = !settings.Enabled ? 0 : Math.Max(settings.InstantText ? 0 : text.ElementCount / settings.ElementsPerSecond, profile.Duration);
+            _speed = settings.ElementsPerSecond * speedMultiplier;
+            _duration = !settings.Enabled ? 0 : Math.Max(settings.InstantText ? 0 : text.ElementCount / _speed, profile.Duration)
+                + (settings.InstantText ? 0 : pauseAfter);
             if (!settings.Enabled || settings.InstantText) VisibleUtf16 = text.Text.Length;
             if (_duration == 0) Finish(DisplayCompletion.Completed);
         }
@@ -40,7 +47,7 @@ namespace SocialStim.Application.PresentationCues
             if (!Busy) return;
             _elapsed = Math.Min(_duration, _elapsed + seconds);
             VisibleUtf16 = !_settings.Enabled || _settings.InstantText ? Text.Text.Length
-                : Text.EndOfElements((int)(_elapsed * _settings.ElementsPerSecond));
+                : Text.EndOfElements((int)(_elapsed * _speed));
             Frame = _profile.Sample(_elapsed, _settings);
             if (!_permitFlash) Frame = new EffectFrame(Frame.Shake, Frame.Border, Frame.Vignette, 0);
             else if (Frame.Flash > 0 && !_flashStarted) { _nextFlash = _clock + 2; _flashStarted = true; }

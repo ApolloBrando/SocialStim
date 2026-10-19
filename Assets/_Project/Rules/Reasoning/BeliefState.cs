@@ -23,12 +23,14 @@ namespace SocialStim.Rules.Reasoning
         private readonly Personality _personality;
         private readonly CharacterId _self;
         private readonly ReasoningSettings _settings;
+        private readonly bool _deceptionPossible;
 
         internal BeliefState(IEnumerable<CharacterId> characters, Personality personality, IRandomSource random,
             CharacterId self, RoleSpec ownRole, SetupKnowledge setup, IReadOnlyList<RoleSpec> catalog,
             IEnumerable<CharacterId> teammates, ReasoningSettings settings)
         {
             _self = self; _personality = personality; _settings = settings;
+            _deceptionPossible = catalog.Any(r => r.Ability == AbilityKind.Forge);
             var ids = characters.ToList();
             foreach (CharacterId id in ids) { _suspicion.Add(id, 12 + random.Next(13)); _trust.Add(id, 45 + random.Next(11)); }
             _distribution = new BeliefDistribution(ids, setup, catalog, self, ownRole, teammates);
@@ -111,7 +113,7 @@ namespace SocialStim.Rules.Reasoning
             _distribution.Know(target, role.Faction, role.Id);
             Record(day, EvidenceKind.RoleReveal, target, target, role: role.Id, alignment: role.Faction);
             if (_claims.TryGetValue(target, out RoleId claim) && claim != role.Id) Penalize(target, _settings.ContradictionPenalty, day, true);
-            foreach (CharacterId reporter in _reports.Where(r => r.Target == target && r.Alignment != role.Appearance).Select(r => r.Speaker).Distinct())
+            foreach (CharacterId reporter in _reports.Where(r => !_deceptionPossible && r.Target == target && r.Alignment != role.Appearance).Select(r => r.Speaker).Distinct())
                 Penalize(reporter, _settings.ContradictionPenalty, day, true);
             foreach (EvidenceRecord accusation in _evidence.Where(e => e.Kind == EvidenceKind.Statement && e.Target == target
                 && (e.Intent == SpeechIntent.Accuse || e.Intent == SpeechIntent.CallForTrial)).ToList())

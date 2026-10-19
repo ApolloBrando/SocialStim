@@ -7,8 +7,8 @@ namespace SocialStim.Rules.Night
     public sealed class NightReport
     {
         /// <summary>Creates a scoped report; target/alignment are only legitimate result data.</summary>
-        public NightReport(CharacterId recipient, ReportKind kind, CharacterId? target = null, Faction? alignment = null, int night = 0)
-        { Recipient = recipient; Kind = kind; Target = target; Alignment = alignment; Night = night; }
+        public NightReport(CharacterId recipient, ReportKind kind, CharacterId? target = null, Faction? alignment = null, int night = 0, CharacterId? subject = null)
+        { Recipient = recipient; Kind = kind; Target = target; Alignment = alignment; Night = night; Subject = subject; }
         /// <summary>Only authorized observer.</summary>
         public CharacterId Recipient { get; }
         /// <summary>Result category.</summary>
@@ -17,6 +17,8 @@ namespace SocialStim.Rules.Night
         public CharacterId? Target { get; }
         /// <summary>Apparent alignment for an investigation.</summary>
         public Faction? Alignment { get; }
+        /// <summary>Watched location for visitor reports; never an undisclosed killer identity.</summary>
+        public CharacterId? Subject { get; }
         /// <summary>Night number attached when the session delivers this result.</summary>
         public int Night { get; }
     }

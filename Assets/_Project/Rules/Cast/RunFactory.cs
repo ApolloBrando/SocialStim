@@ -15,14 +15,17 @@ namespace SocialStim.Rules.Cast
     {
         /// <summary>Creates the seven-character setup; rejects unsupported chosen roles and exhausted categories.</summary>
         public static RunSession Create(RunOptions options, IEnumerable<RoleSpec> roles, IEnumerable<string> names,
-            IEnumerable<DialogueLine> dialogue, INpcStrategy strategy = null, ReasoningSettings reasoning = null)
+            IEnumerable<DialogueLine> dialogue, INpcStrategy strategy = null, ReasoningSettings reasoning = null, RoleList setup = null)
         {
             var catalog = ValidateCatalog(roles);
             var availableNames = names.ToList();
-            if (availableNames.Count < 7 || availableNames.Any(string.IsNullOrWhiteSpace) || availableNames.Distinct(StringComparer.Ordinal).Count() != availableNames.Count)
-                throw new ArgumentException("Provide at least seven distinct, nonempty names.");
+            int castSize = setup?.Slots.Count ?? 7;
+            if (availableNames.Count < castSize || availableNames.Any(string.IsNullOrWhiteSpace) || availableNames.Distinct(StringComparer.Ordinal).Count() != availableNames.Count)
+                throw new ArgumentException("Provide enough distinct, nonempty names for the role list.");
             var random = new SeededRandom(options.Seed);
-            var assigned = new List<RoleSpec>();
+            var assigned = setup == null ? new List<RoleSpec>() : setup.Resolve(catalog, options.PlayerRole, random).ToList();
+            if (setup == null)
+            {
             foreach (RoleCategory category in new[] { RoleCategory.TownInvestigative, RoleCategory.TownProtective,
                 RoleCategory.TownSupport, RoleCategory.AntagonistKilling, RoleCategory.NeutralBenign })
                 assigned.Add(Pick(catalog.Where(r => r.Category == category), assigned, random));
@@ -37,6 +40,7 @@ namespace SocialStim.Rules.Cast
                     if (slot < 0) throw new ArgumentException("Chosen role cannot fit this role list.");
                     assigned[slot] = chosen;
                 }
+            }
             }
             Shuffle(assigned, random); Shuffle(availableNames, random);
             if (options.PlayerRole.HasValue)
@@ -62,8 +66,11 @@ namespace SocialStim.Rules.Cast
                 throw new ArgumentException("A scenario needs at least three uniquely named participants.");
             foreach (var group in cast.GroupBy(c => c.Role.Id))
                 if (group.First().Role.Unique && group.Count() > 1) throw new ArgumentException("Unique role occurs more than once.");
-            if (winCondition == null && catalog.Any(r => r.Ability == AbilityKind.Attack && r.Faction != Faction.Antagonist))
-                throw new ArgumentException("Starter parity does not support independent lethal roles; supply a different win condition.");
+            if (winCondition == null && catalog.Any(r => r.Ability == AbilityKind.Attack && r.Faction != Faction.Antagonist
+                && r.Category != RoleCategory.TownKilling && r.Category != RoleCategory.NeutralKilling))
+                throw new ArgumentException("Independent attacks require an explicit killing category or custom win condition.");
+            if (winCondition == null && catalog.Any(r => (int)r.Category > (int)RoleCategory.NeutralBenign))
+                winCondition = new CapabilityWinCondition();
             var settings = reasoning ?? new ReasoningSettings();
             return new RunSession(options, cast, catalog, dialogue, strategy ?? new SocialNpcStrategy(settings), winCondition ?? new StarterWinCondition(), settings);
         }

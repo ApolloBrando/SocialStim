@@ -10,11 +10,13 @@ namespace SocialStim.Tests.PlayMode
     /// <summary>Requires real TMP resources; these adapter checks cannot run in the headless project.</summary>
     public sealed class TextEffectsAdapterTests
     {
-        [TestCase(false)]
-        [TestCase(true)]
-        public void SemanticAccentsKeepContrastAgainstThePhaseBackground(bool night)
+        [TestCase(false, 0f)]
+        [TestCase(false, 0.5f)]
+        [TestCase(false, 1f)]
+        [TestCase(true, 0f)]
+        public void SemanticAccentsKeepContrastAgainstThePhaseBackground(bool night, float dayProgress)
         {
-            var palette = new TextPalette(night);
+            var palette = new TextPalette(night, dayProgress);
             foreach (SemanticStyle style in Enum.GetValues(typeof(SemanticStyle)))
             {
                 float foreground = Luminance(palette.Accent(style));

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6a8643ad95059d8b4a7a1d1853a368a, type: 3}
+  m_Name: LoneKiller
+  m_EditorClassIdentifier:
+  _id: lone-killer
+  _displayName: Lone Killer
+  _faction: 2
+  _category: 10
+  _ability: 3
+  _attack: 2
+  _defense: 1
+  _protection: 0
+  _charges: -1
+  _appearance: 2
+  _unique: 1

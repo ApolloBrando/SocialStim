@@ -520,6 +520,24 @@
       "metadata": {
         "emotionKey": "tense"
       }
+    },
+    {
+      "id": "report-action.1",
+      "intent": "ReportAction",
+      "text": "PLACEHOLDER: {speaker}: {result}",
+      "weight": 1
+    },
+    {
+      "id": "report-action.2",
+      "intent": "ReportAction",
+      "text": "PLACEHOLDER: {speaker}: {result}",
+      "weight": 1
+    },
+    {
+      "id": "report-action.3",
+      "intent": "ReportAction",
+      "text": "PLACEHOLDER: {speaker}: {result}",
+      "weight": 1
     }
   ]
 }

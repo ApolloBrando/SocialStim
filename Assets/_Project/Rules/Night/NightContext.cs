@@ -10,7 +10,8 @@ namespace SocialStim.Rules.Night
         internal NightContext(IReadOnlyList<NightActor> actors, IReadOnlyList<NightOrder> orders)
         {
             Actors = actors; Orders = orders;
-            foreach (NightActor actor in actors) Defense.Add(actor.Id, actor.Role.Defense);
+            foreach (NightActor actor in actors)
+            { Defense.Add(actor.Id, actor.Role.Defense); Appearance.Add(actor.Id, actor.Role.Appearance); }
         }
         /// <summary>Living actors at selection time, in stable order.</summary>
         public IReadOnlyList<NightActor> Actors { get; }
@@ -20,6 +21,8 @@ namespace SocialStim.Rules.Night
         public HashSet<CharacterId> Blocked { get; } = new HashSet<CharacterId>();
         /// <summary>Temporary effective defense per participant.</summary>
         public Dictionary<CharacterId, int> Defense { get; } = new Dictionary<CharacterId, int>();
+        /// <summary>Night-local investigative appearance; never changes true alignment.</summary>
+        public Dictionary<CharacterId, SocialStim.Rules.Roles.Faction> Appearance { get; } = new Dictionary<CharacterId, SocialStim.Rules.Roles.Faction>();
         /// <summary>Deaths are accumulated before simultaneous cleanup.</summary>
         public HashSet<CharacterId> Deaths { get; } = new HashSet<CharacterId>();
         /// <summary>Actors spending one limited charge.</summary>

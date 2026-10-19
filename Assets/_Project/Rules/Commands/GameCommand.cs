@@ -28,6 +28,8 @@ namespace SocialStim.Rules.Commands
         /// <summary>Builds a truthful or deceptive attributed statement.</summary>
         public static GameCommand Speak(SpeechIntent intent, CharacterId? target = null, RoleId? role = null, Faction? faction = null)
             => new GameCommand(CommandKind.Speak, target, intent, role, faction);
+        /// <summary>Publicly reports the observer's recorded selection and legitimate results from last night.</summary>
+        public static GameCommand ReportLastAction() => new GameCommand(CommandKind.ReportLastAction);
         /// <summary>Nominates a participant, or abstains.</summary>
         public static GameCommand Nominate(CharacterId? target) => new GameCommand(CommandKind.Nominate, target);
         /// <summary>Submits a judgement stance.</summary>

@@ -1,8 +1,9 @@
 # Initial game design
 
-Status: the initial five-role loop is implemented in milestone 01 and covered by
-headless tests; Unity presentation verification remains pending. The advanced
-starter catalog roles are planned milestone 03 work.
+Status: milestones 01/02/05 are merged. Milestone 03 implements the expanded
+catalog, including repeatable Citizen, and the latest playtest flow. Current
+role/outcome policies and Unity gates are in [ROLE_INTERACTIONS.md](ROLE_INTERACTIONS.md).
+The initial-slice descriptions below retain their historical scope.
 
 ## Run defaults
 

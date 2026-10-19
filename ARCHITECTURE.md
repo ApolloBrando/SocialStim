@@ -2,31 +2,21 @@
 
 ## Status and constraints
 
-Milestone 01 implements the five-role participant-loop candidate. Milestone 02
-adds attributed evidence, trust, constrained heuristic estimates, visible
-self-exposure, coordinated team plans, and contextual dialogue. Shared Rules,
-Application, and engine-free dialogue import code compile and pass behavioral
-tests in GitHub Actions. Unity-specific adapters and the committed scene still
-need editor import, compilation, and play verification.
+Milestones 01/02/05 provide the merged loop, attributed social evidence, scoped
+NPC knowledge, conditional dialogue and presentation effects. This branch adds
+milestone 03's role interactions, authored setup, morning/day flow and playtest
+presentation changes. Ongoing-run save/resume was cancelled by the owner.
 
-Current code includes `RunFactory`, `RunSession`, `PhaseMachine`, `NightResolver`
-and its stages, `SocialNpcStrategy` (default), `BasicNpcStrategy` (baseline), restricted `KnowledgeView` records,
-`DialogueSelector`, `StarterWinCondition`, and `GameController`. Unity data assets
-and `GameBootstrap` wire these to `TextGameView` through `GamePresenter`.
-The original design contracts below also cover deferred systems: full role
-probabilities and exposure estimates (02), advanced roles (03), save snapshots
-(04). This feature branch implements milestone 05 on top of main, independently of
-02/03/04; its Unity adapters remain unverified.
-The original design contracts below also cover deferred systems: advanced roles (03), save snapshots
-(04), and tension/visual effects (05). Those systems are not implemented yet.
+The player is a cast participant under the same legality rules as NPCs.
+Dialogue remains prewritten data; no runtime generation service is used.
+Rules and Application have no Unity references. Presentation owns uGUI/TMP
+objects and display timing; those clocks never advance gameplay randomness.
+Runs have no persistent state. Only UI/accessibility preferences persist.
 
-The game is single-player and text-only initially. The player is a participant
-with the same action legality rules as NPCs. Dialogue is prewritten data, with
-no runtime text-generation service. Gameplay randomness is seeded with capturable
-stream state; full run save/resume is milestone 04. No run state persists today.
-
-The owner authorized milestone 02 development in parallel with their milestone
-01 Unity verification. No editor success is inferred from that decision.
+Historical CI results apply to their recorded commits. The new shared compile
+and behavioral suite must pass independently. Unity adapter/editor compilation,
+actual rendering/input and player builds are still unverified here. The owner
+is playtesting main; no feature branch authorizes an automatic merge.
 
 ## Assembly dependencies
 
@@ -83,7 +73,7 @@ Scenes, authored JSON, and asset instances live outside code namespace roots.
 | `Assets/_Project/Rules/Dialogue` | Intent selection inputs, weighted lines, anti-repetition |
 | `Assets/_Project/Rules/Victory` | Faction outcomes and personal achievements |
 | `Assets/_Project/Rules/Randomness` | Specified PRNG with capturable stream state |
-| `Assets/_Project/Application` | Session coordination, observations, input, saves, cues |
+| `Assets/_Project/Application` | Session coordination, observations, input, cues |
 | `Assets/_Project/Data/Definitions` | Definition types and validated runtime conversion |
 | `Assets/_Project/Data/Dialogue` | Authored dialogue files; no generated runtime prose |
 | `Assets/_Project/ScriptableObjects` | Role, setup, personality, catalog, and later effect assets |
@@ -197,7 +187,7 @@ Self-exposure estimates use observed reactions, not other characters' private
 beliefs. Stable ordering breaks ties before any explicitly seeded random choice.
 
 Dialogue selection uses intent, permitted context, authored conditions, weighted
-sampling, and a saved per-speaker recent-line history. Personality affects intent
+sampling, and a run-local per-speaker recent-line history. Personality affects intent
 utility and authored line suitability. Selection treats text as opaque, including
 future markup. Adding lines must require data edits only. See
 [Docs/DIALOGUE_AUTHORING.md](Docs/DIALOGUE_AUTHORING.md).
@@ -206,26 +196,17 @@ Player choices expose available assertions and likely social meaning. The normal
 UI does not expose exact NPC belief deltas. Truthful and deceptive variants both
 use the same command and evidence pipeline.
 
-## Determinism and save/resume
+## Determinism and one-sitting runs
 
-Use `IRandomSource` backed by a specified, versioned algorithm with serializable
-state; do not rely on `UnityEngine.Random` or a hidden `System.Random` state.
-Separate setup, NPC decision, and dialogue streams from presentation randomness.
-Sort collections by stable IDs before iteration that affects results. Use integer
-weights or explicitly defined rounding in decisions; cosmetic timing is irrelevant.
+Use IRandomSource with the specified versioned algorithm and independent setup,
+NPC decision and dialogue streams. Keep presentation timing independent of
+gameplay randomness, sort decisions by stable IDs, and use integer weights.
+A seed reproduces a run only with matching content/rules and player commands.
 
-A seed reproduces a run only with matching content/rules versions and the same
-player commands. Mid-run snapshots must include schema version, content/rules
-fingerprints, settings, seed and stream states, cast/roles/resources, current
-phase and trial counters, pending commands and outstanding input, evidence and
-private knowledge, belief state, dialogue repetition history, and outcomes.
-Use stable IDs, never scene references or ScriptableObject instance IDs.
-
-Save at command boundaries with a consistent snapshot. If a presentation-only
-line is in progress, restore its full text instantly or replay it without
-consuming gameplay/dialogue RNG. A failed or incompatible load returns a clear
-error; it must not silently regenerate hidden state. Nothing crosses runs except
-settings. Persistence is behind an adapter; snapshot creation stays engine-free.
+Runs are intended to be completed in one sitting. There is no run snapshot,
+resume protocol, gameplay save slot, or saved input/observer state. New run
+starts fresh. Only presentation/accessibility preferences persist through the
+Unity-facing UiPreferences adapter.
 
 ## Presentation and effects
 
@@ -295,7 +276,7 @@ Dialogue tests also cover eligibility/repetition and actual JSON loading. A
 headless .NET test project compiles actual shared sources with warnings treated
 as errors and completes 50 seeds for each of Town and antagonist play. This
 verifies consistency and termination, not balance or enjoyment. Later tests cover
-save continuation, advanced role interactions, and effects. Do not add tests that only
+advanced role interactions and effects. Do not add tests that only
 assert the scaffold's existence or mirror implementation details.
 
 ## Design risks
@@ -309,7 +290,7 @@ assert the scaffold's existence or mirror implementation details.
 - Antagonist passivity: test kills, false reports, alibis, and teammate management
   as player tools, not merely survival through voting.
 - Architecture leaks: prevent unrestricted state/events from entering views,
-  dialogue conditions, NPC strategies, saves exposed in UI, or tension cues.
+  dialogue conditions, NPC strategies, or tension cues.
 - Neutral outcomes and parity: evaluate capabilities and competing threats;
   faction headcount alone is not sufficient in the full ruleset.
 - Premature visual scope: establish readable plain-text play before animation.
@@ -320,3 +301,54 @@ intent/target metadata after observer evidence is updated. Nomination ballots
 are chosen before publication and enter public evidence; deaths also enter
 evidence when role reveal is disabled. Integration regression tests cover all
 three contracts.
+
+## Milestone 03 integration
+
+RoleList/RoleSlot resolve authored constraints with deterministic bounded search;
+unique roles and a chosen player role are validated together. Unity's
+RoleListDefinition converts authored slots into detached rules. Citizens have no
+visiting ability and may repeat. New enum values are appended to preserve
+existing serialized values.
+
+The default advanced night pipeline is block (10), forge (15), visits (20),
+protection (30), simultaneous attacks (40), watch (45), investigation (50).
+Forgery changes only a night-local appearance map. Watch reports only actual
+visitors to its authorized recipient, with no role or attacker label. Limited
+attacks spend a charge when executed, even against protection; blocked/pass
+orders do not spend. Only Antagonist attacks enter the single team plan.
+
+CapabilityWinCondition evaluates living roles/resources. Conservative parity
+waits for usable Town attack/block/protection and independent killers. The day
+cap bounds unresolved combat and protection loops. Provocateur execution is a
+separate recorded personal achievement and does not terminate faction play.
+
+Morning reports use recorded own actions/results or public-role-based bluffing;
+they enter the existing attributed evidence path. The player can yield the
+opening without spending a discussion round. Reporting and opening state are
+authoritative rules state; menu navigation and pacing are presentation state.
+
+Dialogue display completion includes the reading pause. Speaker pacing derives
+from public speaker/sequence IDs, never gameplay RNG. Category/family/page
+navigation keeps original revision-scoped leaf IDs. Claim highlights and the
+claim board are applied from delivered observations, not undisplayed future
+claims. Static frames are separate uGUI objects and survive effects-off mode.
+
+ParticipantCard is a scene UI component keyed by public CharacterId. Cards render
+only identity, survival and authorized teammate knowledge. Status/cast updates
+wait until pending observations finish, while claim highlights are applied as
+their individual spoken observations complete.
+
+## One-sitting run policy and cozy UI
+
+The owner cancelled ongoing-run saving. The milestone 04 draft is closed and
+none of its snapshot/file-store code is part of this branch. UiPreferences
+persists only presentation booleans, intensity and text speed in PlayerPrefs;
+GameBootstrap owns this adapter and the view raises SettingsChanged. New run
+still creates fresh roles, beliefs, resources and random streams.
+
+TextUiFactory caches a small rounded sprite and uses native sliced Image,
+Outline and light Shadow components for surfaces. ParticipantCard remains a
+public-identity object. Titles and action descriptions have separate hierarchy;
+ChoiceFocusIndicator supports hover plus a textual keyboard marker and sage
+focus tint. The palette distinguishes canvas, panel, button, text and subdued
+frames. No generated scene objects or runtime textures are committed assets.

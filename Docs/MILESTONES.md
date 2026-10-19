@@ -1,7 +1,8 @@
 # Milestones
 
 Keep each milestone in its own branch and review scope. The owner explicitly
-authorized 02 and then 05 in parallel with main testing, deferring 03/04. Milestone 00 contains no gameplay.
+authorized 03 after merging 02 and 05, with playtest changes in
+ROLE_INTERACTIONS.md. The owner subsequently cancelled ongoing-run save/resume. Milestone 00 contains no gameplay.
 Each PR, or specifically confirmed direct publication to `main`, updates README
 and ARCHITECTURE, lists actual checks and unavailable checks, and contains only
 its milestone's scope. Do not merge automatically.
@@ -12,7 +13,7 @@ its milestone's scope. Do not merge automatically.
 | 01 | `milestone/01-core-loop` | Seeded seven-character cast, five initial roles, full day/trial/night loop, basic intent-based NPCs and placeholder dialogue, plain text UI | Complete a Town run and an Assassin run; tests for phases, votes, target legality, night interactions, outcomes, determinism, and information isolation |
 | 02 | `milestone/02-social-reasoning` | Personality tuning, attributed evidence, uncertain claims, contradictions, exposure estimates, team planning, authoring importer and anti-repetition | Reproducible scenarios with competing claims; no secret-state access; data-only new lines work |
 | 03 | `milestone/03-role-interactions` | Remaining starter roles, constrained role-list generation, advanced priority policies, capability-aware outcomes and stalemates | Invalid setup reports and role interaction matrix; viable player tools for each role |
-| 04 | `milestone/04-save-resume` | Versioned snapshots, complete stream/state persistence, load validation, settings | Identical continuation after save/resume, including pending input, beliefs, resources and dialogue selection |
+| 04 | Cancelled | Runs are finished in one sitting; only UI preferences persist | Closed unmerged PR #6; no run-save code in the active branch |
 | 05 | `milestone/05-presentation-effects` | Cue profiles, semantic markup, skip/accessibility, typewriter, color, shake, vignette/border, limited flash, playground | Parser and sequence/blend/cancel tests; editor preview; no allocations during steady effect updates |
 | 06 | `milestone/06-content-balance` | Owner-authored content coverage, difficulty tuning, simulation reports, refinement of antagonist/neutral agency | Reproducible simulation data plus human playtesting; no hidden-state advantage |
 
@@ -100,3 +101,18 @@ The latest code CI passed 61 tests with zero failures/skips, including the 100
 seeded runs. Final checks are recorded in `Docs/VALIDATION.md`. Unity adapter compilation, real preview, renderer
 behavior, and steady-update allocation profiling remain explicitly pending in
 `Docs/EFFECTS_VERIFICATION.md`. No main write or merge is authorized by this branch.
+
+## Current authorization and milestone 03
+
+Milestones 02 and 05 are merged by the owner. The owner authorized 03 and 04
+and requested the playtest changes recorded in Docs/ROLE_INTERACTIONS.md.
+Milestone 03 now includes the remaining role catalog, constrained authored
+setup, role interactions, conservative capability outcomes, repeatable Citizen,
+morning reporting, grouped choices, and paced turn-aware presentation.
+Milestone 04 save/resume was cancelled. Its unmerged draft is closed. Neither authorizes an
+automatic merge or direct main update. Earlier inverse palette notes above
+are historical; the latest light-day/dark-night correction takes precedence.
+
+The latest owner direction is one-sitting runs with a cozy, clean native Unity
+UI. UI preferences remain; gameplay state, snapshots, run slots and load controls
+do not. PR #6 is withdrawn and must not be merged.
