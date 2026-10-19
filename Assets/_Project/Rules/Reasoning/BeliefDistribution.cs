@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using SocialStim.Rules.Persistence;
 using SocialStim.Rules.Cast;
 using SocialStim.Rules.Roles;
 
@@ -72,6 +74,39 @@ namespace SocialStim.Rules.Reasoning
                 for (int index = 0; index < candidates.Count; index++) output.Add(candidates[index].Id, values[index]);
             }
             return _catalog.Select(r => new RoleEstimate(r.Id, output[r.Id])).ToList().AsReadOnly();
+        }
+
+        internal void WriteState(BinaryWriter w)
+        {
+            w.Write(_weights.Count);
+            foreach (var pair in _weights.OrderBy(p => p.Key.Value))
+            {
+                w.Write(pair.Key.Value);
+                foreach (long weight in pair.Value) w.Write(weight);
+                SnapshotIO.OptionalEnum(w, _known.TryGetValue(pair.Key, out Faction faction) ? faction : (Faction?)null);
+                SnapshotRecords.Role(w, _knownRoles.TryGetValue(pair.Key, out RoleId role) ? role : (RoleId?)null);
+                SnapshotRecords.Role(w, _claims.TryGetValue(pair.Key, out RoleId claim) ? claim : (RoleId?)null);
+            }
+        }
+
+        internal void ReadState(BinaryReader r, int castCount)
+        {
+            if (SnapshotIO.Int(r, 0, 20) != castCount) throw new InvalidDataException("Incomplete belief distribution.");
+            _weights.Clear(); _known.Clear(); _knownRoles.Clear(); _claims.Clear();
+            for (int i = 0; i < castCount; i++)
+            {
+                if (SnapshotIO.Int(r, 0, castCount - 1) != i) throw new InvalidDataException("Unordered belief identity.");
+                var id = new CharacterId(i);
+                _weights.Add(id, new[] { SnapshotIO.Weight(r), SnapshotIO.Weight(r), SnapshotIO.Weight(r) });
+                var faction = SnapshotIO.OptionalEnum<Faction>(r);
+                RoleId? role = SnapshotRecords.Role(r, _catalog);
+                RoleId? claim = SnapshotRecords.Role(r, _catalog);
+                if (role.HasValue && (!faction.HasValue || _catalog.Single(x => x.Id == role.Value).Faction != faction.Value))
+                    throw new InvalidDataException("Known role/faction mismatch.");
+                if (faction.HasValue) _known.Add(id, faction.Value);
+                if (role.HasValue) _knownRoles.Add(id, role.Value);
+                if (claim.HasValue) _claims.Add(id, claim.Value);
+            }
         }
 
         private static int[] Normalize(long[] weights, int total)

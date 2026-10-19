@@ -351,3 +351,37 @@ from public speaker/sequence IDs, never gameplay RNG. Category/family/page
 navigation keeps original revision-scoped leaf IDs. Claim highlights and the
 claim board are applied from delivered observations, not undisplayed future
 claims. Static frames are separate uGUI objects and survive effects-off mode.
+
+## Milestone 04 persistence
+
+RunSession.Save/Load use a versioned explicit binary schema; no reflection-based
+object graph, executable type names, delegates, Unity objects, or command replay
+are serialized. SnapshotIO bounds reads and validates enum/ID/value ranges.
+Snapshots capture both random streams; full observer scores/distributions,
+known facts, claims, report assertions, private results and evidence; dialogue
+anti-repetition queues; phase/revision/counters; all actors/resources; opening,
+last-action and execution-objective state; reveals, previous team plan, and the
+scoped transcript/metadata.
+
+Checksums detect corruption. A SHA-256 content fingerprint includes rules
+version, role definitions, dialogue/conditions/metadata, and reasoning tuning.
+Load reconstructs the original full starting cast, restores state, checks
+cross-state invariants, and returns a separate session. Failed loads do not
+touch the active session. The fingerprint is compatibility checking, not
+authentication or encryption.
+
+FileSaveStore uses fixed slots under the composition root's persistent-data
+directory. Writes flush a same-directory temporary file before atomic replace,
+retaining a backup. There is no delete-and-overwrite fallback. RunSaveService
+validates primary/backup sessions; an invalid primary does not replace an
+existing backup on the next successful save. Recovery never overwrites files
+implicitly. Platform atomic-replace support still requires Unity verification.
+
+Settings have their own small versioned payload. TextGameView raises save/load
+and settings events; GameBootstrap owns filesystem paths and swaps presenters
+only after successful load validation. Choices are reconstructed from the exact
+saved revision. Saves occur at completed display/input boundaries; resumed
+history is fully revealed without consuming either gameplay random stream.
+Production SocialNpcStrategy/BasicNpcStrategy and Starter/Capability outcome
+policies have explicit persistence; arbitrary injected implementations fail
+clearly instead of losing unknown state.

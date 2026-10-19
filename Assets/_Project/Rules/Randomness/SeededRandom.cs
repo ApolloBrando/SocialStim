@@ -13,6 +13,12 @@ namespace SocialStim.Rules.Randomness
             _state = state == 0 ? 0x6D2B79F5u : state;
         }
 
+        internal void Restore(uint state)
+        {
+            if (state == 0) throw new ArgumentException("A random stream state cannot be zero.");
+            _state = state;
+        }
+
         /// <inheritdoc />
         public uint State => _state;
 

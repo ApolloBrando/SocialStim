@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using SocialStim.Rules.Persistence;
 using SocialStim.Rules.Cast;
 using SocialStim.Rules.Commands;
 using SocialStim.Rules.Dialogue;
@@ -147,6 +149,54 @@ namespace SocialStim.Rules.Reasoning
         }
 
         internal void ObserveDeath(CharacterId target, int day) => Record(day, EvidenceKind.Death, target, target);
+
+        internal void WriteState(BinaryWriter w)
+        {
+            w.Write(Exposure); w.Write(_suspicion.Count);
+            foreach (var pair in _suspicion.OrderBy(p => p.Key.Value))
+            {
+                w.Write(pair.Key.Value); w.Write(pair.Value); w.Write(_trust[pair.Key]);
+                SnapshotRecords.Role(w, Claim(pair.Key));
+            }
+            w.Write(_reports.Count);
+            foreach (ReportAssertion report in _reports)
+            { w.Write(report.Speaker.Value); w.Write(report.Target.Value); w.Write(report.Night); w.Write((int)report.Alignment); }
+            w.Write(_privateReports.Count);
+            foreach (NightReport report in _privateReports) SnapshotRecords.Report(w, report);
+            w.Write(_evidence.Count);
+            foreach (EvidenceRecord record in _evidence) SnapshotRecords.Evidence(w, record);
+            _distribution.WriteState(w);
+        }
+
+        internal void ReadState(BinaryReader r, int castCount, int day, IReadOnlyList<RoleSpec> catalog)
+        {
+            Exposure = SnapshotIO.Int(r, 0, 100);
+            if (SnapshotIO.Int(r, 0, 20) != castCount) throw new InvalidDataException("Incomplete observer scores.");
+            _claims.Clear();
+            for (int i = 0; i < castCount; i++)
+            {
+                if (SnapshotIO.Int(r, 0, castCount - 1) != i) throw new InvalidDataException("Unordered observer score.");
+                var id = new CharacterId(i);
+                _suspicion[id] = SnapshotIO.Int(r, 0, 100); _trust[id] = SnapshotIO.Int(r, 0, 100);
+                RoleId? claim = SnapshotRecords.Role(r, catalog);
+                if (claim.HasValue) _claims.Add(id, claim.Value);
+            }
+            _reports.Clear();
+            int count = SnapshotIO.Int(r, 0, 200000);
+            for (int i = 0; i < count; i++)
+                _reports.Add(new ReportAssertion(SnapshotRecords.RequiredId(r, castCount), SnapshotRecords.RequiredId(r, castCount),
+                    SnapshotIO.Int(r, 1, day), SnapshotIO.EnumValue<Faction>(r)));
+            _privateReports.Clear(); count = SnapshotIO.Int(r, 0, 200000);
+            for (int i = 0; i < count; i++)
+            {
+                NightReport report = SnapshotRecords.Report(r, castCount, day, _self);
+                if (report.Kind != ReportKind.Investigation) throw new InvalidDataException("Invalid belief-private report.");
+                _privateReports.Add(report);
+            }
+            _evidence.Clear(); count = SnapshotIO.Int(r, 0, 200000);
+            for (int i = 0; i < count; i++) _evidence.Add(SnapshotRecords.Evidence(r, i, castCount, day, _self, catalog));
+            _distribution.ReadState(r, castCount);
+        }
 
         private void Penalize(CharacterId speaker, int penalty, int day, bool publicContradiction)
         {

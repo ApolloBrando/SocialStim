@@ -111,3 +111,11 @@ morning reporting, grouped choices, and paced turn-aware presentation.
 Milestone 04 remains a separate stacked review scope. Neither authorizes an
 automatic merge or direct main update. Earlier inverse palette notes above
 are historical; the latest light-day/dark-night correction takes precedence.
+
+## Milestone 04 implementation
+
+The stacked save/resume branch adds explicit version-1 complete state snapshots,
+content compatibility validation, atomic local slots with backup recovery,
+independent settings, and toolbar controls. It includes input-boundary
+continuation and filesystem/settings checks. CI results and the Unity execution
+gate must be reported separately; see Docs/SAVE_RESUME.md.

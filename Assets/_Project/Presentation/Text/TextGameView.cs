@@ -51,12 +51,20 @@ namespace SocialStim.Presentation.Text
         private string _menuFamily;
         private int _menuPage;
         private int _displayDay = 1;
+        private Button _saveButton;
+        private Button _loadButton;
+        private bool _hasSave;
+        public event Action SaveRequested;
+        public event Action LoadRequested;
+        public event Action<EffectsSettings> SettingsChanged;
+        public EffectsSettings Settings => _settings;
         public event Action<string> OptionChosen;
         public event Action RestartRequested;
         public bool IsDisplaying => _playback.Busy || _request != null && _next < _request.View.Transcript.Count;
 
-        public void Initialize(TMP_FontAsset font, IReadOnlyDictionary<PresentationCue, EffectProfile> profiles = null)
+        public void Initialize(TMP_FontAsset font, IReadOnlyDictionary<PresentationCue, EffectProfile> profiles = null, EffectsSettings initialSettings = null)
         {
+            _settings = initialSettings ?? new EffectsSettings();
             _font = font; _profiles = profiles ?? DefaultCueProfiles.Create();
             _onAcknowledged = acknowledgement =>
             {
@@ -82,7 +90,7 @@ namespace SocialStim.Presentation.Text
             _status = TextUiFactory.Text("Status", canvas.transform, font, 17); _labels.Add(_status);
             _claimSummary = TextUiFactory.Text("Role Claims Board", canvas.transform, font, 16); _labels.Add(_claimSummary);
             TextUiFactory.Fill(_claimSummary.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(20, -166), new Vector2(-20, -112));
-            TextUiFactory.Fill(_status.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(20, -128), new Vector2(-150, -12));
+            TextUiFactory.Fill(_status.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(20, -128), new Vector2(-380, -12));
             Button restart = TextUiFactory.Button(canvas.transform, font, "New run", 42);
             _controls.Add(restart);
             TextUiFactory.Fill((RectTransform)restart.transform, Vector2.one, Vector2.one, new Vector2(-140, -55), new Vector2(-20, -12));
@@ -95,6 +103,7 @@ namespace SocialStim.Presentation.Text
             transcriptLayout.childControlHeight = true; transcriptLayout.childControlWidth = true; transcriptLayout.childForceExpandHeight = false;
             transcriptContent.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             _textEffects = gameObject.AddComponent<TextEffectRenderer>(); _textEffects.Initialize(_transcript);
+            _textEffects.SetSemanticColors(_settings.Enabled);
             _choiceScroll = TextUiFactory.Scroll("Choices", canvas.transform, out _choices);
             _surfaces.Add(_choiceScroll.GetComponent<Image>());
             TextUiFactory.Fill((RectTransform)_choiceScroll.transform, new Vector2(0.64f, 0), Vector2.one, new Vector2(8, 68), new Vector2(-20, -178));
@@ -111,6 +120,18 @@ namespace SocialStim.Presentation.Text
             Control(footer, "Flash: off", () => ChangeSettings(flashes: !_settings.Flashes));
             Control(footer, "Text: animated", () => ChangeSettings(instant: !_settings.InstantText));
             Control(footer, "Intensity: 50%", () => ChangeSettings(intensity: _settings.Intensity >= 1 ? 0 : _settings.Intensity + 0.5f));
+            Control(footer, "Speed: " + _settings.ElementsPerSecond.ToString("0"), () =>
+                ChangeSettings(speed: _settings.ElementsPerSecond < 25 ? 28 : _settings.ElementsPerSecond < 35 ? 40 : 18));
+            _saveButton = TextUiFactory.Button(canvas.transform, font, "Save", 42);
+            _controls.Add(_saveButton);
+            TextUiFactory.Fill((RectTransform)_saveButton.transform, Vector2.one, Vector2.one, new Vector2(-250, -55), new Vector2(-150, -12));
+            _saveButton.onClick.AddListener(() => { if (!IsDisplaying && _request != null) SaveRequested?.Invoke(); });
+            _loadButton = TextUiFactory.Button(canvas.transform, font, "Load", 42);
+            _controls.Add(_loadButton);
+            TextUiFactory.Fill((RectTransform)_loadButton.transform, Vector2.one, Vector2.one, new Vector2(-360, -55), new Vector2(-260, -12));
+            _loadButton.onClick.AddListener(() => { if (!IsDisplaying) LoadRequested?.Invoke(); });
+            _saveButton.interactable = false; _loadButton.interactable = false;
+            RefreshSettingLabels();
             RectTransform overlay = TextUiFactory.Rect("Effects Overlay", canvas.transform);
             TextUiFactory.Fill(overlay, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             _screenEffects = overlay.gameObject.AddComponent<ScreenEffectOverlay>(); _screenEffects.raycastTarget = false;
@@ -151,6 +172,8 @@ namespace SocialStim.Presentation.Text
             ClearChoices();
             _menuCategory = null; _menuFamily = null; _menuPage = 0;
             _choiceScroll.gameObject.SetActive(false);
+            if (_saveButton != null) _saveButton.interactable = false;
+            if (_loadButton != null) _loadButton.interactable = false;
             _wasDisplaying = true;
             Pump(); UpdateChoiceState();
             _choiceScroll.verticalNormalizedPosition = 1;
@@ -217,19 +240,27 @@ namespace SocialStim.Presentation.Text
             _visibleClaims.Clear(); _displayDay = 1;
             if (_claimSummary != null) _claimSummary.text = "ROLE CLAIMS (unverified)  |  Nobody has claimed yet.";
             if (_choiceScroll != null) _choiceScroll.gameObject.SetActive(true);
+            if (_saveButton != null) _saveButton.interactable = false;
+            if (_loadButton != null) _loadButton.interactable = _hasSave;
             if (_screenEffects != null) _screenEffects.Apply(default, _palette);
         }
-        private void ChangeSettings(bool? enabled = null, bool? reduced = null, bool? flashes = null, bool? instant = null, float? intensity = null)
+        private void ChangeSettings(bool? enabled = null, bool? reduced = null, bool? flashes = null, bool? instant = null, float? intensity = null, float? speed = null)
         {
             _settings = new EffectsSettings(enabled ?? _settings.Enabled, reduced ?? _settings.ReducedMotion,
-                flashes ?? _settings.Flashes, intensity ?? _settings.Intensity, instant ?? _settings.InstantText);
+                flashes ?? _settings.Flashes, intensity ?? _settings.Intensity, instant ?? _settings.InstantText, speed ?? _settings.ElementsPerSecond);
             _textEffects.SetSemanticColors(_settings.Enabled);
             SkipAll();
+            SettingsChanged?.Invoke(_settings);
+            RefreshSettingLabels();
+        }
+        private void RefreshSettingLabels()
+        {
             SetControl(2, "Effects: " + (_settings.Enabled ? "on" : "off"));
             SetControl(3, "Motion: " + (_settings.ReducedMotion ? "reduced" : "full"));
             SetControl(4, "Flash: " + (_settings.Flashes ? "on" : "off"));
             SetControl(5, "Text: " + (_settings.InstantText ? "instant" : "animated"));
             SetControl(6, "Intensity: " + (_settings.Intensity * 100).ToString("0") + "%");
+            SetControl(7, "Speed: " + _settings.ElementsPerSecond.ToString("0"));
         }
         private void SetControl(int index, string text) => _controls[index].GetComponent<ChoiceFocusIndicator>().SetText(text);
         private Button Control(Transform parent, string label, Action selected)
@@ -262,11 +293,14 @@ namespace SocialStim.Presentation.Text
         private void UpdateChoiceState()
         {
             bool ready = !IsDisplaying;
+            if (_saveButton != null) _saveButton.interactable = ready && _request != null;
+            if (_loadButton != null) _loadButton.interactable = ready && _hasSave;
             _choiceScroll.gameObject.SetActive(ready);
             _wasDisplaying = !ready;
             if (ready && _request != null)
             {
-                ApplyPalette(Daylight.IsNight(_request.View.Phase), Daylight.Progress(_request.View.Phase, _request.View.TrialsUsed, _request.View.TrialsAllowed));
+                if (_request.View.Phase != GamePhase.Ended)
+                    ApplyPalette(Daylight.IsNight(_request.View.Phase), Daylight.Progress(_request.View.Phase, _request.View.TrialsUsed, _request.View.TrialsAllowed));
                 BuildMenu();
             }
         }
@@ -314,6 +348,15 @@ namespace SocialStim.Presentation.Text
             _choiceScroll.verticalNormalizedPosition = 1;
             FocusFirstChoice();
         }
+
+        public void SetSaveAvailable(bool available)
+        {
+            _hasSave = available;
+            if (_loadButton != null) _loadButton.interactable = available && !IsDisplaying;
+            if (_saveButton != null) _saveButton.interactable = _request != null && !IsDisplaying;
+        }
+        public void PrepareLoadedRun() { ResetDisplay(); ClearChoices(); }
+        public void RevealLoadedHistory() => SkipAll();
 
         private void FocusFirstChoice()
         {

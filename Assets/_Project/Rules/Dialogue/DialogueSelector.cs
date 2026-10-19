@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.IO;
+using SocialStim.Rules.Persistence;
 using System.Text.RegularExpressions;
 using SocialStim.Rules.Cast;
 using SocialStim.Rules.Randomness;
@@ -14,6 +16,55 @@ namespace SocialStim.Rules.Dialogue
         private readonly IReadOnlyList<DialogueLine> _lines;
         private readonly IRandomSource _random;
         private readonly Dictionary<CharacterId, Queue<string>> _recent = new Dictionary<CharacterId, Queue<string>>();
+        internal void WriteState(BinaryWriter writer)
+        {
+            writer.Write(_random.State); writer.Write(_recent.Count);
+            foreach (var pair in _recent.OrderBy(p => p.Key.Value))
+            {
+                writer.Write(pair.Key.Value); writer.Write(pair.Value.Count);
+                foreach (string id in pair.Value) SnapshotIO.Text(writer, id);
+            }
+        }
+
+        internal void ReadState(BinaryReader reader, int castCount)
+        {
+            ((SeededRandom)_random).Restore(reader.ReadUInt32());
+            _recent.Clear();
+            int count = SnapshotIO.Int(reader, 0, castCount);
+            for (int i = 0; i < count; i++)
+            {
+                var actor = SnapshotRecords.RequiredId(reader, castCount);
+                if (_recent.ContainsKey(actor)) throw new InvalidDataException("Duplicate dialogue history owner.");
+                int length = SnapshotIO.Int(reader, 0, 3);
+                var history = new Queue<string>();
+                for (int j = 0; j < length; j++)
+                {
+                    string id = SnapshotIO.Text(reader, 256);
+                    if (!_lines.Any(l => l.Id == id) || history.Contains(id)) throw new InvalidDataException("Invalid dialogue history.");
+                    history.Enqueue(id);
+                }
+                _recent.Add(actor, history);
+            }
+        }
+
+        internal void WriteContent(BinaryWriter w)
+        {
+            w.Write(_lines.Count);
+            foreach (DialogueLine line in _lines)
+            {
+                SnapshotIO.Text(w, line.Id); w.Write((int)line.Intent); SnapshotIO.Text(w, line.Text);
+                w.Write(line.Weight); w.Write((int)line.RequiredTrait); SnapshotRecords.Role(w, line.SpeakerRole);
+                SnapshotIO.Text(w, line.Metadata.Emotion); SnapshotIO.Text(w, line.Metadata.Portrait); SnapshotIO.Text(w, line.Metadata.Audio);
+                w.Write(line.Conditions.Count);
+                foreach (DialogueCondition c in line.Conditions)
+                {
+                    w.Write((int)c.Kind); SnapshotIO.Text(w, c.Value);
+                    w.Write(c.Number.HasValue); if (c.Number.HasValue) w.Write(c.Number.Value);
+                    w.Write(c.Flag.HasValue); if (c.Flag.HasValue) w.Write(c.Flag.Value);
+                }
+            }
+        }
+
         private static readonly Regex Variables = new Regex(@"\{([a-zA-Z]+)\}");
         private static readonly HashSet<string> AllowedVariables = new HashSet<string> { "speaker", "target", "role", "result", "day" };
 

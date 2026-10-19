@@ -141,3 +141,19 @@ latest playtest correction and supersedes the original inverse palette.
 Compilation, behavioral checks, and Unity rendering must be reported separately.
 The workspace runner was unavailable during this revision; CI is the compile
 and shared-test gate. Unity adapter/rendering verification is still pending.
+
+## Save/resume (milestone 04)
+
+Save and Load are available at completed input boundaries. One local run slot
+stores complete versioned binary state with a checksum and content/rules
+fingerprint. Load validates a separate session before replacing the active run;
+an invalid primary can recover the previous valid backup. Incompatible content
+is rejected rather than silently continuing with changed rules.
+
+Accessibility and text speed persist independently in a settings slot. New run
+creates fresh gameplay state; it does not copy the previous run's beliefs or
+resources. Resumed history is shown in full and the pending choices return
+without replaying gameplay. Save files contain private simulation state and
+are local implementation data, not public/player-scoped exports. Custom
+injected strategies/outcome policies are explicitly unsupported for saving.
+See [save format and verification](Docs/SAVE_RESUME.md).

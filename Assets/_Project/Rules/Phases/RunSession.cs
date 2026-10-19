@@ -13,9 +13,10 @@ using SocialStim.Rules.Victory;
 namespace SocialStim.Rules.Phases
 {
     /// <summary>Coordinates phase services, authoritative cast state, and player-scoped observations.</summary>
-    public sealed class RunSession
+    public sealed partial class RunSession
     {
         private readonly RunOptions _options;
+        private readonly ReasoningSettings _reasoning;
         private readonly List<Participant> _cast;
         private readonly IReadOnlyList<RoleSpec> _catalog;
         private readonly PhaseMachine _phases = new PhaseMachine();
@@ -41,6 +42,7 @@ namespace SocialStim.Rules.Phases
         internal RunSession(RunOptions options, List<Participant> cast, IReadOnlyList<RoleSpec> catalog,
             IEnumerable<DialogueLine> dialogue, INpcStrategy strategy, IWinCondition winCondition, ReasoningSettings reasoning)
         {
+            _reasoning = reasoning;
             _options = options; _cast = cast; _catalog = catalog; _strategy = strategy; _winCondition = winCondition;
             _decisions = new SeededRandom(options.Seed ^ 0xA341316Cu);
             _dialogue = new DialogueSelector(dialogue, new SeededRandom(options.Seed ^ 0xC8013EA4u));

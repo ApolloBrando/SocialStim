@@ -12,6 +12,13 @@ namespace SocialStim.Rules.Phases
         /// <summary>Emitted after a legal phase transition.</summary>
         public event Action<GamePhase> Changed;
 
+        internal void Restore(GamePhase phase, int day)
+        {
+            if (!Enum.IsDefined(typeof(GamePhase), phase) || phase == GamePhase.Execution || phase == GamePhase.NightResolution || day < 1)
+                throw new ArgumentException("Invalid saved input phase.");
+            Phase = phase; Day = day;
+        }
+
         /// <summary>Rejects transitions that bypass the trial/night loop.</summary>
         public void MoveTo(GamePhase next)
         {

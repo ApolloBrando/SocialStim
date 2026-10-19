@@ -17,6 +17,8 @@ namespace SocialStim.Rules.Reasoning
         /// <summary>Creates a strategy with immutable authored tuning.</summary>
         public SocialNpcStrategy(ReasoningSettings settings = null) { _settings = settings ?? new ReasoningSettings(); }
 
+        internal ReasoningSettings Settings => _settings;
+
         /// <inheritdoc />
         public GameCommand Speak(KnowledgeView knowledge, IRandomSource random)
         {
