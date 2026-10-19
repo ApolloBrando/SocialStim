@@ -2,31 +2,22 @@
 
 ## Status and constraints
 
-Milestone 01 implements the five-role participant-loop candidate. Milestone 02
-adds attributed evidence, trust, constrained heuristic estimates, visible
-self-exposure, coordinated team plans, and contextual dialogue. Shared Rules,
-Application, and engine-free dialogue import code compile and pass behavioral
-tests in GitHub Actions. Unity-specific adapters and the committed scene still
-need editor import, compilation, and play verification.
+Milestones 01/02/05 provide the merged loop, attributed social evidence, scoped
+NPC knowledge, conditional dialogue and presentation effects. This branch adds
+milestone 03's role interactions, authored setup, morning/day flow and playtest
+presentation changes. Milestone 04 adds explicit complete snapshots, validated
+load, atomic local slots and persistent settings.
 
-Current code includes `RunFactory`, `RunSession`, `PhaseMachine`, `NightResolver`
-and its stages, `SocialNpcStrategy` (default), `BasicNpcStrategy` (baseline), restricted `KnowledgeView` records,
-`DialogueSelector`, `StarterWinCondition`, and `GameController`. Unity data assets
-and `GameBootstrap` wire these to `TextGameView` through `GamePresenter`.
-The original design contracts below also cover deferred systems: full role
-probabilities and exposure estimates (02), advanced roles (03), save snapshots
-(04). This feature branch implements milestone 05 on top of main, independently of
-02/03/04; its Unity adapters remain unverified.
-The original design contracts below also cover deferred systems: advanced roles (03), save snapshots
-(04), and tension/visual effects (05). Those systems are not implemented yet.
+The player is a cast participant under the same legality rules as NPCs.
+Dialogue remains prewritten data; no runtime generation service is used.
+Rules and Application have no Unity references. Presentation owns uGUI/TMP
+objects and display timing; those clocks never advance gameplay randomness.
+Only the explicit local save/settings slots persist state.
 
-The game is single-player and text-only initially. The player is a participant
-with the same action legality rules as NPCs. Dialogue is prewritten data, with
-no runtime text-generation service. Gameplay randomness is seeded with capturable
-stream state; full run save/resume is milestone 04. No run state persists today.
-
-The owner authorized milestone 02 development in parallel with their milestone
-01 Unity verification. No editor success is inferred from that decision.
+Historical CI results apply to their recorded commits. The new shared compile
+and behavioral suite must pass independently. Unity adapter/editor compilation,
+actual rendering/input and player builds are still unverified here. The owner
+is playtesting main; no feature branch authorizes an automatic merge.
 
 ## Assembly dependencies
 
@@ -385,3 +376,8 @@ history is fully revealed without consuming either gameplay random stream.
 Production SocialNpcStrategy/BasicNpcStrategy and Starter/Capability outcome
 policies have explicit persistence; arbitrary injected implementations fail
 clearly instead of losing unknown state.
+
+ParticipantCard is keyed by public CharacterId and renders only scoped identity,
+survival and teammate knowledge. Display gates status/cast updates as well as
+choice visibility. Command reentry and saves during observation callbacks are
+rejected to preserve atomic input-boundary snapshots.

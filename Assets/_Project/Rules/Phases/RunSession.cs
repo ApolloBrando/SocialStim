@@ -17,6 +17,7 @@ namespace SocialStim.Rules.Phases
     {
         private readonly RunOptions _options;
         private readonly ReasoningSettings _reasoning;
+        private bool _applyingCommand;
         private readonly List<Participant> _cast;
         private readonly IReadOnlyList<RoleSpec> _catalog;
         private readonly PhaseMachine _phases = new PhaseMachine();
@@ -78,47 +79,53 @@ namespace SocialStim.Rules.Phases
         /// <summary>Applies one legal player command; invalid input leaves state and RNG untouched.</summary>
         public bool TrySubmit(GameCommand command, out string error)
         {
+            if (_applyingCommand) { error = "A command is already being applied."; return false; }
             error = ValidatePlayerCommand(command);
             if (error != null) return false;
-            switch (_phases.Phase)
+            _applyingCommand = true;
+            try
             {
-                case GamePhase.Discussion:
-                    if (_opening && command.Kind == CommandKind.Continue)
-                    {
-                        _opening = false;
-                        var speakers = Living().Where(c => c.Id != Player.Id).ToList();
-                        if (speakers.Count > 0)
+                switch (_phases.Phase)
+                {
+                    case GamePhase.Discussion:
+                        if (_opening && command.Kind == CommandKind.Continue)
                         {
-                            Participant speaker = speakers[_decisions.Next(speakers.Count)];
-                            if (_beliefs[speaker.Id].Evidence.Any(e => e.Kind == EvidenceKind.Death && e.Day == _phases.Day - 1))
-                                Say(speaker, GameCommand.Speak(SpeechIntent.ReactToDeath));
-                            else SayNpc(speaker);
+                            _opening = false;
+                            var speakers = Living().Where(c => c.Id != Player.Id).ToList();
+                            if (speakers.Count > 0)
+                            {
+                                Participant speaker = speakers[_decisions.Next(speakers.Count)];
+                                if (_beliefs[speaker.Id].Evidence.Any(e => e.Kind == EvidenceKind.Death && e.Day == _phases.Day - 1))
+                                    Say(speaker, GameCommand.Speak(SpeechIntent.ReactToDeath));
+                                else SayNpc(speaker);
+                            }
+                            break;
                         }
+                        _opening = false;
+                        if (Player.Alive)
+                        {
+                            if (command.Kind == CommandKind.ReportLastAction) SayActionReport(Player);
+                            else Say(Player, command);
+                        }
+                        foreach (Participant actor in Living().Where(c => c.Id != Player.Id).ToList()) SayNpc(actor);
+                        if (++_discussionRounds >= _options.DiscussionRounds) Move(GamePhase.Nomination);
                         break;
-                    }
-                    _opening = false;
-                    if (Player.Alive)
-                    {
-                        if (command.Kind == CommandKind.ReportLastAction) SayActionReport(Player);
-                        else Say(Player, command);
-                    }
-                    foreach (Participant actor in Living().Where(c => c.Id != Player.Id).ToList()) SayNpc(actor);
-                    if (++_discussionRounds >= _options.DiscussionRounds) Move(GamePhase.Nomination);
-                    break;
-                case GamePhase.Nomination: Nominate(command); break;
-                case GamePhase.Defense:
-                    if (_defendant == Player.Id) Say(Player, command);
-                    Move(GamePhase.Judgement); break;
-                case GamePhase.Judgement: Judge(command); break;
-                case GamePhase.LastWords:
-                    if (_defendant == Player.Id) Say(Player, command);
-                    Execute(); break;
-                case GamePhase.NightSelection: ResolveNight(command); break;
-                case GamePhase.Dawn:
-                    _trials = 0; _discussionRounds = 0; _opening = true; Move(GamePhase.Discussion); MorningReports(); break;
+                    case GamePhase.Nomination: Nominate(command); break;
+                    case GamePhase.Defense:
+                        if (_defendant == Player.Id) Say(Player, command);
+                        Move(GamePhase.Judgement); break;
+                    case GamePhase.Judgement: Judge(command); break;
+                    case GamePhase.LastWords:
+                        if (_defendant == Player.Id) Say(Player, command);
+                        Execute(); break;
+                    case GamePhase.NightSelection: ResolveNight(command); break;
+                    case GamePhase.Dawn:
+                        _trials = 0; _discussionRounds = 0; _opening = true; Move(GamePhase.Discussion); MorningReports(); break;
+                }
+                _revision++;
+                return true;
             }
-            _revision++;
-            return true;
+            finally { _applyingCommand = false; }
         }
 
         private Participant Player => _cast[0];

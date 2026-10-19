@@ -5,26 +5,26 @@ Inspired by Town of Salem, Gnosia and Slaughter Horse 2.
 
 ## Current status
 
-A work in progress for sure
+Milestones 01, 02 and 05 are merged. This branch adds milestone 03: eleven
+role definitions, an authored nine-participant setup with repeatable Citizens,
+advanced night interactions and outcomes, morning reporting, grouped choices,
+and the owner's playtest UI changes. Milestone 04 adds complete validated
+save/resume and independently persistent settings.
 
-Milestone 01 adds a complete participant-loop candidate: seven seeded characters,
-five roles, discussion and deceptive claims, nomination, defense, judgement,
-execution, night targeting, scoped results, and outcomes. All dialogue is marked
-PLACEHOLDER. This independent milestone 05 branch adds presentation effects on
-top of main; milestone 02 remains a separate PR, and 03/04 are deferred.
+Dialogue is authored data marked PLACEHOLDER; no runtime generative AI is used.
+The player belongs to the cast and follows the same command legality as NPCs.
 
-Day uses soft white text on near-black; night uses near-black on soft white.
-The UI stays minimal so semantic emphasis and occasional effects stand out.
-Typewriter, semantic accents, text shake, border/vignette, and a limited flash
-are controlled by cue profiles. Reduced motion is enabled and flashes disabled
-by default. The footer provides skip, effects, motion, flash, text and intensity
-controls. Settings last for the current application session.
-PLACEHOLDER. Milestone 02 adds attributed evidence, trust, constrained role/faction
-estimates, public self-exposure, consistent bluffs, team planning, and conditional
-dialogue. Save/resume, advanced roles, and effects remain later work.
+Day uses a light background that warms from pale yellow toward soft red through
+trial phases; night uses a dark background with light text. Framed participant
+cards, grouped choices, labelled role claims and an unverified claim board keep
+the interface readable. Text reveals at 28 graphemes/second by default with
+stable speaker speeds and varied reading pauses. Choices wait for the player's
+turn. Skip, instant text, reduced motion, flashes, and intensity are available.
+Text speed and accessibility settings persist across application sessions.
 
-Milestone 02 is being developed in parallel while the owner verifies milestone
-01 in Unity. Editor verification is still pending.
+New shared compilation and behavioral checks are pending in CI. Unity import,
+adapter compilation, actual rendering/input, and player builds remain a
+separate verification gate; the current changes are review candidates.
 
 ## Run in Unity
 
@@ -59,6 +59,12 @@ and palette without playing a game. See [Docs/EFFECTS.md](Docs/EFFECTS.md).
 | Interrupter | Town | Block another participant's ability |
 | Assassin | Antagonist | Select the single team kill, or pass |
 | Survivor | Neutral | Spend one of two self-protection charges, or pass |
+| Citizen | Town | No night ability; repeatable good role |
+| Vigilante | Town | Independent basic attack with two charges |
+| Forger | Antagonist | Frame another's apparent alignment for one night |
+| Coordinator | Antagonist | Observe actual visitors to another participant |
+| Provocateur | Neutral | No night ability; seek execution as a personal objective |
+| Lone Killer | Neutral | Independent powerful attack; basic innate defense |
 
 Everyone can accuse, defend, vouch, deflect, claim any role, nominate, and judge.
 Agreement/disagreement and calls for trial also affect public social evidence.
@@ -78,7 +84,7 @@ remain out of the normal text UI.
 Tune `Assets/_Project/ScriptableObjects/Reasoning/DefaultReasoning.asset` and start
 a new run to apply changes. The catalog already references it; no extra scene
 wiring is required. Dialogue JSON version 2 supports declarative conditions and
-contains 51 PLACEHOLDER lines. Version 1 content still loads. See
+contains 54 PLACEHOLDER lines. Version 1 content still loads. See
 [Docs/SOCIAL_REASONING.md](Docs/SOCIAL_REASONING.md) for policies and checks.
 
 ## Verification
@@ -157,3 +163,7 @@ without replaying gameplay. Save files contain private simulation state and
 are local implementation data, not public/player-scoped exports. Custom
 injected strategies/outcome policies are explicitly unsupported for saving.
 See [save format and verification](Docs/SAVE_RESUME.md).
+
+Participants also have individual framed uGUI cards. Public status and cast
+updates wait for pending dialogue to finish. The editor content validator checks
+every selectable role against the authored setup.

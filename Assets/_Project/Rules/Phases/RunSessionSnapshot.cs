@@ -24,6 +24,7 @@ namespace SocialStim.Rules.Phases
         /// <summary>Captures an input-boundary snapshot, including all random streams and observer state.</summary>
         public byte[] Save()
         {
+            if (_applyingCommand) throw new InvalidOperationException("Save only after the current command has completed.");
             if (!(_strategy is SocialNpcStrategy) && !(_strategy is BasicNpcStrategy))
                 throw new NotSupportedException("Saving custom NPC strategies requires an explicit persistence implementation.");
             if (!(_winCondition is StarterWinCondition) && !(_winCondition is CapabilityWinCondition))
@@ -225,6 +226,23 @@ namespace SocialStim.Rules.Phases
                 throw new InvalidDataException("Invalid team plan actor.");
             if (_winCondition is StarterWinCondition && _cast.Any(a => a.Role.Ability == AbilityKind.Attack && a.Role.Faction != Faction.Antagonist))
                 throw new InvalidDataException("Unsupported starter outcome policy.");
+            if (_defendant.HasValue && !trial && _phases.Phase != GamePhase.Ended)
+                throw new InvalidDataException("Unexpected defendant outside a trial.");
+            if (_opening && _discussionRounds != 0) throw new InvalidDataException("Opening after discussion rounds.");
+            if (_options.RevealOnDeath && _revealed.Count != _cast.Count(a => !a.Alive))
+                throw new InvalidDataException("Missing public death reveals.");
+            foreach (Participant actor in _cast.Where(a => a.Role.Category == RoleCategory.NeutralEvil))
+            {
+                bool executed = _transcript.Any(o => o.Cue == GameCue.ExecutionCarriedOut && o.Target == actor.Id);
+                if (executed != _executionObjectives.Contains(actor.Id)) throw new InvalidDataException("Execution objective/history mismatch.");
+            }
+            if (_outcome != OutcomeKind.Ongoing)
+            {
+                OutcomeKind expected = _winCondition is CapabilityWinCondition policy
+                    ? policy.Evaluate(LivingNightActors().AsReadOnly(), _phases.Day, _options.MaximumDays)
+                    : _winCondition.Evaluate(Living().Select(a => a.Role.Faction).ToList().AsReadOnly(), _phases.Day, _options.MaximumDays);
+                if (expected != _outcome) throw new InvalidDataException("Outcome disagrees with terminal state.");
+            }
             foreach (Participant actor in _cast) _ = Knowledge(actor);
         }
     }

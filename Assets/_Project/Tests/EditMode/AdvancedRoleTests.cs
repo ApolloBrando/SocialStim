@@ -37,6 +37,17 @@ namespace SocialStim.Tests.EditMode
             Roles(), TestContent.Lines(), strategy);
 
         [Test]
+        public void ActionReportAuthoringSupportsPassesAndTargetedAssertions()
+        {
+            Assert.DoesNotThrow(() => new DialogueLine("targeted", SpeechIntent.ReportAction, "PLACEHOLDER {target}: {result}",
+                conditions: new[] { new DialogueCondition(DialogueConditionKind.HasTarget, flag: true), new DialogueCondition(DialogueConditionKind.HasAssertion, flag: true) }));
+            Assert.DoesNotThrow(() => new DialogueLine("passed", SpeechIntent.ReportAction, "PLACEHOLDER {result}",
+                conditions: new[] { new DialogueCondition(DialogueConditionKind.HasTarget, flag: false) }));
+            Assert.Throws<ArgumentException>(() => new DialogueLine("too-early", SpeechIntent.ReportAction, "PLACEHOLDER",
+                conditions: new[] { new DialogueCondition(DialogueConditionKind.MaximumDay, number: 1) }));
+        }
+
+        [Test]
         public void ForgeryAffectsOnlyThisNightsAppearanceAndBlockingPreventsIt()
         {
             var cast = new[] { Actor(0, "forger"), Actor(1, "inspector"), Actor(2, "citizen"), Actor(3, "interrupter") };

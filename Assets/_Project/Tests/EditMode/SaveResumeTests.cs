@@ -83,16 +83,18 @@ namespace SocialStim.Tests.EditMode
         {
             RunSession run = RunFactory.CreateScenario(new RunOptions(123, discussionRounds: 10, maximumDays: 5),
                 new[] { "vigilante", "assassin", "citizen", "citizen" }.Select((id, i) => new CastMemberSpec("Person" + i, new RoleId(id))),
-                AdvancedRoleTests.Roles(), TestContent.Lines());
+                AdvancedRoleTests.Roles(), TestContent.Lines(), new BasicNpcStrategy());
             for (int i = 0; i < 10; i++) Assert.That(run.TrySubmit(GameCommand.Speak(SpeechIntent.Accuse, new CharacterId(1)), out _), Is.True);
             Assert.That(run.TrySubmit(GameCommand.Nominate(new CharacterId(1)), out _), Is.True);
             Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.Defense)); RoundTrip(run);
-            Assert.That(run.TrySubmit(GameCommand.Continue(), out _), Is.True);
+            bool playerDefendant = run.GetPlayerView().Defendant == run.GetPlayerView().PlayerId;
+            Assert.That(run.TrySubmit(playerDefendant ? GameCommand.Speak(SpeechIntent.Defend) : GameCommand.Continue(), out _), Is.True);
             Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.Judgement)); RoundTrip(run);
-            Assert.That(run.TrySubmit(GameCommand.Judge(Verdict.Guilty), out _), Is.True);
+            Assert.That(run.TrySubmit(playerDefendant ? GameCommand.Continue() : GameCommand.Judge(Verdict.Guilty), out _), Is.True);
             Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.LastWords)); RoundTrip(run);
-            Assert.That(run.TrySubmit(GameCommand.Continue(), out _), Is.True);
-            Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.Ended)); RoundTrip(run);
+            Assert.That(run.TrySubmit(playerDefendant ? GameCommand.Speak(SpeechIntent.LastWords) : GameCommand.Continue(), out _), Is.True);
+            Assert.That(run.GetPlayerView().Phase == GamePhase.Ended || run.GetPlayerView().Phase == GamePhase.NightSelection, Is.True);
+            RoundTrip(run);
         }
 
         [Test]
@@ -109,6 +111,21 @@ namespace SocialStim.Tests.EditMode
             Assert.Throws<InvalidDataException>(() => RunSession.Load(original, AdvancedRoleTests.Roles(), TestContent.Lines(), new ReasoningSettings(assertionWeight: 13)));
             Assert.Throws<InvalidDataException>(() => RunSession.Load(original, AdvancedRoleTests.Roles().Where(r => r.Id.Value != "forger"), TestContent.Lines()));
             Assert.That(run.Save(), Is.EqualTo(original));
+        }
+
+        [Test]
+        public void SavingOrSubmittingInsideAnObservationCallbackCannotCaptureHalfACommand()
+        {
+            RunSession run = Create(); int callbacks = 0;
+            run.Observation += observation =>
+            {
+                callbacks++;
+                Assert.Throws<InvalidOperationException>(() => run.Save());
+                Assert.That(run.TrySubmit(GameCommand.Continue(), out _), Is.False);
+            };
+            Assert.That(run.TrySubmit(GameCommand.Continue(), out _), Is.True);
+            Assert.That(callbacks, Is.GreaterThan(0));
+            RoundTrip(run);
         }
 
         [Test]

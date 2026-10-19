@@ -1,4 +1,5 @@
 using SocialStim.Data.Definitions;
+using SocialStim.Rules.Randomness;
 using SocialStim.Application.PresentationCues;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -18,7 +19,14 @@ namespace SocialStim.Editor
 #else
             var catalog = AssetDatabase.LoadAssetAtPath<GameCatalog>("Assets/_Project/ScriptableObjects/Catalogs/StarterCatalog.asset");
             if (catalog == null) throw new System.InvalidOperationException("StarterCatalog.asset is missing.");
-            int roles = catalog.LoadRoles().Count;
+            var definitions = catalog.LoadRoles();
+            int roles = definitions.Count;
+            var setup = catalog.LoadSetup();
+            if (setup != null)
+            {
+                if (catalog.LoadNames().Count < setup.Slots.Count) throw new System.InvalidOperationException("The role list needs more cast names.");
+                foreach (var role in definitions) setup.Resolve(definitions, role.Id, new SeededRandom(1));
+            }
             var dialogue = catalog.LoadDialogue();
             foreach (var line in dialogue) SemanticMarkup.Parse(line.Text);
             int lines = dialogue.Count;
