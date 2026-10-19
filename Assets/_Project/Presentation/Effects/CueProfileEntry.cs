@@ -1,0 +1,12 @@
+using System;
+using SocialStim.Application.PresentationCues;
+
+namespace SocialStim.Presentation.Effects
+{
+    [Serializable]
+    public sealed class CueProfileEntry
+    {
+        public PresentationCue cue;
+        public EffectTrackDefinition[] tracks = Array.Empty<EffectTrackDefinition>();
+    }
+}

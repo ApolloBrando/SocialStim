@@ -1,4 +1,23 @@
-# Milestone 01 validation
+# Validation
+
+## Milestone 05 branch
+
+The first effects branch build compiled portable code with warnings treated as
+errors and passed **58 tests, 0 failures, 0 skipped**, including the existing
+100 seeded runs and a zero-allocation steady portable playback check:
+[run 39257380492](https://github.com/ApolloBrando/SocialStim/actions/runs/39257380492).
+The envelope update passed **61 tests, 0 failures, 0 skipped**:
+[run 39258208133](https://github.com/ApolloBrando/SocialStim/actions/runs/39258208133).
+Three new envelope cases pin the alternate pulse shapes. Unity-only adapter tests
+are excluded from this count and remain pending.
+
+The headless project additionally compiles the engine-free GamePresenter and
+its input/acknowledgement integration test from the PlayMode folder. It does
+not compile TextGameView, TMP geometry, UI overlays, editor tooling or assets.
+The real TMP adapter tests are in Unity's PlayMode assembly and remain unrun.
+Follow `EFFECTS_VERIFICATION.md` for the distinct Unity and allocation gates.
+
+## Milestone 01 validation
 
 ## Milestone 02 branch
 
@@ -67,7 +86,8 @@ reported above. No clean Unity import should be inferred from them.
 
 The game scene is prewired to the starter catalog, and the role/catalog assets
 have committed metadata. Unity EditMode should discover the shared behavioral
-suite. The PlayMode assembly is reserved and has no UI tests yet. Full editor
+suite. Milestone 01 reserved the PlayMode assembly; milestone 05 adds presenter
+and TMP adapter checks. Full editor
 validation remains an open gate before calling the scene verified.
 
 ## Unity NUnit compatibility correction

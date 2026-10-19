@@ -1,0 +1,143 @@
+# Presentation effects: milestone 05
+
+This branch starts from main's milestone 01, independently of 02, 03 and 04.
+It retains Screen Space - Overlay uGUI/TMP. No camera, URP, shader, post-processing,
+runtime generation service, or new package is needed. A later save adapter must
+restore completed text without advancing any gameplay stream; saving is not here.
+
+## Display and input contract
+
+`GamePresenter` supplies scoped requests to `IGameView`. The view queues only new
+transcript observations. Each started line creates one `DisplayPlayback` transaction:
+parsed text, profile, settings, sequence ID, and completion callback. `Tick` samples
+portable channels and reveals complete text elements using cached boundaries.
+
+The callback fires exactly once as Completed, Skipped, or Cancelled. It is cleared
+before invocation, including under reentrant skip/cancel. Rules already completed
+the command; effects never call rules, consume RNG, or determine outcomes.
+`IGameView.IsDisplaying` blocks the next player command in the presenter as well
+as disabling choice buttons. Skip reveals the whole queued batch and restores
+all owned output. New run cancels the active line and discards unstarted lines;
+unstarted lines never acquired a display acknowledgement. Disable resets display.
+
+The renderer builds strings, parses markup and caches mesh buffers at line/layout
+boundaries. Steady `Tick`, `Apply`, and channel evaluation use bounded loops and
+reused data. TMP layout/font atlas rebuilds and first-capacity growth are separate
+allocation boundaries. A headless allocation test covers the portable clock;
+Unity profiler validation after warm-up remains required.
+
+## Minimal palettes and controls
+
+Day is soft white on near-black. Night is near-black on warm soft white. Setup
+uses day. The palette changes at the visible NightFalls/DawnBreaks observation,
+not from hidden night decisions. Panels and buttons share the phase background;
+focus uses `>` and follows keyboard selection into the scroll viewport.
+
+The footer offers Skip [Space], Effects on/off, Motion reduced/full, Flash off/on,
+Text animated/instant, and Intensity 0/50/100%. Changes finish the pending batch
+before applying the next display policy. Settings survive New run in the current
+application session, with no disk persistence. Defaults are 50% intensity,
+reduced motion, flashes off, and 60 text elements/second.
+
+Reduced motion suppresses shake and flash; gentle alpha cues remain. Effects off
+reveals text immediately, disables semantic accents, and clears every channel.
+Instant text preserves independent cue timing. Color never supplies missing
+game facts: accusations, votes, deaths and outcomes retain their actual words.
+There is no automatic camera shake or constant ambient noise.
+
+Flash is a single smooth low-opacity tint rather than a strobe. Profiles reject
+multiple flash tracks and flash durations under one second. Output is capped at
+8% opacity at full intensity, with a two-second start cooldown across lines.
+Reduced motion suppresses it even if the flash preference is enabled. Phase
+palette inversion is separate from the optional flash channel.
+
+## Semantic markup cheat sheet
+
+| Syntax | Presentation | Suggested use |
+| --- | --- | --- |
+| `<emphasis>text</emphasis>` | Stronger neutral ink | A decisive phrase, last words |
+| `<fear>text</fear>` | Muted violet accent | Fear or uncertainty |
+| `<calm>text</calm>` | Muted green accent | Defense or reassurance |
+| `<evidence>text</evidence>` | Muted blue accent | An asserted finding; never proof of truth |
+| `<danger>text</danger>` | Muted red accent | An accusation or warning |
+| `<<` | Literal `<` | Comparisons or literal tag examples |
+
+Tags are case-sensitive, properly nested, and limited to eight levels. The inner
+style wins. One source line allows 32768 UTF-16 units. Unknown tags, attributes,
+unmatched tags, raw TMP tags and sprite/material injection are rejected. Rules
+still select opaque text; only presentation parses it. Runtime displays malformed
+text literally with TMP rich text disabled. Tools > SocialStim > Validate Starter
+Content rejects invalid authored markup. Five existing PLACEHOLDER lines demonstrate
+the supported syntax; the owner remains responsible for final dialogue.
+
+| Speech intent | Recommended emphasis |
+| --- | --- |
+| Accuse / CallForTrial / Deflect | A short danger phrase |
+| Defend / Vouch / Agree | Calm, or neutral text |
+| ClaimRole / ReportInvestigation | Evidence on the assertion, regardless of truth |
+| Disagree / VoteJustification | Emphasis on the reason |
+| ExpressFear / ReactToDeath | Fear used sparingly |
+| ReactToRoleReveal / LastWords | Evidence or emphasis |
+| StaySilent | Neutral |
+
+## Cue vocabulary
+
+`VisibleCueResolver` reads only player snapshots, public assertions and scoped
+observations. Added rule metadata is factual: delivered intent, asserted role,
+public nominee, death subject and trial defendant. It never contains a pending
+hostile target, an unrevealed role, or an NPC's private belief model. Observation
+enum values were appended to preserve the existing numeric meanings.
+
+| Visible event | Cue / default treatment |
+| --- | --- |
+| Dawn / dusk | Dawn / Dusk; gentle border, phase palette inversion |
+| Accusation / nomination | Accusation / Nomination; tense / gentle border |
+| Trial / defense | Trial / Defense; tense / gentle emphasis |
+| Guilty / innocent | Guilty / Innocent; decisive / gentle cue |
+| Execution / public death / reveal | Execution / Death / Reveal |
+| Private blocked / investigation report | Blocked / Investigation |
+| Survived an attack | NarrowEscape; tense cue only after the legitimate report |
+| Failed strict majority | Tie; same initial no-majority meaning as the rules cue |
+| Victory / defeat / draw | Victory / Defeat / Draw |
+| Player death | PlayerKilled takes precedence over generic death |
+| Player put on trial | NearExposure; public pressure, not secret exposure estimates |
+| Known teammate dies | TeammateLost takes precedence over generic death |
+| Speaker switches a claimed role | ContradictedClaim; assertion history only |
+| Last protection charge used | ResourcesDepleted; own legitimate result and resource count |
+| Public death leaves three participants | FinalThree, unless player/teammate death takes precedence |
+
+Ordinary PhaseChanged observations and generic speech have no screen pulse.
+There is no continuous tension score, hidden-target warning, or producer for
+future role mechanics. Profiles may map these semantic meanings differently.
+
+## Profile authoring and conflicts
+
+`StarterEffects.asset` is assigned to Game.unity. It contains a sample Dusk override;
+unlisted cues use `DefaultCueProfiles`. Create another profile set with Assets >
+Create > SocialStim > Cue Profiles and assign it to GameBootstrap. Definitions
+are copied and validated at startup, not consulted per frame. Duplicate cues,
+invalid tracks, more than 64 tracks, and unsupported flash patterns are rejected.
+
+Each track specifies channel, delay, duration, amount, priority, blend and envelope.
+Channels are independent TextShake, Border, Vignette and Flash. Sine, Triangle
+and Smooth envelopes begin/end at zero. Authoring delays allow overlap or sequence;
+the portable builder offers Parallel followed by Then for explicit composition.
+
+Replacement tracks choose the highest priority; equal priority chooses the later
+authored track. All additive tracks then sum over the winning replacement, with
+the final channel clamped to [0,1]. Different observations play sequentially.
+Skip/cancel clears every channel and restores the current text's baseline vertices.
+Semantic text color is a cached style channel, not a source of facts. All screen
+geometry ignores raycasts and uses the existing UI material.
+
+## Editor preview and remaining gates
+
+Tools > SocialStim > Effects Playground previews default profiles and the portable
+clock, day/night palettes, intensity, reduced motion, flash opt-in, text reveal,
+skip and cancel. It parses the same markup and reports acknowledgements. It does
+not modify a scene. This IMGUI preview approximates screen geometry; actual TMP
+glyph styling, profile asset overrides and layout require Play Mode.
+
+Follow [EFFECTS_VERIFICATION.md](EFFECTS_VERIFICATION.md). Headless compilation and
+tests establish portable behavior, not Unity import, adapter compilation, actual
+screen appearance, font resources, navigation, builds, or runtime allocation results.

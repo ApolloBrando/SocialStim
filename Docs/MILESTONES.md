@@ -1,6 +1,7 @@
 # Milestones
 
-Implement and review one milestone at a time. Milestone 00 contains no gameplay.
+Keep each milestone in its own branch and review scope. The owner explicitly
+authorized 02 and then 05 in parallel with main testing, deferring 03/04. Milestone 00 contains no gameplay.
 Each PR, or specifically confirmed direct publication to `main`, updates README
 and ARCHITECTURE, lists actual checks and unavailable checks, and contains only
 its milestone's scope. Do not merge automatically.
@@ -58,7 +59,8 @@ catalog. Its initial role-list constraints are code, with general setup assets
 deferred to milestone 03. Import TMP essential resources through Unity;
 preserve its generated metadata and font licensing. Route every displayed line
 through the text presenter. No typewriter, animated text, flash, shader, or
-post-processing work belongs in this slice.
+post-processing work belongs in milestone 01; the independent 05 branch adds
+presentation on top of that stable loop.
 
 ## Effects milestone prerequisites
 
@@ -81,3 +83,20 @@ text/symbols must retain every distinction otherwise shown by color. Add unit
 tests for markup validation, sequence/parallel timing, blending, cancellation,
 and exactly-once acknowledgement. Add an editor-only playground with intensity
 controls. Full effect expansion is subsequent work within the same reviewed scope.
+
+## Milestone 05 implementation
+
+Branch `milestone/05-presentation-effects` starts at main's merged milestone 01.
+It does not include the unmerged social reasoning branch or require advanced roles
+or saving. The current Screen Space - Overlay uGUI/TMP setup is retained, with
+white-on-black day and black-on-white night palettes as requested by the owner.
+
+Implemented: strict semantic parser, grapheme typewriter, cached vertex color/shake,
+overlay border/vignette and limited flash, inspector cue overrides, portable
+sequence/parallel profiles, easing, conflict resolution, skip/cancel acknowledgement,
+accessibility controls, input gating, keyboard scroll-follow, and editor playground.
+
+The latest code CI passed 61 tests with zero failures/skips, including the 100
+seeded runs. Final checks are recorded in `Docs/VALIDATION.md`. Unity adapter compilation, real preview, renderer
+behavior, and steady-update allocation profiling remain explicitly pending in
+`Docs/EFFECTS_VERIFICATION.md`. No main write or merge is authorized by this branch.

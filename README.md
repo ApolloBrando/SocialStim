@@ -10,6 +10,15 @@ A work in progress for sure
 Milestone 01 adds a complete participant-loop candidate: seven seeded characters,
 five roles, discussion and deceptive claims, nomination, defense, judgement,
 execution, night targeting, scoped results, and outcomes. All dialogue is marked
+PLACEHOLDER. This independent milestone 05 branch adds presentation effects on
+top of main; milestone 02 remains a separate PR, and 03/04 are deferred.
+
+Day uses soft white text on near-black; night uses near-black on soft white.
+The UI stays minimal so semantic emphasis and occasional effects stand out.
+Typewriter, semantic accents, text shake, border/vignette, and a limited flash
+are controlled by cue profiles. Reduced motion is enabled and flashes disabled
+by default. The footer provides skip, effects, motion, flash, text and intensity
+controls. Settings last for the current application session.
 PLACEHOLDER. Milestone 02 adds attributed evidence, trust, constrained role/faction
 estimates, public self-exposure, consistent bluffs, team planning, and conditional
 dialogue. Save/resume, advanced roles, and effects remain later work.
@@ -28,7 +37,8 @@ Milestone 02 is being developed in parallel while the owner verifies milestone
 4. Run **Tools > SocialStim > Validate Starter Content**, then
    **Tools > SocialStim > Open Game Scene** and press Play.
 5. Choose Random role or a role button. Scroll each panel independently; arrow
-   keys/Enter navigate buttons and a `>` marker shows keyboard focus.
+   keys/Enter navigate buttons, keep focused choices visible, and a `>` marker
+   shows focus. Space or Skip reveals the pending batch; choices unlock afterward.
 
 `Assets/_Project/Scenes/Game.unity` already references `StarterCatalog.asset`.
 It builds the Canvas, transcript, choices and Input System EventSystem at startup.
@@ -36,6 +46,9 @@ No manual catalog/component wiring is needed. Missing input mode or font resourc
 are reported in the Console. Disable **Random Seed** on the scene's `SocialStim`
 object and set **Fixed Seed** (for example `147`) for reproducible play. Trial
 count, discussion rounds, and role reveal are also inspector options.
+`StarterEffects.asset` is assigned to the scene for inspector-authored overrides.
+Open **Tools > SocialStim > Effects Playground** to preview the portable timing
+and palette without playing a game. See [Docs/EFFECTS.md](Docs/EFFECTS.md).
 
 ## Roles
 
@@ -82,8 +95,9 @@ exception to the exclusion of Unity-generated IDE project files.
 
 **Unity import, adapter compilation, UI behavior, and player builds remain
 unverified.** Follow [Docs/UNITY_VERIFICATION.md](Docs/UNITY_VERIFICATION.md) before
-calling the scene verified. Commit the editor-generated package lock/settings on
-the feature branch after import. No runtime generative AI is used.
+calling the scene verified. Milestone 05 has a separate
+[effects verification gate](Docs/EFFECTS_VERIFICATION.md). Commit the
+editor-generated package lock/settings on the feature branch after import. No runtime generative AI is used.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md), [Docs/GAME_DESIGN.md](Docs/GAME_DESIGN.md),
 [Docs/DIALOGUE_AUTHORING.md](Docs/DIALOGUE_AUTHORING.md), and
@@ -93,3 +107,9 @@ confirmation of the concrete batch. No license has been selected.
 CI compiles the NUnit 3.5.0 API baseline and runs shared tests with NUnit 3.14.0. Collection
 membership assertions use the older-compatible Has.No.Member API. This remains
 separate from Unity compilation and editor execution.
+
+Milestones 02 and 05 share a single speech event per line, carrying public
+intent/target metadata after observer evidence is updated. Nomination ballots
+are chosen before publication and enter public evidence; deaths also enter
+evidence when role reveal is disabled. Integration regression tests cover all
+three contracts.

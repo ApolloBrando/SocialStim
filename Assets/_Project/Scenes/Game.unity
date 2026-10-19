@@ -46,6 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   _catalog: {fileID: 11400000, guid: e19f2061d4135644a259a752d1dac0ed, type: 2}
   _font: {fileID: 0}
+  _effects: {fileID: 11400000, guid: 3e9d4d8194de552c86284783258e3f26, type: 2}
   _randomSeed: 1
   _fixedSeed: 147
   _trialsPerDay: 2

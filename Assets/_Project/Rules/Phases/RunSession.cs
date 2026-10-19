@@ -159,7 +159,7 @@ namespace SocialStim.Rules.Phases
                 _phases.Phase, speech.Target, _beliefs[actor.Id].Evidence, _beliefs[actor.Id].Exposure);
             DialogueSelection line = _dialogue.Select(speech.Intent, context);
             foreach (Participant observer in _cast) _beliefs[observer.Id].Observe(actor.Id, speech, _phases.Day);
-            Emit(GameCue.SpeechDelivered, $"{actor.Name}: {line.Text}", actor.Id, line.Metadata);
+            Emit(GameCue.SpeechDelivered, $"{actor.Name}: {line.Text}", actor.Id, line.Metadata, speech.Target, speech.Intent, speech.ClaimedRole);
         }
 
         private void Nominate(GameCommand command)
@@ -173,10 +173,11 @@ namespace SocialStim.Rules.Phases
                 votes.Add(vote);
                 ballots.Add(new KeyValuePair<CharacterId, CharacterId?>(actor.Id, vote));
             }
-            foreach (var ballot in ballots)
+            // Choose all ballots before publishing any, so later voters cannot see this round's earlier votes.
+            foreach (KeyValuePair<CharacterId, CharacterId?> ballot in ballots)
             {
                 foreach (Participant observer in _cast) _beliefs[observer.Id].ObserveNomination(ballot.Key, ballot.Value, _phases.Day);
-                Emit(GameCue.PhaseChanged, $"{Actor(ballot.Key).Name} nominates {(ballot.Value.HasValue ? Actor(ballot.Value.Value).Name : "nobody")}.");
+                Emit(GameCue.NominationMade, $"{Actor(ballot.Key).Name} nominates {(ballot.Value.HasValue ? Actor(ballot.Value.Value).Name : "nobody")}.", ballot.Key, target: ballot.Value);
             }
             _defendant = VoteResolver.Nominee(votes, Living().Count());
             if (!_defendant.HasValue)
@@ -272,10 +273,10 @@ namespace SocialStim.Rules.Phases
             {
                 case ReportKind.Investigation:
                     Emit(GameCue.InvestigationResultReceived, $"PRIVATE: {Actor(report.Target.Value).Name} appeared {report.Alignment} to your investigation."); break;
-                case ReportKind.Blocked: Emit(GameCue.PhaseChanged, "PRIVATE: Your night ability was blocked. The visitor is unknown."); break;
+                case ReportKind.Blocked: Emit(GameCue.AbilityBlocked, "PRIVATE: Your night ability was blocked. The visitor is unknown."); break;
                 case ReportKind.Targeted: Emit(GameCue.PlayerTargetedAtNight, "PRIVATE: You were attacked and survived. The attacker is unknown."); break;
                 case ReportKind.AttackFailed: Emit(GameCue.PhaseChanged, $"PRIVATE: Your attack on {Actor(report.Target.Value).Name} failed."); break;
-                case ReportKind.ProtectionApplied: Emit(GameCue.PhaseChanged, $"PRIVATE: You applied protection to {Actor(report.Target.Value).Name}. This does not prove an attack occurred."); break;
+                case ReportKind.ProtectionApplied: Emit(GameCue.ProtectionApplied, $"PRIVATE: You applied protection to {Actor(report.Target.Value).Name}. This does not prove an attack occurred."); break;
             }
         }
 
@@ -283,7 +284,7 @@ namespace SocialStim.Rules.Phases
         {
             actor.Alive = false;
             foreach (Participant observer in _cast) _beliefs[observer.Id].ObserveDeath(actor.Id, _phases.Day);
-            Emit(execution ? GameCue.ExecutionCarriedOut : GameCue.DeathReported, execution ? $"{actor.Name} was executed." : $"{actor.Name} died during the night.");
+            Emit(execution ? GameCue.ExecutionCarriedOut : GameCue.DeathReported, execution ? $"{actor.Name} was executed." : $"{actor.Name} died during the night.", target: actor.Id);
             if (_options.RevealOnDeath)
             {
                 _revealed[actor.Id] = actor.Role;
@@ -325,12 +326,13 @@ namespace SocialStim.Rules.Phases
             GameCue cue = phase == GamePhase.NightSelection ? GameCue.NightFalls : phase == GamePhase.Dawn ? GameCue.DawnBreaks
                 : phase == GamePhase.Defense ? GameCue.TrialStarted : GameCue.PhaseChanged;
             Emit(cue, phase == GamePhase.Defense ? $"Trial {_trials}/{_options.TrialsPerDay}: {Actor(_defendant.Value).Name} may defend."
-                : $"Day {_phases.Day}: {phase}.");
+                : $"Day {_phases.Day}: {phase}.", target: phase == GamePhase.Defense ? _defendant : null);
         }
 
-        private void Emit(GameCue cue, string text, CharacterId? speaker = null, DialogueMetadata metadata = null)
+        private void Emit(GameCue cue, string text, CharacterId? speaker = null, DialogueMetadata metadata = null,
+            CharacterId? target = null, SpeechIntent? intent = null, RoleId? claimedRole = null)
         {
-            var observation = new GameObservation(_transcript.Count, _phases.Day, cue, text, speaker, metadata);
+            var observation = new GameObservation(_transcript.Count, _phases.Day, cue, text, speaker, metadata, target, intent, claimedRole);
             _transcript.Add(observation); Observation?.Invoke(observation);
         }
     }

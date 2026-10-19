@@ -144,8 +144,12 @@ Every engineering starter line visibly begins `PLACEHOLDER:`. Replacing these
 with final dialogue is owner-authored content work; a final-content build gate
 forbidding leftover placeholders is deferred. Selection does not parse markup.
 
-## Future semantic markup
+## Presentation boundary
 
+Milestone 00/01 treated all markup as opaque text. The independent milestone 05
+branch adds the exact supported syntax below. Planning names such as shout,
+whisper and accuse are not supported tags. Rules keep text opaque; rendering
+syntax never modifies intent or evidence.
 No custom markup parser or text effects ship in milestone 00/01/02. Milestone 05
 will define a cheat sheet for semantic tags such as `fear`, `shout`, `whisper`,
 and `accuse`, mapped to style assets. The presentation importer validates unknown
@@ -155,3 +159,12 @@ opaque. Reserved tags are planning names, not currently supported syntax.
 All key information must remain readable with effects, motion, flashes, and
 color distinctions disabled. Effect profiles must never change a line's factual
 meaning or reveal a secret through style selection.
+
+## Milestone 05 semantic markup
+
+On the independent 05 branch, presentation parses `<emphasis>`, `<fear>`, `<calm>`,
+`<evidence>`, and `<danger>` with matching closing tags. Use `<<` for a literal
+less-than sign. Raw TMP/HTML tags are rejected. Rules and dialogue selection
+continue treating the text as opaque; markup never changes evidence or intent.
+The editor content validator checks syntax, and runtime has a literal fallback
+for malformed display text. See `Docs/EFFECTS.md` for the complete cheat sheet.

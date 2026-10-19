@@ -14,8 +14,10 @@
   <ItemGroup>
     <Compile Include="../../Assets/_Project/Rules/**/*.cs" />
     <Compile Include="../../Assets/_Project/Application/**/*.cs" />
+    <Compile Include="../../Assets/_Project/Presentation/Text/GamePresenter.cs" />
     <Compile Include="../../Assets/_Project/Data/Dialogue/*.cs" />
     <Compile Include="../../Assets/_Project/Tests/EditMode/*.cs" />
+    <Compile Include="../../Assets/_Project/Tests/PlayMode/PresenterDisplayTests.cs" />
     <None Include="../../Assets/_Project/Data/Dialogue/StarterDialogue.json" Link="StarterDialogue.json" CopyToOutputDirectory="PreserveNewest" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageReference Include="NUnit" Version="$(NUnitVersion)" />
