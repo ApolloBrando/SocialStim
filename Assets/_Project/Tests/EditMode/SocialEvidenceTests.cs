@@ -76,6 +76,18 @@ namespace SocialStim.Tests.EditMode
             Assert.That(model.Roles(target).Single(r => r.Role.Value == "physician").BasisPoints, Is.EqualTo(10000));
         }
 
+        /// <summary>Publicly revealed alignment changes the credibility of earlier judgement stances.</summary>
+        [Test]
+        public void RevealReevaluatesEarlierVoters()
+        {
+            BeliefState model = Model(); var voter = new CharacterId(1); var target = new CharacterId(3);
+            model.ObserveVote(voter, target, Verdict.Guilty, 2);
+            int before = model.Trust(voter);
+            model.Reveal(target, TestContent.Roles()[1], 2);
+            Assert.That(model.Trust(voter), Is.LessThan(before));
+            Assert.That(model.Evidence.Any(e => e.Kind == EvidenceKind.Judgement && e.Actor == voter), Is.True);
+        }
+
         /// <summary>Secret death alignment cannot change the public initial-count model.</summary>
         [Test]
         public void UnrevealedDeathDoesNotRecomputeSecretFactionCounts()

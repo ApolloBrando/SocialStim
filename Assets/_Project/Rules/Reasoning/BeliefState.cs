@@ -119,6 +119,15 @@ namespace SocialStim.Rules.Reasoning
                 Change(accusation.Actor, role.Faction == Faction.Antagonist ? -8 : 4);
                 TrustChange(accusation.Actor, role.Faction == Faction.Antagonist ? 8 : -4);
             }
+            foreach (EvidenceRecord ballot in _evidence.Where(e => e.Kind == EvidenceKind.Judgement && e.Target == target))
+            {
+                if (ballot.Verdict == Verdict.Abstain) continue;
+                bool supportedExecution = ballot.Verdict == Verdict.Guilty;
+                int credibility = role.Faction == Faction.Antagonist ? (supportedExecution ? 8 : -4) : (supportedExecution ? -3 : 2);
+                TrustChange(ballot.Actor, credibility);
+                Change(ballot.Actor, -credibility / 2);
+                if (ballot.Actor == _self && credibility < 0) Expose(-credibility);
+            }
         }
 
         internal void ObserveNomination(CharacterId voter, CharacterId? target, int day)
