@@ -1,6 +1,8 @@
 # Initial game design
 
-Status: planned behavior; milestone 00 contains no implementation.
+Status: the initial five-role loop is implemented in milestone 01 and covered by
+headless tests; Unity presentation verification remains pending. The advanced
+starter catalog roles are planned milestone 03 work.
 
 ## Run defaults
 
@@ -107,7 +109,9 @@ because it has no independent Town/Neutral killing ability.
 Survivor's personal objective is to be alive when the run ends, regardless of
 which major faction wins. Provocateur records a personal achievement only when
 executed by judgement; it does not automatically end the remaining factions'
-run. Lone Killer seeks elimination of competing lethal factions. Exact policies
+run. Lone Killer seeks elimination of competing lethal factions. The initial
+loop has a configurable maximum of 30 days, ending unresolved runs as draws.
+Advanced stalemate and capability policies remain deferred. Exact policies
 for joint outcomes, all-dead draws, stalled combat, turn caps, and protection
 loops must be settled and tested before these advanced roles ship.
 
