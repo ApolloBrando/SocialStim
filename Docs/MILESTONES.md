@@ -24,17 +24,24 @@ C# code compiled and 33 tests passed in its first GitHub Actions run, including
 100 seeded runs across Town and antagonist player roles. Subsequent test/schema
 updates are recorded in `Docs/VALIDATION.md` and the PR checks.
 
-The next required external gate is Unity import and real scene play, using
-`Docs/UNITY_VERIFICATION.md`. Complete this before moving to milestone 02 or
-claiming a verified Unity build. No Unity editor/license is available in the
-creation environment; headless tests cannot check TMP resources or uGUI input.
+Milestone 01 is merged into `main`; its final headless suite passed 36 tests.
+The owner authorized milestone 02 on a separate branch while verifying 01 in
+Unity. Milestone 02's evidence models, utility strategy, team planner, tuning
+asset, and conditional dialogue are implemented with dedicated scenarios.
+Its first headless CI run passed 58 tests, including the existing 100 seeded runs.
+
+Unity import and real scene play remain an external gate in
+`Docs/UNITY_VERIFICATION.md`. Parallel development does not mark that gate passed.
+No Unity editor/license is available here; headless tests cannot check TMP
+resources or uGUI input. No merge or main write is implied by milestone 02 work.
 
 - Run `python3 Tools/validate_scaffold.py`.
 - Review `.asmdef` dependencies and metadata pairs.
 - Check `git diff --check` and ignored Unity/IDE/credential files.
 - Open with Unity 6000.3.26f1, resolve packages, commit generated lock/settings,
   and record editor import results when an editor is available.
-- Expect no playable scene and no discovered gameplay tests yet.
+- That historical milestone 00 check had no scene/tests; subsequent milestones
+  now contain a scene and behavioral suite, with editor verification pending.
 
 ## Milestone 01 vertical slice
 

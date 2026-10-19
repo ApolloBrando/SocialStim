@@ -1,9 +1,9 @@
 # Dialogue authoring specification
 
-Status: milestone 01 implements the version 1 format below with 45 explicitly
-marked placeholder lines. There is a runtime loader, schema validator and editor
+Status: milestone 02 supports version 2 below with 51 explicitly
+marked placeholder lines. Version 1 still loads without conditions. There is a runtime loader, schema validator and editor
 validation command. All final lines are written by the project owner; no runtime
-generative AI is permitted. Richer condition expressions remain milestone 02 work.
+generative AI is permitted. Conditions are registered data predicates, never code.
 
 ## Format
 
@@ -24,27 +24,32 @@ Each file has a `schemaVersion` and `lines` array. Each line has:
 | `weight` | Positive integer selection weight |
 | `requiredTrait` | Optional speaker flag or comma-separated flags; all are required |
 | `speakerRole` | Optional speaker's own known role ID for eligibility |
+| `conditions` | Optional version 2 array of AND-combined registered predicates |
 | `metadata` | Optional emotion/expression, portrait and audio keys; text UI ignores them |
 
-Version 1 supports only the two optional eligibility fields above. Missing
+Version 1 supports only the two original optional eligibility fields above. Missing
 `requiredTrait` means no trait restriction; missing `speakerRole` means any role.
-Unknown and duplicate JSON properties are rejected, including the planned
-`conditions` and `variables` arrays. Do not add unsupported conditions and expect
-them to take effect. Intent, target and assertion validity are checked by the
-session before selecting text. No target's hidden role enters line selection.
+Unknown and duplicate JSON properties are rejected. A `conditions` array requires
+`schemaVersion: 2`; `variables` arrays remain unsupported because substitutions
+are validated directly in text. Intent, target and assertion validity are checked
+before selection. No target's hidden role enters the context.
 
 This is the implemented format. A complete document also needs an unrestricted
 fallback for every intent; copy the starter document before adding variants:
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "lines": [
     {
       "id": "placeholder.accuse.direct.001",
       "intent": "accuse",
       "text": "PLACEHOLDER: {target}, explain your vote.",
       "weight": 1,
+      "conditions": [
+        { "kind": "phase", "value": "Discussion" },
+        { "kind": "hasTarget", "flag": true }
+      ],
       "metadata": { "emotionKey": "suspicious" }
     }
   ]
@@ -57,6 +62,38 @@ true secret role. Other contexts expose explicit values only when allowed.
 The current text view has rich text disabled. Future markup views must escape
 substitutions before interpreting styles. No reflected
 property access or arbitrary string-to-code evaluation is permitted.
+
+## Version 2 conditions
+
+Each condition has `kind` and only the parameter shown below. Predicates use
+speaker-authorized context before the current statement is published. Thus a
+line cannot qualify for `targetAccused` merely by delivering its own accusation.
+
+| Kind | Parameter | Meaning |
+| --- | --- | --- |
+| `phase` | `value`: phase name | Current public phase; must be reachable for this intent |
+| `minimumDay` | `number`: integer >= 1 | Inclusive lower day bound |
+| `maximumDay` | `number`: integer >= 1 | Inclusive upper day bound |
+| `hasTarget` | `flag`: boolean | Matches whether the intent supplies a target |
+| `hasAssertion` | `flag`: boolean | Matches a role claim or asserted investigation result |
+| `speakerTrait` | `value`: trait flags | Requires all named speaker traits |
+| `speakerRole` | `value`: catalog role ID | Tests the speaker's own known role |
+| `observedDeath` | None | Speaker has observed a public death |
+| `observedRoleReveal` | None | Speaker has observed a public role reveal |
+| `targetAccused` | None | Target was previously accused/called for trial/deflected toward |
+| `targetHasClaim` | None | Target has publicly claimed a role |
+| `speakerUnderPressure` | `number`: 0-100 | Speaker's estimate of visible pressure reaches the threshold |
+
+Phase/trait/kind names parse without case sensitivity; role IDs are case-sensitive.
+Day bounds are inclusive. Investigation reports cannot occur before Day 2.
+Accusations and other discussion intents cannot select a NightSelection line;
+defense supports Defend/ClaimRole, and LastWords supports its own intent.
+
+Impossible day bounds, phase/intent combinations, presence requirements and
+conflicting own-role predicates fail at import with the line ID. Unknown kinds,
+wrong parameter types, unsupported versions, and unknown catalog role references
+also fail. Keep an unrestricted fallback for **every** intent: no trait, own-role,
+or condition restrictions. A conditional-only intent pool is invalid.
 
 ## Writing by intent
 
@@ -74,8 +111,8 @@ line. Fallback selection must not invent facts or reveal hidden information.
 | `vouch` | Qualified confidence; 1 sentence | Target and stated basis if mentioned | 6-8 |
 | `callForTrial` | Decisive; 1-2 sentences | Eligible target | 8-12 |
 | `voteJustification` | Brief explanation; 1 sentence | Vote, target, known or alleged basis | 6-8 |
-| `agree` | Supportive without adding facts; 1 sentence | Referenced statement | 6-8 |
-| `disagree` | Skeptical without hidden proof; 1 sentence | Referenced statement | 6-8 |
+| `agree` | Supportive without adding facts; 1 sentence | Public target being supported | 6-8 |
+| `disagree` | Skeptical without hidden proof; 1 sentence | Public target being challenged | 6-8 |
 | `deflect` | Evasive or counteraccusing; 1-2 sentences | Current accusation, optional counter-target | 8-12 |
 | `staySilent` | Short authored silence indication | Speaker's deliberate silence intent | 5-8 |
 | `expressFear` | Restrained or alarmed; 1-2 sentences | Public danger context | 5-8 |
@@ -113,6 +150,11 @@ Milestone 00/01 treated all markup as opaque text. The independent milestone 05
 branch adds the exact supported syntax below. Planning names such as shout,
 whisper and accuse are not supported tags. Rules keep text opaque; rendering
 syntax never modifies intent or evidence.
+No custom markup parser or text effects ship in milestone 00/01/02. Milestone 05
+will define a cheat sheet for semantic tags such as `fear`, `shout`, `whisper`,
+and `accuse`, mapped to style assets. The presentation importer validates unknown
+tags, nesting, closure, and parameters with line identifiers. Rules keep text
+opaque. Reserved tags are planning names, not currently supported syntax.
 
 All key information must remain readable with effects, motion, flashes, and
 color distinctions disabled. Effect profiles must never change a line's factual

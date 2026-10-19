@@ -23,6 +23,7 @@ namespace SocialStim.Editor
             foreach (var line in dialogue) SemanticMarkup.Parse(line.Text);
             int lines = dialogue.Count;
             int names = catalog.LoadNames().Count;
+            catalog.LoadReasoning();
             Debug.Log($"SocialStim content valid: {roles} roles, {lines} placeholder lines, {names} names.");
 #endif
         }

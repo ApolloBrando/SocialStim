@@ -30,8 +30,8 @@ namespace SocialStim.Data.Dialogue
             }
             catch (SerializationException exception)
             { throw new ArgumentException("Malformed dialogue JSON or missing required fields.", exception); }
-            if (document == null || document._schemaVersion != 1 || document._lines == null)
-                throw new ArgumentException("Dialogue schemaVersion must be 1 and lines must be an array.");
+            if (document == null || (document._schemaVersion != 1 && document._schemaVersion != 2) || document._lines == null)
+                throw new ArgumentException("Dialogue schemaVersion must be 1 or 2 and lines must be an array.");
             var lines = document._lines.Select(row => row?.ToLine() ?? throw new ArgumentException("Null dialogue row.")).ToList().AsReadOnly();
             _ = new DialogueSelector(lines, new SeededRandom(1));
             return lines;

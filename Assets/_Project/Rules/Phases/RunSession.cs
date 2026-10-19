@@ -33,19 +33,26 @@ namespace SocialStim.Rules.Phases
         private int _revision;
         private CharacterId? _defendant;
         private OutcomeKind _outcome;
+        private TeamNightPlan _lastTeamPlan;
 
         internal RunSession(RunOptions options, List<Participant> cast, IReadOnlyList<RoleSpec> catalog,
-            IEnumerable<DialogueLine> dialogue, INpcStrategy strategy, IWinCondition winCondition)
+            IEnumerable<DialogueLine> dialogue, INpcStrategy strategy, IWinCondition winCondition, ReasoningSettings reasoning)
         {
             _options = options; _cast = cast; _catalog = catalog; _strategy = strategy; _winCondition = winCondition;
             _decisions = new SeededRandom(options.Seed ^ 0xA341316Cu);
             _dialogue = new DialogueSelector(dialogue, new SeededRandom(options.Seed ^ 0xC8013EA4u));
+            // The role list discloses these initial totals; hidden deaths never recalculate them.
+            var setup = new SetupKnowledge(cast.Count(c => c.Role.Faction == Faction.Town), cast.Count(c => c.Role.Faction == Faction.Antagonist), cast.Count(c => c.Role.Faction == Faction.Neutral));
             foreach (Participant actor in _cast)
             {
-                _beliefs.Add(actor.Id, new BeliefState(_cast.Select(c => c.Id), actor.Personality, _decisions));
+                var teammates = actor.Role.Faction == Faction.Antagonist
+                    ? _cast.Where(c => c.Id != actor.Id && c.Role.Faction == Faction.Antagonist).Select(c => c.Id) : Enumerable.Empty<CharacterId>();
+                _beliefs.Add(actor.Id, new BeliefState(_cast.Select(c => c.Id), actor.Personality, _decisions,
+                    actor.Id, actor.Role, setup, catalog, teammates, reasoning));
                 _results.Add(actor.Id, new List<NightReport>());
             }
             Emit(GameCue.PhaseChanged, $"Day 1. You are {Player.Name}, the {Player.Role.Name} ({Player.Role.Faction}). Seed: {options.Seed}.");
+            Emit(GameCue.PhaseChanged, $"Public setup: {setup.Town} Town, {setup.Antagonist} Antagonist, {setup.Neutral} Neutral. These are initial counts, not surviving secret alignments.");
         }
 
         /// <summary>Only public/player-private observations are ever emitted on this event.</summary>
@@ -127,14 +134,15 @@ namespace SocialStim.Rules.Phases
             if (command.Kind != CommandKind.Speak || !Enum.IsDefined(typeof(SpeechIntent), command.Intent)) return false;
             if (command.ClaimedRole.HasValue != (command.Intent == SpeechIntent.ClaimRole)
                 || command.ReportedFaction.HasValue != (command.Intent == SpeechIntent.ReportInvestigation)) return false;
-            bool needsTarget = command.Intent == SpeechIntent.Accuse || command.Intent == SpeechIntent.Vouch || command.Intent == SpeechIntent.CallForTrial
-                || command.Intent == SpeechIntent.Deflect || command.Intent == SpeechIntent.ReportInvestigation;
+            bool needsTarget = SpeechContract.RequiresTarget(command.Intent);
             if (needsTarget != command.Target.HasValue) return false;
             if (needsTarget && (!command.Target.HasValue || !Living().Any(c => c.Id == command.Target && c.Id != actor.Id))) return false;
             if (command.Intent == SpeechIntent.ClaimRole && (!command.ClaimedRole.HasValue || !_catalog.Any(r => r.Id == command.ClaimedRole.Value))) return false;
             if (command.Intent == SpeechIntent.ReportInvestigation && (_phases.Day <= 1 || !command.ReportedFaction.HasValue
                 || !Enum.IsDefined(typeof(Faction), command.ReportedFaction.Value))) return false;
-            return command.Intent != SpeechIntent.LastWords && command.Intent != SpeechIntent.ReactToDeath && command.Intent != SpeechIntent.ReactToRoleReveal;
+            if (command.Intent == SpeechIntent.ReactToDeath && !_beliefs[actor.Id].Evidence.Any(e => e.Kind == EvidenceKind.Death)) return false;
+            if (command.Intent == SpeechIntent.ReactToRoleReveal && !_beliefs[actor.Id].Evidence.Any(e => e.Kind == EvidenceKind.RoleReveal)) return false;
+            return command.Intent != SpeechIntent.LastWords;
         }
 
         private void SayNpc(Participant actor)
@@ -145,17 +153,20 @@ namespace SocialStim.Rules.Phases
 
         private void Say(Participant actor, GameCommand speech)
         {
-            foreach (Participant observer in Living()) _beliefs[observer.Id].Observe(actor.Id, speech, _phases.Day);
             string claimed = speech.ClaimedRole.HasValue ? _catalog.First(r => r.Id == speech.ClaimedRole.Value).Name : "";
             var context = new DialogueContext(actor.Id, actor.Name, speech.Target.HasValue ? Actor(speech.Target.Value).Name : "",
-                claimed, speech.ReportedFaction?.ToString() ?? "", _phases.Day, actor.Role.Id, actor.Personality);
+                claimed, speech.ReportedFaction?.ToString() ?? "", _phases.Day, actor.Role.Id, actor.Personality,
+                _phases.Phase, speech.Target, _beliefs[actor.Id].Evidence, _beliefs[actor.Id].Exposure);
             DialogueSelection line = _dialogue.Select(speech.Intent, context);
             Emit(GameCue.SpeechDelivered, $"{actor.Name}: {line.Text}", actor.Id, line.Metadata, speech.Target, speech.Intent, speech.ClaimedRole);
+            foreach (Participant observer in _cast) _beliefs[observer.Id].Observe(actor.Id, speech, _phases.Day);
+            Emit(GameCue.SpeechDelivered, $"{actor.Name}: {line.Text}", actor.Id, line.Metadata);
         }
 
         private void Nominate(GameCommand command)
         {
             var votes = new List<CharacterId?>();
+            var ballots = new List<KeyValuePair<CharacterId, CharacterId?>>();
             foreach (Participant actor in Living())
             {
                 CharacterId? vote = actor.Id == Player.Id ? command.Target : _strategy.Nominate(Knowledge(actor), _decisions);
@@ -182,7 +193,7 @@ namespace SocialStim.Rules.Phases
             }
             foreach (KeyValuePair<CharacterId, Verdict> ballot in ballots)
             {
-                foreach (Participant observer in Living()) _beliefs[observer.Id].ObserveVote(ballot.Key, _defendant.Value, ballot.Value);
+                foreach (Participant observer in _cast) _beliefs[observer.Id].ObserveVote(ballot.Key, _defendant.Value, ballot.Value, _phases.Day);
                 Emit(GameCue.PhaseChanged, $"{Actor(ballot.Key).Name}: {ballot.Value}.");
             }
             if (VoteResolver.IsGuilty(ballots.Select(b => b.Value)))
@@ -218,11 +229,23 @@ namespace SocialStim.Rules.Phases
                 var order = new NightOrder(actor.Id, target);
                 orders.Add(NightLegality.IsLegal(actors.First(a => a.Id == actor.Id), order, actors) ? order : new NightOrder(actor.Id, null));
             }
-            // One shared faction kill; a living player killer owns the final team choice.
             var killers = orders.Where(o => Actor(o.Actor).Role.Faction == Faction.Antagonist && Actor(o.Actor).Role.Ability == AbilityKind.Attack)
-                .OrderBy(o => o.Actor == Player.Id ? -1 : o.Actor.Value).ToList();
-            foreach (NightOrder extra in killers.Skip(1))
-            { orders.Remove(extra); orders.Add(new NightOrder(extra.Actor, null)); }
+                .OrderBy(o => o.Actor.Value).ToList();
+            var proposals = killers.Select(order =>
+            {
+                KnowledgeView view = Knowledge(Actor(order.Actor));
+                KnownCharacter target = order.Target.HasValue ? view.Characters.First(c => c.Id == order.Target.Value) : null;
+                return new TeamProposal(order.Actor, order.Target, target == null ? 0 : SocialNpcStrategy.PublicThreat(view, target));
+            });
+            bool playerKiller = killers.Any(o => o.Actor == Player.Id);
+            _lastTeamPlan = new TeamNightPlanner().Plan(proposals, playerKiller ? Player.Id : (CharacterId?)null, playerKiller ? command.Target : null);
+            foreach (NightOrder killer in killers)
+            {
+                orders.Remove(killer);
+                orders.Add(new NightOrder(killer.Actor, _lastTeamPlan.Killer == killer.Actor ? _lastTeamPlan.Target : null));
+            }
+            if (Player.Alive && Player.Role.Faction == Faction.Antagonist && _lastTeamPlan != null)
+                Emit(GameCue.PhaseChanged, $"PRIVATE TEAM: {Actor(_lastTeamPlan.Killer).Name} will {( _lastTeamPlan.Target.HasValue ? "attack " + Actor(_lastTeamPlan.Target.Value).Name : "pass tonight")}.");
             Move(GamePhase.NightResolution);
             NightResolution resolution = _night.Resolve(actors, orders);
             foreach (CharacterId id in resolution.SpentCharges) Actor(id).Charges--;
@@ -259,7 +282,7 @@ namespace SocialStim.Rules.Phases
             if (_options.RevealOnDeath)
             {
                 _revealed[actor.Id] = actor.Role;
-                foreach (Participant observer in Living()) _beliefs[observer.Id].Reveal(actor.Id, actor.Role);
+                foreach (Participant observer in _cast) _beliefs[observer.Id].Reveal(actor.Id, actor.Role, _phases.Day);
                 Emit(GameCue.RoleRevealed, $"Revealed: {actor.Name} was {actor.Role.Name} ({actor.Role.Faction}).");
             }
             if (actor.Id == Player.Id) Emit(GameCue.PhaseChanged, "You are dead. Continue to spectate; you can no longer speak, vote, or target anyone.");
@@ -283,8 +306,10 @@ namespace SocialStim.Rules.Phases
             var characters = _cast.Select(c => new KnownCharacter(c.Id, c.Name, c.Alive, _beliefs[observer.Id].Suspicion(c.Id),
                 observer.Role.Faction == Faction.Antagonist && c.Role.Faction == Faction.Antagonist && c.Id != observer.Id,
                 _revealed.TryGetValue(c.Id, out RoleSpec revealed) ? revealed.Id : (RoleId?)null,
-                _revealed.TryGetValue(c.Id, out RoleSpec faction) ? faction.Faction : (Faction?)null, _beliefs[observer.Id].Claim(c.Id)));
-            return new KnowledgeView(observer.Id, observer.Role, observer.Personality, observer.Charges, _phases.Day, characters, _results[observer.Id]);
+                _revealed.TryGetValue(c.Id, out RoleSpec faction) ? faction.Faction : (Faction?)null, _beliefs[observer.Id].Claim(c.Id),
+                _beliefs[observer.Id].Trust(c.Id), _beliefs[observer.Id].Factions(c.Id), _beliefs[observer.Id].Roles(c.Id)));
+            return new KnowledgeView(observer.Id, observer.Role, observer.Personality, observer.Charges, _phases.Day,
+                characters, _results[observer.Id], _beliefs[observer.Id].Evidence, _beliefs[observer.Id].Exposure, _catalog, _lastTeamPlan);
         }
 
         private List<NightActor> LivingNightActors() => Living().Select(c => new NightActor(c.Id, c.Role, c.Charges)).ToList();

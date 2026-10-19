@@ -27,7 +27,7 @@ namespace SocialStim.Tests.EditMode
         [Test]
         public void InvalidDocumentsFailEarly()
         {
-            Assert.Throws<ArgumentException>(() => DialogueDocument.Parse(Document().Replace("\"schemaVersion\":1", "\"schemaVersion\":2")));
+            Assert.Throws<ArgumentException>(() => DialogueDocument.Parse(Document().Replace("\"schemaVersion\":1", "\"schemaVersion\":999")));
             Assert.Throws<ArgumentException>(() => DialogueDocument.Parse("{\"schemaVersion\":1}"));
             Assert.Throws<ArgumentException>(() => DialogueDocument.Parse(Document(",{\"id\":\"bad\",\"intent\":\"omniscience\",\"text\":\"x\",\"weight\":1}")));
             Assert.Throws<ArgumentException>(() => DialogueDocument.Parse(Document().Replace("\"schemaVersion\":1", "\"schemaVersion\":1,\"schemaVersion\":1")));
@@ -44,7 +44,7 @@ namespace SocialStim.Tests.EditMode
             string path = Path.Combine(TestContext.CurrentContext.TestDirectory, "StarterDialogue.json");
 #endif
             var lines = DialogueDocument.Parse(File.ReadAllText(path));
-            Assert.That(lines.Count, Is.EqualTo(45));
+            Assert.That(lines.Count, Is.EqualTo(51));
             Assert.That(lines.All(line => line.Text.StartsWith("PLACEHOLDER:", StringComparison.Ordinal)), Is.True);
         }
     }

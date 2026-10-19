@@ -4,6 +4,7 @@ using System.Linq;
 using SocialStim.Data.Dialogue;
 using SocialStim.Rules.Dialogue;
 using SocialStim.Rules.Roles;
+using SocialStim.Rules.Reasoning;
 using UnityEngine;
 
 namespace SocialStim.Data.Definitions
@@ -15,6 +16,7 @@ namespace SocialStim.Data.Definitions
         [SerializeField] private RoleDefinition[] _roles;
         [SerializeField] private TextAsset _dialogue;
         [SerializeField] private string[] _names;
+        [SerializeField] private ReasoningDefinition _reasoning;
 
         /// <summary>Loads detached role definitions, rejecting missing/duplicate assets.</summary>
         public IReadOnlyList<RoleSpec> LoadRoles()
@@ -32,8 +34,12 @@ namespace SocialStim.Data.Definitions
             var lines = DialogueDocument.Parse(_dialogue.text);
             var roles = LoadRoles();
             foreach (DialogueLine line in lines)
+            {
                 if (line.SpeakerRole.HasValue && !roles.Any(r => r.Id == line.SpeakerRole.Value))
                     throw new InvalidOperationException($"{line.Id}: unknown speaker role condition.");
+                foreach (DialogueCondition condition in line.Conditions.Where(c => c.Kind == DialogueConditionKind.SpeakerRole))
+                    if (!roles.Any(r => r.Id.Value == condition.Value)) throw new InvalidOperationException($"{line.Id}: unknown speaker role condition {condition.Value}.");
+            }
             return lines;
         }
 
@@ -45,5 +51,8 @@ namespace SocialStim.Data.Definitions
                 throw new InvalidOperationException("Catalog needs seven or more distinct nonempty names.");
             return _names.ToList().AsReadOnly();
         }
+
+        /// <summary>Loads optional tuning; older catalogs retain documented defaults.</summary>
+        public ReasoningSettings LoadReasoning() => _reasoning != null ? _reasoning.ToSettings() : new ReasoningSettings();
     }
 }

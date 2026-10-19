@@ -19,6 +19,12 @@ Typewriter, semantic accents, text shake, border/vignette, and a limited flash
 are controlled by cue profiles. Reduced motion is enabled and flashes disabled
 by default. The footer provides skip, effects, motion, flash, text and intensity
 controls. Settings last for the current application session.
+PLACEHOLDER. Milestone 02 adds attributed evidence, trust, constrained role/faction
+estimates, public self-exposure, consistent bluffs, team planning, and conditional
+dialogue. Save/resume, advanced roles, and effects remain later work.
+
+Milestone 02 is being developed in parallel while the owner verifies milestone
+01 in Unity. Editor verification is still pending.
 
 ## Run in Unity
 
@@ -55,10 +61,25 @@ and palette without playing a game. See [Docs/EFFECTS.md](Docs/EFFECTS.md).
 | Survivor | Neutral | Spend one of two self-protection charges, or pass |
 
 Everyone can accuse, defend, vouch, deflect, claim any role, nominate, and judge.
+Agreement/disagreement and calls for trial also affect public social evidence.
 From Day 2 everyone can report an alleged alignment, including lies. Choices
 explain their social meaning without showing NPC belief scores. Your own role
 and legitimate private results are visible; other living roles stay hidden.
 Death enters spectator mode. New run returns to setup and discards run state.
+
+## Social reasoning and authoring
+
+The default `SocialNpcStrategy` uses each observer's evidence, credibility,
+personality and visible pressure. `BasicNpcStrategy` remains injectable for
+comparison. Neither reads other participants' secret roles or private beliefs.
+Normalized estimates are heuristic beliefs, not calibrated probabilities, and
+remain out of the normal text UI.
+
+Tune `Assets/_Project/ScriptableObjects/Reasoning/DefaultReasoning.asset` and start
+a new run to apply changes. The catalog already references it; no extra scene
+wiring is required. Dialogue JSON version 2 supports declarative conditions and
+contains 51 PLACEHOLDER lines. Version 1 content still loads. See
+[Docs/SOCIAL_REASONING.md](Docs/SOCIAL_REASONING.md) for policies and checks.
 
 ## Verification
 

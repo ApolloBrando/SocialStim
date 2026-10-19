@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.Serialization;
+using System.Linq;
 using SocialStim.Rules.Cast;
 using SocialStim.Rules.Dialogue;
 using SocialStim.Rules.Roles;
@@ -16,6 +17,7 @@ namespace SocialStim.Data.Dialogue
         [DataMember(Name = "requiredTrait")] private string _requiredTrait = default;
         [DataMember(Name = "speakerRole")] private string _speakerRole = default;
         [DataMember(Name = "metadata")] private DialogueMetadataRecord _metadata = default;
+        [DataMember(Name = "conditions")] private DialogueConditionRecord[] _conditions = default;
 
         internal DialogueLine ToLine()
         {
@@ -25,8 +27,13 @@ namespace SocialStim.Data.Dialogue
             if (!string.IsNullOrEmpty(_requiredTrait) && (!Enum.TryParse(_requiredTrait, true, out trait)
                 || (trait & ~(Personality.Aggressive | Personality.Cautious | Personality.Gullible | Personality.Loyal | Personality.Deceptive)) != 0))
                 throw new ArgumentException($"{_id}: unknown speaker trait.");
-            return new DialogueLine(_id, intent, _text, _weight, trait,
-                string.IsNullOrWhiteSpace(_speakerRole) ? (RoleId?)null : new RoleId(_speakerRole), _metadata?.ToMetadata());
+            try
+            {
+                return new DialogueLine(_id, intent, _text, _weight, trait,
+                    string.IsNullOrWhiteSpace(_speakerRole) ? (RoleId?)null : new RoleId(_speakerRole), _metadata?.ToMetadata(),
+                    _conditions?.Select(c => c?.ToCondition() ?? throw new ArgumentException("Null condition.")));
+            }
+            catch (ArgumentException exception) { throw new ArgumentException($"{_id}: {exception.Message}", exception); }
         }
     }
 }
