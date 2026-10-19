@@ -28,7 +28,7 @@ namespace SocialStim.Rules.Dialogue
                 foreach (Match match in Variables.Matches(line.Text))
                     if (!AllowedVariables.Contains(match.Groups[1].Value)) throw new ArgumentException($"{line.Id}: unknown variable {match.Value}.");
             foreach (SpeechIntent intent in Enum.GetValues(typeof(SpeechIntent)))
-                if (!_lines.Any(l => l.Intent == intent && l.RequiredTrait == Personality.None && !l.SpeakerRole.HasValue))
+                if (!_lines.Any(l => l.Intent == intent && l.RequiredTrait == Personality.None && !l.SpeakerRole.HasValue && l.Conditions.Count == 0))
                     throw new ArgumentException($"Missing unrestricted dialogue fallback for {intent}.");
             foreach (var group in _lines.GroupBy(l => l.Intent)) checked { _ = group.Sum(l => l.Weight); }
         }
@@ -37,7 +37,7 @@ namespace SocialStim.Rules.Dialogue
         public DialogueSelection Select(SpeechIntent intent, DialogueContext context)
         {
             var eligible = _lines.Where(l => l.Intent == intent && (context.Traits & l.RequiredTrait) == l.RequiredTrait
-                && (!l.SpeakerRole.HasValue || l.SpeakerRole.Value == context.OwnRole)).ToList();
+                && (!l.SpeakerRole.HasValue || l.SpeakerRole.Value == context.OwnRole) && l.Conditions.All(c => c.Matches(context))).ToList();
             if (eligible.Count == 0) throw new InvalidOperationException($"No eligible line for {intent}.");
             if (!_recent.TryGetValue(context.SpeakerId, out Queue<string> history))
             { history = new Queue<string>(); _recent.Add(context.SpeakerId, history); }

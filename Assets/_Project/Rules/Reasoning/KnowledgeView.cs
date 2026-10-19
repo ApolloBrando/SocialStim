@@ -11,11 +11,16 @@ namespace SocialStim.Rules.Reasoning
     {
         /// <summary>Copies allowed knowledge; true roles of other characters are absent.</summary>
         public KnowledgeView(CharacterId self, RoleSpec ownRole, Personality personality, int charges,
-            int day, IEnumerable<KnownCharacter> characters, IEnumerable<NightReport> privateResults)
+            int day, IEnumerable<KnownCharacter> characters, IEnumerable<NightReport> privateResults,
+            IEnumerable<EvidenceRecord> evidence = null, int selfExposure = 0, IEnumerable<RoleSpec> roleCatalog = null, TeamNightPlan teamPlan = null)
         {
             Self = self; OwnRole = ownRole; Personality = personality; Charges = charges; Day = day;
             Characters = characters.OrderBy(c => c.Id.Value).ToList().AsReadOnly();
             PrivateResults = privateResults.Where(r => r.Recipient == self).ToList().AsReadOnly();
+            Evidence = (evidence ?? Enumerable.Empty<EvidenceRecord>()).Where(e => e.Kind != EvidenceKind.PrivateInvestigation || e.Actor == self).ToList().AsReadOnly();
+            SelfExposure = selfExposure;
+            RoleCatalog = (roleCatalog ?? new[] { ownRole }).OrderBy(r => r.Id.Value, System.StringComparer.Ordinal).ToList().AsReadOnly();
+            TeamPlan = ownRole.Faction == Faction.Antagonist ? teamPlan : null;
         }
         /// <summary>Observer identity.</summary>
         public CharacterId Self { get; }
@@ -31,5 +36,13 @@ namespace SocialStim.Rules.Reasoning
         public IReadOnlyList<KnownCharacter> Characters { get; }
         /// <summary>Results legitimately delivered to this observer.</summary>
         public IReadOnlyList<NightReport> PrivateResults { get; }
+        /// <summary>Observer's evidence history, never foreign private observations.</summary>
+        public IReadOnlyList<EvidenceRecord> Evidence { get; }
+        /// <summary>Estimated exposure from public reactions; other minds are not read.</summary>
+        public int SelfExposure { get; }
+        /// <summary>Public definition catalog, not the cast's assigned roles.</summary>
+        public IReadOnlyList<RoleSpec> RoleCatalog { get; }
+        /// <summary>Previous authorized faction plan; always null for other factions.</summary>
+        public TeamNightPlan TeamPlan { get; }
     }
 }

@@ -15,7 +15,7 @@ namespace SocialStim.Rules.Cast
     {
         /// <summary>Creates the seven-character setup; rejects unsupported chosen roles and exhausted categories.</summary>
         public static RunSession Create(RunOptions options, IEnumerable<RoleSpec> roles, IEnumerable<string> names,
-            IEnumerable<DialogueLine> dialogue, INpcStrategy strategy = null)
+            IEnumerable<DialogueLine> dialogue, INpcStrategy strategy = null, ReasoningSettings reasoning = null)
         {
             var catalog = ValidateCatalog(roles);
             var availableNames = names.ToList();
@@ -47,12 +47,13 @@ namespace SocialStim.Rules.Cast
             var members = new List<CastMemberSpec>();
             for (int i = 0; i < assigned.Count; i++)
                 members.Add(new CastMemberSpec(availableNames[i], assigned[i].Id, (Personality)(1 << random.Next(5)) | (Personality)(1 << random.Next(5))));
-            return CreateScenario(options, members, catalog, dialogue, strategy);
+            return CreateScenario(options, members, catalog, dialogue, strategy, reasoning: reasoning);
         }
 
         /// <summary>Builds an explicit starting scenario without exposing session secrets afterward.</summary>
         public static RunSession CreateScenario(RunOptions options, IEnumerable<CastMemberSpec> members,
-            IEnumerable<RoleSpec> roles, IEnumerable<DialogueLine> dialogue, INpcStrategy strategy = null, IWinCondition winCondition = null)
+            IEnumerable<RoleSpec> roles, IEnumerable<DialogueLine> dialogue, INpcStrategy strategy = null, IWinCondition winCondition = null,
+            ReasoningSettings reasoning = null)
         {
             var catalog = ValidateCatalog(roles);
             var cast = members.Select((m, index) => new Participant(new CharacterId(index), m.Name,
@@ -63,7 +64,8 @@ namespace SocialStim.Rules.Cast
                 if (group.First().Role.Unique && group.Count() > 1) throw new ArgumentException("Unique role occurs more than once.");
             if (winCondition == null && catalog.Any(r => r.Ability == AbilityKind.Attack && r.Faction != Faction.Antagonist))
                 throw new ArgumentException("Starter parity does not support independent lethal roles; supply a different win condition.");
-            return new RunSession(options, cast, catalog, dialogue, strategy ?? new BasicNpcStrategy(), winCondition ?? new StarterWinCondition());
+            var settings = reasoning ?? new ReasoningSettings();
+            return new RunSession(options, cast, catalog, dialogue, strategy ?? new SocialNpcStrategy(settings), winCondition ?? new StarterWinCondition(), settings);
         }
 
         private static List<RoleSpec> ValidateCatalog(IEnumerable<RoleSpec> roles)
