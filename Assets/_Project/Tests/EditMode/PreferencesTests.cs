@@ -98,6 +98,28 @@ namespace SocialStim.Tests.EditMode
             finally { if (Directory.Exists(directory)) Directory.Delete(directory, true); }
         }
 
+        [Test]
+        public void PointBuyRejectsAnOverspendAndCanRecoverWithoutLosingTheDraft()
+        {
+            var service = new SettingsService(new MemoryStore(), MissionTestContent.Roles(), 20);
+            service.Edit(GameSetting.StatsMode, 2); service.Edit(GameSetting.Logic, 10);
+            Assert.That(service.Validation(), Does.Contain("30"));
+            Assert.That(service.ApplyGame(out _), Is.False);
+            service.Edit(GameSetting.Logic, 5);
+            Assert.That(service.Validation(), Is.Null);
+            Assert.That(service.ApplyGame(out _), Is.True);
+        }
+
+        [Test]
+        public void ResizingCustomSlotsKeepsExistingChoicesAndAddsAnySlots()
+        {
+            var game = new GamePreferences(20).With(GameSetting.PlayerCount, 5).WithSlot(0, "archon")
+                .With(GameSetting.PlayerCount, 7);
+            Assert.That(game.Slots.Count, Is.EqualTo(7));
+            Assert.That(game.Slots[0], Is.EqualTo("archon"));
+            Assert.That(game.Slots[6], Is.EqualTo("Any"));
+        }
+
         private sealed class MemoryStore : ISettingsStore
         {
             private string _text;

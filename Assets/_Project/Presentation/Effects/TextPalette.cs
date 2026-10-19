@@ -6,7 +6,8 @@ namespace SocialStim.Presentation.Effects
     /// <summary>Warm light daytime surfaces and dark nighttime surfaces with contrasting text.</summary>
     public readonly struct TextPalette
     {
-        public TextPalette(bool night, float dayProgress = 0) { Night = night; DayProgress = Mathf.Clamp01(dayProgress); }
+        public TextPalette(bool night, float dayProgress = 0, bool colorblind = false) { Night = night; DayProgress = Mathf.Clamp01(dayProgress); Colorblind = colorblind; }
+        public bool Colorblind { get; }
         public bool Night { get; }
         public float DayProgress { get; }
         public Color Background => Night ? new Color(0.075f, 0.09f, 0.105f)
@@ -19,6 +20,10 @@ namespace SocialStim.Presentation.Effects
         public Color Frame => Night ? new Color(0.62f, 0.65f, 0.59f, 0.35f) : new Color(0.48f, 0.39f, 0.30f, 0.25f);
         public Color Accent(SemanticStyle style)
         {
+            if (Colorblind && style != SemanticStyle.Emphasis && style != SemanticStyle.Default)
+                return style == SemanticStyle.Danger || style == SemanticStyle.Fear
+                    ? Night ? new Color(1f, 0.82f, 0.55f) : new Color(0.40f, 0.19f, 0.01f)
+                    : Night ? new Color(0.65f, 0.85f, 1f) : new Color(0.02f, 0.23f, 0.40f);
             switch (style)
             {
                 case SemanticStyle.Emphasis: return Foreground;

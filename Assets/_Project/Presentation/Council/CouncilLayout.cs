@@ -86,6 +86,12 @@ namespace SocialStim.Presentation.Council
         internal RectTransform DrawerButtons { get; }
         internal GridLayoutGroup DrawerGrid { get; }
         private TextPalette _palette;
+        internal void Preferences(float fontSize, float scale)
+        {
+            Body.fontSize = fontSize;
+            Root.GetComponent<CanvasScaler>().referenceResolution = new Vector2(1280, 800) / scale;
+            Canvas.ForceUpdateCanvases(); Resize();
+        }
 
         internal Button Button(Transform parent, string title, string detail = "", int height = 76)
         {
@@ -96,8 +102,9 @@ namespace SocialStim.Presentation.Council
         {
             for (int i = parent.childCount - 1; i >= 0; i--)
             {
-                var child = parent.GetChild(i); var button = child.GetComponent<Button>();
-                if (button != null) { button.interactable = false; _buttons.Remove(button); }
+                var child = parent.GetChild(i);
+                foreach (var button in child.GetComponentsInChildren<Button>(true))
+                { button.interactable = false; _buttons.Remove(button); }
                 child.gameObject.SetActive(false); UnityEngine.Object.Destroy(child.gameObject);
             }
         }
@@ -117,6 +124,14 @@ namespace SocialStim.Presentation.Council
         }
         internal void Resize()
         {
+            float height = Root.rect.height;
+            float rosterBottom = Mathf.Min(226, height * 0.30f);
+            float actionTop = Mathf.Min(210, height * 0.27f);
+            TextUiFactory.Fill((RectTransform)RosterScroll.transform, new Vector2(0, 1), Vector2.one, new Vector2(32, -rosterBottom), new Vector2(-32, -84));
+            TextUiFactory.Fill(Speaker.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(40, -rosterBottom - 46), new Vector2(-40, -rosterBottom - 12));
+            TextUiFactory.Fill(Body.rectTransform, Vector2.zero, Vector2.one, new Vector2(40, actionTop + 42), new Vector2(-40, -rosterBottom - 62));
+            TextUiFactory.Fill(Prompt.rectTransform, Vector2.zero, new Vector2(1, 0), new Vector2(36, actionTop + 8), new Vector2(-36, actionTop + 34));
+            TextUiFactory.Fill((RectTransform)ActionScroll.transform, Vector2.zero, new Vector2(1, 0), new Vector2(32, 24), new Vector2(-32, actionTop));
             int columns = Mathf.Max(1, Mathf.FloorToInt(RosterScroll.viewport.rect.width / 120));
             RosterGrid.constraintCount = columns;
             float width = ActionScroll.viewport.rect.width;

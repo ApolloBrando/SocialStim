@@ -7,3 +7,5 @@ The new mission is being implemented on feature branches. Start with [the audit]
 Core mission contracts and authoring: [roles/setup/night rules](docs/ROLES.md).
 
 [Council interaction and Unity checklist](docs/COUNCIL_UI.md).
+
+[Settings and new-run editor](docs/SETTINGS.md).

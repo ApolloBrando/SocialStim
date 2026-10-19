@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using SocialStim.Application.Settings;
 using SocialStim.Application.Sessions;
 using SocialStim.Presentation.Council;
 using SocialStim.Rules.Council;
@@ -31,6 +33,8 @@ namespace SocialStim.Presentation.Text
         [SerializeField, Range(3, 7)] private int _councilRounds = 5;
         [SerializeField, Range(1, 2)] private int _playerWindows = 1;
         private CouncilScreen _council;
+        private SettingsService _settings;
+        private float _saveAfter;
         private TextGameView _view;
         private GamePresenter _presenter;
 
@@ -50,10 +54,27 @@ namespace SocialStim.Presentation.Text
                 events.transform.SetParent(transform, false);
                 if (!_trialMode)
                 {
-                    _catalog.LoadMissionRoles();
+                    var roles = _catalog.LoadMissionRoles();
+                    string path = Path.Combine(UnityEngine.Application.persistentDataPath, "settings-v2.json");
+                    bool firstLoad = !File.Exists(path);
+                    _settings = new SettingsService(new SettingsFileStore(path), roles, _catalog.LoadNames().Count);
+                    if (firstLoad)
+                    {
+                        _settings.BeginGameEdit();
+                        _settings.Edit(GameSetting.PlayerCount, Mathf.Max(5, _participantCount));
+                        _settings.Edit(GameSetting.Rounds, _councilRounds);
+                        _settings.Edit(GameSetting.Windows, _playerWindows);
+                        _settings.Edit(GameSetting.RevealRoles, _revealOnDeath ? 1 : 0);
+                        if (!_randomSeed) _settings.Seed(unchecked((uint)_fixedSeed).ToString());
+                        _settings.ApplyGame(out _);
+                        MigrateDisplayPreferences();
+                    }
                     _council = gameObject.AddComponent<CouncilScreen>();
                     _council.NewRunRequested += ShowCouncilSetup;
-                    _council.Initialize(font, UiPreferences.Load(), _effects != null ? _effects.Load() : null);
+                    _council.SettingsRequested += ShowCouncilSettings;
+                    _council.Initialize(font, _settings.Current.Display.Effects(), _effects != null ? _effects.Load() : null);
+                    _settings.DisplayChanged += ApplyCouncilPreferences;
+                    _council.ApplyPreferences(_settings.Current.Display);
                     return;
                 }
                 _view = gameObject.AddComponent<TextGameView>();
@@ -67,20 +88,36 @@ namespace SocialStim.Presentation.Text
         }
 
         private void ShowCouncilSetup()
+        { _council.ShowGameSetup(_settings, _catalog.LoadMissionRoles(), BeginCouncil); }
+        private void ShowCouncilSettings()
+        { _council.ShowPreferences(_settings, _catalog.LoadMissionRoles()); }
+        private void ApplyCouncilPreferences(DisplayPreferences preferences)
+        { _council.ApplyPreferences(preferences); _saveAfter = Time.unscaledTime + 0.35f; }
+        private void Update()
         {
-            int count = Mathf.Max(5, _participantCount);
-            _council.ShowSetup(_catalog.LoadMissionRoles(), count + " participants · " + _councilRounds + " rounds", BeginCouncil);
+            if (_settings == null || !_settings.Dirty || Time.unscaledTime < _saveAfter) return;
+            string error = _settings.Flush();
+            if (error != null) { Debug.LogWarning(error, this); _saveAfter = Time.unscaledTime + 10; }
         }
-
-        private void BeginCouncil(RoleId? chosenRole, Faction? chosenFaction)
+        private void MigrateDisplayPreferences()
+        {
+            if (PlayerPrefs.GetInt("SocialStim.UI.version", 0) != 1) return;
+            var old = UiPreferences.Load();
+            _settings.Display(DisplaySetting.Speed, Math.Abs(old.ElementsPerSecond - 28) < 0.001f ? 84 : old.ElementsPerSecond);
+            _settings.Display(DisplaySetting.Effects, old.Enabled ? 1 : 0);
+            _settings.Display(DisplaySetting.Intensity, old.Intensity);
+            _settings.Display(DisplaySetting.ReducedMotion, old.ReducedMotion ? 1 : 0);
+            _settings.Display(DisplaySetting.Flashes, old.Flashes ? 1 : 0);
+            _settings.Display(DisplaySetting.Instant, old.InstantText ? 1 : 0);
+        }
+        private void BeginCouncil()
         {
             try
             {
-                uint seed = _randomSeed ? BitConverter.ToUInt32(Guid.NewGuid().ToByteArray(), 0) : unchecked((uint)_fixedSeed);
-                var options = new CouncilOptions(seed, _councilRounds, _playerWindows, revealRoles: _revealOnDeath);
-                var setup = new SetupConfiguration(Mathf.Max(5, _participantCount), playerRole: chosenRole, playerFaction: chosenFaction);
-                var session = CouncilFactory.Create(options, setup, _catalog.LoadMissionRoles(), _catalog.LoadNames(), _catalog.LoadDialogue());
-                _council.Begin(session);
+                var game = _settings.Current.Game;
+                uint seed = string.IsNullOrWhiteSpace(game.Seed) ? BitConverter.ToUInt32(Guid.NewGuid().ToByteArray(), 0) : uint.Parse(game.Seed);
+                var session = CouncilFactory.Create(game.Options(seed), game.Setup(), _catalog.LoadMissionRoles(), _catalog.LoadNames(), _catalog.LoadDialogue());
+                _council.Begin(session, _settings.Current.Display.On(DisplaySetting.QuickMode));
             }
             catch (Exception exception) when (exception is ArgumentException || exception is InvalidOperationException)
             { Debug.LogException(exception, this); }
@@ -116,7 +153,9 @@ namespace SocialStim.Presentation.Text
         private void OnDestroy()
         {
             _presenter?.Dispose();
-            if (_council != null) _council.NewRunRequested -= ShowCouncilSetup;
+            if (_settings != null) { _settings.Flush(); _settings.DisplayChanged -= ApplyCouncilPreferences; }
+            if (_council != null)
+            { _council.NewRunRequested -= ShowCouncilSetup; _council.SettingsRequested -= ShowCouncilSettings; }
             if (_view != null)
             {
                 _view.RestartRequested -= ShowSetup;

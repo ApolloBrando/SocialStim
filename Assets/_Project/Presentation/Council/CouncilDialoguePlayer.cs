@@ -21,6 +21,10 @@ namespace SocialStim.Presentation.Council
         private EffectsSettings _settings;
         private int _cursor;
         private bool _started;
+        private bool _autoAdvance;
+        private float _autoDelay = 0.35f;
+        private float _completedSeconds;
+        internal void AutoAdvance(bool enabled, float delay) { _autoAdvance = enabled; _autoDelay = delay; _completedSeconds = 0; }
         private int _lastPressFrame = -1;
         internal CouncilDialoguePlayer(TextEffectRenderer renderer, TextMeshProUGUI label, EffectsSettings settings,
             IReadOnlyDictionary<PresentationCue, EffectProfile> profiles)
@@ -37,7 +41,15 @@ namespace SocialStim.Presentation.Council
         { _playback.Cancel(); _events = Array.Empty<CouncilEvent>(); _cursor = 0; _started = false; _label.text = ""; }
         internal void Tick(float seconds)
         {
-            if (Pending) _playback.Tick(seconds);
+            if (Pending)
+            {
+                bool revealing = _playback.Busy;
+                _playback.Tick(seconds);
+                if (_playback.Busy || revealing) _completedSeconds = 0;
+                else _completedSeconds += seconds;
+                float readingDelay = _autoDelay + Mathf.Min(1.5f, _playback.Text.Text.Length / 180f);
+                if (_autoAdvance && !_playback.Busy && _completedSeconds >= readingDelay) Advance();
+            }
             _renderer.Apply(_playback.VisibleUtf16, _playback.Frame, Time.unscaledTime);
         }
         internal void Advance()
@@ -53,7 +65,7 @@ namespace SocialStim.Presentation.Council
         internal void Palette(TextPalette palette) { _palette = palette; _renderer.SetPalette(palette); }
         private void Start()
         {
-            _started = true; var record = _events[_cursor]; Started?.Invoke(record);
+            _started = true; _completedSeconds = 0; var record = _events[_cursor]; Started?.Invoke(record);
             SemanticText text;
             try { text = SemanticMarkup.Parse(record.Text); } catch (ArgumentException) { text = SemanticText.Literal(record.Text); }
             _renderer.SetDocument(text, 0, _palette);

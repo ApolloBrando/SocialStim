@@ -36,6 +36,9 @@ namespace SocialStim.Application.Settings
         public void Slot(int index, string code) { Draft = Draft.WithSlot(index, code); }
         public string Validation()
         {
+            if (Draft.Get(GameSetting.StatsMode) == 2 && Draft.Get(GameSetting.Charisma) + Draft.Get(GameSetting.Intuition)
+                + Draft.Get(GameSetting.Logic) + Draft.Get(GameSetting.Charm) + Draft.Get(GameSetting.Performance) + Draft.Get(GameSetting.Stealth) != 30)
+                return "Allocate exactly 30 stat points.";
             if (!string.IsNullOrWhiteSpace(Draft.Seed) && !uint.TryParse(Draft.Seed, out _)) return "Seed must be a whole number.";
             return SetupBuilder.Error(Draft.Setup(), _roles, _capacity);
         }

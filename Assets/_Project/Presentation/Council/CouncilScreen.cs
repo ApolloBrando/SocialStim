@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SocialStim.Application.Council;
+using SocialStim.Application.Settings;
 using SocialStim.Application.PresentationCues;
 using SocialStim.Presentation.Effects;
 using SocialStim.Rules.Cast;
@@ -25,6 +26,8 @@ namespace SocialStim.Presentation.Council
         private CouncilController _controller;
         private EffectsSettings _settings;
         private TextPalette _palette;
+        private CouncilSettingsPanel _preferencesPanel;
+        private DisplayPreferences _preferences = new DisplayPreferences();
         private readonly HashSet<CharacterId> _deliveredDeaths = new HashSet<CharacterId>();
         private readonly Dictionary<CharacterId, RoleId> _deliveredClaims = new Dictionary<CharacterId, RoleId>();
         private readonly Dictionary<CharacterId, string> _marks = new Dictionary<CharacterId, string>();
@@ -62,7 +65,7 @@ namespace SocialStim.Presentation.Council
 
         public void Begin(CouncilSession session, bool quickMode = false)
         {
-            _controller = new CouncilController(session) { QuickMode = quickMode };
+            _controller = new CouncilController(session) { QuickMode = quickMode || _preferences.On(DisplaySetting.QuickMode) };
             _delivered.Clear(); _deliveredDeaths.Clear(); _deliveredClaims.Clear(); _marks.Clear(); _speaker = null;
             _dialogue.Reset(); Resume(); Render();
         }
@@ -78,22 +81,25 @@ namespace SocialStim.Presentation.Council
             if (SettingsRequested != null) PanelButton("Settings", () => SettingsRequested?.Invoke());
             PanelButton("Quit", ApplicationQuit);
         }
-        public void ShowSetup(IReadOnlyList<RoleSpec> roles, string description, Action<RoleId?, Faction?> begin)
+        public void ApplyPreferences(DisplayPreferences preferences)
         {
-            OpenPanel("New Run", description);
-            PanelButton("Random role", () => begin(null, null));
-            foreach (Faction faction in new[] { Faction.Town, Faction.Antagonist, Faction.Neutral })
-            {
-                var side = faction;
-                PanelButton(side == Faction.Antagonist ? "Evil" : side.ToString(), () => {
-                    OpenPanel("Choose a role", description);
-                    PanelButton("Random " + (side == Faction.Antagonist ? "Evil" : side.ToString()), () => begin(null, side));
-                    foreach (var role in roles.Where(r => r.Faction == side))
-                    { var id = role.Id; PanelButton(role.Name, () => begin(id, null)); }
-                    PanelButton("Back", () => ShowSetup(roles, description, begin));
-                });
-            }
-            PanelButton("Back", ShowMainMenu);
+            _preferences = preferences; ApplySettings(preferences.Effects());
+            _dialogue.AutoAdvance(preferences.On(DisplaySetting.AutoAdvance), preferences.Get(DisplaySetting.AutoDelay));
+            _layout.Preferences(preferences.Get(DisplaySetting.FontSize), preferences.Get(DisplaySetting.UiScale));
+            if (_controller != null) _controller.QuickMode = preferences.On(DisplaySetting.QuickMode);
+            _palette = new TextPalette(_palette.Night, _palette.DayProgress, preferences.On(DisplaySetting.Colorblind));
+            _layout.Theme(_palette); _dialogue.Palette(_palette);
+        }
+        public void ShowPreferences(SettingsService service, IReadOnlyList<RoleSpec> roles)
+        { PreferencesPanel(service, roles).Show(); }
+        public void ShowGameSetup(SettingsService service, IReadOnlyList<RoleSpec> roles, Action begin)
+        { PreferencesPanel(service, roles).BeginGame(true, begin); }
+        private CouncilSettingsPanel PreferencesPanel(SettingsService service, IReadOnlyList<RoleSpec> roles)
+        {
+            if (_preferencesPanel == null)
+                _preferencesPanel = new CouncilSettingsPanel(_layout, service, roles, OpenPanel, PanelButton,
+                    () => { if (_controller != null) ShowDrawer(); else ShowMainMenu(); });
+            return _preferencesPanel;
         }
         private void Update()
         {
@@ -121,7 +127,7 @@ namespace SocialStim.Presentation.Council
                 || record.Kind == CouncilEventKind.RoleReveal && record.Reason == ReasonType.NightPattern;
             float progress = morning ? 0 : record.Kind == CouncilEventKind.Vote || record.Kind == CouncilEventKind.Tally ? 0.8f
                 : record.Kind == CouncilEventKind.Elimination ? 1 : Mathf.Clamp01((record.Round - 1f) / Mathf.Max(1, view.Rounds));
-            _palette = new TextPalette(night, progress); _layout.Theme(_palette); _dialogue.Palette(_palette);
+            _palette = new TextPalette(night, progress, _preferences.On(DisplaySetting.Colorblind)); _layout.Theme(_palette); _dialogue.Palette(_palette);
             string name = record.Actor.HasValue ? view.Knowledge.Characters.Single(c => c.Id == record.Actor.Value).Name : "";
             _layout.Speaker.text = (record.Recipient.HasValue ? "PRIVATE · " : "") + name
                 + (record.Kind == CouncilEventKind.Claim ? " · CLAIM" : "");
@@ -145,7 +151,8 @@ namespace SocialStim.Presentation.Council
             if (_drawer || _controller == null || _dialogue.Pending) return;
             _readyFrame = Time.frameCount; var view = _controller.Snapshot; _layout.Clear(_layout.Actions);
             _palette = new TextPalette(view.Phase == CouncilPhase.Night,
-                view.Phase == CouncilPhase.Vote || view.Phase == CouncilPhase.Elimination ? 0.9f : Mathf.Clamp01((view.Round - 1f) / view.Rounds));
+                view.Phase == CouncilPhase.Vote || view.Phase == CouncilPhase.Elimination ? 0.9f : Mathf.Clamp01((view.Round - 1f) / view.Rounds),
+                _preferences.On(DisplaySetting.Colorblind));
             _layout.Theme(_palette); _dialogue.Palette(_palette);
             _layout.Header.text = "DAY " + (view.Phase == CouncilPhase.Morning ? view.Day + 1 : view.Day)
                 + " · " + view.Phase.ToString().ToUpperInvariant()
@@ -259,7 +266,7 @@ namespace SocialStim.Presentation.Council
         }
         private void OpenPanel(string title, string text)
         {
-            _drawer = true; _layout.Main.gameObject.SetActive(false); _layout.Drawer.gameObject.SetActive(true);
+            _preferencesPanel?.Hide(); _drawer = true; _layout.Main.gameObject.SetActive(false); _layout.Drawer.gameObject.SetActive(true);
             _layout.DrawerTitle.text = title; _layout.DrawerText.text = text; _layout.Clear(_layout.DrawerButtons);
             Canvas.ForceUpdateCanvases(); _layout.Resize();
         }
