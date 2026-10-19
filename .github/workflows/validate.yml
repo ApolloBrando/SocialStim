@@ -2,7 +2,7 @@ name: Validate SocialStim
 
 on:
   push:
-    branches: [main, 'milestone/**']
+    branches: [main, 'milestone/**', 'phase/**']
   pull_request:
 
 permissions:

@@ -140,7 +140,7 @@ namespace SocialStim.Presentation.Text
             transcriptLayout.childControlHeight = true; transcriptLayout.childControlWidth = true; transcriptLayout.childForceExpandHeight = false;
             transcriptContent.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             _textEffects = gameObject.AddComponent<TextEffectRenderer>(); _textEffects.Initialize(_transcript);
-            _textEffects.SetSemanticColors(_settings.Enabled);
+            _textEffects.SetSettings(_settings);
             _choiceScroll = TextUiFactory.Scroll("Choices", canvas.transform, out _choices);
             _surfaces.Add(_choiceScroll.GetComponent<Image>());
             TextUiFactory.Fill((RectTransform)_choiceScroll.transform, new Vector2(0.64f, 0), Vector2.one, new Vector2(10, 82), new Vector2(-32, -230));
@@ -243,7 +243,7 @@ namespace SocialStim.Presentation.Text
             if (IsDisplaying && EventSystem.current != null) EventSystem.current.SetSelectedGameObject(_skip.gameObject);
         }
 
-        public void ShowInputError(string message) => _status.text = message + "\n" + _status.text;
+        public void ShowInputError(string message) => _status.text = message;
 
         private void Update()
         {
@@ -255,7 +255,7 @@ namespace SocialStim.Presentation.Text
         private void LateUpdate()
         {
             if (_request == null) return;
-            _textEffects.Apply(_currentStart + _playback.VisibleUtf16, _playback.Frame, _playback.Elapsed);
+            _textEffects.Apply(_currentStart + _playback.VisibleUtf16, _playback.Frame, Time.unscaledTime);
             _screenEffects.Apply(_playback.Frame, _palette);
         }
         private void Pump()
@@ -312,8 +312,8 @@ namespace SocialStim.Presentation.Text
         {
             _settings = new EffectsSettings(enabled ?? _settings.Enabled, reduced ?? _settings.ReducedMotion,
                 flashes ?? _settings.Flashes, intensity ?? _settings.Intensity, instant ?? _settings.InstantText, speed ?? _settings.ElementsPerSecond);
-            _textEffects.SetSemanticColors(_settings.Enabled);
-            SkipAll();
+            _textEffects.SetSettings(_settings);
+            _playback.Reconfigure(_settings);
             SettingsChanged?.Invoke(_settings);
             RefreshSettingLabels();
         }
