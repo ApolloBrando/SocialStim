@@ -289,3 +289,13 @@ assert the scaffold's existence or mirror implementation details.
 - Neutral outcomes and parity: evaluate capabilities and competing threats;
   faction headcount alone is not sufficient in the full ruleset.
 - Premature visual scope: establish readable plain-text play before animation.
+
+## NUnit and input compatibility correction
+
+Unity import exposed a newer-NUnit collection Contain overload in the shared tests.
+Collection membership assertions now use Has.No.Member. CI compiles against NUnit 3.5.0
+on .NET Framework 4.7.2 and runs NUnit 3.14.0 tests on .NET 8; neither reproduces Unity's custom integration.
+The starter validator also checks ENABLE_INPUT_SYSTEM and reports the exact
+Player Settings path if inactive. Enable Input System Package (New), then restart
+Unity; installing the package alone does not select that backend. No generated
+PlayerSettings asset is overwritten.

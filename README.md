@@ -21,7 +21,8 @@ Milestone 02 is being developed in parallel while the owner verifies milestone
 
 1. Open the project in **Unity 6000.3.26f1** and let Package Manager resolve it.
 2. Set **Project Settings > Player > Other Settings > Active Input Handling** to
-   **Input System Package (New)** or **Both**, then restart Unity if prompted.
+   **Input System Package (New)**, then restart Unity if prompted. The package is
+   already included; this disables the deprecated legacy Input Manager.
 3. Import **Window > TextMeshPro > Import TMP Essential Resources**, or assign
    a TMP font asset to the scene's `GameBootstrap` component.
 4. Run **Tools > SocialStim > Validate Starter Content**, then
@@ -88,3 +89,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md), [Docs/GAME_DESIGN.md](Docs/GAME_DESIGN.m
 [Docs/DIALOGUE_AUTHORING.md](Docs/DIALOGUE_AUTHORING.md), and
 [Docs/MILESTONES.md](Docs/MILESTONES.md). Direct publication to `main` requires
 confirmation of the concrete batch. No license has been selected.
+
+CI compiles the NUnit 3.5.0 API baseline and runs shared tests with NUnit 3.14.0. Collection
+membership assertions use the older-compatible Has.No.Member API. This remains
+separate from Unity compilation and editor execution.

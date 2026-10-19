@@ -14,7 +14,8 @@ owner checks that baseline; its existence is not evidence of a successful import
 - [ ] Open the repository root using Unity **6000.3.26f1**.
 - [ ] Resolve packages, inspect Console errors, and preserve all committed GUIDs.
 - [ ] Set Player Settings > Other Settings > Active Input Handling to **Input
-  System Package (New)** or **Both**; allow the editor restart if prompted.
+  System Package (New)**; allow the editor restart if prompted. The package is
+  already included and this project does not need the legacy Input Manager.
 - [ ] Import Window > TextMeshPro > **TMP Essential Resources**, or assign an
   existing TMP font on `GameBootstrap`. Commit imported assets with metadata and
   review their license files. This delivery contains no third-party font bytes.
