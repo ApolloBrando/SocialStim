@@ -499,6 +499,366 @@
       "intent": "ReportAction",
       "text": "My report: {result}",
       "weight": 1
+    },
+    {
+      "id": "mission.Question.001",
+      "intent": "Question",
+      "text": "What do you make of this, {target}?",
+      "weight": 1
+    },
+    {
+      "id": "mission.Question.002",
+      "intent": "Question",
+      "text": "{target}, who worries you most?",
+      "weight": 1
+    },
+    {
+      "id": "mission.Question.003",
+      "intent": "Question",
+      "text": "Can we hear your view, {target}?",
+      "weight": 1
+    },
+    {
+      "id": "mission.Question.004",
+      "intent": "Question",
+      "text": "{target}, where would you put your vote?",
+      "weight": 1
+    },
+    {
+      "id": "mission.Answer.001",
+      "intent": "Answer",
+      "text": "Here's how I see it.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Answer.002",
+      "intent": "Answer",
+      "text": "I'll answer that.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Answer.003",
+      "intent": "Answer",
+      "text": "I haven't settled on anyone yet.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Answer.004",
+      "intent": "Answer",
+      "text": "Let me think it through aloud.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Banter.001",
+      "intent": "Banter",
+      "text": "The coffee was bad before the sabotage.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Banter.002",
+      "intent": "Banter",
+      "text": "I miss arguing about maintenance schedules.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Banter.003",
+      "intent": "Banter",
+      "text": "Someone owes me a quiet shift.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Banter.004",
+      "intent": "Banter",
+      "text": "Even the ventilation sounds nervous.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Chat.001",
+      "intent": "Chat",
+      "text": "Let's hear each other out.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Chat.002",
+      "intent": "Chat",
+      "text": "Who's willing to speak first?",
+      "weight": 1
+    },
+    {
+      "id": "mission.Chat.003",
+      "intent": "Chat",
+      "text": "We need a clearer picture.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Chat.004",
+      "intent": "Chat",
+      "text": "Let's compare what we actually know.",
+      "weight": 1
+    },
+    {
+      "id": "mission.CounterClaim.001",
+      "intent": "CounterClaim",
+      "text": "That can't be right. I'm the {role}.",
+      "weight": 1
+    },
+    {
+      "id": "mission.CounterClaim.002",
+      "intent": "CounterClaim",
+      "text": "Hold on. My role is {role}.",
+      "weight": 1
+    },
+    {
+      "id": "mission.CounterClaim.003",
+      "intent": "CounterClaim",
+      "text": "We both can't be telling the truth about {role}.",
+      "weight": 1
+    },
+    {
+      "id": "mission.CounterClaim.004",
+      "intent": "CounterClaim",
+      "text": "I'm claiming {role} too. Hear both accounts.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Thank.001",
+      "intent": "Thank",
+      "text": "Thanks for hearing me out.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Thank.002",
+      "intent": "Thank",
+      "text": "I appreciate the backup.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Thank.003",
+      "intent": "Thank",
+      "text": "Thank you. That matters.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Thank.004",
+      "intent": "Thank",
+      "text": "I'm glad someone listened.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Apologize.001",
+      "intent": "Apologize",
+      "text": "I spoke too quickly. Sorry.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Apologize.002",
+      "intent": "Apologize",
+      "text": "I owe you an apology.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Apologize.003",
+      "intent": "Apologize",
+      "text": "That was unfair of me.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Apologize.004",
+      "intent": "Apologize",
+      "text": "I shouldn't have jumped at you.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Doubt.001",
+      "intent": "Doubt",
+      "text": "I'm still not sure about {target}.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Doubt.002",
+      "intent": "Doubt",
+      "text": "Something about {target} leaves me uneasy.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Doubt.003",
+      "intent": "Doubt",
+      "text": "I need more from {target}.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Doubt.004",
+      "intent": "Doubt",
+      "text": "I'm keeping an eye on {target}.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Plead.001",
+      "intent": "Plead",
+      "text": "Give me one more day.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Plead.002",
+      "intent": "Plead",
+      "text": "Please don't decide before you've heard me.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Plead.003",
+      "intent": "Plead",
+      "text": "I'm asking you to reconsider.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Plead.004",
+      "intent": "Plead",
+      "text": "Look at me. Is this really your best choice?",
+      "weight": 1
+    },
+    {
+      "id": "mission.Whisper.001",
+      "intent": "Whisper",
+      "text": "Keep your voice down.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Whisper.002",
+      "intent": "Whisper",
+      "text": "I wanted a quiet word.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Whisper.003",
+      "intent": "Whisper",
+      "text": "Can we speak away from the others?",
+      "weight": 1
+    },
+    {
+      "id": "mission.Whisper.004",
+      "intent": "Whisper",
+      "text": "There's something I want to tell you privately.",
+      "weight": 1
+    },
+    {
+      "id": "mission.FreeTime.001",
+      "intent": "FreeTime",
+      "text": "Mind if I sit here?",
+      "weight": 1
+    },
+    {
+      "id": "mission.FreeTime.002",
+      "intent": "FreeTime",
+      "text": "How are you holding up?",
+      "weight": 1
+    },
+    {
+      "id": "mission.FreeTime.003",
+      "intent": "FreeTime",
+      "text": "You look like you could use company.",
+      "weight": 1
+    },
+    {
+      "id": "mission.FreeTime.004",
+      "intent": "FreeTime",
+      "text": "Want to talk for a minute?",
+      "weight": 1
+    },
+    {
+      "id": "mission.AnnounceVote.001",
+      "intent": "AnnounceVote",
+      "text": "I've made my choice.",
+      "weight": 1
+    },
+    {
+      "id": "mission.AnnounceVote.002",
+      "intent": "AnnounceVote",
+      "text": "I know where my vote is going.",
+      "weight": 1
+    },
+    {
+      "id": "mission.AnnounceVote.003",
+      "intent": "AnnounceVote",
+      "text": "I'm ready to vote.",
+      "weight": 1
+    },
+    {
+      "id": "mission.AnnounceVote.004",
+      "intent": "AnnounceVote",
+      "text": "I'll stand by my decision.",
+      "weight": 1
+    },
+    {
+      "id": "mission.ChangeVote.001",
+      "intent": "ChangeVote",
+      "text": "I've changed my mind.",
+      "weight": 1
+    },
+    {
+      "id": "mission.ChangeVote.002",
+      "intent": "ChangeVote",
+      "text": "I need to reconsider my vote.",
+      "weight": 1
+    },
+    {
+      "id": "mission.ChangeVote.003",
+      "intent": "ChangeVote",
+      "text": "That makes me lean another way.",
+      "weight": 1
+    },
+    {
+      "id": "mission.ChangeVote.004",
+      "intent": "ChangeVote",
+      "text": "I'm moving my vote.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Gloat.001",
+      "intent": "Gloat",
+      "text": "That worked out rather neatly.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Gloat.002",
+      "intent": "Gloat",
+      "text": "One less problem to untangle.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Gloat.003",
+      "intent": "Gloat",
+      "text": "A surprisingly convenient turn.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Gloat.004",
+      "intent": "Gloat",
+      "text": "Well. Someone will sleep easier.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Stall.001",
+      "intent": "Stall",
+      "text": "Wait. I need another moment.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Stall.002",
+      "intent": "Stall",
+      "text": "Let's slow down.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Stall.003",
+      "intent": "Stall",
+      "text": "We still have time to think.",
+      "weight": 1
+    },
+    {
+      "id": "mission.Stall.004",
+      "intent": "Stall",
+      "text": "Don't rush the last question.",
+      "weight": 1
     }
   ]
 }
