@@ -314,3 +314,9 @@ assert the scaffold's existence or mirror implementation details.
   faction headcount alone is not sufficient in the full ruleset.
 - Premature visual scope: establish readable plain-text play before animation.
 
+
+Milestones 02 and 05 share a single speech event per line, carrying public
+intent/target metadata after observer evidence is updated. Nomination ballots
+are chosen before publication and enter public evidence; deaths also enter
+evidence when role reveal is disabled. Integration regression tests cover all
+three contracts.

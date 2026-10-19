@@ -107,3 +107,9 @@ confirmation of the concrete batch. No license has been selected.
 CI compiles the NUnit 3.5.0 API baseline and runs shared tests with NUnit 3.14.0. Collection
 membership assertions use the older-compatible Has.No.Member API. This remains
 separate from Unity compilation and editor execution.
+
+Milestones 02 and 05 share a single speech event per line, carrying public
+intent/target metadata after observer evidence is updated. Nomination ballots
+are chosen before publication and enter public evidence; deaths also enter
+evidence when role reveal is disabled. Integration regression tests cover all
+three contracts.

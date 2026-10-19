@@ -158,9 +158,8 @@ namespace SocialStim.Rules.Phases
                 claimed, speech.ReportedFaction?.ToString() ?? "", _phases.Day, actor.Role.Id, actor.Personality,
                 _phases.Phase, speech.Target, _beliefs[actor.Id].Evidence, _beliefs[actor.Id].Exposure);
             DialogueSelection line = _dialogue.Select(speech.Intent, context);
-            Emit(GameCue.SpeechDelivered, $"{actor.Name}: {line.Text}", actor.Id, line.Metadata, speech.Target, speech.Intent, speech.ClaimedRole);
             foreach (Participant observer in _cast) _beliefs[observer.Id].Observe(actor.Id, speech, _phases.Day);
-            Emit(GameCue.SpeechDelivered, $"{actor.Name}: {line.Text}", actor.Id, line.Metadata);
+            Emit(GameCue.SpeechDelivered, $"{actor.Name}: {line.Text}", actor.Id, line.Metadata, speech.Target, speech.Intent, speech.ClaimedRole);
         }
 
         private void Nominate(GameCommand command)
@@ -172,7 +171,13 @@ namespace SocialStim.Rules.Phases
                 CharacterId? vote = actor.Id == Player.Id ? command.Target : _strategy.Nominate(Knowledge(actor), _decisions);
                 if (vote.HasValue && !Living().Any(c => c.Id == vote && c.Id != actor.Id)) vote = null;
                 votes.Add(vote);
-                Emit(GameCue.NominationMade, $"{actor.Name} nominates {(vote.HasValue ? Actor(vote.Value).Name : "nobody")}.", actor.Id, target: vote);
+                ballots.Add(new KeyValuePair<CharacterId, CharacterId?>(actor.Id, vote));
+            }
+            // Choose all ballots before publishing any, so later voters cannot see this round's earlier votes.
+            foreach (KeyValuePair<CharacterId, CharacterId?> ballot in ballots)
+            {
+                foreach (Participant observer in _cast) _beliefs[observer.Id].ObserveNomination(ballot.Key, ballot.Value, _phases.Day);
+                Emit(GameCue.NominationMade, $"{Actor(ballot.Key).Name} nominates {(ballot.Value.HasValue ? Actor(ballot.Value.Value).Name : "nobody")}.", ballot.Key, target: ballot.Value);
             }
             _defendant = VoteResolver.Nominee(votes, Living().Count());
             if (!_defendant.HasValue)
@@ -278,6 +283,7 @@ namespace SocialStim.Rules.Phases
         private void Kill(Participant actor, bool execution)
         {
             actor.Alive = false;
+            foreach (Participant observer in _cast) _beliefs[observer.Id].ObserveDeath(actor.Id, _phases.Day);
             Emit(execution ? GameCue.ExecutionCarriedOut : GameCue.DeathReported, execution ? $"{actor.Name} was executed." : $"{actor.Name} died during the night.", target: actor.Id);
             if (_options.RevealOnDeath)
             {
