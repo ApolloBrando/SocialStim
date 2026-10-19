@@ -16,6 +16,7 @@ namespace SocialStim.Application.PresentationCues
         private double _nextFlash;
         private bool _permitFlash;
         private bool _flashStarted;
+        private bool _active;
         public bool Busy { get; private set; }
         public SemanticText Text { get; private set; }
         public int VisibleUtf16 { get; private set; }
@@ -32,7 +33,7 @@ namespace SocialStim.Application.PresentationCues
             Text = text ?? throw new ArgumentNullException(nameof(text));
             _profile = profile ?? throw new ArgumentNullException(nameof(profile));
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            _sequence = sequence; _acknowledge = acknowledge; _elapsed = 0; Frame = default; VisibleUtf16 = 0; Busy = true;
+            _sequence = sequence; _acknowledge = acknowledge; _elapsed = 0; Frame = default; VisibleUtf16 = 0; Busy = true; _active = true;
             _permitFlash = _clock >= _nextFlash; _flashStarted = false;
             _speed = settings.ElementsPerSecond * speedMultiplier;
             _duration = !settings.Enabled ? 0 : Math.Max(settings.InstantText ? 0 : text.ElementCount / _speed, profile.Duration)
@@ -44,8 +45,14 @@ namespace SocialStim.Application.PresentationCues
         {
             if (!EffectStep.Finite(seconds) || seconds < 0) throw new ArgumentOutOfRangeException(nameof(seconds));
             _clock += seconds;
-            if (!Busy) return;
-            _elapsed = Math.Min(_duration, _elapsed + seconds);
+            if (!_active) return;
+            _elapsed += seconds;
+            if (!Busy)
+            {
+                EffectFrame retained = _profile.Sample(_elapsed, _settings);
+                Frame = new EffectFrame(retained.Shake, 0, 0, 0);
+                return;
+            }
             VisibleUtf16 = !_settings.Enabled || _settings.InstantText ? Text.Text.Length
                 : Text.EndOfElements((int)(_elapsed * _speed));
             Frame = _profile.Sample(_elapsed, _settings);
@@ -54,10 +61,17 @@ namespace SocialStim.Application.PresentationCues
             if (_elapsed >= _duration) Finish(DisplayCompletion.Completed);
         }
         public void Skip() { if (Busy) Finish(DisplayCompletion.Skipped); }
-        public void Cancel() { if (Busy) Finish(DisplayCompletion.Cancelled); }
+        public void Cancel()
+        {
+            _active = false; Frame = default;
+            if (Busy) Finish(DisplayCompletion.Cancelled);
+        }
         private void Finish(DisplayCompletion completion)
         {
-            Busy = false; VisibleUtf16 = Text.Text.Length; Frame = default;
+            Busy = false; VisibleUtf16 = Text.Text.Length;
+            if (completion == DisplayCompletion.Cancelled) _active = false;
+            EffectFrame retained = _active ? _profile.Sample(_elapsed, _settings) : default;
+            Frame = new EffectFrame(retained.Shake, 0, 0, 0);
             Action<DisplayAcknowledgement> callback = _acknowledge;
             _acknowledge = null;
             callback?.Invoke(new DisplayAcknowledgement(_sequence, completion));
