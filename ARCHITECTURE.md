@@ -13,7 +13,8 @@ and its stages, `BasicNpcStrategy`, restricted `KnowledgeView` records,
 and `GameBootstrap` wire these to `TextGameView` through `GamePresenter`.
 The original design contracts below also cover deferred systems: full role
 probabilities and exposure estimates (02), advanced roles (03), save snapshots
-(04), and tension/visual effects (05). Those systems are not implemented yet.
+(04). This feature branch implements milestone 05 on top of main, independently of
+02/03/04; its Unity adapters remain unverified.
 
 The game is single-player and text-only initially. The player is a participant
 with the same action legality rules as NPCs. Dialogue is prewritten data, with
@@ -80,9 +81,9 @@ Scenes, authored JSON, and asset instances live outside code namespace roots.
 | `Assets/_Project/Data/Dialogue` | Authored dialogue files; no generated runtime prose |
 | `Assets/_Project/ScriptableObjects` | Role, setup, personality, catalog, and later effect assets |
 | `Assets/_Project/Presentation/Text` | Text presenter, views, input, composition root |
-| `Assets/_Project/Presentation/Effects` | Reserved for milestone 05 |
+| `Assets/_Project/Presentation/Effects` | TMP vertex adapter, overlay geometry, palettes, cue profile assets |
 | `Assets/_Project/Scenes` | Future bootstrap, game, and playground scenes |
-| `Assets/_Project/Editor/EffectsPlayground` | Reserved editor-only preview tooling |
+| `Assets/_Project/Editor/EffectsPlayground` | Editor-only portable timing and palette preview |
 | `Assets/_Project/Tests` | EditMode rules tests and PlayMode adapter tests |
 
 Empty folders are tracked with `.gitkeep` files, which Unity ignores. Folder and
@@ -197,7 +198,7 @@ consuming gameplay/dialogue RNG. A failed or incompatible load returns a clear
 error; it must not silently regenerate hidden state. Nothing crosses runs except
 settings. Persistence is behind an adapter; snapshot creation stays engine-free.
 
-## Future presentation and effects
+## Presentation and effects
 
 Current ports are `IGameView` and `IPlayerInputProvider`. `GamePresenter` routes
 portable option IDs to `GameController` and scoped requests back to the view.
@@ -205,7 +206,11 @@ portable option IDs to `GameController` and scoped requests back to the view.
 dialogue or cue ports wait for a distinct consumer. UI objects never appear in
 these payloads. A future front end implements the same ports and semantic cues.
 
-One presenter routes all text and cues. Later it delegates to one effect director
+One presenter routes all text and cues. The current view delegates display playback
+to the engine-free `DisplayPlayback`, cached `TextEffectRenderer`, and
+`ScreenEffectOverlay`. A view-wide outstanding acknowledgement gates input.
+Rules finish a command synchronously; display timing never advances rules or RNG.
+The design contract is implemented by one playback director
 using ScriptableObject cue profiles and semantic style mappings. Text geometry,
 text color, screen tint, borders, and motion are separate channels. Profiles define
 sequence/parallel execution, intensity, easing, priority, blending, cancellation,
@@ -228,15 +233,18 @@ or animation callback can alter targeting, RNG, or victory resolution.
 Application's future tension signal uses **player-visible evidence only**.
 Hidden targeting, undiscovered deaths, and private NPC beliefs must not leak into
 ambient effects. Reduced motion, adjustable intensity, disabled/limited flashes,
-skip, and non-color indicators are required. The full effects slice belongs to
-milestone 05, including a markup validator and editor playground.
+skip, and non-color indicators are required. The milestone 05 branch implements
+strict semantic markup, timeline profiles,
+portable acknowledgement, TMP/overlay adapters, and an editor playground.
+See `Docs/EFFECTS.md` for exact conflict and cancellation policies. Runtime
+allocation profiling, editor import, and real UI verification remain open gates.
 
 ## Tests and limitations
 
 Milestone 00's static validator checks file/metadata pairing, GUID uniqueness,
 assembly references and dependency cycles, layer constraints, package/version
 pins, and unwanted files. Unity import and compilation remain unverified until
-the pinned editor is available. The PlayMode assembly remains reserved.
+the pinned editor is available. The PlayMode assembly now includes presenter and TMP adapter checks; Unity execution remains pending.
 
 Milestone 01 tests cover legal transitions, trial limits and ties, command
 parity for player/NPCs, blocked actions, protection/attack interactions, simultaneous
