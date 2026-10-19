@@ -23,7 +23,7 @@ namespace SocialStim.Tests.EditMode
             var selector = new DialogueSelector(lines, new SeededRandom(55));
             string[] choices = Enumerable.Range(0, 4).Select(_ => selector.Select(SpeechIntent.Accuse, Context()).Id).ToArray();
             Assert.That(choices.Distinct().Count(), Is.EqualTo(4));
-            Assert.That(choices, Does.Not.Contain("restricted"));
+            Assert.That(choices, Has.No.Member("restricted"));
         }
 
         /// <summary>Invalid variables and missing fallbacks fail at content load, not mid-conversation.</summary>
@@ -70,7 +70,7 @@ namespace SocialStim.Tests.EditMode
             var view = TestContent.Scenario("assassin", "assassin", "physician", "interrupter", "survivor").GetPlayerView();
             Assert.That(view.Characters.Single(c => c.Id.Value == 1).IsTeammate, Is.True);
             Assert.That(view.Characters.Single(c => c.Id.Value == 1).RevealedRole, Is.Null);
-            Assert.That(view.LegalNightTargets, Does.Not.Contain(new CharacterId(1)));
+            Assert.That(view.LegalNightTargets, Has.No.Member(new CharacterId(1)));
         }
 
         /// <summary>A saved RNG state reproduces the next values exactly.</summary>

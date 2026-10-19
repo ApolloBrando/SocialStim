@@ -12,12 +12,16 @@ namespace SocialStim.Editor
         [MenuItem("Tools/SocialStim/Validate Starter Content")]
         public static void ValidateStarterContent()
         {
+#if !ENABLE_INPUT_SYSTEM
+            throw new System.InvalidOperationException("Enable Input System Package (New) in Edit > Project Settings > Player > Other Settings > Active Input Handling, then restart Unity.");
+#else
             var catalog = AssetDatabase.LoadAssetAtPath<GameCatalog>("Assets/_Project/ScriptableObjects/Catalogs/StarterCatalog.asset");
             if (catalog == null) throw new System.InvalidOperationException("StarterCatalog.asset is missing.");
             int roles = catalog.LoadRoles().Count;
             int lines = catalog.LoadDialogue().Count;
             int names = catalog.LoadNames().Count;
             Debug.Log($"SocialStim content valid: {roles} roles, {lines} placeholder lines, {names} names.");
+#endif
         }
 
         /// <summary>Opens the committed scene after allowing the editor to save existing scene work.</summary>
