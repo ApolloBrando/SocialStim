@@ -33,3 +33,6 @@ The [Unity workflow pass](Docs/UNITY_WORKFLOW.md) adds native dialogue editing,
 automatic content/import/build validation, role/catalog inspector feedback,
 InputAction-based text controls and TMP profiler scopes. The Unity-first working
 preference is recorded in [AGENTS.md](AGENTS.md). Native verification remains pending.
+
+The [current gameplay scope](MISSION_SCOPE.md) is day discussion/voting and night
+role actions only. The previously proposed Free Time activity is cancelled.

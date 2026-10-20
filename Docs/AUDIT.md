@@ -79,7 +79,7 @@ independent continuous effect stacks. Those are tracked under the effects phase.
 | UiPreferences.cs:11-23 | Invalid speed/intensity causes every preference to reset; no per-field clamping, version migration, individual reset, or JSON file. Stored speed remains the user's old choice after a new default ships. | Versioned settings file, independent validation/clamping, migrate supported PlayerPrefs, explicit per-setting/global reset. |
 | GameBootstrap.cs:18-23; ShowSetup | Most game configuration is inspector-only; no player count/role-list/difficulty/stats setup UI. | New Run configuration with live legality checks before Start. |
 | TextGameView / ChoiceFocusIndicator | No modal focus containment, Escape/back policy, controller verification or touch-size/layout verification. | Drawer/screen focus scopes and responsive layout tests; editor/device checks remain required. |
-| GameBootstrap / GameController terminal request | No main menu, vote-reveal screen, Free Time, detailed morning screen or after-action report. Terminal state merely has no choices, with New run remaining in the header. | Explicit screen state and scoped after-action record. Continue must not imply a saved-run system: ongoing-run saving was previously cancelled. |
+| GameBootstrap / GameController terminal request | No main menu, vote-reveal screen, detailed morning screen or after-action report. Terminal state merely has no choices, with New run remaining in the header. | Explicit screen state and scoped after-action record. Continue must not imply a saved-run system: ongoing-run saving was previously cancelled. |
 
 Current default text speed is **28 text elements/second**, multiplied by a stable
 speaker tempo; speech holds are **0.65-1.64 seconds**, system holds 0.3 seconds.
@@ -173,8 +173,8 @@ Implementation decisions for the role phase:
   requested "forging a Physician's result" edge case must prove it is unaffected.
 - Resolve the complete death batch before promotion, victory or win stealing.
   A pending Nullifier backlash remains explicit state until its next-night cleanup.
-- Free Time follows the core discussion/vote/night contract. Proposed optional
-  flavor abilities remain deferred and off by default.
+- The owner cancelled the proposed social/visit period on 2026-10-20. Only
+  daytime discussion/voting and nighttime actions remain. See MISSION_SCOPE.md.
 
 ## Performance hazards
 
@@ -239,7 +239,7 @@ reviewable intent batches. Nothing merges to main automatically.
 | 4 inference/social | Observer-only sampled worlds, reason/utility decisions, faction plans, affinity, bounded mistakes and difficulty budgets |
 | 5 dialogue | Curated cast/voices, metadata and validator, >=3500 reviewed unique lines, >=500 player lines, coverage/authoring guides |
 | 6 effects | Span lifetimes/stacking, semantic style data, >=25 effects, parser, safety, playground and Unity profiling checklist |
-| 7 extras/balance | Stable-core extra roles, optional Free Time, debug overlay, thousands-of-games simulation report and tuning |
+| 7 extras/balance | Stable-core extra roles, debug overlay, thousands-of-games simulation report and tuning |
 
 Planned scope is not marked implemented by this document. Current Unity pins
 remain 6000.3.26f1 / Input System 1.17.0 / uGUI 2.0.0 / Test Framework 1.6.0.
