@@ -21,3 +21,15 @@ MonoBehaviour:
       delay: 0
       priority: 0
       blend: 0
+    - channel: 4
+      duration: 1.6
+      amount: 0.65
+      delay: 0
+      priority: 0
+      blend: 0
+    - channel: 5
+      duration: 1.6
+      amount: 0.7
+      delay: 0
+      priority: 0
+      blend: 0

@@ -60,7 +60,7 @@ namespace SocialStim.Application.PresentationCues
             VisibleUtf16 = !_settings.Enabled || _settings.InstantText ? Text.Text.Length
                 : Text.EndOfElements((int)(_elapsed * _speed + _revealOffset));
             Frame = _profile.Sample(_elapsed, _settings);
-            if (!_permitFlash) Frame = new EffectFrame(Frame.Shake, Frame.Border, Frame.Vignette, 0);
+            if (!_permitFlash) Frame = new EffectFrame(Frame.Shake, Frame.Border, Frame.Vignette, 0, Frame.ColorWash, Frame.EdgeGlow);
             else if (Frame.Flash > 0 && !_flashStarted) { _nextFlash = _clock + 2; _flashStarted = true; }
             if (_elapsed >= _duration) Finish(DisplayCompletion.Completed);
         }
@@ -89,7 +89,7 @@ namespace SocialStim.Application.PresentationCues
             else if (revealed < Text.ElementCount)
                 _duration = Math.Max(_profile.Duration, _elapsed + (Text.ElementCount - revealed) / _speed) + _pauseAfter;
             Frame = _profile.Sample(_elapsed, settings);
-            if (!_permitFlash) Frame = new EffectFrame(Frame.Shake, Frame.Border, Frame.Vignette, 0);
+            if (!_permitFlash) Frame = new EffectFrame(Frame.Shake, Frame.Border, Frame.Vignette, 0, Frame.ColorWash, Frame.EdgeGlow);
         }
 
         public void Skip() { if (Busy) Finish(DisplayCompletion.Skipped); }

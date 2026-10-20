@@ -20,6 +20,6 @@ namespace SocialStim.Application.PresentationCues
             return this;
         }
         public EffectSequence Then(EffectStep step) => Parallel(step);
-        public EffectProfile Build() => new EffectProfile(_steps);
+        public EffectProfile Build(EffectTone tone = EffectTone.Neutral) => new EffectProfile(_steps, tone);
     }
 }

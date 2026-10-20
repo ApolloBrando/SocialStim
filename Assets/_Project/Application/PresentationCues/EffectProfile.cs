@@ -8,8 +8,10 @@ namespace SocialStim.Application.PresentationCues
     {
         private readonly EffectStep[] _steps;
         public static readonly EffectProfile None = new EffectProfile(Array.Empty<EffectStep>());
-        public EffectProfile(IEnumerable<EffectStep> steps)
+        public EffectProfile(IEnumerable<EffectStep> steps, EffectTone tone = EffectTone.Neutral)
         {
+            if (!Enum.IsDefined(typeof(EffectTone), tone)) throw new ArgumentOutOfRangeException(nameof(tone));
+            Tone = tone;
             _steps = new List<EffectStep>(steps ?? throw new ArgumentNullException(nameof(steps))).ToArray();
             if (_steps.Length > 64) throw new ArgumentException("An effect profile supports at most 64 tracks.");
             int flashes = 0;
@@ -22,6 +24,8 @@ namespace SocialStim.Application.PresentationCues
             }
         }
         public float Duration { get; }
+        /// <summary>Semantic colour family, never an assertion that a speaker is truthful.</summary>
+        public EffectTone Tone { get; }
         public EffectFrame Sample(float time, EffectsSettings settings)
         {
             if (!EffectStep.Finite(time) || time < 0) throw new ArgumentOutOfRangeException(nameof(time));
@@ -29,7 +33,9 @@ namespace SocialStim.Application.PresentationCues
             return new EffectFrame(settings.ReducedMotion ? 0 : Channel(EffectChannel.TextShake, time) * settings.Intensity,
                 Channel(EffectChannel.Border, time) * settings.Intensity,
                 Channel(EffectChannel.Vignette, time) * settings.Intensity,
-                !settings.Flashes || settings.ReducedMotion ? 0 : Channel(EffectChannel.Flash, time) * settings.Intensity * 0.08f);
+                !settings.Flashes || settings.ReducedMotion ? 0 : Channel(EffectChannel.Flash, time) * settings.Intensity * 0.08f,
+                Channel(EffectChannel.ColorWash, time) * settings.Intensity * (settings.ReducedMotion ? 0.035f : 0.07f),
+                settings.ReducedMotion ? 0 : Channel(EffectChannel.EdgeGlow, time) * settings.Intensity * 0.3f);
         }
         private float Channel(EffectChannel channel, float time)
         {

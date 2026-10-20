@@ -45,6 +45,7 @@ namespace SocialStim.Presentation.Text
         private int _next;
         private int _currentStart;
         private TextPalette _palette;
+        private EffectTone _activeTone;
         private TextEffectRenderer _textEffects;
         private ScreenEffectOverlay _screenEffects;
         private Action<DisplayAcknowledgement> _onAcknowledged;
@@ -267,7 +268,7 @@ namespace SocialStim.Presentation.Text
         {
             if (_request == null) return;
             _textEffects.Apply(_currentStart + _playback.VisibleUtf16, _playback.Frame, Time.unscaledTime);
-            _screenEffects.Apply(_playback.Frame, _palette);
+            _screenEffects.Apply(_playback.Frame, _palette, _activeTone);
         }
         private void Pump()
         {
@@ -294,6 +295,7 @@ namespace SocialStim.Presentation.Text
                 foreach (SemanticSpan span in line.Spans) _spans.Add(new SemanticSpan(span.Start + _currentStart, span.Length, span.Style));
                 _textEffects.SetDocument(new SemanticText(_shown.ToString(), _spans), _currentStart, _palette);
                 EffectProfile profile = _profiles[_cues.Resolve(observation, _request.View)];
+                _activeTone = profile.Tone;
                 var pacing = new SpeechPacing(observation);
                 _playback.Begin(observation.Sequence, line, profile, _settings, _onAcknowledged, pacing.Pause, pacing.Speed);
                 Canvas.ForceUpdateCanvases();
@@ -328,7 +330,7 @@ namespace SocialStim.Presentation.Text
             // Reconfigure preserves reveal position; the next Update pumps only completed lines.
             if (_request != null)
                 _textEffects.Apply(_currentStart + _playback.VisibleUtf16, _playback.Frame, Time.unscaledTime);
-            _screenEffects.Apply(_playback.Frame, _palette);
+            _screenEffects.Apply(_playback.Frame, _palette, _activeTone);
             SettingsChanged?.Invoke(_settings);
             RefreshSettingLabels();
         }

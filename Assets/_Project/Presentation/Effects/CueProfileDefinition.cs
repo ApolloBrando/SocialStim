@@ -25,7 +25,7 @@ namespace SocialStim.Presentation.Effects
                     if (track == null) throw new ArgumentException("Missing effect track.");
                     steps.Add(track.ToStep());
                 }
-                result[entry.cue] = new EffectProfile(steps);
+                result[entry.cue] = new EffectProfile(steps, entry.overrideTone ? entry.tone : result[entry.cue].Tone);
             }
             return result;
         }
