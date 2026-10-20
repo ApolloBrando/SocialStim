@@ -392,3 +392,24 @@ valid. Policy changes clear any retained animation. Day/night palettes are uncha
 Both NPC strategies veto hostile Town choices against hard observer-known Town
 alignment, independent of stale suspicion. These repairs do not implement the
 mission's joint-world inference or new role catalog.
+
+## Mission Phase 1A: discussion and plurality vote
+
+See [Docs/DISCUSSION_VOTING.md](Docs/DISCUSSION_VOTING.md) for the implemented
+contract, explicit UI limitations and manual checklist. Gnosia mode is the new
+run default. Trial Mode remains an explicit alternative; legacy regression
+fixtures select Trial instead of silently changing their behavioral contract.
+
+DiscussionSchedule counts ordinary windows. DiscussionExchange owns the public
+speaking queue and priority responses, independent of authoritative role state.
+RunSession supplies scoped strategy decisions and emits existing speech evidence.
+PluralityResult is a detached public tally; no ballot is published until all
+voters decide. Appended Voting/VoteReveal phases guard the single-revote and
+elimination boundary. PlayerView exposes public round/window/response/candidate
+state, and GameController creates valid revision-scoped choices. New bootstrap
+fields use default group rounds of five while preserving old scene fields for
+Trial Mode. No scene YAML or existing metadata GUID is rewritten.
+
+This is the Phase 1A loop foundation, not the complete interaction/UI rewrite.
+Current-menu replacement, reason-tagged phrasing, current-line presentation and
+the drawer remain subsequent work. No main commit/merge is performed.
