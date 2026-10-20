@@ -48,8 +48,8 @@ namespace SocialStim.Rules.Reasoning
         internal void Observe(CharacterId speaker, GameCommand speech, int day)
         {
             int influence = Math.Max(0, _settings.AssertionWeight * (_trust[speaker] + 25) / 75);
-            if (_personality.HasFlag(Personality.Gullible)) influence += _settings.GullibleBonus;
-            if (_personality.HasFlag(Personality.Cautious)) influence = Math.Max(0, influence - 2);
+            if ((_personality == Personality.Anxious || _personality == Personality.Slow)) influence += _settings.GullibleBonus;
+            if ((_personality == Personality.Anxious || _personality == Personality.Grim)) influence = Math.Max(0, influence - 2);
             EvidenceKind kind = speech.Intent == SpeechIntent.ClaimRole ? EvidenceKind.RoleClaim
                 : speech.Intent == SpeechIntent.ReportInvestigation ? EvidenceKind.InvestigationClaim : EvidenceKind.Statement;
             Record(day, kind, speaker, speech.Target, speech.Intent, speech.ClaimedRole, speech.ReportedFaction, night: day - 1);

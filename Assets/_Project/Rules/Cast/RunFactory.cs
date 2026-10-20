@@ -38,7 +38,7 @@ namespace SocialStim.Rules.Cast
             }
             var members = new List<CastMemberSpec>();
             for (int i = 0; i < assigned.Count; i++)
-                members.Add(new CastMemberSpec(availableNames[i], assigned[i].Id, (Personality)(1 << random.Next(5)) | (Personality)(1 << random.Next(5))));
+                members.Add(new CastMemberSpec(availableNames[i], assigned[i].Id));
             return CreateScenario(options, members, catalog, dialogue, strategy, reasoning: reasoning);
         }
 
@@ -51,8 +51,31 @@ namespace SocialStim.Rules.Cast
             var catalog = ValidateCatalog(roles);
             var specifications = members?.ToList() ?? throw new ArgumentNullException(nameof(members));
             if (specifications.Any(m => m == null)) throw new ArgumentException("Scenario members cannot be null.");
-            var cast = specifications.Select((m, index) => new Participant(new CharacterId(index), m.Name,
-                catalog.FirstOrDefault(r => r.Id == m.Role) ?? throw new ArgumentException($"Unknown role: {m.Role}."), m.Personality)).ToList();
+            var traits = Enum.GetValues(typeof(Personality)).Cast<Personality>().Where(trait => trait != Personality.None).ToList();
+            var remaining = new List<Personality>();
+            // A separate existing seeded stream makes voice independent of role/faction
+            // assignment and does not consume either the rules or dialogue stream.
+            var traitRandom = new SeededRandom(options.Seed ^ 0x93D76A4Bu);
+            var cast = new List<Participant>();
+            for (int index = 0; index < specifications.Count; index++)
+            {
+                CastMemberSpec member = specifications[index];
+                Personality trait = Personality.None;
+                if (index == 0)
+                {
+                    if (member.Personality != Personality.None)
+                        throw new ArgumentException("The player does not have an NPC trait.");
+                }
+                else
+                {
+                    if (remaining.Count == 0) { remaining.AddRange(traits); Shuffle(remaining, traitRandom); }
+                    trait = member.Personality == Personality.None ? remaining[0] : member.Personality;
+                    if (!remaining.Remove(trait))
+                        throw new ArgumentException("Use every NPC trait before repeating one in a scenario.");
+                }
+                cast.Add(new Participant(new CharacterId(index), member.Name,
+                    catalog.FirstOrDefault(role => role.Id == member.Role) ?? throw new ArgumentException($"Unknown role: {member.Role}."), trait));
+            }
             if (cast.Count < 3 || cast.Select(c => c.Name).Distinct(StringComparer.Ordinal).Count() != cast.Count)
                 throw new ArgumentException("A scenario needs at least three uniquely named participants.");
             foreach (var group in cast.GroupBy(c => c.Role.Id))

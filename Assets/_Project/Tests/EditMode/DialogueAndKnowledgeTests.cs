@@ -19,7 +19,7 @@ namespace SocialStim.Tests.EditMode
         [Test]
         public void RecentLinesDoNotRepeatUntilPoolIsExhausted()
         {
-            var lines = TestContent.Lines().Concat(new[] { new DialogueLine("restricted", SpeechIntent.Accuse, "secret", 1000, Personality.Aggressive) });
+            var lines = TestContent.Lines().Concat(new[] { new DialogueLine("restricted", SpeechIntent.Accuse, "secret", 1000, Personality.Brave) });
             var selector = new DialogueSelector(lines, new SeededRandom(55));
             string[] choices = Enumerable.Range(0, 4).Select(_ => selector.Select(SpeechIntent.Accuse, Context()).Id).ToArray();
             Assert.That(choices.Distinct().Count(), Is.EqualTo(4));

@@ -25,7 +25,7 @@ namespace SocialStim.Rules.Reasoning
             KnownCharacter suspect = Suspect(knowledge);
             KnownCharacter trusted = knowledge.Characters.Where(c => c.Alive && c.Id != knowledge.Self)
                 .OrderByDescending(c => c.Trust).ThenBy(c => c.Id.Value).FirstOrDefault();
-            bool deceptive = knowledge.OwnRole.Faction == Faction.Antagonist || knowledge.Personality.HasFlag(Personality.Deceptive);
+            bool deceptive = knowledge.OwnRole.Faction == Faction.Antagonist || (knowledge.Personality == Personality.Smug || knowledge.Personality == Personality.Jokester);
             if (knowledge.OwnRole.Category == RoleCategory.NeutralEvil)
             {
                 RoleSpec hostile = knowledge.RoleCatalog.FirstOrDefault(r => r.Faction == Faction.Antagonist);
@@ -52,7 +52,7 @@ namespace SocialStim.Rules.Reasoning
             if (result != null) candidates.Add((GameCommand.Speak(SpeechIntent.ReportInvestigation, result.Target, faction: result.Alignment), 90));
             if (suspect != null)
             {
-                int accusation = Threat(suspect) / 2 + (knowledge.Personality.HasFlag(Personality.Aggressive) ? _settings.AggressiveBonus : 0);
+                int accusation = Threat(suspect) / 2 + ((knowledge.Personality == Personality.Brave || knowledge.Personality == Personality.Smug) ? _settings.AggressiveBonus : 0);
                 candidates.Add((GameCommand.Speak(SpeechIntent.Accuse, suspect.Id), accusation));
                 if (Threat(suspect) >= 40) candidates.Add((GameCommand.Speak(SpeechIntent.CallForTrial, suspect.Id), accusation + 3));
                 candidates.Add((GameCommand.Speak(SpeechIntent.Disagree, suspect.Id), 10 + accusation / 3));
@@ -64,7 +64,7 @@ namespace SocialStim.Rules.Reasoning
             }
             if (trusted != null)
             {
-                int loyalty = knowledge.Personality.HasFlag(Personality.Loyal) ? _settings.LoyaltyBonus : 0;
+                int loyalty = (knowledge.Personality == Personality.Brave) ? _settings.LoyaltyBonus : 0;
                 candidates.Add((GameCommand.Speak(SpeechIntent.Vouch, trusted.Id), 10 + loyalty + trusted.Trust / 6));
                 candidates.Add((GameCommand.Speak(SpeechIntent.Agree, trusted.Id), 8 + loyalty + trusted.Trust / 8));
             }
@@ -78,7 +78,7 @@ namespace SocialStim.Rules.Reasoning
         public CharacterId? Nominate(KnowledgeView knowledge, IRandomSource random)
         {
             KnownCharacter suspect = Suspect(knowledge);
-            int threshold = 28 + (knowledge.Personality.HasFlag(Personality.Cautious) ? _settings.CautiousThreshold : 0);
+            int threshold = 28 + ((knowledge.Personality == Personality.Anxious || knowledge.Personality == Personality.Grim) ? _settings.CautiousThreshold : 0);
             return suspect != null && Threat(suspect) >= threshold ? suspect.Id : (CharacterId?)null;
         }
 
@@ -87,8 +87,8 @@ namespace SocialStim.Rules.Reasoning
         {
             KnownCharacter target = knowledge.Characters.First(c => c.Id == defendant);
             if (target.IsTeammate || knowledge.OwnRole.Faction == Faction.Town && ConfirmedTown(target)) return Verdict.Innocent;
-            int threshold = 35 + (knowledge.Personality.HasFlag(Personality.Cautious) ? _settings.CautiousThreshold : 0);
-            if (knowledge.Personality.HasFlag(Personality.Loyal) && target.Trust > 60) threshold += _settings.LoyaltyBonus;
+            int threshold = 35 + ((knowledge.Personality == Personality.Anxious || knowledge.Personality == Personality.Grim) ? _settings.CautiousThreshold : 0);
+            if ((knowledge.Personality == Personality.Brave) && target.Trust > 60) threshold += _settings.LoyaltyBonus;
             if (knowledge.OwnRole.Faction == Faction.Antagonist) threshold -= 15;
             return Threat(target) >= threshold ? Verdict.Guilty : Verdict.Innocent;
         }

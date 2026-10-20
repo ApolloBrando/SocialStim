@@ -120,7 +120,7 @@ namespace SocialStim.Tests.EditMode
         [Test]
         public void TraitsChangeEvidenceResponse()
         {
-            BeliefState gullible = Model(Personality.Gullible), cautious = Model(Personality.Cautious);
+            BeliefState gullible = Model(Personality.Slow), cautious = Model(Personality.Grim);
             var accusation = GameCommand.Speak(SpeechIntent.Accuse, new CharacterId(3));
             gullible.Observe(new CharacterId(1), accusation, 1); cautious.Observe(new CharacterId(1), accusation, 1);
             Assert.That(gullible.Suspicion(new CharacterId(3)), Is.GreaterThan(cautious.Suspicion(new CharacterId(3))));

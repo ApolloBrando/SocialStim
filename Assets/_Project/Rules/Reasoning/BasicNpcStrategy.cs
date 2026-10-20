@@ -27,7 +27,7 @@ namespace SocialStim.Rules.Reasoning
             KnownCharacter suspect = Suspect(knowledge);
             if (knowledge.OwnRole.Faction == Faction.Antagonist && knowledge.Day > 1 && suspect != null && random.Next(100) < 25)
                 return GameCommand.Speak(SpeechIntent.ReportInvestigation, suspect.Id, faction: Faction.Antagonist);
-            if (suspect != null && (suspect.Suspicion >= 30 || knowledge.Personality.HasFlag(Personality.Aggressive)))
+            if (suspect != null && (suspect.Suspicion >= 30 || (knowledge.Personality == Personality.Brave || knowledge.Personality == Personality.Smug)))
                 return GameCommand.Speak(SpeechIntent.Accuse, suspect.Id);
             int choice = random.Next(4);
             if (choice == 0) return GameCommand.Speak(SpeechIntent.ClaimRole,
@@ -40,7 +40,7 @@ namespace SocialStim.Rules.Reasoning
         public CharacterId? Nominate(KnowledgeView knowledge, IRandomSource random)
         {
             KnownCharacter suspect = Suspect(knowledge);
-            int threshold = knowledge.Personality.HasFlag(Personality.Cautious) ? 34 : 24;
+            int threshold = (knowledge.Personality == Personality.Anxious || knowledge.Personality == Personality.Grim) ? 34 : 24;
             return suspect != null && suspect.Suspicion >= threshold ? suspect.Id : (CharacterId?)null;
         }
 
@@ -49,8 +49,8 @@ namespace SocialStim.Rules.Reasoning
         {
             KnownCharacter target = knowledge.Characters.First(c => c.Id == defendant);
             if (target.IsTeammate || knowledge.OwnRole.Faction == Faction.Town && ConfirmedTown(target)) return Verdict.Innocent;
-            int threshold = knowledge.Personality.HasFlag(Personality.Cautious) ? 42 : 30;
-            if (knowledge.Personality.HasFlag(Personality.Loyal)) threshold += 6;
+            int threshold = (knowledge.Personality == Personality.Anxious || knowledge.Personality == Personality.Grim) ? 42 : 30;
+            if ((knowledge.Personality == Personality.Brave)) threshold += 6;
             if (knowledge.OwnRole.Faction == Faction.Antagonist) threshold -= 12;
             return target.Suspicion >= threshold ? Verdict.Guilty : Verdict.Innocent;
         }

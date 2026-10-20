@@ -57,7 +57,7 @@ namespace SocialStim.Tests.EditMode
         {
             var role = TestContent.Role("vigilante", Faction.Town, RoleCategory.TownKilling, AbilityKind.Attack, attack: 1, charges: 2);
             var confirmed = new CharacterId(1);
-            var view = new KnowledgeView(new CharacterId(0), role, Personality.Aggressive, 2, 2, new[] {
+            var view = new KnowledgeView(new CharacterId(0), role, Personality.Brave, 2, 2, new[] {
                 new KnownCharacter(new CharacterId(0), "Self", true, 0),
                 new KnownCharacter(confirmed, "Confirmed", true, 100, factionEstimate: new FactionEstimate(10000, 0, 0), knownFaction: Faction.Town),
             }, System.Array.Empty<NightReport>());
