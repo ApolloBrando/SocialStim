@@ -27,7 +27,7 @@ namespace SocialStim.Tests.EditMode
             .SelectMany(intent => Enumerable.Range(0, 4).Select(index => new DialogueLine($"{intent}.{index}", intent,
                 $"PLACEHOLDER {index}: {{speaker}} {intent} {{target}} {{role}} {{result}} day {{day}}"))).ToList().AsReadOnly();
 
-        internal static RunSession Scenario(params string[] roles) => RunFactory.CreateScenario(new RunOptions(123, discussionRounds: 1),
+        internal static RunSession Scenario(params string[] roles) => RunFactory.CreateScenario(new RunOptions(123, discussionRounds: 1, votingMode: VotingMode.Trial),
             roles.Select((role, index) => new CastMemberSpec($"Person{index}", new RoleId(role))), Roles(), Lines());
 
         internal static string[] Names() => Enumerable.Range(0, 20).Select(i => $"Person{i}").ToArray();
