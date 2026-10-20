@@ -589,7 +589,7 @@ namespace SocialStim.Rules.Phases
         private void Emit(GameCue cue, string text, CharacterId? speaker = null, DialogueMetadata metadata = null,
             CharacterId? target = null, SpeechIntent? intent = null, RoleId? claimedRole = null)
         {
-            var observation = new GameObservation(_transcript.Count, _phases.Day, cue, text, speaker, metadata, target, intent, claimedRole);
+            var observation = new GameObservation(_transcript.Count, _phases.Day, cue, text, speaker, metadata, target, intent, claimedRole, Math.Min(_options.DiscussionRounds, _schedule?.Round ?? _discussionRounds + 1));
             _transcript.Add(observation); Observation?.Invoke(observation);
         }
     }

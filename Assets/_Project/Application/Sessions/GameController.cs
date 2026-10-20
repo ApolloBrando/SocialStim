@@ -44,7 +44,7 @@ namespace SocialStim.Application.Sessions
                         break;
                     }
                     if (view.Opening) add("Let someone else open", "Listen first. Keeps your turn.", GameCommand.Continue());
-                    if (view.CanReportAction) add("Report last night's action", "Share your action and results.", GameCommand.ReportLastAction());
+                    if (view.CanReportAction && view.OwnRole.Ability != AbilityKind.None) add("Report last night's action", "Share your action and results.", GameCommand.ReportLastAction());
                     add("Defend yourself", "Push back on suspicion.", GameCommand.Speak(SpeechIntent.Defend));
                     add("Express fear", "Share your unease.", GameCommand.Speak(SpeechIntent.ExpressFear));
                     add("Stay silent", "Listen this turn.", GameCommand.Speak(SpeechIntent.StaySilent));

@@ -20,6 +20,8 @@ namespace SocialStim.Presentation.Text
         [SerializeField] private TMP_FontAsset _font;
         [SerializeField] private CueProfileDefinition _effects;
         [SerializeField] private TextStyleDefinition _textStyles;
+        private bool _preferencesDirty;
+        private float _saveAt;
         private GamePreferences _preferences;
         private TextGameView _view;
         private GamePresenter _presenter;
@@ -76,13 +78,22 @@ namespace SocialStim.Presentation.Text
 
         private void SavePreferences(GamePreferences settings)
         {
-            _preferences = settings;
-            try { UiPreferences.Store(settings); }
-            catch (Exception exception) when (exception is System.IO.IOException || exception is UnauthorizedAccessException) { _view.ShowInputError("Preferences could not be kept: " + exception.Message); }
+            _preferences = settings; _preferencesDirty = true; _saveAt = Time.unscaledTime + 0.35f;
+        }
+        private void Update() { if (_preferencesDirty && Time.unscaledTime >= _saveAt) FlushPreferences(); }
+        private void OnApplicationPause(bool paused) { if (paused) FlushPreferences(false); }
+        private void OnApplicationQuit() => FlushPreferences(false);
+        private void FlushPreferences(bool notify = true)
+        {
+            if (!_preferencesDirty) return; _preferencesDirty = false;
+            try { UiPreferences.Store(_preferences); }
+            catch (Exception exception) when (exception is System.IO.IOException || exception is UnauthorizedAccessException)
+            { if (notify && _view != null) _view.ShowInputError("Preferences could not be kept: " + exception.Message); else Debug.LogWarning(exception.Message); }
         }
 
         private void OnDestroy()
         {
+            FlushPreferences(false);
             _presenter?.Dispose();
             if (_view != null)
             {

@@ -63,6 +63,7 @@ namespace SocialStim.Presentation.Effects
         }
         private void Paint(TMP_TextInfo info)
         {
+            int effectBudget = 16384;
             for (int i = 0; i < info.characterCount; i++)
             {
                 TMP_CharacterInfo character = info.characterInfo[i];
@@ -78,10 +79,11 @@ namespace SocialStim.Presentation.Effects
                 {
                     float strength = _settings.ReducedMotion || !_settings.Enabled ? 0 : _frame.Shake;
                     x = Mathf.Sin(_time * 27 + i * 1.7f) * strength * 3; y = Mathf.Cos(_time * 31 + i * 1.3f) * strength * 3;
-                    for (int n = 0; n < _document.Effects.Count; n++)
+                    for (int n = 0; n < _document.Effects.Count && effectBudget > 0; n++)
                     {
                         GlyphEffectSpan span = _document.Effects[n];
                         if (index < span.Start || index >= span.Start + span.Length) continue;
+                        effectBudget--;
                         GlyphTransform sample = GlyphEffectSampler.Sample(span.Effect, Math.Max(0, _time - _revealed[index]), i, _settings, _time);
                         x += sample.X; y += sample.Y; sx *= sample.ScaleX; sy *= sample.ScaleY; angle += sample.Angle; alpha *= sample.Alpha;
                         if (_semanticColors) color = Color.Lerp(color, _palette.Accent(SemanticStyle.Evidence), sample.Color);

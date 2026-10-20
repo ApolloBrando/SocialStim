@@ -52,7 +52,6 @@ namespace SocialStim.Presentation.Text
         private bool _lineReady, _choosingTarget;
         private float _readyAt;
         private InteractionAction? _action;
-        private CharacterId? _target;
         /// <summary>Emits only a revision-scoped application option/phrasing ID.</summary>
         public event Action<string> OptionChosen;
         /// <summary>Returns to the setup screen, discarding the current run through the composition root.</summary>
@@ -156,6 +155,13 @@ namespace SocialStim.Presentation.Text
             _playback.Cancel(); _current = _request.View.Transcript[_next]; _lineReady = false;
             if (_current.Cue == GameCue.NightFalls) Palette(true);
             if (_current.Cue == GameCue.DawnBreaks) Palette(false);
+            string phase = _current.Cue == GameCue.BallotRevealed || _current.Cue == GameCue.VoteTallied ? "VOTE REVEAL"
+                : _current.Cue == GameCue.DawnBreaks || _current.Cue == GameCue.DeathReported ? "MORNING REPORT"
+                : _current.Cue == GameCue.ExecutionCarriedOut || _current.Cue == GameCue.RoleRevealed ? "ELIMINATION"
+                : _current.Cue == GameCue.NightFalls ? "NIGHT"
+                : _current.Cue == GameCue.VictoryAchieved || _current.Cue == GameCue.DefeatSuffered || _current.Cue == GameCue.RunDrawn ? "GAME OVER"
+                : _current.Speaker.HasValue ? "DISCUSSION · ROUND " + _current.Round + "/" + _request.View.DiscussionRoundsAllowed : "REPORT";
+            _header.text = "DAY " + _current.Day + " · " + phase;
             _speaker.text = _current.Speaker.HasValue ? _request.View.Characters.First(c => c.Id == _current.Speaker.Value).Name : "";
             string source = _current.Text;
             if (_current.Speaker.HasValue)
@@ -233,7 +239,7 @@ namespace SocialStim.Presentation.Text
             Choice("Back", BuildActions); FocusChoice();
         }
         private void Phrases(InteractionAction action, CharacterId? target)
-        { _action = action; _target = target; _choosingTarget = false; RenderRoster(null); Offer(InteractionMenu.Options(_request, action, target)); }
+        { _action = action; _choosingTarget = false; RenderRoster(null); Offer(InteractionMenu.Options(_request, action, target)); }
         private void Offer(IReadOnlyList<PlayerOption> options)
         {
             Clear(_choiceButtons);
@@ -251,7 +257,7 @@ namespace SocialStim.Presentation.Text
             }
             if (_preferences.QuickMode && phrases.Count > 0) { Submit(phrases[0].Id); return; }
             foreach (var phrase in phrases.Take(3)) { string id = phrase.Id; Choice(phrase.Text, () => Submit(id), 64); }
-            Choice("Back", () => { if (_action == InteractionAction.Claim) Claims(); else if (_request.View.RespondTo.HasValue) BuildActions(); else Targets(_action.Value); });
+            Choice("Back", () => { if (_action == InteractionAction.Claim) { if (InteractionMenu.Options(_request, InteractionAction.Claim, null).Count > 1) Claims(); else BuildActions(); } else if (_request.View.RespondTo.HasValue) BuildActions(); else Targets(_action.Value); });
             FocusChoice();
         }
         private void Submit(string id) { if (!IsDisplaying && Time.frameCount > _readyFrame) OptionChosen?.Invoke(id); }

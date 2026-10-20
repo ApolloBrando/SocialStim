@@ -8,8 +8,10 @@ namespace SocialStim.Rules.Phases
     public sealed class GameObservation
     {
         internal GameObservation(int sequence, int day, GameCue cue, string text, CharacterId? speaker = null, DialogueMetadata metadata = null,
-            CharacterId? target = null, SpeechIntent? intent = null, RoleId? claimedRole = null)
-        { Sequence = sequence; Day = day; Cue = cue; Text = text; Speaker = speaker; Metadata = metadata; Target = target; Intent = intent; ClaimedRole = claimedRole; }
+            CharacterId? target = null, SpeechIntent? intent = null, RoleId? claimedRole = null, int round = 1)
+        { Round = round; Sequence = sequence; Day = day; Cue = cue; Text = text; Speaker = speaker; Metadata = metadata; Target = target; Intent = intent; ClaimedRole = claimedRole; }
+        /// <summary>Public discussion round at event delivery, before the next window advances.</summary>
+        public int Round { get; }
         /// <summary>Monotonic transcript identity.</summary>
         public int Sequence { get; }
         /// <summary>Public day associated with the observation.</summary>
