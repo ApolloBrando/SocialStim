@@ -80,7 +80,7 @@ namespace SocialStim.Editor.EffectsPlayground
             double now = EditorApplication.timeSinceStartup;
             bool wasBusy = _playback.Busy;
             _playback.Tick((float)Math.Min(0.1, Math.Max(0, now - _last))); _last = now;
-            if (wasBusy || _playback.Busy) Repaint();
+            if (wasBusy || _playback.Busy || _playback.Text != null) Repaint();
         }
         private void OnDisable() { _playback.Cancel(); }
     }

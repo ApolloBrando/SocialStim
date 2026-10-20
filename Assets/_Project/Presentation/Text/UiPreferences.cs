@@ -15,7 +15,7 @@ namespace SocialStim.Presentation.Text
             {
                 return new EffectsSettings(Flag("enabled", true), Flag("reduced", true), Flag("flashes", false),
                     PlayerPrefs.GetFloat(Prefix + "intensity", 0.5f), Flag("instant", false),
-                    PlayerPrefs.GetFloat(Prefix + "speed", 28));
+                    PlayerPrefs.GetFloat(Prefix + "speed", 84));
             }
             catch (ArgumentException) { return new EffectsSettings(); }
         }

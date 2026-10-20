@@ -40,6 +40,7 @@ namespace SocialStim.Rules.Reasoning
         internal IReadOnlyList<EvidenceRecord> Evidence => _evidence.ToList().AsReadOnly();
         internal int Suspicion(CharacterId target) => _suspicion[target];
         internal int Trust(CharacterId target) => _trust[target];
+        internal Faction? KnownFaction(CharacterId target) => _distribution.KnownFaction(target);
         internal FactionEstimate Factions(CharacterId target) => _distribution.Factions(target);
         internal IReadOnlyList<RoleEstimate> Roles(CharacterId target) => _distribution.Roles(target);
         internal RoleId? Claim(CharacterId target) => _claims.TryGetValue(target, out RoleId claim) ? claim : (RoleId?)null;
