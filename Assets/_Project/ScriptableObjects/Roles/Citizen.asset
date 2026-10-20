@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Citizen
   m_EditorClassIdentifier:
   _id: citizen
-  _displayName: Citizen
+  _displayName: Solarian
   _faction: 0
   _category: 6
   _ability: 5
@@ -23,3 +23,5 @@ MonoBehaviour:
   _charges: 0
   _appearance: 0
   _unique: 0
+  _canClaimTruthfully: 0
+  _canBluff: 0

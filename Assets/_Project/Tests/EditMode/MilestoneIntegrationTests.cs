@@ -34,7 +34,7 @@ namespace SocialStim.Tests.EditMode
             run.Observation += delivered.Add;
             Submit(run, GameCommand.Speak(SpeechIntent.Accuse, new CharacterId(1)));
             var speech = delivered.Where(e => e.Cue == GameCue.SpeechDelivered).ToList();
-            Assert.That(speech.Count, Is.EqualTo(5));
+            Assert.That(speech.Count, Is.EqualTo(1), "Silent NPC turns do not publish dialogue.");
             Assert.That(speech.GroupBy(e => e.Speaker).All(g => g.Count() == 1), Is.True);
             GameObservation player = speech.Single(e => e.Speaker == new CharacterId(0));
             Assert.That(player.Intent, Is.EqualTo(SpeechIntent.Accuse));

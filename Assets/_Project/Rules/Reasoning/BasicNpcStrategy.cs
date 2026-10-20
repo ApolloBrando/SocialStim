@@ -14,15 +14,13 @@ namespace SocialStim.Rules.Reasoning
         /// <inheritdoc />
         public GameCommand Speak(KnowledgeView knowledge, IRandomSource random)
         {
-            RoleSpec decoy = knowledge.RoleCatalog.Where(r => r.Faction == Faction.Town)
-                .OrderByDescending(r => r.Ability == AbilityKind.Investigate)
-                .ThenBy(r => r.Id.Value, System.StringComparer.Ordinal).FirstOrDefault();
+            RoleSpec decoy = ClaimPolicy.Proactive(knowledge);
             RoleId claim = decoy?.Id ?? knowledge.OwnRole.Id;
             NightReport result = knowledge.PrivateResults.LastOrDefault(r => r.Kind == ReportKind.Investigation && r.Night == knowledge.Day - 1
                 && knowledge.Characters.Any(c => c.Id == r.Target && c.Alive));
             if (result != null && random.Next(100) < 70)
                 return GameCommand.Speak(SpeechIntent.ReportInvestigation, result.Target, faction: result.Alignment);
-            if (knowledge.OwnRole.Faction == Faction.Antagonist && random.Next(100) < 25)
+            if (knowledge.OwnRole.CanBluff && decoy != null && random.Next(100) < 25)
                 return GameCommand.Speak(SpeechIntent.ClaimRole, role: claim);
             KnownCharacter suspect = Suspect(knowledge);
             if (knowledge.OwnRole.Faction == Faction.Antagonist && knowledge.Day > 1 && suspect != null && random.Next(100) < 25)
@@ -30,8 +28,8 @@ namespace SocialStim.Rules.Reasoning
             if (suspect != null && (suspect.Suspicion >= 30 || (knowledge.Personality == Personality.Brave || knowledge.Personality == Personality.Smug)))
                 return GameCommand.Speak(SpeechIntent.Accuse, suspect.Id);
             int choice = random.Next(4);
-            if (choice == 0) return GameCommand.Speak(SpeechIntent.ClaimRole,
-                role: knowledge.OwnRole.Faction == Faction.Antagonist ? claim : knowledge.OwnRole.Id);
+            if (choice == 0 && decoy != null && (knowledge.OwnRole.CanBluff || knowledge.SelfExposure >= 40))
+                return GameCommand.Speak(SpeechIntent.ClaimRole, role: decoy.Id);
             if (choice == 1 && suspect != null) return GameCommand.Speak(SpeechIntent.Accuse, suspect.Id);
             return GameCommand.Speak(choice == 2 ? SpeechIntent.ExpressFear : SpeechIntent.StaySilent);
         }

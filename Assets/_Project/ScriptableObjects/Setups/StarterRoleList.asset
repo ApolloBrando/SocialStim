@@ -27,7 +27,7 @@ MonoBehaviour:
     FilterFaction: 0
     Faction: 0
     FilterCategory: 1
-    Category: 2
+    Category: 5
   - Role:
     FilterFaction: 1
     Faction: 0

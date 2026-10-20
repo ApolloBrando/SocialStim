@@ -840,6 +840,62 @@
       "text": "I shall give the details once, so listening would be wise. {result}",
       "weight": 1,
       "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.counterclaim.01",
+      "intent": "CounterClaim",
+      "text": "An ambitious impersonation. Unfortunately, I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.counterclaim.02",
+      "intent": "CounterClaim",
+      "text": "You neglected one detail: the actual {role} is listening. That would be me.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.counterclaim.03",
+      "intent": "CounterClaim",
+      "text": "How flattering. Someone wants my job. I remain the {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.counterclaim.04",
+      "intent": "CounterClaim",
+      "text": "I suppose I must correct the record personally. I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.counterclaim.05",
+      "intent": "CounterClaim",
+      "text": "That claim would work better without the genuine {role} in the room.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.counterclaim.06",
+      "intent": "CounterClaim",
+      "text": "Borrowing my title does not confer competence. I am the real {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.counterclaim.07",
+      "intent": "CounterClaim",
+      "text": "A bold claim, delivered to precisely the wrong audience. I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.counterclaim.08",
+      "intent": "CounterClaim",
+      "text": "Allow me to spoil the performance. The {role} is me.",
+      "weight": 1,
+      "requiredTrait": "Smug"
     }
   ]
 }

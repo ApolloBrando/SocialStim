@@ -95,5 +95,45 @@ namespace SocialStim.Tests.PlayMode
 
         private static string Label(Button button) => button.GetComponentsInChildren<TextMeshProUGUI>(true)
             .Single(label => label.name == "Label").text.TrimStart('>', ' ');
+
+        [Test]
+        public void DiscussionUsesOneRosterAndTwoStepAccuseAndDefendMenus()
+        {
+            Assert.That(TMP_Settings.defaultFontAsset, Is.Not.Null, "Import TMP Essential Resources.");
+            var root = new GameObject("Discussion layout regression");
+            try
+            {
+                var civilian = new RoleSpec(new RoleId("civilian"), "Solarian", Faction.Town,
+                    RoleCategory.TownBenign, AbilityKind.None, 0, 0, 0, -1, Faction.Town);
+                var physician = new RoleSpec(new RoleId("physician"), "Physician", Faction.Town,
+                    RoleCategory.TownProtective, AbilityKind.Protect, 0, 0, 1, -1, Faction.Town, unique: true);
+                var evil = new RoleSpec(new RoleId("evil"), "Archon", Faction.Antagonist,
+                    RoleCategory.AntagonistKilling, AbilityKind.Attack, 1, 0, 0, -1, Faction.Antagonist);
+                var roles = new[] { civilian, physician, evil };
+                var lines = Enum.GetValues(typeof(Personality)).Cast<Personality>().SelectMany(trait =>
+                    Enum.GetValues(typeof(SpeechIntent)).Cast<SpeechIntent>().Select(intent =>
+                        new DialogueLine(trait + "." + intent, intent, "Test speech.", requiredTrait: trait)));
+                var run = RunFactory.CreateScenario(new RunOptions(42), new[] {
+                    new CastMemberSpec("Ada", civilian.Id), new CastMemberSpec("Bram", physician.Id),
+                    new CastMemberSpec("Celia", evil.Id)
+                }, roles, lines);
+                var view = root.AddComponent<TextGameView>();
+                view.Initialize(TMP_Settings.defaultFontAsset, initialSettings: new EffectsSettings(enabled: false));
+                view.ShowSetup(roles, "Test", _ => { });
+                view.Render(new GameController(run, roles).Request());
+                Assert.That(root.transform.Find("Text Canvas/Role Claims Board"), Is.Null);
+                Assert.That(root.GetComponentsInChildren<ParticipantCard>().Length, Is.EqualTo(3));
+                Transform choices = root.transform.Find("Text Canvas/Choices");
+                Func<Button[]> active = () => choices.GetComponentsInChildren<Button>().Where(b => b.gameObject.activeInHierarchy).ToArray();
+                Assert.That(active().Select(Label), Is.EquivalentTo(new[] { "Wait", "Accuse", "Defend" }));
+                active().Single(b => Label(b) == "Accuse").onClick.Invoke();
+                Assert.That(active().Select(Label), Is.EquivalentTo(new[] { "Back", "Bram", "Celia" }));
+                Assert.That(run.GetPlayerView().Revision, Is.Zero, "Opening a target menu must not spend the turn.");
+                active().Single(b => Label(b) == "Back").onClick.Invoke();
+                active().Single(b => Label(b) == "Defend").onClick.Invoke();
+                Assert.That(active().Select(Label), Is.EquivalentTo(new[] { "Back", "Bram", "Celia" }));
+            }
+            finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
     }
 }

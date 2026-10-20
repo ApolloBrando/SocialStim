@@ -15,12 +15,12 @@ namespace SocialStim.Application.Input
         /// <summary>Qualitative social meaning, not a promise of exact NPC scores.</summary>
         public string Interpretation { get; }
         /// <summary>Presentation navigation only; choosing a category never submits a command.</summary>
-        public string Category => Command.Kind == CommandKind.ReportLastAction ? "Night reports" : Command.Kind != CommandKind.Speak ? "Actions"
-            : Command.Intent == SpeechIntent.ClaimRole ? "Role claims"
-            : Command.Intent == SpeechIntent.ReportInvestigation || Command.Intent == SpeechIntent.ReportAction ? "Night reports"
-            : Command.Intent == SpeechIntent.Accuse || Command.Intent == SpeechIntent.CallForTrial || Command.Intent == SpeechIntent.Deflect ? "Pressure"
-            : Command.Intent == SpeechIntent.Vouch || Command.Intent == SpeechIntent.Agree || Command.Intent == SpeechIntent.Disagree ? "Support and challenge"
-            : "Personal";
+        public string Category => Command.Kind == CommandKind.ReportLastAction ? "Claim Role" : Command.Kind != CommandKind.Speak ? "Actions"
+            : Command.Intent == SpeechIntent.ClaimRole ? "Claim Role"
+            : Command.Intent == SpeechIntent.Accuse ? "Accuse"
+            : Command.Intent == SpeechIntent.Vouch ? "Defend" : "Actions";
+        /// <summary>Whether presentation should open a target/role submenu before submitting.</summary>
+        public bool HasSubmenu => Category != "Actions";
         public string Family => Command.Kind == CommandKind.Speak ? ActionLabels.Speech(Command.Intent) : Command.Kind == CommandKind.ReportLastAction ? "Report last night" : "Actions";
         internal GameCommand Command { get; }
     }

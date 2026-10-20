@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Assassin
   m_EditorClassIdentifier:
   _id: assassin
-  _displayName: Assassin
+  _displayName: Archon
   _faction: 1
   _category: 3
   _ability: 3
@@ -22,4 +22,6 @@ MonoBehaviour:
   _protection: 0
   _charges: -1
   _appearance: 1
-  _unique: 0
+  _unique: 1
+  _canClaimTruthfully: 0
+  _canBluff: 1

@@ -47,7 +47,7 @@ namespace SocialStim.Editor
                     catch (ArgumentException exception)
                     { throw new ArgumentException(line.Id + ": " + exception.Message, exception); }
                 }
-                catalog.LoadReasoning();
+                catalog.LoadReasoning(); catalog.LoadInteractionLabels();
             }, failures);
             if (catalogs == 0) failures.Add("No GameCatalog assets found in Assets/_Project.");
             ValidateAssets<RoleDefinition>(asset => asset.ToSpec(), failures);

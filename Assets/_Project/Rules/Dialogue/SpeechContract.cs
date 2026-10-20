@@ -14,7 +14,7 @@ namespace SocialStim.Rules.Dialogue
         public static bool AllowsOptionalTarget(SpeechIntent intent) => intent == SpeechIntent.ReportAction;
 
         /// <summary>Whether the intent necessarily asserts a role or investigation result.</summary>
-        public static bool HasAssertion(SpeechIntent intent) => intent == SpeechIntent.ClaimRole || intent == SpeechIntent.ReportInvestigation || intent == SpeechIntent.ReportAction;
+        public static bool HasAssertion(SpeechIntent intent) => intent == SpeechIntent.ClaimRole || intent == SpeechIntent.CounterClaim || intent == SpeechIntent.ReportInvestigation || intent == SpeechIntent.ReportAction;
 
         /// <summary>Actual authored-speech entry phases supported by the current participant loop.</summary>
         public static bool AllowsPhase(SpeechIntent intent, GamePhase phase) => phase == GamePhase.Discussion

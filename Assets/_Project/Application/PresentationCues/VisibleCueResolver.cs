@@ -16,7 +16,7 @@ namespace SocialStim.Application.PresentationCues
         {
             if (observation.Cue == GameCue.SpeechDelivered)
             {
-                if (observation.Intent == SpeechIntent.ClaimRole && observation.Speaker.HasValue && observation.ClaimedRole.HasValue)
+                if ((observation.Intent == SpeechIntent.ClaimRole || observation.Intent == SpeechIntent.CounterClaim) && observation.Speaker.HasValue && observation.ClaimedRole.HasValue)
                 {
                     bool changed = _claims.TryGetValue(observation.Speaker.Value, out RoleId prior) && prior != observation.ClaimedRole.Value;
                     _claims[observation.Speaker.Value] = observation.ClaimedRole.Value;

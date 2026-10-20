@@ -152,8 +152,7 @@ namespace SocialStim.Tests.EditMode
             var view = run.GetPlayerView();
             Assert.That(view.Phase, Is.EqualTo(GamePhase.Discussion));
             Assert.That(view.Opening, Is.False);
-            Assert.That(view.Transcript.Count(e => e.Cue == GameCue.SpeechDelivered), Is.EqualTo(1));
-            Assert.That(view.Transcript.Last(e => e.Cue == GameCue.SpeechDelivered).Speaker, Is.Not.EqualTo(view.PlayerId));
+            Assert.That(view.Transcript.Count(e => e.Cue == GameCue.SpeechDelivered), Is.Zero, "A silent opener emits no speech.");
             Submit(run, GameCommand.Speak(SpeechIntent.StaySilent));
             Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.Nomination));
         }
@@ -230,7 +229,7 @@ namespace SocialStim.Tests.EditMode
             Submit(run, GameCommand.Night(null)); Submit(run, GameCommand.Continue());
             var reports = run.GetPlayerView().Transcript.Where(e => e.Day == 2 && e.Intent == SpeechIntent.ReportInvestigation
                 && (e.Speaker == new CharacterId(1) || e.Speaker == new CharacterId(2))).ToList();
-            Assert.That(reports.Count, Is.EqualTo(2));
+            Assert.That(reports.Count, Is.EqualTo(1), "Teammates must not all impersonate the same investigator.");
             Assert.That(reports.All(e => e.Target != new CharacterId(1) && e.Target != new CharacterId(2)), Is.True);
         }
 

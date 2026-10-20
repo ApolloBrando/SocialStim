@@ -17,6 +17,16 @@ namespace SocialStim.Rules.Reasoning
         /// <summary>Creates a strategy with immutable authored tuning.</summary>
         public SocialNpcStrategy(ReasoningSettings settings = null) { _settings = settings ?? new ReasoningSettings(); }
 
+        /// <summary>Optional public follow-up, using only this listener's permitted beliefs.</summary>
+        public static GameCommand Reaction(KnowledgeView knowledge, CharacterId speaker, CharacterId subject,
+            bool accusation, IRandomSource random)
+        {
+            if (knowledge.Self == speaker || knowledge.Self == subject || random.Next(100) >= 45) return null;
+            KnownCharacter target = knowledge.Characters.First(c => c.Id == subject);
+            bool suspicious = target.Suspicion >= 30 && !target.IsTeammate && target.KnownFaction != Faction.Town;
+            return GameCommand.Speak(suspicious == accusation ? SpeechIntent.Agree : SpeechIntent.Disagree, speaker);
+        }
+
         /// <inheritdoc />
         public GameCommand Speak(KnowledgeView knowledge, IRandomSource random)
         {
@@ -25,22 +35,24 @@ namespace SocialStim.Rules.Reasoning
             KnownCharacter suspect = Suspect(knowledge);
             KnownCharacter trusted = knowledge.Characters.Where(c => c.Alive && c.Id != knowledge.Self)
                 .OrderByDescending(c => c.Trust).ThenBy(c => c.Id.Value).FirstOrDefault();
-            bool deceptive = knowledge.OwnRole.Faction == Faction.Antagonist || (knowledge.Personality == Personality.Smug || knowledge.Personality == Personality.Jokester);
+            bool deceptive = knowledge.OwnRole.CanBluff;
             if (knowledge.OwnRole.Category == RoleCategory.NeutralEvil)
             {
-                RoleSpec hostile = knowledge.RoleCatalog.FirstOrDefault(r => r.Faction == Faction.Antagonist);
+                RoleSpec hostile = ClaimPolicy.Proactive(knowledge);
                 if (hostile != null && !self.ClaimedRole.HasValue)
                     return GameCommand.Speak(SpeechIntent.ClaimRole, role: hostile.Id);
                 if (suspect != null) return GameCommand.Speak(SpeechIntent.Deflect, suspect.Id);
             }
-            RoleSpec decoy = knowledge.RoleCatalog.Where(r => r.Faction == Faction.Town)
-                .OrderByDescending(r => r.Ability == AbilityKind.Investigate).ThenBy(r => r.Id.Value, System.StringComparer.Ordinal).FirstOrDefault();
+            RoleSpec decoy = ClaimPolicy.Proactive(knowledge);
             RoleId claim = self.ClaimedRole ?? (deceptive && decoy != null ? decoy.Id : knowledge.OwnRole.Id);
             candidates.Add((GameCommand.Speak(SpeechIntent.StaySilent), 8));
             candidates.Add((GameCommand.Speak(SpeechIntent.ExpressFear), 12));
             candidates.Add((GameCommand.Speak(SpeechIntent.Defend), knowledge.SelfExposure >= _settings.ExposureThreshold ? 75 : 4));
-            candidates.Add((GameCommand.Speak(SpeechIntent.ClaimRole, role: claim),
-                self.ClaimedRole.HasValue ? 3 : 18 + (deceptive ? _settings.DeceptionBonus : 0)));
+            // Town power roles keep cover until pressure or useful private evidence warrants a claim.
+            if (decoy != null && (deceptive || knowledge.SelfExposure >= _settings.ExposureThreshold
+                || knowledge.PrivateResults.Any(r => r.Kind == ReportKind.Investigation && r.Alignment == Faction.Antagonist)))
+                candidates.Add((GameCommand.Speak(SpeechIntent.ClaimRole, role: decoy.Id),
+                    28 + (deceptive ? _settings.DeceptionBonus : 35)));
             if (knowledge.Evidence.Any(e => e.Kind == EvidenceKind.Death && e.Day >= knowledge.Day - 1))
                 candidates.Add((GameCommand.Speak(SpeechIntent.ReactToDeath), 24));
             if (knowledge.Evidence.Any(e => e.Kind == EvidenceKind.RoleReveal && e.Day >= knowledge.Day - 1))

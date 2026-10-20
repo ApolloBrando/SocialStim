@@ -82,26 +82,14 @@ namespace SocialStim.Tests.EditMode
 
         /// <summary>Listeners treat claims as uncertain but penalize a speaker contradicting their prior claim.</summary>
         [Test]
-        public void SwitchingRoleClaimsRaisesEachObserversSuspicion()
+        public void TownCannotBluffOrClaimAnOrdinaryCitizen()
         {
-            var observed = new Dictionary<CharacterId, int>();
-            var strategy = new ScenarioStrategy
-            {
-                OnSpeech = knowledge => observed[knowledge.Self] = knowledge.Characters.Single(c => c.Id.Value == 0).Suspicion,
-            };
-            var run = RunFactory.CreateScenario(new RunOptions(123, discussionRounds: 3, votingMode: VotingMode.Trial), new[]
-            {
-                new CastMemberSpec("Player", new RoleId("interrupter")),
-                new CastMemberSpec("Listener1", new RoleId("inspector")),
-                new CastMemberSpec("Listener2", new RoleId("physician")),
-                new CastMemberSpec("Listener3", new RoleId("assassin")),
-                new CastMemberSpec("Listener4", new RoleId("survivor")),
-            }, TestContent.Roles(), TestContent.Lines(), strategy);
-            Submit(run, GameCommand.Speak(SpeechIntent.ClaimRole, role: new RoleId("inspector")));
-            var before = observed.ToDictionary(pair => pair.Key, pair => pair.Value);
-            Submit(run, GameCommand.Speak(SpeechIntent.ClaimRole, role: new RoleId("survivor")));
-            Assert.That(observed.Count, Is.EqualTo(4));
-            foreach (var pair in before) Assert.That(observed[pair.Key], Is.GreaterThan(pair.Value));
+            var run = Scenario(new ScenarioStrategy());
+            int revision = run.GetPlayerView().Revision;
+            Assert.That(run.TrySubmit(GameCommand.Speak(SpeechIntent.ClaimRole, role: new RoleId("inspector")), out _), Is.False);
+            Assert.That(run.TrySubmit(GameCommand.Speak(SpeechIntent.ClaimRole, role: new RoleId("survivor")), out _), Is.False);
+            Assert.That(run.GetPlayerView().Revision, Is.EqualTo(revision));
+            Submit(run, GameCommand.Speak(SpeechIntent.ClaimRole, role: new RoleId("interrupter")));
         }
     }
 }

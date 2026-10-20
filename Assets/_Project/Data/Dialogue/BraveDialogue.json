@@ -882,6 +882,62 @@
       "text": "No evasion from me about the night. {result}",
       "weight": 1,
       "requiredTrait": "Brave"
+    },
+    {
+      "id": "npc.brave.counterclaim.01",
+      "intent": "CounterClaim",
+      "text": "That role is mine. I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Brave"
+    },
+    {
+      "id": "npc.brave.counterclaim.02",
+      "intent": "CounterClaim",
+      "text": "I will challenge that claim openly. The real {role} is standing here.",
+      "weight": 1,
+      "requiredTrait": "Brave"
+    },
+    {
+      "id": "npc.brave.counterclaim.03",
+      "intent": "CounterClaim",
+      "text": "You picked the wrong role to steal. I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Brave"
+    },
+    {
+      "id": "npc.brave.counterclaim.04",
+      "intent": "CounterClaim",
+      "text": "Everyone heard that claim. Now hear mine: I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Brave"
+    },
+    {
+      "id": "npc.brave.counterclaim.05",
+      "intent": "CounterClaim",
+      "text": "I was keeping quiet for a reason. I am the {role}, and that claim is false.",
+      "weight": 1,
+      "requiredTrait": "Brave"
+    },
+    {
+      "id": "npc.brave.counterclaim.06",
+      "intent": "CounterClaim",
+      "text": "No hiding behind my job. I am the {role}. Face me.",
+      "weight": 1,
+      "requiredTrait": "Brave"
+    },
+    {
+      "id": "npc.brave.counterclaim.07",
+      "intent": "CounterClaim",
+      "text": "I will stake my name on this. I am the genuine {role}.",
+      "weight": 1,
+      "requiredTrait": "Brave"
+    },
+    {
+      "id": "npc.brave.counterclaim.08",
+      "intent": "CounterClaim",
+      "text": "Hold it. You cannot have my role. I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Brave"
     }
   ]
 }

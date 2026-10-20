@@ -16,7 +16,7 @@ namespace SocialStim.Rules.Night
                 RoleSpec role = context.Actor(order.Actor).Role;
                 if (role.Ability != AbilityKind.Attack) continue;
                 context.Reports.Add(new NightReport(order.Target.Value, ReportKind.Targeted));
-                if (role.Attack > context.Defense[order.Target.Value]) context.Deaths.Add(order.Target.Value);
+                if (!context.Actor(order.Target.Value).Role.NightImmune && role.Attack > context.Defense[order.Target.Value]) context.Deaths.Add(order.Target.Value);
                 else context.Reports.Add(new NightReport(order.Actor, ReportKind.AttackFailed, order.Target));
             }
         }

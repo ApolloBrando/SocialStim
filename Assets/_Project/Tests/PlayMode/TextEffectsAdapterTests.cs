@@ -1,15 +1,43 @@
 using System;
+using System.Collections;
 using NUnit.Framework;
 using SocialStim.Application.PresentationCues;
 using SocialStim.Presentation.Effects;
 using TMPro;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace SocialStim.Tests.PlayMode
 {
     /// <summary>Requires real TMP resources; these adapter checks cannot run in the headless project.</summary>
     public sealed class TextEffectsAdapterTests
     {
+        [UnityTest]
+        public IEnumerator FearAndExplicitShakeRestoreGeometryAfterOneAndHalfSeconds()
+        {
+            Assert.That(TMP_Settings.defaultFontAsset, Is.Not.Null, "Import TMP Essential Resources.");
+            var canvas = new GameObject("Timed shake regression", typeof(RectTransform), typeof(Canvas));
+            try
+            {
+                var child = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
+                child.transform.SetParent(canvas.transform, false);
+                var label = child.GetComponent<TextMeshProUGUI>();
+                label.font = TMP_Settings.defaultFontAsset;
+                label.rectTransform.sizeDelta = new Vector2(500, 200);
+                var renderer = canvas.AddComponent<TextEffectRenderer>(); renderer.Initialize(label);
+                renderer.SetSettings(new EffectsSettings(reducedMotion: false));
+                renderer.SetDocument(SemanticMarkup.Parse("<fear>AB</fear>"), 0, new TextPalette(false));
+                label.ForceMeshUpdate();
+                var character = label.textInfo.characterInfo[0];
+                Vector3 baseline = label.textInfo.meshInfo[character.materialReferenceIndex].vertices[character.vertexIndex];
+                renderer.Apply(2, new EffectFrame(1, 0, 0, 0), 0.2f);
+                Assert.That(label.textInfo.meshInfo[character.materialReferenceIndex].vertices[character.vertexIndex], Is.Not.EqualTo(baseline));
+                yield return new WaitForSecondsRealtime(1.6f);
+                renderer.Apply(2, new EffectFrame(1, 0, 0, 0), 1.8f);
+                Assert.That(label.textInfo.meshInfo[character.materialReferenceIndex].vertices[character.vertexIndex], Is.EqualTo(baseline));
+            }
+            finally { UnityEngine.Object.DestroyImmediate(canvas); }
+        }
         [TestCase(false, 0f)]
         [TestCase(false, 0.5f)]
         [TestCase(false, 1f)]

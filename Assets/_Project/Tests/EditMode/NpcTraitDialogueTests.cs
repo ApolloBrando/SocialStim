@@ -197,7 +197,7 @@ namespace SocialStim.Tests.EditMode
         public void OriginalIdsAndConditionalMetadataRemainAccessible()
         {
             var lines = TestContent.AuthoredLines().ToDictionary(line => line.Id);
-            Assert.That(lines.Keys.Count(id => !id.StartsWith("npc.", StringComparison.Ordinal)), Is.EqualTo(70));
+            Assert.That(lines.Keys.Count(id => !id.StartsWith("npc.", StringComparison.Ordinal) && !id.StartsWith("player.counterclaim.", StringComparison.Ordinal)), Is.EqualTo(70));
             var pressure = lines["starter.social.defend.pressure"];
             Assert.That(pressure.Weight, Is.EqualTo(3));
             Assert.That(pressure.Metadata.Emotion, Is.EqualTo("tense"));
@@ -220,7 +220,7 @@ namespace SocialStim.Tests.EditMode
             var values = Regex.Matches(names, @"^  - (.+)$", RegexOptions.Multiline).Cast<Match>().Select(match => match.Groups[1].Value).ToArray();
             Assert.That(values.Length, Is.GreaterThanOrEqualTo(40));
             Assert.That(values.Distinct().Count(), Is.EqualTo(values.Length));
-            Assert.That(values.All(value => value.Length <= 16 && Regex.IsMatch(value, "^[A-Za-z ]+$")), Is.True);
+            Assert.That(values.All(value => value.Length <= 16 && Regex.IsMatch(value, "^[A-Za-z]+$")), Is.True);
             foreach (string original in "Ada Bram Celia Dorian Elena Felix Greta Hector Iris Jonas Kira Lucian Mara Nico Orla Petra Quinn Radu Sabina Tomas".Split(' '))
                 Assert.That(values, Has.Member(original));
         }

@@ -13,13 +13,15 @@ MonoBehaviour:
   m_Name: Coordinator
   m_EditorClassIdentifier:
   _id: coordinator
-  _displayName: Coordinator
-  _faction: 1
-  _category: 8
+  _displayName: Watcher
+  _faction: 0
+  _category: 0
   _ability: 7
   _attack: 0
   _defense: 0
   _protection: 0
   _charges: -1
-  _appearance: 1
-  _unique: 0
+  _appearance: 0
+  _unique: 1
+  _canClaimTruthfully: 1
+  _canBluff: 0

@@ -50,7 +50,7 @@ namespace SocialStim.Rules.Reasoning
             int influence = Math.Max(0, _settings.AssertionWeight * (_trust[speaker] + 25) / 75);
             if ((_personality == Personality.Anxious || _personality == Personality.Slow)) influence += _settings.GullibleBonus;
             if ((_personality == Personality.Anxious || _personality == Personality.Grim)) influence = Math.Max(0, influence - 2);
-            EvidenceKind kind = speech.Intent == SpeechIntent.ClaimRole ? EvidenceKind.RoleClaim
+            EvidenceKind kind = speech.Intent == SpeechIntent.ClaimRole || speech.Intent == SpeechIntent.CounterClaim ? EvidenceKind.RoleClaim
                 : speech.Intent == SpeechIntent.ReportInvestigation ? EvidenceKind.InvestigationClaim : EvidenceKind.Statement;
             Record(day, kind, speaker, speech.Target, speech.Intent, speech.ClaimedRole, speech.ReportedFaction, night: day - 1);
             if (speech.Intent == SpeechIntent.Accuse || speech.Intent == SpeechIntent.CallForTrial || speech.Intent == SpeechIntent.Deflect)
@@ -73,6 +73,21 @@ namespace SocialStim.Rules.Reasoning
             { Change(speaker, -3); if (speaker == _self) Expose(-3); }
             if (speech.Intent == SpeechIntent.Agree && speech.Target.HasValue) TrustChange(speech.Target.Value, 3);
             if (speech.Intent == SpeechIntent.Disagree && speech.Target.HasValue) TrustChange(speech.Target.Value, -3);
+            if ((speech.Intent == SpeechIntent.Agree || speech.Intent == SpeechIntent.Disagree) && speech.Target.HasValue)
+            {
+                EvidenceRecord statement = _evidence.LastOrDefault(e => e.Actor == speech.Target.Value
+                    && (e.Intent == SpeechIntent.Accuse || e.Intent == SpeechIntent.Deflect
+                        || e.Intent == SpeechIntent.Vouch || e.Intent == SpeechIntent.Defend));
+                if (statement != null)
+                {
+                    CharacterId subject = statement.Target ?? statement.Actor;
+                    bool accusation = statement.Intent == SpeechIntent.Accuse || statement.Intent == SpeechIntent.Deflect;
+                    int change = (speech.Intent == SpeechIntent.Agree) == accusation ? influence : -influence;
+                    Change(subject, change);
+                    _distribution.AssertAlignment(subject, change > 0 ? Faction.Antagonist : Faction.Town, Math.Abs(change));
+                    if (subject == _self) Expose(change);
+                }
+            }
             if (speech.ClaimedRole.HasValue)
             {
                 bool priorExists = _claims.TryGetValue(speaker, out RoleId prior);

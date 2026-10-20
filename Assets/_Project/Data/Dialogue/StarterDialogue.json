@@ -459,6 +459,30 @@
       "intent": "ReportAction",
       "text": "My night report follows: {result}",
       "weight": 1
+    },
+    {
+      "id": "player.counterclaim.01",
+      "intent": "CounterClaim",
+      "text": "I am the actual {role}.",
+      "weight": 1
+    },
+    {
+      "id": "player.counterclaim.02",
+      "intent": "CounterClaim",
+      "text": "That claim is false. I am the {role}.",
+      "weight": 1
+    },
+    {
+      "id": "player.counterclaim.03",
+      "intent": "CounterClaim",
+      "text": "I dispute that claim. The {role} is me.",
+      "weight": 1
+    },
+    {
+      "id": "player.counterclaim.04",
+      "intent": "CounterClaim",
+      "text": "We cannot both be the {role}.",
+      "weight": 1
     }
   ]
 }

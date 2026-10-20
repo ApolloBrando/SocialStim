@@ -20,11 +20,11 @@ namespace SocialStim.Rules.Phases
             {
                 case GamePhase.Discussion: legal |= next == GamePhase.Nomination || next == GamePhase.Voting; break;
                 case GamePhase.Voting: legal |= next == GamePhase.VoteReveal; break;
-                case GamePhase.VoteReveal: legal |= next == GamePhase.Voting || next == GamePhase.LastWords
+                case GamePhase.VoteReveal: legal |= next == GamePhase.Defense || next == GamePhase.Voting || next == GamePhase.LastWords
                     || next == GamePhase.Execution || next == GamePhase.NightSelection; break;
                 case GamePhase.Nomination: legal |= next == GamePhase.Defense || next == GamePhase.NightSelection; break;
                 case GamePhase.Defense: legal |= next == GamePhase.Judgement; break;
-                case GamePhase.Judgement: legal |= next == GamePhase.LastWords || next == GamePhase.Nomination || next == GamePhase.NightSelection; break;
+                case GamePhase.Judgement: legal |= next == GamePhase.Execution || next == GamePhase.LastWords || next == GamePhase.Nomination || next == GamePhase.NightSelection; break;
                 case GamePhase.LastWords: legal |= next == GamePhase.Execution; break;
                 case GamePhase.Execution: legal |= next == GamePhase.NightSelection; break;
                 case GamePhase.NightSelection: legal |= next == GamePhase.NightResolution; break;

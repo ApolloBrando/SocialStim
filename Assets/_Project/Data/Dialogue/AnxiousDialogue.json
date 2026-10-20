@@ -840,6 +840,62 @@
       "text": "I... I need to share this record. {result}",
       "weight": 1,
       "requiredTrait": "Anxious"
+    },
+    {
+      "id": "npc.anxious.counterclaim.01",
+      "intent": "CounterClaim",
+      "text": "Um, no... I am the {role}. Please believe me.",
+      "weight": 1,
+      "requiredTrait": "Anxious"
+    },
+    {
+      "id": "npc.anxious.counterclaim.02",
+      "intent": "CounterClaim",
+      "text": "Sorry, but that is my role. I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Anxious"
+    },
+    {
+      "id": "npc.anxious.counterclaim.03",
+      "intent": "CounterClaim",
+      "text": "Wait, what? There cannot be two of us. I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Anxious"
+    },
+    {
+      "id": "npc.anxious.counterclaim.04",
+      "intent": "CounterClaim",
+      "text": "I was afraid of this... someone is pretending to be me. I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Anxious"
+    },
+    {
+      "id": "npc.anxious.counterclaim.05",
+      "intent": "CounterClaim",
+      "text": "No, no. I know my own job. The {role} is me.",
+      "weight": 1,
+      "requiredTrait": "Anxious"
+    },
+    {
+      "id": "npc.anxious.counterclaim.06",
+      "intent": "CounterClaim",
+      "text": "Please stop. You are claiming my role, {role}, and now everyone will suspect me.",
+      "weight": 1,
+      "requiredTrait": "Anxious"
+    },
+    {
+      "id": "npc.anxious.counterclaim.07",
+      "intent": "CounterClaim",
+      "text": "I should have spoken sooner... I am actually the {role}.",
+      "weight": 1,
+      "requiredTrait": "Anxious"
+    },
+    {
+      "id": "npc.anxious.counterclaim.08",
+      "intent": "CounterClaim",
+      "text": "Oh dear. That claim is false. I am the real {role}.",
+      "weight": 1,
+      "requiredTrait": "Anxious"
     }
   ]
 }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Inspector
   m_EditorClassIdentifier:
   _id: inspector
-  _displayName: Inspector
+  _displayName: Decryptor
   _faction: 0
   _category: 0
   _ability: 0
@@ -22,4 +22,6 @@ MonoBehaviour:
   _protection: 0
   _charges: -1
   _appearance: 0
-  _unique: 0
+  _unique: 1
+  _canClaimTruthfully: 1
+  _canBluff: 0

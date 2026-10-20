@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: LoneKiller
   m_EditorClassIdentifier:
   _id: lone-killer
-  _displayName: Lone Killer
+  _displayName: Anarchy
   _faction: 2
   _category: 10
   _ability: 3
@@ -23,3 +23,5 @@ MonoBehaviour:
   _charges: -1
   _appearance: 2
   _unique: 1
+  _canClaimTruthfully: 0
+  _canBluff: 1

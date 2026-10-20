@@ -28,7 +28,7 @@ namespace SocialStim.Presentation.Text
         [SerializeField] private bool _lastWords = true;
         [SerializeField] private bool _revealOnDeath = true;
         [Tooltip("Total participants, including you. Zero uses the exact authored role slots.")]
-        [SerializeField, Min(0)] private int _participantCount = 9;
+        [SerializeField, Min(0)] private int _participantCount = 7;
         private TextGameView _view;
         private GamePresenter _presenter;
 
@@ -46,7 +46,7 @@ namespace SocialStim.Presentation.Text
                 _catalog.LoadRoles(); _catalog.LoadDialogue(); _catalog.LoadNames(); _catalog.LoadReasoning();
                 UiEventSystem.Ensure(transform);
                 _view = gameObject.AddComponent<TextGameView>();
-                _view.Initialize(font, _effects != null ? _effects.Load() : null, UiPreferences.Load());
+                _view.Initialize(font, _effects != null ? _effects.Load() : null, UiPreferences.Load(), _catalog.LoadInteractionLabels());
                 _view.RestartRequested += ShowSetup;
                 _view.SettingsChanged += SavePreferences;
                 ShowSetup();
@@ -73,7 +73,8 @@ namespace SocialStim.Presentation.Text
                     votingMode: _votingMode, playerWindowsPerRound: _playerWindowsPerRound,
                     allowAbstain: _allowAbstain, revoteTies: _revoteTies, lastWords: _lastWords);
                 var session = RunFactory.Create(options, roles, _catalog.LoadNames(), _catalog.LoadDialogue(), reasoning: _catalog.LoadReasoning(), setup: _catalog.LoadSetup(_participantCount));
-                _presenter = new GamePresenter(new GameController(session, roles), _view, _view);
+                if (_votingMode == VotingMode.Gnosia) session.TrySubmit(SocialStim.Rules.Commands.GameCommand.Continue(), out _);
+                _presenter = new GamePresenter(new GameController(session, roles, _catalog.LoadInteractionLabels()), _view, _view);
             }
             catch (Exception e) when (e is ArgumentException || e is InvalidOperationException || e is OverflowException)
             { _view.ShowInputError("Invalid setup: " + e.Message); }
