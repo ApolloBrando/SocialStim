@@ -24,7 +24,7 @@ namespace SocialStim.Presentation.Text
         private TextMeshProUGUI _status;
         private TextMeshProUGUI _choiceHeading;
         private TextMeshProUGUI _conversationHeading;
-        private bool _displayOptionsOpen;
+        private RectTransform _displayOptionsPanel;
         private Image _canvasSurface;
         private TextMeshProUGUI _transcript;
         private RectTransform _choices;
@@ -157,15 +157,24 @@ namespace SocialStim.Presentation.Text
             var footerLayout = footer.gameObject.AddComponent<HorizontalLayoutGroup>();
             footerLayout.spacing = 6; footerLayout.childControlWidth = true; footerLayout.childControlHeight = true; footerLayout.childForceExpandWidth = false;
             _skip = Control(footer, "Skip [Space]", SkipAll);
-            Control(footer, "Effects: on", () => ChangeSettings(enabled: !_settings.Enabled));
-            Control(footer, "Motion: reduced", () => ChangeSettings(reduced: !_settings.ReducedMotion));
-            Control(footer, "Flash: off", () => ChangeSettings(flashes: !_settings.Flashes));
-            Control(footer, "Text: animated", () => ChangeSettings(instant: !_settings.InstantText));
-            Control(footer, "Intensity: 50%", () => ChangeSettings(intensity: _settings.Intensity >= 1 ? 0 : Mathf.Min(1, _settings.Intensity + 0.5f)));
-            Control(footer, "Speed: " + _settings.ElementsPerSecond.ToString("0"), () =>
-                ChangeSettings(speed: _settings.ElementsPerSecond < 25 ? 28 : _settings.ElementsPerSecond < 35 ? 40 : 18));
+            _displayOptionsPanel = TextUiFactory.Rect("Display Options", canvas.transform);
+            TextUiFactory.Fill(_displayOptionsPanel, new Vector2(1, 0), new Vector2(1, 0), new Vector2(-300, 70), new Vector2(-32, 400));
+            _surfaces.Add(_displayOptionsPanel.gameObject.AddComponent<Image>());
+            TextUiFactory.Border(_displayOptionsPanel);
+            var displayLayout = _displayOptionsPanel.gameObject.AddComponent<VerticalLayoutGroup>();
+            displayLayout.padding = new RectOffset(12, 12, 12, 12); displayLayout.spacing = 6;
+            displayLayout.childControlWidth = true; displayLayout.childControlHeight = true;
+            displayLayout.childForceExpandHeight = false;
+            Control(_displayOptionsPanel, "Effects: on", () => ChangeSettings(enabled: !_settings.Enabled));
+            Control(_displayOptionsPanel, "Motion: reduced", () => ChangeSettings(reduced: !_settings.ReducedMotion));
+            Control(_displayOptionsPanel, "Flash: off", () => ChangeSettings(flashes: !_settings.Flashes));
+            Control(_displayOptionsPanel, "Text: animated", () => ChangeSettings(instant: !_settings.InstantText));
+            Control(_displayOptionsPanel, "Intensity: 50%", () => ChangeSettings(intensity: _settings.Intensity >= 1 ? 0 : Mathf.Min(1, _settings.Intensity + 0.5f)));
+            Control(_displayOptionsPanel, "Speed: " + _settings.ElementsPerSecond.ToString("0"), () =>
+                ChangeSettings(speed: _settings.ElementsPerSecond < 84 ? 84 : _settings.ElementsPerSecond < 168 ? 168 : 28));
             Control(footer, "Display options", ToggleDisplayOptions);
-            for (int i = 2; i <= 6; i++) _controls[i].gameObject.SetActive(false);
+            Control(_displayOptionsPanel, "Reset display defaults", ResetSettings);
+            _displayOptionsPanel.gameObject.SetActive(false);
             RefreshSettingLabels();
             RectTransform overlay = TextUiFactory.Rect("Effects Overlay", canvas.transform);
             TextUiFactory.Fill(overlay, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
@@ -231,8 +240,14 @@ namespace SocialStim.Presentation.Text
             TextUiFactory.Fill((RectTransform)_transcriptScroll.transform, Vector2.zero, new Vector2(0.64f, 1), new Vector2(32, 82), new Vector2(-10, -230));
             TextUiFactory.Fill((RectTransform)_choiceScroll.transform, new Vector2(0.64f, 0), Vector2.one, new Vector2(10, 82), new Vector2(-32, -230));
             var view = request.View;
+            _choiceHeading.text = view.RespondTo.HasValue ? "RESPOND"
+                : view.Phase == GamePhase.Voting ? (view.Revote ? "REVOTE" : "VOTE") : "YOUR TURN";
             _pendingStatus = $"Day {view.Day} · {ActionLabels.Phase(view.Phase)} · {view.OwnRole.Name} ({view.OwnRole.Faction}) | {(view.Alive ? "Alive" : "Spectator")}"
                 + $" | Uses: {(view.Charges < 0 ? "unlimited" : view.Charges.ToString())}\nSeed {view.Seed} | Trials {view.TrialsUsed}/{view.TrialsAllowed}";
+            if (view.VotingMode == VotingMode.Gnosia)
+                _pendingStatus = $"Day {view.Day} · {ActionLabels.Phase(view.Phase)} · Round {view.DiscussionRound}/{view.DiscussionRoundsAllowed}"
+                    + $" · Window {view.PlayerWindow}/{view.WindowsPerRound} · {view.OwnRole.Name} ({view.OwnRole.Faction})"
+                    + $" · {(view.Alive ? "Alive" : "Spectator")} · Seed {view.Seed}";
             ClearChoices();
             _menuCategory = null; _menuFamily = null; _menuPage = 0;
             _status.text = "Listening…";
@@ -314,6 +329,9 @@ namespace SocialStim.Presentation.Text
                 flashes ?? _settings.Flashes, intensity ?? _settings.Intensity, instant ?? _settings.InstantText, speed ?? _settings.ElementsPerSecond);
             _textEffects.SetSettings(_settings);
             _playback.Reconfigure(_settings);
+            _textEffects.SetSemanticColors(_settings.Enabled);
+            SkipAll();
+            _playback.Cancel();
             SettingsChanged?.Invoke(_settings);
             RefreshSettingLabels();
         }
@@ -326,11 +344,18 @@ namespace SocialStim.Presentation.Text
             SetControl(6, "Intensity: " + (_settings.Intensity * 100).ToString("0") + "%");
             SetControl(7, "Speed: " + _settings.ElementsPerSecond.ToString("0"));
         }
+        private void ResetSettings()
+        {
+            var defaults = new EffectsSettings();
+            ChangeSettings(defaults.Enabled, defaults.ReducedMotion, defaults.Flashes, defaults.InstantText,
+                defaults.Intensity, defaults.ElementsPerSecond);
+        }
         private void ToggleDisplayOptions()
         {
-            _displayOptionsOpen = !_displayOptionsOpen;
-            for (int i = 2; i <= 6; i++) _controls[i].gameObject.SetActive(_displayOptionsOpen);
-            SetControl(8, _displayOptionsOpen ? "Hide options" : "Display options");
+            bool open = !_displayOptionsPanel.gameObject.activeSelf;
+            _displayOptionsPanel.gameObject.SetActive(open);
+            SetControl(8, open ? "Hide options" : "Display options");
+            if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(_controls[open ? 2 : 8].gameObject);
         }
 
         private void SetControl(int index, string text) => _controls[index].GetComponent<ChoiceFocusIndicator>().SetText(text);

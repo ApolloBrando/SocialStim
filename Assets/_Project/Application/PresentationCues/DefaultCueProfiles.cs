@@ -12,7 +12,7 @@ namespace SocialStim.Application.PresentationCues
             foreach (PresentationCue cue in Enum.GetValues(typeof(PresentationCue))) result.Add(cue, EffectProfile.None);
             var gentle = new EffectSequence().Parallel(new EffectStep(EffectChannel.Border, 0.65f, 0.4f)).Build();
             var tense = new EffectSequence().Parallel(new EffectStep(EffectChannel.Border, 0.8f, 0.7f),
-                new EffectStep(EffectChannel.TextShake, 0.45f, 0.4f), new EffectStep(EffectChannel.Vignette, 0.8f, 0.45f)).Build();
+                new EffectStep(EffectChannel.TextShake, 0.45f, 0.4f, continuous: true), new EffectStep(EffectChannel.Vignette, 0.8f, 0.45f)).Build();
             var decisive = new EffectSequence().Parallel(new EffectStep(EffectChannel.Border, 1.2f, 0.9f),
                 new EffectStep(EffectChannel.Vignette, 1.2f, 0.7f), new EffectStep(EffectChannel.Flash, 1.2f, 0.5f)).Build();
             foreach (PresentationCue cue in new[] { PresentationCue.Dawn, PresentationCue.Dusk, PresentationCue.Nomination,
