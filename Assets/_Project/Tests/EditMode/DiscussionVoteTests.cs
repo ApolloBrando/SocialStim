@@ -26,7 +26,7 @@ namespace SocialStim.Tests.EditMode
         }
 
         private static RunSession Run(ScriptedConversation strategy = null, int windows = 1, bool abstain = true,
-            bool revote = true, bool lastWords = true, bool reveal = true) => RunFactory.CreateScenario(
+            bool revote = true, bool lastWords = true, bool reveal = true) => RunFactory.CreateScenario(TestContent.Text,
             new RunOptions(42, discussionRounds: 3, playerWindowsPerRound: windows, allowAbstain: abstain,
                 revoteTies: revote, lastWords: lastWords, revealOnDeath: reveal),
             new[] { "citizen", "inspector", "physician", "assassin", "citizen" }
@@ -205,7 +205,7 @@ namespace SocialStim.Tests.EditMode
         private static string[] Play(uint seed, string role)
         {
             var roles = AdvancedRoleTests.Roles();
-            var run = RunFactory.Create(new RunOptions(seed, new RoleId(role)), roles,
+            var run = RunFactory.Create(TestContent.Text, new RunOptions(seed, new RoleId(role)), roles,
                 TestContent.Names(), TestContent.Lines(), setup: RoleList.ForPopulation(9));
             var controller = new GameController(run, roles);
             for (int step = 0; step < 3000; step++)

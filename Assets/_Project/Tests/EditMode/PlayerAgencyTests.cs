@@ -13,7 +13,7 @@ namespace SocialStim.Tests.EditMode
     /// <summary>Player trial, death, spectator and private-result integration scenarios.</summary>
     public sealed class PlayerAgencyTests
     {
-        private static RunSession Scenario(ScenarioStrategy strategy, bool reveal = true) => RunFactory.CreateScenario(
+        private static RunSession Scenario(ScenarioStrategy strategy, bool reveal = true) => RunFactory.CreateScenario(TestContent.Text,
             new RunOptions(123, discussionRounds: 1, revealOnDeath: reveal, votingMode: VotingMode.Trial), new[]
             {
                 new CastMemberSpec("Player", new RoleId("interrupter")),
@@ -89,7 +89,7 @@ namespace SocialStim.Tests.EditMode
             {
                 OnSpeech = knowledge => observed[knowledge.Self] = knowledge.Characters.Single(c => c.Id.Value == 0).Suspicion,
             };
-            var run = RunFactory.CreateScenario(new RunOptions(123, discussionRounds: 3, votingMode: VotingMode.Trial), new[]
+            var run = RunFactory.CreateScenario(TestContent.Text, new RunOptions(123, discussionRounds: 3, votingMode: VotingMode.Trial), new[]
             {
                 new CastMemberSpec("Player", new RoleId("assassin")),
                 new CastMemberSpec("Listener1", new RoleId("inspector")),

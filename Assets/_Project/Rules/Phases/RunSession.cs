@@ -16,6 +16,9 @@ namespace SocialStim.Rules.Phases
     public sealed class RunSession
     {
         private readonly RunOptions _options;
+        private readonly TextTemplates _text;
+        /// <summary>Immutable authored copy shared with the application view.</summary>
+        public TextTemplates Text => _text;
         private readonly List<Participant> _cast;
         private readonly IReadOnlyList<RoleSpec> _catalog;
         private readonly PhaseMachine _phases = new PhaseMachine();
@@ -46,8 +49,9 @@ namespace SocialStim.Rules.Phases
         private readonly HashSet<CharacterId> _executionObjectives = new HashSet<CharacterId>();
 
         internal RunSession(RunOptions options, List<Participant> cast, IReadOnlyList<RoleSpec> catalog,
-            IEnumerable<DialogueLine> dialogue, INpcStrategy strategy, IWinCondition winCondition, ReasoningSettings reasoning)
+            IEnumerable<DialogueLine> dialogue, INpcStrategy strategy, IWinCondition winCondition, ReasoningSettings reasoning, TextTemplates text)
         {
+            _text = text ?? throw new ArgumentNullException(nameof(text));
             _schedule = options.VotingMode == VotingMode.Gnosia
                 ? new DiscussionSchedule(options.DiscussionRounds, options.PlayerWindowsPerRound) : null;
             _discussion = _schedule == null ? null : new DiscussionExchange(_schedule, new CharacterId(0));
@@ -64,8 +68,8 @@ namespace SocialStim.Rules.Phases
                     actor.Id, actor.Role, setup, catalog, teammates, reasoning));
                 _results.Add(actor.Id, new List<NightReport>());
             }
-            Emit(GameCue.PhaseChanged, $"You are {Player.Name}, the {Player.Role.Name} ({Player.Role.Faction}).");
-            Emit(GameCue.PhaseChanged, $"Starting cast: {setup.Town} Town · {setup.Antagonist} Antagonist · {setup.Neutral} Neutral.");
+            Emit(GameCue.PhaseChanged, _text.Render("run.identity", ("name", Player.Name), ("role", Player.Role.Name), ("faction", _text.Render("faction." + Player.Role.Faction))));
+            Emit(GameCue.PhaseChanged, _text.Render("run.cast", ("town", setup.Town), ("evil", setup.Antagonist), ("neutral", setup.Neutral)));
         }
 
         /// <summary>Only public/player-private observations are ever emitted on this event.</summary>
@@ -84,18 +88,18 @@ namespace SocialStim.Rules.Phases
                 _options.VotingMode, _schedule?.Round ?? _discussionRounds + 1, _schedule?.Window ?? 1,
                 _options.PlayerWindowsPerRound, _discussion?.RespondTo,
                 _voteCandidates.Where(id => id != Player.Id).ToList().AsReadOnly(), _options.AllowAbstain, _revoting, _results[Player.Id].ToList().AsReadOnly(),
-                _phases.Phase == GamePhase.Ended ? _cast.Select(c => c.Name + ": " + c.Role.Name + " (" + c.Role.Faction + ")")
+                _phases.Phase == GamePhase.Ended ? _cast.Select(c => _text.Render("review.role", ("name", c.Name), ("role", c.Role.Name), ("faction", _text.Render("faction." + c.Role.Faction))))
                     .Concat(_actionReview).ToList().AsReadOnly() : new List<string>().AsReadOnly());
         }
 
         /// <summary>Applies one legal player command; invalid input leaves state and RNG untouched.</summary>
         public bool TrySubmit(GameCommand command, out string error)
         {
-            if (_submitting) { error = "A turn is already resolving."; return false; }
+            if (_submitting) { error = _text.Render("error.resolving"); return false; }
             error = ValidatePlayerCommand(command);
             if (error != null) return false;
             if (command.DialogueLine != null && !_dialogue.Options(command.Intent, SpeechContext(Player, command, null)).Any(l => l.Id == command.DialogueLine))
-            { error = "That phrasing is no longer available."; return false; }
+            { error = _text.Render("error.phrasing"); return false; }
             _submitting = true;
             try { ApplyCommand(command); return true; }
             finally { _submitting = false; }
@@ -153,41 +157,41 @@ namespace SocialStim.Rules.Phases
 
         private string ValidatePlayerCommand(GameCommand command)
         {
-            if (command == null || _phases.Phase == GamePhase.Ended) return "No active input request.";
-            if (!Player.Alive) return command.Kind == CommandKind.Continue ? null : "Dead participants may only spectate.";
+            if (command == null || _phases.Phase == GamePhase.Ended) return _text.Render("error.noInput");
+            if (!Player.Alive) return command.Kind == CommandKind.Continue ? null : _text.Render("error.spectator");
             switch (_phases.Phase)
             {
                 case GamePhase.Discussion:
                     if (_discussion?.RespondTo != null)
                         return SpeechLegal(Player, command) && (command.Intent == SpeechIntent.Defend || command.Intent == SpeechIntent.Accuse
                             || command.Intent == SpeechIntent.ClaimRole || command.Intent == SpeechIntent.StaySilent)
-                            ? null : "Respond to the public accusation first.";
+                            ? null : _text.Render("error.response");
                     if (command.Kind == CommandKind.Continue && _opening) return null;
-                    if (command.Kind == CommandKind.ReportLastAction) return _lastActions.ContainsKey(Player.Id) ? null : "There is no previous night action.";
-                    return SpeechLegal(Player, command) ? null : "Invalid discussion statement.";
+                    if (command.Kind == CommandKind.ReportLastAction) return _lastActions.ContainsKey(Player.Id) ? null : _text.Render("error.noAction");
+                    return SpeechLegal(Player, command) ? null : _text.Render("error.discussion");
                 case GamePhase.Voting:
                     return command.Kind == CommandKind.Vote && ((!command.Target.HasValue && _options.AllowAbstain)
                         || command.Target.HasValue && command.Target.Value != Player.Id && _voteCandidates.Contains(command.Target.Value))
-                        ? null : "Choose a valid ballot target.";
+                        ? null : _text.Render("error.ballot");
                 case GamePhase.VoteReveal:
-                    return command.Kind == CommandKind.Continue ? null : "Acknowledge the public ballot result.";
+                    return command.Kind == CommandKind.Continue ? null : _text.Render("error.tally");
                 case GamePhase.Nomination:
-                    return command.Kind == CommandKind.Nominate && (!command.Target.HasValue || Living().Any(c => c.Id == command.Target && c.Id != Player.Id)) ? null : "Invalid nominee.";
+                    return command.Kind == CommandKind.Nominate && (!command.Target.HasValue || Living().Any(c => c.Id == command.Target && c.Id != Player.Id)) ? null : _text.Render("error.nominee");
                 case GamePhase.Defense:
-                    return _defendant == Player.Id ? (SpeechLegal(Player, command) && (command.Intent == SpeechIntent.Defend || command.Intent == SpeechIntent.ClaimRole) ? null : "Choose a defense or role claim.")
-                        : command.Kind == CommandKind.Continue ? null : "Acknowledge the defense.";
+                    return _defendant == Player.Id ? (SpeechLegal(Player, command) && (command.Intent == SpeechIntent.Defend || command.Intent == SpeechIntent.ClaimRole) ? null : _text.Render("error.defense"))
+                        : command.Kind == CommandKind.Continue ? null : _text.Render("error.hearDefense");
                 case GamePhase.Judgement:
-                    return _defendant == Player.Id ? (command.Kind == CommandKind.Continue ? null : "Defendants cannot judge themselves.")
-                        : command.Kind == CommandKind.Judge && Enum.IsDefined(typeof(Verdict), command.Verdict) ? null : "Choose a verdict.";
+                    return _defendant == Player.Id ? (command.Kind == CommandKind.Continue ? null : _text.Render("error.selfJudge"))
+                        : command.Kind == CommandKind.Judge && Enum.IsDefined(typeof(Verdict), command.Verdict) ? null : _text.Render("error.verdict");
                 case GamePhase.LastWords:
                     return _defendant == Player.Id ? command.Kind == CommandKind.Speak && command.Intent == SpeechIntent.LastWords
-                        && !command.Target.HasValue && !command.ClaimedRole.HasValue && !command.ReportedFaction.HasValue ? null : "Choose last words."
-                        : command.Kind == CommandKind.Continue ? null : "Acknowledge last words.";
+                        && !command.Target.HasValue && !command.ClaimedRole.HasValue && !command.ReportedFaction.HasValue ? null : _text.Render("error.lastWords")
+                        : command.Kind == CommandKind.Continue ? null : _text.Render("error.hearLastWords");
                 case GamePhase.NightSelection:
                     var actors = LivingNightActors();
-                    return command.Kind == CommandKind.ChooseNightTarget && NightLegality.IsLegal(actors.First(a => a.Id == Player.Id), new NightOrder(Player.Id, command.Target), actors) ? null : "Invalid night target or exhausted ability.";
-                case GamePhase.Dawn: return command.Kind == CommandKind.Continue ? null : "Acknowledge dawn.";
-                default: return "This phase does not accept participant input.";
+                    return command.Kind == CommandKind.ChooseNightTarget && NightLegality.IsLegal(actors.First(a => a.Id == Player.Id), new NightOrder(Player.Id, command.Target), actors) ? null : _text.Render("error.night");
+                case GamePhase.Dawn: return command.Kind == CommandKind.Continue ? null : _text.Render("error.dawn");
+                default: return _text.Render("error.phase");
             }
         }
 
@@ -224,7 +228,7 @@ namespace SocialStim.Rules.Phases
             DialogueContext context = SpeechContext(actor, speech, actionReport);
             DialogueSelection line = _dialogue.Select(speech.Intent, context, speech.DialogueLine);
             foreach (Participant observer in _cast) _beliefs[observer.Id].Observe(actor.Id, speech, _phases.Day);
-            Emit(GameCue.SpeechDelivered, $"{actor.Name}: {line.Text}", actor.Id, line.Metadata, speech.Target, speech.Intent, speech.ClaimedRole);
+            Emit(GameCue.SpeechDelivered, _text.Render("speech.attributed", ("name", actor.Name), ("line", line.Text)), actor.Id, line.Metadata, speech.Target, speech.Intent, speech.ClaimedRole, line.Text);
         }
 
         /// <summary>Public player revision used for safe request caching.</summary>
@@ -239,14 +243,14 @@ namespace SocialStim.Rules.Phases
         {
             string claimed = speech.ClaimedRole.HasValue ? _catalog.First(r => r.Id == speech.ClaimedRole.Value).Name : "";
             return new DialogueContext(actor.Id, actor.Name, speech.Target.HasValue ? Actor(speech.Target.Value).Name : "",
-                claimed, speech.ReportedFaction?.ToString() ?? actionReport ?? "", _phases.Day, actor.Role.Id, actor.Personality,
+                claimed, speech.ReportedFaction.HasValue ? _text.Render("faction." + speech.ReportedFaction.Value) : actionReport ?? "", _phases.Day, actor.Role.Id, actor.Personality,
                 _phases.Phase, speech.Target, _beliefs[actor.Id].Evidence, _beliefs[actor.Id].Exposure);
         }
 
         private void SayActionReport(Participant actor)
         {
             NightOrder order = _lastActions[actor.Id];
-            string report = NightActionText.Selection(actor.Role.Ability, order.Target.HasValue ? Actor(order.Target.Value).Name : null);
+            string report = NightActionText.Selection(_text, actor.Role.Ability, order.Target.HasValue ? Actor(order.Target.Value).Name : null);
             foreach (NightReport result in _results[actor.Id].Where(r => r.Night == _phases.Day - 1))
                 report += " " + DescribeReport(result);
             Say(actor, GameCommand.Speak(SpeechIntent.ReportAction, order.Target), report);
@@ -256,14 +260,14 @@ namespace SocialStim.Rules.Phases
         {
             switch (report.Kind)
             {
-                case ReportKind.Investigation: return Actor(report.Target.Value).Name + " appeared " + report.Alignment + ".";
-                case ReportKind.Blocked: return "Someone blocked me. I don\'t know who.";
-                case ReportKind.AttackFailed: return "My attack failed.";
-                case ReportKind.ProtectionApplied: return "My protection took effect; I can\'t tell if anyone attacked.";
-                case ReportKind.VisitorSeen: return Actor(report.Target.Value).Name + " visited " + Actor(report.Subject.Value).Name + ".";
-                case ReportKind.NoVisitors: return "I saw no other visitors to " + Actor(report.Target.Value).Name + ".";
-                case ReportKind.ForgeryApplied: return "I made the target look like an Antagonist for the night.";
-                default: return "I survived an attack. I don\'t know who it was.";
+                case ReportKind.Investigation: return _text.Render("report.investigation", ("target", Actor(report.Target.Value).Name), ("result", _text.Render("faction." + report.Alignment)));
+                case ReportKind.Blocked: return _text.Render("report.blocked");
+                case ReportKind.AttackFailed: return _text.Render("report.attackFailed");
+                case ReportKind.ProtectionApplied: return _text.Render("report.protection");
+                case ReportKind.VisitorSeen: return _text.Render("report.visit", ("visitor", Actor(report.Target.Value).Name), ("target", Actor(report.Subject.Value).Name));
+                case ReportKind.NoVisitors: return _text.Render("report.noVisitors", ("target", Actor(report.Target.Value).Name));
+                case ReportKind.ForgeryApplied: return _text.Render("report.forged");
+                default: return _text.Render("report.survived");
             }
         }
 
@@ -289,7 +293,7 @@ namespace SocialStim.Rules.Phases
                         Say(actor, GameCommand.Speak(SpeechIntent.ReportInvestigation, targets[_decisions.Next(targets.Count)], faction: Faction.Antagonist));
                     else
                         Say(actor, GameCommand.Speak(SpeechIntent.ReportAction),
-                            NightActionText.Claimed(asserted.Ability));
+                            NightActionText.Claimed(_text, asserted.Ability));
                 }
             }
         }
@@ -353,22 +357,20 @@ namespace SocialStim.Rules.Phases
                 if (vote.HasValue)
                 {
                     KnownCharacter considered = Knowledge(actor).Characters.First(c => c.Id == vote.Value);
-                    _actionReview.Add("Day " + _phases.Day + ": " + actor.Name + " voted " + considered.Name
-                        + "; their suspicion was " + considered.Suspicion + "/100 and credibility " + considered.Trust + "/100.");
+                    _actionReview.Add(_text.Render("review.vote", ("day", _phases.Day), ("name", actor.Name), ("target", considered.Name), ("suspicion", considered.Suspicion), ("credibility", considered.Trust)));
                 }
             }
             // All ballots are chosen before any are published; there is no later-voter information advantage.
             foreach (var ballot in ballots)
             {
                 foreach (Participant observer in _cast) _beliefs[observer.Id].ObserveNomination(ballot.Key, ballot.Value, _phases.Day);
-                Emit(GameCue.BallotRevealed, Actor(ballot.Key).Name + " votes "
-                    + (ballot.Value.HasValue ? Actor(ballot.Value.Value).Name : "to abstain") + ".", ballot.Key, target: ballot.Value);
+                Emit(GameCue.BallotRevealed, _text.Render("vote.ballot", ("name", Actor(ballot.Key).Name), ("target", ballot.Value.HasValue ? Actor(ballot.Value.Value).Name : _text.Render("vote.abstainTarget"))), ballot.Key, target: ballot.Value);
             }
             _ballot = VoteResolver.Plurality(ballots.Select(b => b.Value));
-            string tally = string.Join(" · ", _ballot.Counts.OrderBy(pair => pair.Key.Value).Select(pair => Actor(pair.Key).Name + ": " + pair.Value));
-            Emit(GameCue.VoteTallied, (tally.Length > 0 ? tally : "No votes cast") + " · Abstentions: " + _ballot.Abstentions + ".");
+            string tally = string.Join(_text.Render("separator.tally"), _ballot.Counts.OrderBy(pair => pair.Key.Value).Select(pair => _text.Render("vote.count", ("name", Actor(pair.Key).Name), ("count", pair.Value))));
+            Emit(GameCue.VoteTallied, _text.Render("vote.tally", ("tally", tally.Length > 0 ? tally : _text.Render("vote.empty")), ("count", _ballot.Abstentions)));
             _defendant = _ballot.Winner;
-            if (!_defendant.HasValue) Emit(GameCue.VoteTied, _ballot.Tied.Count > 0 ? "The vote is tied." : "Everyone abstained.");
+            if (!_defendant.HasValue) Emit(GameCue.VoteTied, _ballot.Tied.Count > 0 ? _text.Render("vote.tied") : _text.Render("vote.allAbstained"));
             Move(GamePhase.VoteReveal);
         }
 
@@ -379,7 +381,7 @@ namespace SocialStim.Rules.Phases
                 if (!_revoting && _options.RevoteTies && _ballot.Tied.Count > 1)
                 {
                     _revoting = true; _voteCandidates.Clear(); _voteCandidates.AddRange(_ballot.Tied);
-                    Emit(GameCue.RevoteStarted, "Revote between " + string.Join(", ", _voteCandidates.Select(id => Actor(id).Name)) + ".");
+                    Emit(GameCue.RevoteStarted, _text.Render("vote.revoteBetween", ("names", string.Join(_text.Render("separator.names"), _voteCandidates.Select(id => Actor(id).Name)))));
                     Move(GamePhase.Voting);
                 }
                 else StartNight();
@@ -405,11 +407,11 @@ namespace SocialStim.Rules.Phases
             foreach (KeyValuePair<CharacterId, CharacterId?> ballot in ballots)
             {
                 foreach (Participant observer in _cast) _beliefs[observer.Id].ObserveNomination(ballot.Key, ballot.Value, _phases.Day);
-                Emit(GameCue.NominationMade, $"{Actor(ballot.Key).Name} nominates {(ballot.Value.HasValue ? Actor(ballot.Value.Value).Name : "nobody")}.", ballot.Key, target: ballot.Value);
+                Emit(GameCue.NominationMade, _text.Render("trial.nomination", ("name", Actor(ballot.Key).Name), ("target", ballot.Value.HasValue ? Actor(ballot.Value.Value).Name : _text.Render("trial.nobody"))), ballot.Key, target: ballot.Value);
             }
             _defendant = VoteResolver.Nominee(votes, Living().Count());
             if (!_defendant.HasValue)
-            { Emit(GameCue.VoteTied, "No majority. No trial today."); StartNight(); return; }
+            { Emit(GameCue.VoteTied, _text.Render("trial.noMajority")); StartNight(); return; }
             _trials++;
             Move(GamePhase.Defense);
             if (_defendant != Player.Id) Say(Actor(_defendant.Value), GameCommand.Speak(SpeechIntent.Defend));
@@ -427,17 +429,17 @@ namespace SocialStim.Rules.Phases
             foreach (KeyValuePair<CharacterId, Verdict> ballot in ballots)
             {
                 foreach (Participant observer in _cast) _beliefs[observer.Id].ObserveVote(ballot.Key, _defendant.Value, ballot.Value, _phases.Day);
-                Emit(GameCue.PhaseChanged, $"{Actor(ballot.Key).Name}: {ballot.Value}.");
+                Emit(GameCue.PhaseChanged, _text.Render("trial.ballot", ("name", Actor(ballot.Key).Name), ("verdict", _text.Render("verdict." + ballot.Value))));
             }
             if (VoteResolver.IsGuilty(ballots.Select(b => b.Value)))
             {
-                Emit(GameCue.VerdictGuilty, $"{Actor(_defendant.Value).Name} is found guilty.");
+                Emit(GameCue.VerdictGuilty, _text.Render("trial.guilty", ("name", Actor(_defendant.Value).Name)));
                 Move(GamePhase.LastWords);
                 if (_defendant != Player.Id) Say(Actor(_defendant.Value), GameCommand.Speak(SpeechIntent.LastWords));
             }
             else
             {
-                Emit(GameCue.VerdictInnocent, $"{Actor(_defendant.Value).Name} is acquitted.");
+                Emit(GameCue.VerdictInnocent, _text.Render("trial.innocent", ("name", Actor(_defendant.Value).Name)));
                 _defendant = null;
                 if (_trials < _options.TrialsPerDay) Move(GamePhase.Nomination); else StartNight();
             }
@@ -478,13 +480,12 @@ namespace SocialStim.Rules.Phases
                 orders.Add(new NightOrder(killer.Actor, _lastTeamPlan.Killer == killer.Actor ? _lastTeamPlan.Target : null));
             }
             if (Player.Alive && Player.Role.Faction == Faction.Antagonist && _lastTeamPlan != null)
-                Emit(GameCue.PhaseChanged, $"Team: {Actor(_lastTeamPlan.Killer).Name} will {( _lastTeamPlan.Target.HasValue ? "attack " + Actor(_lastTeamPlan.Target.Value).Name : "pass tonight")}.");
+                Emit(GameCue.PhaseChanged, _text.Render("night.team", ("name", Actor(_lastTeamPlan.Killer).Name), ("action", _lastTeamPlan.Target.HasValue ? _text.Render("night.teamAttack", ("target", Actor(_lastTeamPlan.Target.Value).Name)) : _text.Render("night.teamPass"))));
             _lastActions.Clear();
             foreach (NightOrder order in orders)
             {
                 _lastActions.Add(order.Actor, order);
-                _actionReview.Add("Night " + _phases.Day + ": " + Actor(order.Actor).Name + " (" + Actor(order.Actor).Role.Name + ") "
-                    + NightActionText.Selection(Actor(order.Actor).Role.Ability, order.Target.HasValue ? Actor(order.Target.Value).Name : null));
+                _actionReview.Add(_text.Render("review.night", ("night", _phases.Day), ("name", Actor(order.Actor).Name), ("role", Actor(order.Actor).Role.Name), ("action", NightActionText.Selection(_text, Actor(order.Actor).Role.Ability, order.Target.HasValue ? Actor(order.Target.Value).Name : null))));
             }
             Move(GamePhase.NightResolution);
             NightResolution resolution = _night.Resolve(actors, orders);
@@ -498,7 +499,7 @@ namespace SocialStim.Rules.Phases
                 _beliefs[report.Recipient].Receive(delivered);
                 if (report.Recipient == Player.Id) DeliverReport(delivered);
             }
-            if (resolution.Deaths.Count == 0) Emit(GameCue.DeathReported, "Nobody died during the night.");
+            if (resolution.Deaths.Count == 0) Emit(GameCue.DeathReported, _text.Render("death.none"));
             if (!FinishIfTerminal()) Move(GamePhase.Dawn);
         }
 
@@ -513,7 +514,7 @@ namespace SocialStim.Rules.Phases
                 case ReportKind.ProtectionApplied: cue = GameCue.ProtectionApplied; break;
                 default: cue = GameCue.PhaseChanged; break;
             }
-            Emit(cue, "Private: " + DescribeReport(report));
+            Emit(cue, _text.Render("report.private", ("report", DescribeReport(report))));
         }
 
         private void Kill(Participant actor, bool execution)
@@ -521,14 +522,14 @@ namespace SocialStim.Rules.Phases
             actor.Alive = false;
             if (execution && actor.Role.Category == RoleCategory.NeutralEvil) _executionObjectives.Add(actor.Id);
             foreach (Participant observer in _cast) _beliefs[observer.Id].ObserveDeath(actor.Id, _phases.Day);
-            Emit(execution ? GameCue.ExecutionCarriedOut : GameCue.DeathReported, execution ? $"{actor.Name} was executed." : $"{actor.Name} died during the night.", target: actor.Id);
+            Emit(execution ? GameCue.ExecutionCarriedOut : GameCue.DeathReported, execution ? _text.Render("death.executed", ("name", actor.Name)) : _text.Render("death.night", ("name", actor.Name)), target: actor.Id);
             if (_options.RevealOnDeath)
             {
                 _revealed[actor.Id] = actor.Role;
                 foreach (Participant observer in _cast) _beliefs[observer.Id].Reveal(actor.Id, actor.Role, _phases.Day);
-                Emit(GameCue.RoleRevealed, $"Revealed: {actor.Name} was {actor.Role.Name} ({actor.Role.Faction}).");
+                Emit(GameCue.RoleRevealed, _text.Render("death.reveal", ("name", actor.Name), ("role", actor.Role.Name), ("faction", _text.Render("faction." + actor.Role.Faction))));
             }
-            if (actor.Id == Player.Id) Emit(GameCue.PhaseChanged, "You died. You can keep watching.");
+            if (actor.Id == Player.Id) Emit(GameCue.PhaseChanged, _text.Render("death.spectating"));
         }
 
         private bool FinishIfTerminal()
@@ -539,9 +540,9 @@ namespace SocialStim.Rules.Phases
             if (_outcome == OutcomeKind.Ongoing) return false;
             Move(GamePhase.Ended);
             GameCue cue = _outcome == OutcomeKind.Draw ? GameCue.RunDrawn : PlayerWon() ? GameCue.VictoryAchieved : GameCue.DefeatSuffered;
-            string result = _outcome == OutcomeKind.TownVictory ? "Town wins." : _outcome == OutcomeKind.AntagonistVictory
-                ? "Antagonists win." : _outcome == OutcomeKind.LoneKillerVictory ? "The Lone Killer wins." : "Draw.";
-            Emit(cue, $"Run ended: {result} Objective {(PlayerWon() ? "achieved" : "missed")}.");
+            string result = _outcome == OutcomeKind.TownVictory ? _text.Render("outcome.TownVictory") : _outcome == OutcomeKind.AntagonistVictory
+                ? _text.Render("outcome.AntagonistVictory") : _outcome == OutcomeKind.LoneKillerVictory ? _text.Render("outcome.LoneKillerVictory") : _text.Render("outcome.Draw");
+            Emit(cue, _text.Render("run.ended", ("result", result), ("objective", _text.Render(PlayerWon() ? "objective.achieved" : "objective.missed"))));
             return true;
         }
 
@@ -572,24 +573,24 @@ namespace SocialStim.Rules.Phases
             string text;
             switch (phase)
             {
-                case GamePhase.Defense: text = $"Trial {_trials}/{_options.TrialsPerDay}: {Actor(_defendant.Value).Name}."; break;
-                case GamePhase.Discussion: text = "Discussion begins."; break;
-                case GamePhase.Nomination: text = "Nominations open."; break;
-                case GamePhase.Voting: text = _revoting ? "Revote." : "Vote."; break;
+                case GamePhase.Defense: text = _text.Render("phase.trial", ("trial", _trials), ("maximum", _options.TrialsPerDay), ("name", Actor(_defendant.Value).Name)); break;
+                case GamePhase.Discussion: text = _text.Render("phase.discussion"); break;
+                case GamePhase.Nomination: text = _text.Render("phase.nomination"); break;
+                case GamePhase.Voting: text = _revoting ? _text.Render("phase.revote") : _text.Render("phase.voting"); break;
                 case GamePhase.VoteReveal: return;
-                case GamePhase.Judgement: text = "Time to vote."; break;
-                case GamePhase.LastWords: text = "Last words."; break;
-                case GamePhase.NightSelection: text = $"Night {_phases.Day}."; break;
-                case GamePhase.Dawn: text = $"Day {_phases.Day}."; break;
-                default: text = phase.ToString(); break;
+                case GamePhase.Judgement: text = _text.Render("phase.judgement"); break;
+                case GamePhase.LastWords: text = _text.Render("phase.lastWords"); break;
+                case GamePhase.NightSelection: text = _text.Render("phase.night", ("day", _phases.Day)); break;
+                case GamePhase.Dawn: text = _text.Render("phase.dawn", ("day", _phases.Day)); break;
+                default: text = _text.Render("label.phase." + phase); break;
             }
             Emit(cue, text, target: phase == GamePhase.Defense ? _defendant : null);
         }
 
         private void Emit(GameCue cue, string text, CharacterId? speaker = null, DialogueMetadata metadata = null,
-            CharacterId? target = null, SpeechIntent? intent = null, RoleId? claimedRole = null)
+            CharacterId? target = null, SpeechIntent? intent = null, RoleId? claimedRole = null, string spokenText = null)
         {
-            var observation = new GameObservation(_transcript.Count, _phases.Day, cue, text, speaker, metadata, target, intent, claimedRole, Math.Min(_options.DiscussionRounds, _schedule?.Round ?? _discussionRounds + 1));
+            var observation = new GameObservation(_transcript.Count, _phases.Day, cue, text, speaker, metadata, target, intent, claimedRole, Math.Min(_options.DiscussionRounds, _schedule?.Round ?? _discussionRounds + 1), spokenText);
             _transcript.Add(observation); Observation?.Invoke(observation);
         }
     }

@@ -1,0 +1,1221 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "id": "button.accuse",
+      "text": "ACCUSE"
+    },
+    {
+      "id": "button.back",
+      "text": "Back"
+    },
+    {
+      "id": "button.chat",
+      "text": "CHAT"
+    },
+    {
+      "id": "button.claim",
+      "text": "CLAIM ROLE"
+    },
+    {
+      "id": "button.continue",
+      "text": "Continue [Space]"
+    },
+    {
+      "id": "button.counterAccuse",
+      "text": "Counter-accuse"
+    },
+    {
+      "id": "button.defend",
+      "text": "DEFEND"
+    },
+    {
+      "id": "button.defendResponse",
+      "text": "Defend yourself"
+    },
+    {
+      "id": "button.drawer",
+      "text": "≡"
+    },
+    {
+      "id": "button.everyone",
+      "text": "Everyone"
+    },
+    {
+      "id": "button.newRun",
+      "text": "New run"
+    },
+    {
+      "id": "button.pass",
+      "text": "Pass"
+    },
+    {
+      "id": "button.quit",
+      "text": "Quit"
+    },
+    {
+      "id": "button.self",
+      "text": "Yourself"
+    },
+    {
+      "id": "choice.abstain",
+      "text": "Abstain"
+    },
+    {
+      "id": "choice.abstainHint",
+      "text": "Cast no target vote."
+    },
+    {
+      "id": "choice.abstainTrial",
+      "text": "Abstain"
+    },
+    {
+      "id": "choice.abstainTrialHint",
+      "text": "A majority starts a trial."
+    },
+    {
+      "id": "choice.accuse",
+      "text": "Accuse {target}"
+    },
+    {
+      "id": "choice.accuseHint",
+      "text": "Raise suspicion."
+    },
+    {
+      "id": "choice.agree",
+      "text": "Agree with {target}"
+    },
+    {
+      "id": "choice.agreeHint",
+      "text": "Support their view."
+    },
+    {
+      "id": "choice.awaitVerdict",
+      "text": "Await the verdict"
+    },
+    {
+      "id": "choice.awaitVerdictHint",
+      "text": "You cannot vote in your own trial."
+    },
+    {
+      "id": "choice.beginDiscussion",
+      "text": "Begin discussion"
+    },
+    {
+      "id": "choice.beginDiscussionHint",
+      "text": "Start the day."
+    },
+    {
+      "id": "choice.bluffHint",
+      "text": "Bluff. Contradictions may expose you."
+    },
+    {
+      "id": "choice.claim",
+      "text": "Claim {role}"
+    },
+    {
+      "id": "choice.continue",
+      "text": "Continue"
+    },
+    {
+      "id": "choice.continueTallyHint",
+      "text": "Acknowledge the public tally."
+    },
+    {
+      "id": "choice.counterAccuse",
+      "text": "Counter-accuse"
+    },
+    {
+      "id": "choice.counterAccuseHint",
+      "text": "Challenge your accuser."
+    },
+    {
+      "id": "choice.defend",
+      "text": "Defend yourself"
+    },
+    {
+      "id": "choice.defendHint",
+      "text": "Push back on suspicion."
+    },
+    {
+      "id": "choice.defendResponse",
+      "text": "Defend yourself"
+    },
+    {
+      "id": "choice.defendResponseHint",
+      "text": "Answer the accusation."
+    },
+    {
+      "id": "choice.deflect",
+      "text": "Deflect toward {target}"
+    },
+    {
+      "id": "choice.deflectHint",
+      "text": "Shift attention away from you."
+    },
+    {
+      "id": "choice.disagree",
+      "text": "Disagree with {target}"
+    },
+    {
+      "id": "choice.disagreeHint",
+      "text": "Challenge their view."
+    },
+    {
+      "id": "choice.errorOption",
+      "text": "That option is no longer available."
+    },
+    {
+      "id": "choice.errorPhrasing",
+      "text": "That phrasing is no longer available."
+    },
+    {
+      "id": "choice.fear",
+      "text": "Express fear"
+    },
+    {
+      "id": "choice.fearHint",
+      "text": "Share your unease."
+    },
+    {
+      "id": "choice.honestReport",
+      "text": "Report {name} as {result}"
+    },
+    {
+      "id": "choice.judge",
+      "text": "Vote"
+    },
+    {
+      "id": "choice.judgeHint",
+      "text": "Hear the verdict."
+    },
+    {
+      "id": "choice.lastWords",
+      "text": "Speak last words"
+    },
+    {
+      "id": "choice.lastWordsContinue",
+      "text": "Continue"
+    },
+    {
+      "id": "choice.lastWordsHint",
+      "text": "Execution follows."
+    },
+    {
+      "id": "choice.nightPass",
+      "text": "Pass tonight"
+    },
+    {
+      "id": "choice.nightPassHint",
+      "text": "No visit. Keeps your charges."
+    },
+    {
+      "id": "choice.nightTarget",
+      "text": "{ability}: {target}"
+    },
+    {
+      "id": "choice.nightTargetHint",
+      "text": "Private night action."
+    },
+    {
+      "id": "choice.nominate",
+      "text": "Nominate {target}"
+    },
+    {
+      "id": "choice.nominateHint",
+      "text": "Public nomination."
+    },
+    {
+      "id": "choice.reportAction",
+      "text": "Report last night's action"
+    },
+    {
+      "id": "choice.reportActionHint",
+      "text": "Share your action and results."
+    },
+    {
+      "id": "choice.reportBluff",
+      "text": "Report {target} as {result}"
+    },
+    {
+      "id": "choice.reportBluffHint",
+      "text": "State a finding. You may bluff."
+    },
+    {
+      "id": "choice.reportHonest",
+      "text": "Report {target} as {result}"
+    },
+    {
+      "id": "choice.reportHonestHint",
+      "text": "Share your actual readout."
+    },
+    {
+      "id": "choice.silent",
+      "text": "Stay silent"
+    },
+    {
+      "id": "choice.silentHint",
+      "text": "Listen this turn."
+    },
+    {
+      "id": "choice.silentResponse",
+      "text": "Stay silent"
+    },
+    {
+      "id": "choice.silentResponseHint",
+      "text": "Decline to answer."
+    },
+    {
+      "id": "choice.trialDefend",
+      "text": "Defend yourself"
+    },
+    {
+      "id": "choice.trialDefendHint",
+      "text": "Make your case."
+    },
+    {
+      "id": "choice.trialTarget",
+      "text": "Put {target} on trial"
+    },
+    {
+      "id": "choice.trialTargetHint",
+      "text": "Ask for a trial."
+    },
+    {
+      "id": "choice.truthHint",
+      "text": "Tell the truth."
+    },
+    {
+      "id": "choice.verdictHint",
+      "text": "Guilty must exceed Innocent."
+    },
+    {
+      "id": "choice.voteTarget",
+      "text": "Vote {target}"
+    },
+    {
+      "id": "choice.voteTargetHint",
+      "text": "The largest vote total determines elimination."
+    },
+    {
+      "id": "choice.vouch",
+      "text": "Vouch for {target}"
+    },
+    {
+      "id": "choice.vouchHint",
+      "text": "Offer your support."
+    },
+    {
+      "id": "choice.watch",
+      "text": "Watch"
+    },
+    {
+      "id": "choice.watchHint",
+      "text": "Continue the run."
+    },
+    {
+      "id": "choice.yieldOpening",
+      "text": "Let someone else open"
+    },
+    {
+      "id": "choice.yieldOpeningHint",
+      "text": "Listen first. Keeps your turn."
+    },
+    {
+      "id": "death.executed",
+      "text": "{name} was executed."
+    },
+    {
+      "id": "death.night",
+      "text": "{name} died during the night."
+    },
+    {
+      "id": "death.none",
+      "text": "Nobody died during the night."
+    },
+    {
+      "id": "death.reveal",
+      "text": "Revealed: {name} was {role} ({faction})."
+    },
+    {
+      "id": "death.spectating",
+      "text": "You died. You can keep watching."
+    },
+    {
+      "id": "drawer.claims",
+      "text": "Claims ledger"
+    },
+    {
+      "id": "drawer.close",
+      "text": "Close drawer"
+    },
+    {
+      "id": "drawer.copySeed",
+      "text": "Copy seed"
+    },
+    {
+      "id": "drawer.empty",
+      "text": "No entries yet."
+    },
+    {
+      "id": "drawer.help",
+      "text": "Chat, accuse or defend, then select a valid roster target. Choose the words you want to say.\n\nFirst Space/click reveals the line; the next advances. Pass leaves the floor. Back keeps your turn.\n\nClaims are assertions, not proven roles. Your role and private results are only yours.\n\nSettings change display immediately and game rules on the next run."
+    },
+    {
+      "id": "drawer.helpLabel",
+      "text": "Help"
+    },
+    {
+      "id": "drawer.history",
+      "text": "History"
+    },
+    {
+      "id": "drawer.intro",
+      "text": "History, claims and private role information."
+    },
+    {
+      "id": "drawer.ledgerEntry",
+      "text": "Day {day} · {line}"
+    },
+    {
+      "id": "drawer.newRun",
+      "text": "New run"
+    },
+    {
+      "id": "drawer.noReview",
+      "text": "Available after the run ends."
+    },
+    {
+      "id": "drawer.noRole",
+      "text": "Start a run to receive a role."
+    },
+    {
+      "id": "drawer.review",
+      "text": "After-action report"
+    },
+    {
+      "id": "drawer.role",
+      "text": "Your role"
+    },
+    {
+      "id": "drawer.roleInfo",
+      "text": "{role} · {faction}\n\n{objective}\n\nRemaining uses: {uses}"
+    },
+    {
+      "id": "drawer.seedCopied",
+      "text": "Seed copied: {seed}"
+    },
+    {
+      "id": "drawer.settings",
+      "text": "Settings"
+    },
+    {
+      "id": "drawer.unlimited",
+      "text": "Unlimited"
+    },
+    {
+      "id": "error.ballot",
+      "text": "Choose a valid ballot target."
+    },
+    {
+      "id": "error.dawn",
+      "text": "Acknowledge dawn."
+    },
+    {
+      "id": "error.defense",
+      "text": "Choose a defense or role claim."
+    },
+    {
+      "id": "error.discussion",
+      "text": "Invalid discussion statement."
+    },
+    {
+      "id": "error.hearDefense",
+      "text": "Acknowledge the defense."
+    },
+    {
+      "id": "error.hearLastWords",
+      "text": "Acknowledge last words."
+    },
+    {
+      "id": "error.lastWords",
+      "text": "Choose last words."
+    },
+    {
+      "id": "error.night",
+      "text": "Invalid night target or exhausted ability."
+    },
+    {
+      "id": "error.noAction",
+      "text": "There is no previous night action."
+    },
+    {
+      "id": "error.noInput",
+      "text": "No active input request."
+    },
+    {
+      "id": "error.nominee",
+      "text": "Invalid nominee."
+    },
+    {
+      "id": "error.phase",
+      "text": "This phase does not accept participant input."
+    },
+    {
+      "id": "error.phrasing",
+      "text": "That phrasing is no longer available."
+    },
+    {
+      "id": "error.resolving",
+      "text": "A turn is already resolving."
+    },
+    {
+      "id": "error.response",
+      "text": "Respond to the public accusation first."
+    },
+    {
+      "id": "error.selfJudge",
+      "text": "Defendants cannot judge themselves."
+    },
+    {
+      "id": "error.spectator",
+      "text": "Dead participants may only spectate."
+    },
+    {
+      "id": "error.tally",
+      "text": "Acknowledge the public ballot result."
+    },
+    {
+      "id": "error.verdict",
+      "text": "Choose a verdict."
+    },
+    {
+      "id": "faction.Antagonist",
+      "text": "Antagonist"
+    },
+    {
+      "id": "faction.Neutral",
+      "text": "Neutral"
+    },
+    {
+      "id": "faction.Town",
+      "text": "Town"
+    },
+    {
+      "id": "interaction.action.Accuse",
+      "text": "Accuse"
+    },
+    {
+      "id": "interaction.action.Chat",
+      "text": "Chat"
+    },
+    {
+      "id": "interaction.action.Claim",
+      "text": "Claim"
+    },
+    {
+      "id": "interaction.action.Defend",
+      "text": "Defend"
+    },
+    {
+      "id": "label.ability.Attack",
+      "text": "Attack"
+    },
+    {
+      "id": "label.ability.Block",
+      "text": "Block"
+    },
+    {
+      "id": "label.ability.Forge",
+      "text": "Forge evidence"
+    },
+    {
+      "id": "label.ability.Investigate",
+      "text": "Investigate"
+    },
+    {
+      "id": "label.ability.None",
+      "text": "No night ability"
+    },
+    {
+      "id": "label.ability.Protect",
+      "text": "Protect"
+    },
+    {
+      "id": "label.ability.SelfProtect",
+      "text": "Self-protect"
+    },
+    {
+      "id": "label.ability.Watch",
+      "text": "Watch visits"
+    },
+    {
+      "id": "label.phase.Dawn",
+      "text": "Morning"
+    },
+    {
+      "id": "label.phase.Defense",
+      "text": "Defense"
+    },
+    {
+      "id": "label.phase.Discussion",
+      "text": "Discussion"
+    },
+    {
+      "id": "label.phase.Ended",
+      "text": "Run complete"
+    },
+    {
+      "id": "label.phase.Execution",
+      "text": "Execution"
+    },
+    {
+      "id": "label.phase.Judgement",
+      "text": "Judgement"
+    },
+    {
+      "id": "label.phase.LastWords",
+      "text": "Last words"
+    },
+    {
+      "id": "label.phase.NightResolution",
+      "text": "Night"
+    },
+    {
+      "id": "label.phase.NightSelection",
+      "text": "Night"
+    },
+    {
+      "id": "label.phase.Nomination",
+      "text": "Nominations"
+    },
+    {
+      "id": "label.phase.VoteReveal",
+      "text": "Vote reveal"
+    },
+    {
+      "id": "label.phase.Voting",
+      "text": "Vote"
+    },
+    {
+      "id": "mark.Confirmed",
+      "text": "Confirmed"
+    },
+    {
+      "id": "mark.Suspect",
+      "text": "Suspect"
+    },
+    {
+      "id": "mark.Trust",
+      "text": "Trust"
+    },
+    {
+      "id": "night.claimed.Attack",
+      "text": "I went after someone last night."
+    },
+    {
+      "id": "night.claimed.Block",
+      "text": "I tried to stop someone last night."
+    },
+    {
+      "id": "night.claimed.Forge",
+      "text": "I planted evidence last night."
+    },
+    {
+      "id": "night.claimed.Investigate",
+      "text": "I checked someone last night."
+    },
+    {
+      "id": "night.claimed.None",
+      "text": "I had no night action."
+    },
+    {
+      "id": "night.claimed.Protect",
+      "text": "I tried to keep someone safe last night."
+    },
+    {
+      "id": "night.claimed.SelfProtect",
+      "text": "I tried to keep myself safe last night."
+    },
+    {
+      "id": "night.claimed.Watch",
+      "text": "I kept watch last night."
+    },
+    {
+      "id": "night.selection.Attack",
+      "text": "I tried to attack {target} last night."
+    },
+    {
+      "id": "night.selection.Block",
+      "text": "I tried to block {target} last night."
+    },
+    {
+      "id": "night.selection.Forge",
+      "text": "I tried to plant evidence against {target} last night."
+    },
+    {
+      "id": "night.selection.Investigate",
+      "text": "I tried to check on {target} last night."
+    },
+    {
+      "id": "night.selection.None",
+      "text": "I had no night action."
+    },
+    {
+      "id": "night.selection.Pass",
+      "text": "I stayed in last night."
+    },
+    {
+      "id": "night.selection.Protect",
+      "text": "I tried to protect {target} last night."
+    },
+    {
+      "id": "night.selection.SelfProtect",
+      "text": "I tried to keep myself safe last night."
+    },
+    {
+      "id": "night.selection.Watch",
+      "text": "I tried to watch {target} last night."
+    },
+    {
+      "id": "night.team",
+      "text": "Team: {name} will {action}."
+    },
+    {
+      "id": "night.teamAttack",
+      "text": "attack {target}"
+    },
+    {
+      "id": "night.teamPass",
+      "text": "pass tonight"
+    },
+    {
+      "id": "objective.Antagonist",
+      "text": "Help your team take control."
+    },
+    {
+      "id": "objective.NeutralBenign",
+      "text": "Survive to the end."
+    },
+    {
+      "id": "objective.NeutralEvil",
+      "text": "Be eliminated by the daytime vote."
+    },
+    {
+      "id": "objective.NeutralKilling",
+      "text": "Eliminate the competing factions."
+    },
+    {
+      "id": "objective.Town",
+      "text": "Eliminate the hostile factions."
+    },
+    {
+      "id": "objective.achieved",
+      "text": "achieved"
+    },
+    {
+      "id": "objective.missed",
+      "text": "missed"
+    },
+    {
+      "id": "outcome.AntagonistVictory",
+      "text": "Antagonists win."
+    },
+    {
+      "id": "outcome.Draw",
+      "text": "Draw."
+    },
+    {
+      "id": "outcome.LoneKillerVictory",
+      "text": "The Lone Killer wins."
+    },
+    {
+      "id": "outcome.TownVictory",
+      "text": "Town wins."
+    },
+    {
+      "id": "phase.dawn",
+      "text": "Day {day}."
+    },
+    {
+      "id": "phase.discussion",
+      "text": "Discussion begins."
+    },
+    {
+      "id": "phase.judgement",
+      "text": "Time to vote."
+    },
+    {
+      "id": "phase.lastWords",
+      "text": "Last words."
+    },
+    {
+      "id": "phase.night",
+      "text": "Night {day}."
+    },
+    {
+      "id": "phase.nomination",
+      "text": "Nominations open."
+    },
+    {
+      "id": "phase.revote",
+      "text": "Revote."
+    },
+    {
+      "id": "phase.trial",
+      "text": "Trial {trial}/{maximum}: {name}."
+    },
+    {
+      "id": "phase.voting",
+      "text": "Vote."
+    },
+    {
+      "id": "report.attackFailed",
+      "text": "My attack failed."
+    },
+    {
+      "id": "report.blocked",
+      "text": "Someone blocked me. I don't know who."
+    },
+    {
+      "id": "report.forged",
+      "text": "I made the target look like an Antagonist for the night."
+    },
+    {
+      "id": "report.investigation",
+      "text": "{target} appeared {result}."
+    },
+    {
+      "id": "report.noVisitors",
+      "text": "I saw no other visitors to {target}."
+    },
+    {
+      "id": "report.private",
+      "text": "Private: {report}"
+    },
+    {
+      "id": "report.protection",
+      "text": "My protection took effect; I can't tell if anyone attacked."
+    },
+    {
+      "id": "report.survived",
+      "text": "I survived an attack. I don't know who it was."
+    },
+    {
+      "id": "report.visit",
+      "text": "{visitor} visited {target}."
+    },
+    {
+      "id": "review.night",
+      "text": "Night {night}: {name} ({role}) {action}"
+    },
+    {
+      "id": "review.role",
+      "text": "{name}: {role} ({faction})"
+    },
+    {
+      "id": "review.vote",
+      "text": "Day {day}: {name} voted {target}; their suspicion was {suspicion}/100 and credibility {credibility}/100."
+    },
+    {
+      "id": "roster.alive",
+      "text": "ALIVE"
+    },
+    {
+      "id": "roster.card",
+      "text": "{name}{self}\n{state}{activity}{mark}{claim}"
+    },
+    {
+      "id": "roster.claim",
+      "text": "\nClaims {role}"
+    },
+    {
+      "id": "roster.dead",
+      "text": "DEAD"
+    },
+    {
+      "id": "roster.mark",
+      "text": "\nMark: {mark}"
+    },
+    {
+      "id": "roster.select",
+      "text": " · SELECT"
+    },
+    {
+      "id": "roster.self",
+      "text": " (you)"
+    },
+    {
+      "id": "roster.speaking",
+      "text": " · SPEAKING"
+    },
+    {
+      "id": "roster.teammate",
+      "text": "TEAMMATE"
+    },
+    {
+      "id": "run.cast",
+      "text": "Starting cast: {town} Town · {evil} Antagonist · {neutral} Neutral."
+    },
+    {
+      "id": "run.ended",
+      "text": "Run ended: {result} Objective {objective}."
+    },
+    {
+      "id": "run.identity",
+      "text": "You are {name}, the {role} ({faction})."
+    },
+    {
+      "id": "screen.actionHeader",
+      "text": "DAY {day} · {phase}{round} · ALIVE {alive}"
+    },
+    {
+      "id": "screen.advanceHint",
+      "text": "Space/click to continue"
+    },
+    {
+      "id": "screen.chooseTarget",
+      "text": "{action} · choose a highlighted roster target"
+    },
+    {
+      "id": "screen.discussionRound",
+      "text": "DISCUSSION · ROUND {round}/{maximum}"
+    },
+    {
+      "id": "screen.header",
+      "text": "DAY {day} · {phase}"
+    },
+    {
+      "id": "screen.phase.elimination",
+      "text": "ELIMINATION"
+    },
+    {
+      "id": "screen.phase.ended",
+      "text": "GAME OVER"
+    },
+    {
+      "id": "screen.phase.morning",
+      "text": "MORNING REPORT"
+    },
+    {
+      "id": "screen.phase.night",
+      "text": "NIGHT"
+    },
+    {
+      "id": "screen.phase.report",
+      "text": "REPORT"
+    },
+    {
+      "id": "screen.phase.voteReveal",
+      "text": "VOTE REVEAL"
+    },
+    {
+      "id": "screen.phrasing",
+      "text": "[{tone}] {line}"
+    },
+    {
+      "id": "screen.respond",
+      "text": "Respond to {name}"
+    },
+    {
+      "id": "screen.revealHint",
+      "text": "Space/click reveals this line"
+    },
+    {
+      "id": "screen.roundSuffix",
+      "text": " · ROUND {round}/{maximum}"
+    },
+    {
+      "id": "separator.names",
+      "text": ", "
+    },
+    {
+      "id": "separator.tally",
+      "text": " · "
+    },
+    {
+      "id": "settings.close",
+      "text": "Close settings"
+    },
+    {
+      "id": "settings.group.Accessibility",
+      "text": "Accessibility"
+    },
+    {
+      "id": "settings.group.Data",
+      "text": "Data"
+    },
+    {
+      "id": "settings.group.Game",
+      "text": "Game"
+    },
+    {
+      "id": "settings.group.Text & Display",
+      "text": "Text & Display"
+    },
+    {
+      "id": "settings.label.abstain",
+      "text": "Allow abstentions"
+    },
+    {
+      "id": "settings.label.auto",
+      "text": "Auto advance"
+    },
+    {
+      "id": "settings.label.colorblind",
+      "text": "Neutral accent palette"
+    },
+    {
+      "id": "settings.label.count",
+      "text": "Participants"
+    },
+    {
+      "id": "settings.label.delay",
+      "text": "Auto advance hold"
+    },
+    {
+      "id": "settings.label.effects",
+      "text": "Effects"
+    },
+    {
+      "id": "settings.label.flashes",
+      "text": "Allow safe flashes"
+    },
+    {
+      "id": "settings.label.instant",
+      "text": "Instant text"
+    },
+    {
+      "id": "settings.label.intensity",
+      "text": "Effects intensity"
+    },
+    {
+      "id": "settings.label.lastWords",
+      "text": "Last words"
+    },
+    {
+      "id": "settings.label.motion",
+      "text": "Reduced motion"
+    },
+    {
+      "id": "settings.label.quick",
+      "text": "Quick phrasing"
+    },
+    {
+      "id": "settings.label.reveal",
+      "text": "Reveal roles on death"
+    },
+    {
+      "id": "settings.label.revote",
+      "text": "One tie revote"
+    },
+    {
+      "id": "settings.label.rounds",
+      "text": "Discussion rounds"
+    },
+    {
+      "id": "settings.label.scale",
+      "text": "UI scale"
+    },
+    {
+      "id": "settings.label.size",
+      "text": "Text size"
+    },
+    {
+      "id": "settings.label.speed",
+      "text": "Text speed"
+    },
+    {
+      "id": "settings.label.trial",
+      "text": "Trial Mode"
+    },
+    {
+      "id": "settings.label.trials",
+      "text": "Trials per day (Trial Mode)"
+    },
+    {
+      "id": "settings.label.windows",
+      "text": "Player windows"
+    },
+    {
+      "id": "settings.off",
+      "text": "Off"
+    },
+    {
+      "id": "settings.on",
+      "text": "On"
+    },
+    {
+      "id": "settings.policy",
+      "text": "Display changes apply now. Game changes apply to the next run."
+    },
+    {
+      "id": "settings.reset",
+      "text": "Reset"
+    },
+    {
+      "id": "settings.resetAll",
+      "text": "Reset all defaults"
+    },
+    {
+      "id": "settings.saveError",
+      "text": "Preferences could not be kept: {reason}"
+    },
+    {
+      "id": "settings.seedError",
+      "text": "Seed must be a number from 0 to 4294967295."
+    },
+    {
+      "id": "settings.seedHint",
+      "text": "Seed (blank = random)"
+    },
+    {
+      "id": "settings.toggle",
+      "text": "{title}: {value}"
+    },
+    {
+      "id": "settings.value",
+      "text": "{title}: {value}"
+    },
+    {
+      "id": "setup.chooseRole",
+      "text": "Choose your role"
+    },
+    {
+      "id": "setup.error",
+      "text": "Invalid setup: {reason}"
+    },
+    {
+      "id": "setup.faction",
+      "text": "{faction} roles"
+    },
+    {
+      "id": "setup.header",
+      "text": "SOCIALSTIM · NEW RUN"
+    },
+    {
+      "id": "setup.intro",
+      "text": "Configure the next run in ≡ → Settings. Each run starts fresh."
+    },
+    {
+      "id": "setup.random",
+      "text": "Random role"
+    },
+    {
+      "id": "setup.randomSeed",
+      "text": "Random seed"
+    },
+    {
+      "id": "setup.seed",
+      "text": "Seed {seed}"
+    },
+    {
+      "id": "setup.summary",
+      "text": "{count} participants · {seed}"
+    },
+    {
+      "id": "speech.attributed",
+      "text": "{name}: {line}"
+    },
+    {
+      "id": "tone.challenge",
+      "text": "Challenge"
+    },
+    {
+      "id": "tone.concern",
+      "text": "Concern"
+    },
+    {
+      "id": "tone.conversation",
+      "text": "Conversation"
+    },
+    {
+      "id": "tone.counter",
+      "text": "Counter"
+    },
+    {
+      "id": "tone.result",
+      "text": "Result"
+    },
+    {
+      "id": "tone.role",
+      "text": "Role"
+    },
+    {
+      "id": "tone.selfDefense",
+      "text": "Self-defense"
+    },
+    {
+      "id": "tone.support",
+      "text": "Support"
+    },
+    {
+      "id": "trial.ballot",
+      "text": "{name}: {verdict}."
+    },
+    {
+      "id": "trial.guilty",
+      "text": "{name} is found guilty."
+    },
+    {
+      "id": "trial.innocent",
+      "text": "{name} is acquitted."
+    },
+    {
+      "id": "trial.noMajority",
+      "text": "No majority. No trial today."
+    },
+    {
+      "id": "trial.nobody",
+      "text": "nobody"
+    },
+    {
+      "id": "trial.nomination",
+      "text": "{name} nominates {target}."
+    },
+    {
+      "id": "verdict.Abstain",
+      "text": "Abstain"
+    },
+    {
+      "id": "verdict.Guilty",
+      "text": "Guilty"
+    },
+    {
+      "id": "verdict.Innocent",
+      "text": "Innocent"
+    },
+    {
+      "id": "vote.abstainTarget",
+      "text": "to abstain"
+    },
+    {
+      "id": "vote.allAbstained",
+      "text": "Everyone abstained."
+    },
+    {
+      "id": "vote.ballot",
+      "text": "{name} votes {target}."
+    },
+    {
+      "id": "vote.count",
+      "text": "{name}: {count}"
+    },
+    {
+      "id": "vote.empty",
+      "text": "No votes cast"
+    },
+    {
+      "id": "vote.revoteBetween",
+      "text": "Revote between {names}."
+    },
+    {
+      "id": "vote.tally",
+      "text": "{tally} · Abstentions: {count}."
+    },
+    {
+      "id": "vote.tied",
+      "text": "The vote is tied."
+    }
+  ]
+}

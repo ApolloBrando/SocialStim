@@ -190,7 +190,7 @@ namespace SocialStim.Tests.EditMode
         [Test]
         public void PublicSpeechCuesUseTheAssertedRoleAndIntent()
         {
-            var run = RunFactory.CreateScenario(new RunOptions(123, discussionRounds: 3, votingMode: VotingMode.Trial), new[] {
+            var run = RunFactory.CreateScenario(TestContent.Text, new RunOptions(123, discussionRounds: 3, votingMode: VotingMode.Trial), new[] {
                 new CastMemberSpec("Player", new SocialStim.Rules.Roles.RoleId("assassin")),
                 new CastMemberSpec("Town1", new SocialStim.Rules.Roles.RoleId("inspector")),
                 new CastMemberSpec("Town2", new SocialStim.Rules.Roles.RoleId("physician")),

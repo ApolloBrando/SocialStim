@@ -27,8 +27,8 @@ namespace SocialStim.Tests.EditMode
             var setup = RoleList.ForPopulation(count);
             var names = Enumerable.Range(0, count).Select(i => "Person" + i).ToArray();
             var options = new RunOptions(147, new RoleId("citizen"), votingMode: VotingMode.Trial);
-            var run = RunFactory.Create(options, roles, names, TestContent.Lines(), setup: setup);
-            var again = RunFactory.Create(options, roles, names, TestContent.Lines(), setup: setup);
+            var run = RunFactory.Create(TestContent.Text, options, roles, names, TestContent.Lines(), setup: setup);
+            var again = RunFactory.Create(TestContent.Text, options, roles, names, TestContent.Lines(), setup: setup);
             var assigned = setup.Resolve(roles, options.PlayerRole, new SeededRandom(147));
             Assert.That(run.GetPlayerView().Characters.Count, Is.EqualTo(count));
             Assert.That(run.GetPlayerView().OwnRole.Id.Value, Is.EqualTo("citizen"));
@@ -38,7 +38,7 @@ namespace SocialStim.Tests.EditMode
             Assert.That(assigned.Any(r => r.Faction == Faction.Town), Is.True);
             Assert.That(assigned.Any(r => r.Faction == Faction.Antagonist && r.Ability == AbilityKind.Attack), Is.True);
             Assert.That(assigned.Where(r => r.Unique).Select(r => r.Id).Distinct().Count(), Is.EqualTo(assigned.Count(r => r.Unique)));
-            Assert.Throws<ArgumentException>(() => RunFactory.Create(options, roles, names.Take(count - 1), TestContent.Lines(), setup: setup));
+            Assert.Throws<ArgumentException>(() => RunFactory.Create(TestContent.Text, options, roles, names.Take(count - 1), TestContent.Lines(), setup: setup));
         }
 
         [Test]
@@ -125,7 +125,7 @@ namespace SocialStim.Tests.EditMode
         [Test]
         public void RecordedReportUsesNaturalTextAndAttributesTheSpeakerOnce()
         {
-            var run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1, votingMode: VotingMode.Trial),
+            var run = RunFactory.CreateScenario(TestContent.Text, new RunOptions(42, discussionRounds: 1, votingMode: VotingMode.Trial),
                 new[] { "physician", "inspector", "assassin", "citizen", "survivor" }
                     .Select((id, i) => new CastMemberSpec("Person" + i, new RoleId(id))),
                 AdvancedRoleTests.Roles(), DialogueDocument.Parse(ReadDialogue()), new ScenarioStrategy());

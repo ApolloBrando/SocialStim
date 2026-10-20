@@ -11,7 +11,7 @@ namespace SocialStim.Tests.EditMode
     /// <summary>Team planner integration and audience routing through the real session.</summary>
     public sealed class TeamSessionTests
     {
-        private static RunSession Create(params string[] ids) => RunFactory.CreateScenario(new RunOptions(19, discussionRounds: 1, votingMode: VotingMode.Trial),
+        private static RunSession Create(params string[] ids) => RunFactory.CreateScenario(TestContent.Text, new RunOptions(19, discussionRounds: 1, votingMode: VotingMode.Trial),
             ids.Select((id, index) => new CastMemberSpec("Person" + index, new RoleId(id))), TestContent.Roles(), TestContent.Lines(),
             new ScenarioStrategy { Target = knowledge => knowledge.OwnRole.Ability == AbilityKind.Attack ? new CharacterId(2) : (CharacterId?)null });
 

@@ -12,6 +12,7 @@ namespace SocialStim.Presentation.Text
     public sealed class ParticipantCard : MonoBehaviour
     {
         private TextMeshProUGUI _label;
+        private SocialStim.Rules.Dialogue.TextTemplates _text;
         private Image _surface;
         private bool _self, _speaking, _selectable;
         private Button _button;
@@ -20,9 +21,9 @@ namespace SocialStim.Presentation.Text
         public event Action<CharacterId> Selected;
         public CharacterId Id { get; private set; }
 
-        public void Initialize(CharacterId id, TMP_FontAsset font)
+        public void Initialize(CharacterId id, TMP_FontAsset font, SocialStim.Rules.Dialogue.TextTemplates text = null)
         {
-            Id = id;
+            Id = id; _text = text ?? SocialStim.Data.Definitions.GameText.Load();
             _surface = gameObject.AddComponent<Image>(); _surface.raycastTarget = true;
             _button = gameObject.AddComponent<Button>(); _button.targetGraphic = _surface; _button.transition = Selectable.Transition.None;
             _button.onClick.AddListener(() => Selected?.Invoke(Id));
@@ -38,10 +39,7 @@ namespace SocialStim.Presentation.Text
         public void Render(KnownCharacter participant, bool self, TextPalette palette, bool speaking = false, bool selectable = false, string mark = "", string claim = "", bool targetMode = false)
         {
             _self = self; _speaking = speaking; _selectable = selectable; _button.interactable = !targetMode || selectable;
-            string text = participant.Name + (self ? " (you)" : "")
-                + "\n" + (!participant.Alive ? "DEAD" : participant.IsTeammate ? "TEAMMATE" : "ALIVE");
-            text += (speaking ? " · SPEAKING" : selectable ? " · SELECT" : "")
-                + (string.IsNullOrEmpty(mark) ? "" : "\nMark: " + mark) + (string.IsNullOrEmpty(claim) ? "" : "\nClaims " + claim);
+            string text = _text.Render("roster.card", ("name", participant.Name), ("self", self ? _text.Render("roster.self") : ""), ("state", _text.Render(!participant.Alive ? "roster.dead" : participant.IsTeammate ? "roster.teammate" : "roster.alive")), ("activity", speaking ? _text.Render("roster.speaking") : selectable ? _text.Render("roster.select") : ""), ("mark", string.IsNullOrEmpty(mark) ? "" : _text.Render("roster.mark", ("mark", _text.Render("mark." + mark)))), ("claim", string.IsNullOrEmpty(claim) ? "" : _text.Render("roster.claim", ("role", claim))));
             _focus.SetText(text); Theme(palette);
         }
 

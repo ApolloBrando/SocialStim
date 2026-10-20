@@ -30,7 +30,7 @@ namespace SocialStim.Tests.PlayMode
                 var evil = new RoleSpec(new RoleId("evil"), "Evil", Faction.Antagonist, RoleCategory.AntagonistKilling, AbilityKind.Attack, 1, 0, 0, -1, Faction.Antagonist);
                 var roles = new[] { role, evil };
                 var lines = Enum.GetValues(typeof(SpeechIntent)).Cast<SpeechIntent>().Select(intent => new DialogueLine(intent.ToString(), intent, "Authored line.")).ToArray();
-                var run = RunFactory.CreateScenario(new RunOptions(42), new[] { new CastMemberSpec("Self", role.Id), new CastMemberSpec("Other", role.Id), new CastMemberSpec("Enemy", evil.Id) }, roles, lines);
+                var run = RunFactory.CreateScenario(CopyFixture.Load(), new RunOptions(42), new[] { new CastMemberSpec("Self", role.Id), new CastMemberSpec("Other", role.Id), new CastMemberSpec("Enemy", evil.Id) }, roles, lines);
                 var controller = new GameController(run, roles); var view = root.AddComponent<TextGameView>();
                 view.Initialize(TMP_Settings.defaultFontAsset, initialSettings: new EffectsSettings(elementsPerSecond: 1));
                 view.Render(controller.Request()); yield return null;

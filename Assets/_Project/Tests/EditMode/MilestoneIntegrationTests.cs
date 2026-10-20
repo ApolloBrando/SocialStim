@@ -13,7 +13,7 @@ namespace SocialStim.Tests.EditMode
     /// <summary>Social evidence and presentation metadata must survive feature integration together.</summary>
     public sealed class MilestoneIntegrationTests
     {
-        private static RunSession Create(ScenarioStrategy strategy) => RunFactory.CreateScenario(
+        private static RunSession Create(ScenarioStrategy strategy) => RunFactory.CreateScenario(TestContent.Text,
             new RunOptions(123, discussionRounds: 1, revealOnDeath: false, votingMode: VotingMode.Trial),
             new[] { "inspector", "physician", "interrupter", "assassin", "survivor" }
                 .Select((role, index) => new CastMemberSpec("Person" + index, new RoleId(role))),

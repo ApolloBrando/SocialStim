@@ -20,6 +20,7 @@ namespace SocialStim.Presentation.Text
         [SerializeField] private TMP_FontAsset _font;
         [SerializeField] private CueProfileDefinition _effects;
         [SerializeField] private TextStyleDefinition _textStyles;
+        private SocialStim.Rules.Dialogue.TextTemplates _text;
         private bool _preferencesDirty;
         private float _saveAt;
         private GamePreferences _preferences;
@@ -41,8 +42,8 @@ namespace SocialStim.Presentation.Text
                 var events = new GameObject("Event System", typeof(EventSystem), typeof(InputSystemUIInputModule));
                 events.transform.SetParent(transform, false);
                 _view = gameObject.AddComponent<TextGameView>();
-                _preferences = UiPreferences.Load();
-                _view.Initialize(font, _effects != null ? _effects.Load() : null, _preferences.Effects, _textStyles != null ? _textStyles.Load() : null);
+                _preferences = UiPreferences.Load(); _text = GameText.Load();
+                _view.Initialize(font, _effects != null ? _effects.Load() : null, _preferences.Effects, _textStyles != null ? _textStyles.Load() : null, _text);
                 _view.ApplyPreferences(_preferences);
                 _view.RestartRequested += ShowSetup;
                 _view.PreferencesChanged += SavePreferences;
@@ -55,8 +56,7 @@ namespace SocialStim.Presentation.Text
         private void ShowSetup()
         {
             _presenter?.Dispose(); _presenter = null;
-            _view.ShowSetup(_catalog.LoadRoles(), _preferences.Game.PlayerCount + " participants · "
-                + (_preferences.Game.Seed.HasValue ? "Seed " + _preferences.Game.Seed.Value : "Random seed"), Begin);
+            _view.ShowSetup(_catalog.LoadRoles(), _text.Render("setup.summary", ("count", _preferences.Game.PlayerCount), ("seed", _preferences.Game.Seed.HasValue ? _text.Render("setup.seed", ("seed", _preferences.Game.Seed.Value)) : _text.Render("setup.randomSeed"))), Begin);
         }
 
         private void Begin(RoleId? chosenRole)
@@ -69,11 +69,11 @@ namespace SocialStim.Presentation.Text
                 var options = new RunOptions(seed, chosenRole, setup.Trials, setup.Rounds, setup.Reveal,
                     votingMode: setup.Mode, playerWindowsPerRound: setup.Windows,
                     allowAbstain: setup.Abstain, revoteTies: setup.Revote, lastWords: setup.LastWords);
-                var session = RunFactory.Create(options, roles, _catalog.LoadNames(), _catalog.LoadDialogue(), reasoning: _catalog.LoadReasoning(), setup: _catalog.LoadSetup(setup.PlayerCount));
+                var session = RunFactory.Create(_text, options, roles, _catalog.LoadNames(), _catalog.LoadDialogue(), reasoning: _catalog.LoadReasoning(), setup: _catalog.LoadSetup(setup.PlayerCount));
                 _presenter = new GamePresenter(new GameController(session, roles), _view, _view);
             }
             catch (Exception e) when (e is ArgumentException || e is InvalidOperationException || e is OverflowException)
-            { _view.ShowInputError("Invalid setup: " + e.Message); }
+            { _view.ShowInputError(_text.Render("setup.error", ("reason", e.Message))); }
         }
 
         private void SavePreferences(GamePreferences settings)
@@ -88,7 +88,7 @@ namespace SocialStim.Presentation.Text
             if (!_preferencesDirty) return; _preferencesDirty = false;
             try { UiPreferences.Store(_preferences); }
             catch (Exception exception) when (exception is System.IO.IOException || exception is UnauthorizedAccessException)
-            { if (notify && _view != null) _view.ShowInputError("Preferences could not be kept: " + exception.Message); else Debug.LogWarning(exception.Message); }
+            { if (notify && _view != null) _view.ShowInputError(_text.Render("settings.saveError", ("reason", exception.Message))); else Debug.LogWarning(exception.Message); }
         }
 
         private void OnDestroy()

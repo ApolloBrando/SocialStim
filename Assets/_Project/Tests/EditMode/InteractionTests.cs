@@ -14,7 +14,7 @@ namespace SocialStim.Tests.EditMode
     /// <summary>Actual legal navigation, selected authored speech, claim permissions and terminal information scope.</summary>
     public sealed class InteractionTests
     {
-        private static RunSession Run(string role = "inspector", int days = 30) => RunFactory.CreateScenario(
+        private static RunSession Run(string role = "inspector", int days = 30) => RunFactory.CreateScenario(TestContent.Text,
             new RunOptions(123, discussionRounds: 3, maximumDays: days),
             new[] { role, "citizen", "assassin", "physician", "citizen" }.Select((r, i) => new CastMemberSpec("Person" + i, new RoleId(r))),
             AdvancedRoleTests.Roles(), TestContent.Lines(), new ScenarioStrategy());
@@ -64,7 +64,7 @@ namespace SocialStim.Tests.EditMode
             Assert.That(InteractionMenu.Options(controller.Request(), InteractionAction.Claim, null).Count, Is.GreaterThan(1));
             Assert.That(run.TrySubmit(GameCommand.Speak(SpeechIntent.ClaimRole, role: new RoleId("inspector")), out _), Is.True);
             var spy = new InvalidTownBluffer();
-            var townRun = RunFactory.CreateScenario(new RunOptions(99),
+            var townRun = RunFactory.CreateScenario(TestContent.Text, new RunOptions(99),
                 new[] { "citizen", "inspector", "assassin" }.Select((r, i) => new CastMemberSpec("Person" + i, new RoleId(r))),
                 AdvancedRoleTests.Roles(), TestContent.Lines(), spy);
             Assert.That(townRun.TrySubmit(GameCommand.Speak(SpeechIntent.StaySilent), out _), Is.True);

@@ -27,6 +27,7 @@ namespace SocialStim.Editor
                 if (catalog.LoadNames().Count < setup.Slots.Count) throw new System.InvalidOperationException("The role list needs more cast names.");
                 foreach (var role in definitions) setup.Resolve(definitions, role.Id, new SeededRandom(1));
             }
+            GameText.Load();
             var dialogue = catalog.LoadDialogue();
             foreach (var line in dialogue)
             {

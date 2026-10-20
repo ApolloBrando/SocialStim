@@ -14,6 +14,7 @@ namespace SocialStim.Presentation.Text
     public sealed class SettingsPanel : MonoBehaviour
     {
         private RectTransform _root, _rows;
+        private SocialStim.Rules.Dialogue.TextTemplates _copy;
         private TMP_FontAsset _font;
         private GamePreferences _preferences = new GamePreferences();
         private Action<GamePreferences> _changed;
@@ -22,9 +23,9 @@ namespace SocialStim.Presentation.Text
         private readonly List<Action> _refresh = new List<Action>();
         private Button _close;
         /// <summary>Builds the modal once; rows are rebuilt only when changing groups.</summary>
-        public void Initialize(Transform parent, TMP_FontAsset font, Action<GamePreferences> changed)
+        public void Initialize(Transform parent, TMP_FontAsset font, SocialStim.Rules.Dialogue.TextTemplates copy, Action<GamePreferences> changed)
         {
-            _font = font; _changed = changed;
+            _font = font; _changed = changed; _copy = copy;
             _root = TextUiFactory.Rect("Settings Modal", parent);
             TextUiFactory.Fill(_root, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             _root.gameObject.AddComponent<Image>().color = new Color(0, 0, 0, 0.7f);
@@ -35,17 +36,17 @@ namespace SocialStim.Presentation.Text
             TextUiFactory.Fill(tabs, new Vector2(0, 1), Vector2.one, new Vector2(20, -66), new Vector2(-20, -16));
             var layout = tabs.gameObject.AddComponent<HorizontalLayoutGroup>(); layout.spacing = 8;
             foreach (string group in new[] { "Game", "Text & Display", "Accessibility", "Data" })
-            { string selected = group; Button button = TextUiFactory.Button(tabs, font, group, 42); button.onClick.AddListener(() => Group(selected)); }
+            { string selected = group; Button button = TextUiFactory.Button(tabs, font, _copy.Render("settings.group." + group), 42); button.onClick.AddListener(() => Group(selected)); }
             var scroll = TextUiFactory.Scroll("Preferences", panel, out _rows);
             TextUiFactory.Fill((RectTransform)scroll.transform, Vector2.zero, Vector2.one, new Vector2(16, 76), new Vector2(-16, -76));
             var rows = _rows.gameObject.AddComponent<VerticalLayoutGroup>(); rows.spacing = 8;
             rows.childControlHeight = true; rows.childControlWidth = true; rows.childForceExpandHeight = false;
             _rows.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            _close = TextUiFactory.Button(panel, font, "Close settings", 42);
+            _close = TextUiFactory.Button(panel, font, _copy.Render("settings.close"), 42);
             TextUiFactory.Fill((RectTransform)_close.transform, Vector2.zero, Vector2.zero, new Vector2(20, 18), new Vector2(200, 62));
             _close.onClick.AddListener(Close);
             var hint = TextUiFactory.Text("Apply policy", panel, font, 15);
-            hint.text = "Display changes apply now. Game changes apply to the next run.";
+            hint.text = _copy.Render("settings.policy");
             TextUiFactory.Fill(hint.rectTransform, Vector2.zero, new Vector2(1, 0), new Vector2(224, 20), new Vector2(-20, 60));
             _root.gameObject.SetActive(false); Group("Text & Display");
         }
@@ -92,28 +93,28 @@ namespace SocialStim.Presentation.Text
             foreach (Transform child in _rows) { child.gameObject.SetActive(false); Destroy(child.gameObject); }
             if (group == "Game")
             {
-                Number("Participants", PreferenceKey.PlayerCount, 5, 20, true); Number("Discussion rounds", PreferenceKey.Rounds, 3, 7, true);
-                Number("Player windows", PreferenceKey.Windows, 1, 2, true); Toggle("Trial Mode", PreferenceKey.Mode);
-                Toggle("Allow abstentions", PreferenceKey.Abstain); Toggle("One tie revote", PreferenceKey.Revote);
-                Toggle("Reveal roles on death", PreferenceKey.Reveal); Toggle("Last words", PreferenceKey.LastWords);
-                Number("Trials per day (Trial Mode)", PreferenceKey.Trials, 1, 10, true); Seed();
+                Number(_copy.Render("settings.label.count"), PreferenceKey.PlayerCount, 5, 20, true); Number(_copy.Render("settings.label.rounds"), PreferenceKey.Rounds, 3, 7, true);
+                Number(_copy.Render("settings.label.windows"), PreferenceKey.Windows, 1, 2, true); Toggle(_copy.Render("settings.label.trial"), PreferenceKey.Mode);
+                Toggle(_copy.Render("settings.label.abstain"), PreferenceKey.Abstain); Toggle(_copy.Render("settings.label.revote"), PreferenceKey.Revote);
+                Toggle(_copy.Render("settings.label.reveal"), PreferenceKey.Reveal); Toggle(_copy.Render("settings.label.lastWords"), PreferenceKey.LastWords);
+                Number(_copy.Render("settings.label.trials"), PreferenceKey.Trials, 1, 10, true); Seed();
             }
             else if (group == "Text & Display")
             {
-                Number("Text speed", PreferenceKey.Speed, 1, 240); Toggle("Instant text", PreferenceKey.InstantText);
-                Number("Text size", PreferenceKey.TextSize, 16, 36); Number("UI scale", PreferenceKey.UiScale, 0.75f, 1.5f);
-                Toggle("Auto advance", PreferenceKey.AutoAdvance); Number("Auto advance hold", PreferenceKey.AdvanceDelay, 0.25f, 5);
-                Toggle("Quick phrasing", PreferenceKey.QuickMode);
+                Number(_copy.Render("settings.label.speed"), PreferenceKey.Speed, 1, 240); Toggle(_copy.Render("settings.label.instant"), PreferenceKey.InstantText);
+                Number(_copy.Render("settings.label.size"), PreferenceKey.TextSize, 16, 36); Number(_copy.Render("settings.label.scale"), PreferenceKey.UiScale, 0.75f, 1.5f);
+                Toggle(_copy.Render("settings.label.auto"), PreferenceKey.AutoAdvance); Number(_copy.Render("settings.label.delay"), PreferenceKey.AdvanceDelay, 0.25f, 5);
+                Toggle(_copy.Render("settings.label.quick"), PreferenceKey.QuickMode);
             }
             else if (group == "Accessibility")
             {
-                Toggle("Effects", PreferenceKey.Effects); Toggle("Reduced motion", PreferenceKey.ReducedMotion);
-                Toggle("Allow safe flashes", PreferenceKey.Flashes); Number("Effects intensity", PreferenceKey.Intensity, 0, 1);
-                Toggle("Neutral accent palette", PreferenceKey.Colorblind);
+                Toggle(_copy.Render("settings.label.effects"), PreferenceKey.Effects); Toggle(_copy.Render("settings.label.motion"), PreferenceKey.ReducedMotion);
+                Toggle(_copy.Render("settings.label.flashes"), PreferenceKey.Flashes); Number(_copy.Render("settings.label.intensity"), PreferenceKey.Intensity, 0, 1);
+                Toggle(_copy.Render("settings.label.colorblind"), PreferenceKey.Colorblind);
             }
             else
             {
-                Button reset = TextUiFactory.Button(_rows, _font, "Reset all defaults", 52);
+                Button reset = TextUiFactory.Button(_rows, _font, _copy.Render("settings.resetAll"), 52);
                 reset.onClick.AddListener(() => Commit(new GamePreferences()));
             }
             SetPalette(_palette);
@@ -125,7 +126,7 @@ namespace SocialStim.Presentation.Text
         }
         private void ResetButton(RectTransform row, PreferenceKey key)
         {
-            Button reset = TextUiFactory.Button(row, _font, "Reset", 38);
+            Button reset = TextUiFactory.Button(row, _font, _copy.Render("settings.reset"), 38);
             TextUiFactory.Fill((RectTransform)reset.transform, new Vector2(0.82f, 0), Vector2.one, new Vector2(8, 8), new Vector2(-8, -8));
             reset.onClick.AddListener(() => Commit(PreferencesEditor.Reset(_preferences, key)));
         }
@@ -133,8 +134,7 @@ namespace SocialStim.Presentation.Text
         {
             RectTransform row = Row(54); Button toggle = TextUiFactory.Button(row, _font, title, 42);
             TextUiFactory.Fill((RectTransform)toggle.transform, Vector2.zero, new Vector2(0.82f, 1), Vector2.zero, Vector2.zero);
-            Action refresh = () => toggle.GetComponent<ChoiceFocusIndicator>().SetText(title + ": "
-                + (PreferencesEditor.Value(_preferences, key) >= 0.5f ? "On" : "Off"));
+            Action refresh = () => toggle.GetComponent<ChoiceFocusIndicator>().SetText(_copy.Render("settings.toggle", ("title", title), ("value", _copy.Render(PreferencesEditor.Value(_preferences, key) >= 0.5f ? "settings.on" : "settings.off"))));
             _refresh.Add(refresh); refresh();
             toggle.onClick.AddListener(() => Commit(PreferencesEditor.Apply(_preferences, key, PreferencesEditor.Value(_preferences, key) >= 0.5f ? 0 : 1)));
             ResetButton(row, key);
@@ -149,7 +149,7 @@ namespace SocialStim.Presentation.Text
             var handle = TextUiFactory.Rect("Handle", area); var image = handle.gameObject.AddComponent<Image>();
             handle.sizeDelta = new Vector2(20, 28); slider.handleRect = handle; slider.targetGraphic = image;
             slider.minValue = low; slider.maxValue = high; slider.wholeNumbers = whole;
-            Action refresh = () => { float value = PreferencesEditor.Value(_preferences, key); slider.SetValueWithoutNotify(value); label.text = title + ": " + value.ToString("0.##"); };
+            Action refresh = () => { float value = PreferencesEditor.Value(_preferences, key); slider.SetValueWithoutNotify(value); label.text = _copy.Render("settings.value", ("title", title), ("value", value.ToString("0.##"))); };
             _refresh.Add(refresh); refresh();
             slider.onValueChanged.AddListener(value => Commit(PreferencesEditor.Apply(_preferences, key, value))); ResetButton(row, key);
         }
@@ -159,17 +159,17 @@ namespace SocialStim.Presentation.Text
             var text = TextUiFactory.Text("Seed", row, _font, 18); field.textComponent = text; field.textViewport = row;
             field.contentType = TMP_InputField.ContentType.IntegerNumber;
             field.SetTextWithoutNotify(_preferences.Game.Seed?.ToString() ?? "");
-            var hint = TextUiFactory.Text("Seed hint", row, _font, 14); hint.text = "Seed (blank = random)";
+            var hint = TextUiFactory.Text("Seed hint", row, _font, 14); hint.text = _copy.Render("settings.seedHint");
             TextUiFactory.Fill(hint.rectTransform, new Vector2(0, 0.65f), new Vector2(0.82f, 1), Vector2.zero, Vector2.zero);
             TextUiFactory.Fill(text.rectTransform, Vector2.zero, new Vector2(0.82f, 0.6f), new Vector2(8, 0), new Vector2(-8, 0));
-            _refresh.Add(() => { field.SetTextWithoutNotify(_preferences.Game.Seed?.ToString() ?? ""); hint.text = "Seed (blank = random)"; });
-            Button reset = TextUiFactory.Button(row, _font, "Reset", 38);
+            _refresh.Add(() => { field.SetTextWithoutNotify(_preferences.Game.Seed?.ToString() ?? ""); hint.text = _copy.Render("settings.seedHint"); });
+            Button reset = TextUiFactory.Button(row, _font, _copy.Render("settings.reset"), 38);
             TextUiFactory.Fill((RectTransform)reset.transform, new Vector2(0.82f, 0), Vector2.one, new Vector2(8, 8), new Vector2(-8, -8));
             reset.onClick.AddListener(() => Commit(PreferencesEditor.Seed(_preferences, null)));
             field.onEndEdit.AddListener(value => {
                 if (string.IsNullOrWhiteSpace(value)) Commit(PreferencesEditor.Seed(_preferences, null));
                 else if (uint.TryParse(value, out uint seed)) Commit(PreferencesEditor.Seed(_preferences, seed));
-                else { hint.text = "Seed must be a number from 0 to 4294967295."; field.SetTextWithoutNotify(_preferences.Game.Seed?.ToString() ?? ""); }
+                else { hint.text = _copy.Render("settings.seedError"); field.SetTextWithoutNotify(_preferences.Game.Seed?.ToString() ?? ""); }
             });
         }
     }

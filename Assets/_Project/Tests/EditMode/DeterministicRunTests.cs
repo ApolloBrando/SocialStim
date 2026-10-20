@@ -37,17 +37,17 @@ namespace SocialStim.Tests.EditMode
         {
             foreach (RoleSpec role in TestContent.Roles())
             {
-                var run = RunFactory.Create(new RunOptions(100, role.Id, votingMode: VotingMode.Trial), TestContent.Roles(), TestContent.Names(), TestContent.Lines());
+                var run = RunFactory.Create(TestContent.Text, new RunOptions(100, role.Id, votingMode: VotingMode.Trial), TestContent.Roles(), TestContent.Names(), TestContent.Lines());
                 Assert.That(run.GetPlayerView().OwnRole.Id, Is.EqualTo(role.Id));
                 Assert.That(run.GetPlayerView().Characters.Count, Is.EqualTo(7));
                 Assert.That(run.GetPlayerView().Characters.Select(c => c.Name).Distinct().Count(), Is.EqualTo(7));
             }
-            Assert.Throws<ArgumentException>(() => RunFactory.Create(new RunOptions(100, new RoleId("unknown"), votingMode: VotingMode.Trial), TestContent.Roles(), TestContent.Names(), TestContent.Lines()));
+            Assert.Throws<ArgumentException>(() => RunFactory.Create(TestContent.Text, new RunOptions(100, new RoleId("unknown"), votingMode: VotingMode.Trial), TestContent.Roles(), TestContent.Names(), TestContent.Lines()));
         }
 
         private static string[] Play(uint seed, string role)
         {
-            var run = RunFactory.Create(new RunOptions(seed, new RoleId(role), votingMode: VotingMode.Trial), TestContent.Roles(), TestContent.Names(), TestContent.Lines());
+            var run = RunFactory.Create(TestContent.Text, new RunOptions(seed, new RoleId(role), votingMode: VotingMode.Trial), TestContent.Roles(), TestContent.Names(), TestContent.Lines());
             var controller = new GameController(run, TestContent.Roles());
             for (int step = 0; step < 500; step++)
             {
