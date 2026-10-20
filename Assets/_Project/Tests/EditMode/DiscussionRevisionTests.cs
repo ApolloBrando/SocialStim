@@ -113,7 +113,7 @@ namespace SocialStim.Tests.EditMode
         }
 
         [Test]
-        public void PlayerCounterclaimWindowPrecedesUnrelatedNpcSpeechAndCannotSpendANormalTurn()
+        public void PlayerCounterclaimIsImmediateAndConsumesOneRound()
         {
             var strategy = new Speaker { Speech = k => GameCommand.Speak(SpeechIntent.ClaimRole, role: k.OwnRole.Id) };
             var run = Run(strategy, "assassin", "physician", "inspector");
@@ -127,8 +127,8 @@ namespace SocialStim.Tests.EditMode
             Assert.That(request.Options.Count, Is.EqualTo(2));
             Submit(run, GameCommand.Speak(SpeechIntent.CounterClaim, role: before.CounterClaimRole));
             var after = run.GetPlayerView();
-            Assert.That(after.DiscussionRound, Is.EqualTo(before.DiscussionRound));
-            Assert.That(after.Transcript.Last(e => e.Cue == GameCue.SpeechDelivered).Intent, Is.EqualTo(SpeechIntent.CounterClaim));
+            Assert.That(after.DiscussionRound, Is.EqualTo(before.DiscussionRound + 1));
+            Assert.That(after.Transcript.First(e => e.Sequence >= before.Transcript.Count && e.Cue == GameCue.SpeechDelivered).Intent, Is.EqualTo(SpeechIntent.CounterClaim));
         }
 
         [Test]
@@ -141,23 +141,21 @@ namespace SocialStim.Tests.EditMode
         }
 
         [Test]
-        public void CounterclaimDuringTheLastVictimAnswerMustFinishBeforeVoting()
+        public void EveryPlayerActionClosesTheOldQueueAndTheFinalRoundCannotReopen()
         {
-            var schedule = new DiscussionSchedule(3, 1);
+            var schedule = new DiscussionSchedule(3, 2);
             var exchange = new DiscussionExchange(schedule, new CharacterId(0));
-            for (int i = 0; i < 2; i++)
+            for (int action = 0; action < 2; action++)
             {
-                exchange.Begin(Array.Empty<CharacterId>(), GameCommand.Speak(SpeechIntent.StaySilent), _ => { });
-                exchange.Resume(_ => GameCommand.Speak(SpeechIntent.StaySilent), _ => { }, true);
+                exchange.PlayerActed();
+                exchange.Begin(new[] { new CharacterId(1), new CharacterId(2) }, GameCommand.Speak(SpeechIntent.StaySilent), _ => { });
+                exchange.Resume(_ => GameCommand.Speak(SpeechIntent.Accuse, new CharacterId(0)), _ => { }, true);
+                Assert.That(exchange.RespondTo.HasValue, Is.True);
             }
-            bool counterclaim = false;
-            exchange.Begin(new[] { new CharacterId(1) }, GameCommand.Speak(SpeechIntent.StaySilent), _ => { });
-            exchange.Resume(_ => GameCommand.Speak(SpeechIntent.Accuse, new CharacterId(2)), _ => counterclaim = true,
-                true, () => counterclaim);
-            Assert.That(schedule.Complete, Is.False);
-            counterclaim = false;
-            exchange.Resume(_ => GameCommand.Speak(SpeechIntent.StaySilent), _ => { }, true, () => counterclaim);
+            exchange.PlayerActed();
+            Assert.That(exchange.RespondTo, Is.Null);
             Assert.That(schedule.Complete, Is.True);
+            Assert.Throws<InvalidOperationException>(() => exchange.Begin(Array.Empty<CharacterId>(), GameCommand.Speak(SpeechIntent.StaySilent), _ => { }));
         }
 
         [Test]

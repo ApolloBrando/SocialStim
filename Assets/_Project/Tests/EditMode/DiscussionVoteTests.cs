@@ -54,48 +54,50 @@ namespace SocialStim.Tests.EditMode
 
         [TestCase(1)]
         [TestCase(2)]
-        public void ExactlyConfiguredOrdinaryWindowsPrecedeTheVote(int windows)
+        public void EveryActionConsumesARoundEvenWithLegacyTwoWindowSettings(int windows)
         {
             var run = Run(windows: windows);
-            for (int window = 0; window < 3 * windows; window++)
+            for (int window = 0; window < 3; window++)
             {
                 var view = run.GetPlayerView();
-                Assert.That(view.DiscussionRound, Is.EqualTo(window / windows + 1));
-                Assert.That(view.PlayerWindow, Is.EqualTo(window % windows + 1));
+                Assert.That(view.DiscussionRound, Is.EqualTo(window + 1));
+                Assert.That(view.PlayerWindow, Is.EqualTo(1));
                 Submit(run, GameCommand.Speak(SpeechIntent.StaySilent));
             }
             Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.Voting));
+            Assert.That(run.GetPlayerView().PlayerWindow, Is.EqualTo(1));
+            Assert.That(run.GetPlayerView().WindowsPerRound, Is.EqualTo(1));
             Assert.That(run.TrySubmit(GameCommand.Speak(SpeechIntent.StaySilent), out _), Is.False);
         }
 
         [Test]
-        public void AccusationPausesTheNpcQueueAndResponseDoesNotSpendAnExtraWindow()
+        public void AnsweringAnAccusationConsumesTheRoundAndCannotRestartTheSameExchange()
         {
             var strategy = new ScriptedConversation { Speech = _ => GameCommand.Speak(SpeechIntent.Accuse, new CharacterId(0)) };
             var run = Run(strategy);
             Submit(run, GameCommand.Speak(SpeechIntent.StaySilent));
             var view = run.GetPlayerView();
             Assert.That(view.RespondTo.HasValue, Is.True);
-            Assert.That(view.DiscussionRound, Is.EqualTo(1));
-            Assert.That(view.Transcript.All(e => e.Intent != SpeechIntent.StaySilent), Is.True);
+            Assert.That(view.DiscussionRound, Is.EqualTo(2));
             Assert.That(run.TrySubmit(GameCommand.Speak(SpeechIntent.ExpressFear), out _), Is.False);
-            for (int n = 0; run.GetPlayerView().RespondTo.HasValue && n < 10; n++)
-                Submit(run, GameCommand.Speak(SpeechIntent.Defend));
-            Assert.That(run.GetPlayerView().RespondTo, Is.Null);
-            Assert.That(run.GetPlayerView().DiscussionRound, Is.EqualTo(2));
+            Assert.That(run.GetPlayerView().Revision, Is.EqualTo(view.Revision));
+            Submit(run, GameCommand.Speak(SpeechIntent.Defend));
+            Assert.That(run.GetPlayerView().DiscussionRound, Is.EqualTo(3));
+            Submit(run, GameCommand.Speak(SpeechIntent.StaySilent));
+            Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.Voting));
+            Assert.That(run.GetPlayerView().Transcript.Any(e => e.Intent == SpeechIntent.StaySilent), Is.False);
         }
 
         [Test]
-        public void YieldedOpenerCanBeAnsweredWithoutSpendingTheFirstWindow()
+        public void YieldedOpenerDoesNotSpendARoundButPlayerAnswerDoes()
         {
             var strategy = new ScriptedConversation { Speech = _ => GameCommand.Speak(SpeechIntent.Accuse, new CharacterId(0)) };
             var run = Run(strategy);
             Submit(run, GameCommand.Continue());
             Assert.That(run.GetPlayerView().RespondTo.HasValue, Is.True);
             Submit(run, GameCommand.Speak(SpeechIntent.Defend));
-            Assert.That(run.GetPlayerView().DiscussionRound, Is.EqualTo(1));
+            Assert.That(run.GetPlayerView().DiscussionRound, Is.EqualTo(2));
             Assert.That(run.GetPlayerView().PlayerWindow, Is.EqualTo(1));
-            Assert.That(run.GetPlayerView().RespondTo, Is.Null);
         }
 
         [Test]

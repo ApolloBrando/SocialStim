@@ -11,11 +11,13 @@ namespace SocialStim.Rules.Reasoning
         /// <summary>Creates an observer-specific public character record.</summary>
         public KnownCharacter(CharacterId id, string name, bool alive, int suspicion,
             bool teammate = false, RoleId? revealedRole = null, Faction? revealedFaction = null, RoleId? claim = null,
-            int trust = 50, FactionEstimate factionEstimate = null, IEnumerable<RoleEstimate> roleEstimates = null, Faction? knownFaction = null)
+            int trust = 50, FactionEstimate factionEstimate = null, IEnumerable<RoleEstimate> roleEstimates = null, Faction? knownFaction = null,
+            float? suspicionValue = null, float? trustValue = null)
         { Id = id; Name = name; Alive = alive; Suspicion = suspicion; IsTeammate = teammate;
             RevealedRole = revealedRole; RevealedFaction = revealedFaction; ClaimedRole = claim;
             KnownFaction = knownFaction ?? revealedFaction;
             Trust = trust; FactionEstimate = factionEstimate;
+            SuspicionValue = suspicionValue ?? suspicion / 10f; TrustValue = trustValue ?? trust / 10f;
             RoleEstimates = (roleEstimates ?? Enumerable.Empty<RoleEstimate>()).ToList().AsReadOnly(); }
         /// <summary>Public identity.</summary>
         public CharacterId Id { get; }
@@ -25,6 +27,8 @@ namespace SocialStim.Rules.Reasoning
         public bool Alive { get; }
         /// <summary>This observer's bounded suspicion score, not a role probability.</summary>
         public int Suspicion { get; }
+        /// <summary>Nuanced observer-local suspicion in [0,10]; integer scores are compatibility projections.</summary>
+        public float SuspicionValue { get; }
         /// <summary>True only for explicitly granted antagonist teammate knowledge.</summary>
         public bool IsTeammate { get; }
         /// <summary>Role disclosed by a public reveal, if any.</summary>
@@ -37,6 +41,8 @@ namespace SocialStim.Rules.Reasoning
         public Faction? KnownFaction { get; }
         /// <summary>Observer-local credibility score, not another NPC's private opinion.</summary>
         public int Trust { get; }
+        /// <summary>Independent observer-local trust in [0,10], never a public or shared opinion.</summary>
+        public float TrustValue { get; }
         /// <summary>Normalized model estimates, or null for legacy test contexts.</summary>
         public FactionEstimate FactionEstimate { get; }
         /// <summary>Observer-local candidate roles, never an authoritative assignment.</summary>

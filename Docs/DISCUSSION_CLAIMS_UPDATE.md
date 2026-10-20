@@ -20,7 +20,8 @@ existing dialogue schema, scene, catalog and uGUI components.
   happen in an immediate CounterClaim window, with separate dialogue. The genuine
   NPC role holder counters; at most one NPC bluffer joins. Antagonists do not
   challenge a teammate's claim of that role. The player can counter or wait.
-  A counterclaim does not consume an additional ordinary discussion window.
+  The subsequent AI refinement makes every player counterclaim or pass consume a
+  discussion round, like every other accepted player action. See AI_REFINEMENT.md.
 - Town power roles keep cover unless exposed or holding important hostile evidence;
   a threatened NPC can choose a legal claim instead of its automatic defense.
 - The ordinary menu is Wait, Accuse, Defend, and a conditional Claim Role group.

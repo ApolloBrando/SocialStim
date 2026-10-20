@@ -116,7 +116,7 @@ namespace SocialStim.Tests.EditMode
                     new KnownCharacter(new CharacterId(2), "High suspicion", true, high),
                 }, Array.Empty<NightReport>());
                 Assert.That(strategy.NightTarget(view, new SeededRandom(4)),
-                    Is.EqualTo(high >= 60 ? new CharacterId(2) : (CharacterId?)null));
+                    Is.Null, "A random initial feeling is insufficient to shoot a Town participant.");
             }
         }
 

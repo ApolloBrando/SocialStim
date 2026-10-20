@@ -24,7 +24,7 @@ namespace SocialStim.Rules.Phases
         }
         /// <summary>Daily elimination policy.</summary>
         public VotingMode VotingMode { get; }
-        /// <summary>Ordinary player actions per discussion round, excluding responses.</summary>
+        /// <summary>Legacy serialized preference retained for compatibility. Every accepted player action now closes its round.</summary>
         public int PlayerWindowsPerRound { get; }
         /// <summary>Whether a living voter may deliberately abstain.</summary>
         public bool AllowAbstain { get; }
