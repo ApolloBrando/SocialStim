@@ -28,3 +28,8 @@ All current dialogue and game copy is editable in JSON. Use the
 [complete dialogue catalogue](Docs/DIALOGUE_CATALOGUE.md) to browse every entry
 and the [editing guide](Docs/DIALOGUE_GUIDE.md) to change it. Narration, result
 wording, choices and interface copy have no hardcoded prose fallback.
+
+The [Unity workflow pass](Docs/UNITY_WORKFLOW.md) adds native dialogue editing,
+automatic content/import/build validation, role/catalog inspector feedback,
+InputAction-based text controls and TMP profiler scopes. The Unity-first working
+preference is recorded in [AGENTS.md](AGENTS.md). Native verification remains pending.

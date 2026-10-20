@@ -441,3 +441,19 @@ GameObservation keeps raw SpokenText separately from attributed transcript text,
 so authors can rewrite attribution without duplicating speaker labels.
 Tools/dialogue_catalogue.py generates the complete reference and checks freshness
 and missing bindings in CI. Existing asset GUIDs and scene references are retained.
+
+## Unity-native authoring and integration
+
+The Unity-first preference is recorded in AGENTS.md. Editor tools now reference
+Presentation definitions for validation; the dependency direction remains one-way.
+Rules/Application still cannot reference Unity. UI Toolkit DialogueEditorWindow
+stages prose through an isolated ScriptableObject Undo buffer, preserves unrelated
+JSON fields through EditableTextDocument, validates before an atomic source save,
+and reimports with AssetDatabase. DialogueCatalogue supplies the native reference
+exporter with headless parity coverage. ContentValidation is shared by inspectors,
+deferred AssetPostprocessor checks and IPreprocessBuildWithReport.
+TextInputActions owns clones of optional inspector references and disposes native
+input state with the view. CurrentLinePointer delegates uGUI raycast-delivered
+clicks rather than polling physical pointers. UiEventSystem reuses a compatible
+dispatcher. ProfilerMarker scopes separate TMP effect updates from baseline capture.
+Full decisions and pending Unity checks: Docs/UNITY_WORKFLOW.md.

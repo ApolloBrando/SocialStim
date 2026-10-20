@@ -15,7 +15,10 @@ namespace SocialStim.Editor
     public sealed class DialogueEditorWindow : EditorWindow
     {
         [SerializeField] private TextAsset _asset;
-        [SerializeField] private string _workingJson, _baseline, _selectedId;
+        [SerializeField] private string _baseline, _selectedId;
+        [SerializeField] private DialogueEditBuffer _buffer;
+        private bool _refreshing;
+        private string WorkingJson { get => _buffer == null ? "" : _buffer.Json; set { EnsureBuffer(); _buffer.SetText(value); } }
         private string _search = "";
         private EditableTextDocument _document;
         private List<string> _filtered = new List<string>();
@@ -37,6 +40,7 @@ namespace SocialStim.Editor
         }
         private void OnEnable()
         {
+            EnsureBuffer();
             saveChangesMessage = "Save edited SocialStim dialogue before closing?";
             Undo.undoRedoPerformed += OnUndoRedo;
         }
@@ -62,14 +66,14 @@ namespace SocialStim.Editor
             var split = new TwoPaneSplitView(0, 300, TwoPaneSplitViewOrientation.Horizontal); split.style.flexGrow = 1; rootVisualElement.Add(split);
             _list = new ListView { fixedItemHeight = 24, selectionType = SelectionType.Single, makeItem = () => new Label() };
             _list.bindItem = (element, index) => ((Label)element).text = _document.Group(_filtered[index]) + " · " + _filtered[index];
-            _list.selectionChanged += values => Select(values.OfType<string>().FirstOrDefault()); split.Add(_list);
+            _list.selectionChanged += values => { if (!_refreshing) Select(values.OfType<string>().FirstOrDefault()); }; split.Add(_list);
             var pane = new ScrollView(); split.Add(pane);
             _prose = new TextField("Authored text") { multiline = true, isDelayed = true };
             _prose.style.minHeight = 130; _prose.style.whiteSpace = WhiteSpace.Normal; pane.Add(_prose);
             _prose.RegisterValueChangedCallback(evt => Attempt(() => {
                 if (_document == null || _selectedId == null || _document.Text(_selectedId) == evt.newValue) return;
                 string updated = _document.Reword(_selectedId, evt.newValue);
-                Undo.RecordObject(this, "Edit SocialStim dialogue"); _workingJson = updated; EditorUtility.SetDirty(this);
+                Undo.RecordObject(_buffer, "Edit SocialStim dialogue"); WorkingJson = updated; EditorUtility.SetDirty(_buffer);
                 Refresh(); _status.text = "Text staged. Save validates the full asset. Other fields are preserved.";
             }));
             _details = new TextField("Complete selected entry (read-only)") { multiline = true, isReadOnly = true }; pane.Add(_details);
@@ -78,15 +82,17 @@ namespace SocialStim.Editor
         }
         private void Load(TextAsset asset)
         {
+            if (_buffer != null) DestroyImmediate(_buffer);
+            _buffer = null; EnsureBuffer();
             _asset = asset; _selectedId = null;
-            _workingJson = _baseline = asset == null ? "" : File.ReadAllText(AssetDatabase.GetAssetPath(asset));
+            WorkingJson = _baseline = asset == null ? "" : File.ReadAllText(AssetDatabase.GetAssetPath(asset));
             _assetField?.SetValueWithoutNotify(asset); Refresh();
         }
         private void Refresh()
         {
-            hasUnsavedChanges = _workingJson != _baseline;
+            hasUnsavedChanges = WorkingJson != _baseline;
             if (_list == null) return;
-            try { _document = string.IsNullOrEmpty(_workingJson) ? null : new EditableTextDocument(_workingJson); Filter(); }
+            try { _document = string.IsNullOrEmpty(WorkingJson) ? null : new EditableTextDocument(WorkingJson); Filter(); }
             catch (ArgumentException exception) { _document = null; _filtered.Clear(); _list.itemsSource = _filtered; _list.Rebuild(); _status.text = exception.Message + " Open JSON source to repair its structure."; }
             if (_document != null) Select(_selectedId ?? _filtered.FirstOrDefault());
             else { _prose.SetValueWithoutNotify(""); _details.SetValueWithoutNotify(""); }
@@ -96,7 +102,15 @@ namespace SocialStim.Editor
             if (_list == null) return;
             _filtered = _document == null ? new List<string>() : _document.Ids.Where(id => string.IsNullOrEmpty(_search)
                 || (id + " " + _document.Group(id) + " " + _document.Text(id)).IndexOf(_search, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
-            _list.itemsSource = _filtered; _list.Rebuild();
+            _refreshing = true;
+            try { _list.itemsSource = _filtered; _list.Rebuild(); }
+            finally { _refreshing = false; }
+            if (_document != null)
+            {
+                Select(_filtered.Contains(_selectedId) ? _selectedId : _filtered.FirstOrDefault());
+                int index = _filtered.IndexOf(_selectedId);
+                _list.SetSelectionWithoutNotify(index < 0 ? Array.Empty<int>() : new[] { index });
+            }
             _status.text = _filtered.Count + " entries · " + (hasUnsavedChanges ? "unsaved edits" : "source unchanged");
         }
         private void Select(string id)
@@ -111,7 +125,7 @@ namespace SocialStim.Editor
         {
             if (_document == null) throw new InvalidOperationException("Select a readable dialogue or copy JSON asset.");
             _document.Validate();
-            if (!_document.IsCopy) foreach (var line in DialogueDocument.Parse(_workingJson))
+            if (!_document.IsCopy) foreach (var line in DialogueDocument.Parse(WorkingJson))
                 try { SemanticMarkup.Parse(line.Text); }
                 catch (ArgumentException exception) { throw new ArgumentException(line.Id + ": " + exception.Message, exception); }
             _status.text = "Full asset schema, content bindings and markup valid.";
@@ -127,14 +141,14 @@ namespace SocialStim.Editor
             if (File.ReadAllText(path) != _baseline) throw new IOException("Source changed outside this window. Preserve your edits and reload before saving.");
             if (!AssetDatabase.MakeEditable(path)) throw new IOException("The source is read-only or could not be checked out.");
             string temporary = path + ".tmp~";
-            try { File.WriteAllText(temporary, _workingJson, new System.Text.UTF8Encoding(false)); File.Replace(temporary, path, null); }
+            try { File.WriteAllText(temporary, WorkingJson, new System.Text.UTF8Encoding(false)); File.Replace(temporary, path, null); }
             finally { if (File.Exists(temporary)) File.Delete(temporary); }
-            _baseline = _workingJson; base.SaveChanges(); AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+            _baseline = WorkingJson; base.SaveChanges(); AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
             DialogueCatalogueExport.RefreshFor(path);
             _status.text = "Saved and reimported. Start a new run to load the edited content.";
         }
         /// <summary>Discards only staged window edits; the source file is untouched.</summary>
-        public override void DiscardChanges() { _workingJson = _baseline; base.DiscardChanges(); Refresh(); }
+        public override void DiscardChanges() { WorkingJson = _baseline; base.DiscardChanges(); Refresh(); }
         private bool ResolveUnsaved()
         {
             if (!hasUnsavedChanges) return true;
@@ -145,6 +159,9 @@ namespace SocialStim.Editor
         }
         private void Attempt(Action action)
         { try { action(); } catch (Exception exception) { _status.text = exception.Message; Debug.LogError(exception.Message, _asset); } }
+        private void EnsureBuffer()
+        { if (_buffer == null) { _buffer = CreateInstance<DialogueEditBuffer>(); _buffer.hideFlags = HideFlags.HideAndDontSave; } }
         private void OnUndoRedo() => Refresh();
+        private void OnDestroy() { if (_buffer != null) DestroyImmediate(_buffer); }
     }
 }

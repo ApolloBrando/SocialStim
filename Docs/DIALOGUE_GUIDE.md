@@ -1,5 +1,10 @@
 # Editing all dialogue and game text
 
+Unity-native editing is available at Tools → SocialStim → Dialogue and Text Editor.
+Search entries, inspect metadata, edit prose, Undo/Redo, validate and save. Canonical
+source saves refresh the reference automatically inside Unity. For new entries or
+metadata changes, use Open JSON source. See [UNITY_WORKFLOW.md](UNITY_WORKFLOW.md).
+
 Start with [the complete catalogue](DIALOGUE_CATALOGUE.md) to find a line by intent
 or stable ID. All current conversational choices are in editable JSON, shared by
 players and NPCs. Narration, night-result wording, choice labels, phase/menu text,
@@ -13,7 +18,8 @@ There is no hardcoded fallback prose for these entries.
 | Character/role names | Existing StarterCatalog and role ScriptableObject assets, edited in Unity |
 
 The catalogue is a generated reading reference. Editing a JSON source changes the
-game; editing only the catalogue does not. Keep stable IDs and `.meta` files.
+game; editing only the catalogue does not. Unity saves refresh it natively; external
+edits use Tools → SocialStim → Refresh Dialogue Catalogue or the Python command. Keep stable IDs and `.meta` files.
 Changes load on setup/new run; modifying source files does not hot-reload an active run.
 The present pool has 70 spoken lines. The 500 player-option / roughly 3,500 total
 spoken-line mission targets remain future authoring work. Interface templates do
