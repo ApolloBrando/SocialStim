@@ -21,6 +21,7 @@ namespace SocialStim.Rules.Dialogue
                 string target = result.Target.HasValue ? name(result.Target.Value) : claim.Target.HasValue ? name(claim.Target.Value) : "";
                 switch (result.Kind)
                 {
+                    case ReportKind.Guilt: parts.Add(text.Format("report.guilt")); break;
                     case ReportKind.Blocked: parts.Add(text.Format(claim.Ability == Roles.AbilityKind.Block && claim.Target.HasValue ? "report.blockedBlock" : "report.blocked")); break;
                     case ReportKind.Investigation: parts.Add(text.Format("report.investigation", ("target", target), ("result", result.Alignment.ToString()))); break;
                     case ReportKind.VisitorSeen:

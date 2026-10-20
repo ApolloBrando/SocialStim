@@ -255,7 +255,8 @@ namespace SocialStim.Tests.EditMode
                     while (run.GetPlayerView().Phase != GamePhase.Ended && inputs < 1200)
                     {
                         var view = run.GetPlayerView(); var knowledge = run.PlayerKnowledgeForDiagnostics(); GameCommand command;
-                        if (!view.Alive) command = GameCommand.Continue();
+                        if (view.Phase == GamePhase.JesterRevenge) command = GameCommand.Revenge(view.RevengeTargets.First());
+                        else if (!view.Alive) command = GameCommand.Continue();
                         else if (view.CounterClaimRole.HasValue)
                             command = random.Next(100) < 40 ? GameCommand.Speak(SpeechIntent.CounterClaim, role: view.CounterClaimRole) : GameCommand.Speak(SpeechIntent.StaySilent);
                         else switch (view.Phase)

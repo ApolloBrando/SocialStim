@@ -25,6 +25,9 @@ namespace SocialStim.Rules.Reasoning
         private readonly ReasoningSettings _settings;
         private readonly bool _deceptionPossible;
         private readonly RoleSpec _ownRole;
+        private readonly HashSet<RoleId> _uniqueRoles;
+        private readonly HashSet<CharacterId> _dead = new HashSet<CharacterId>();
+        private readonly HashSet<(int day, CharacterId dead, CharacterId survivor)> _claimantLosses = new HashSet<(int, CharacterId, CharacterId)>();
         private readonly HashSet<(int, CharacterId, CharacterId, bool)> _heard = new HashSet<(int, CharacterId, CharacterId, bool)>();
         private readonly Dictionary<(int, CharacterId, bool), float> _socialBudget = new Dictionary<(int, CharacterId, bool), float>();
         private readonly HashSet<(int, CharacterId, CharacterId, bool)> _stances = new HashSet<(int, CharacterId, CharacterId, bool)>();
@@ -36,6 +39,7 @@ namespace SocialStim.Rules.Reasoning
             CharacterId self, RoleSpec ownRole, SetupKnowledge setup, IReadOnlyList<RoleSpec> catalog,
             IEnumerable<CharacterId> teammates, ReasoningSettings settings)
         {
+            _uniqueRoles = new HashSet<RoleId>(catalog.Where(r => r.Unique).Select(r => r.Id));
             _self = self; _ownRole = ownRole; _personality = personality; _settings = settings;
             _deceptionPossible = catalog.Any(r => r.Ability == AbilityKind.Forge);
             var ids = characters.ToList();
@@ -129,7 +133,7 @@ namespace SocialStim.Rules.Reasoning
             _reports.Add(new ReportAssertion(speaker, target, night, alignment));
             if (speaker != _self)
             {
-                Change(target, alignment == Faction.Antagonist ? influence + 6 : -influence);
+                Change(target, alignment == Faction.Antagonist ? influence + 6 : alignment == Faction.Town ? -influence : 0);
                 _distribution.AssertAlignment(target, alignment, influence * 3);
             }
         }
@@ -191,7 +195,7 @@ namespace SocialStim.Rules.Reasoning
             { Change(report.Target.Value, 20); _distribution.AssertAlignment(report.Target.Value, Faction.Antagonist, 35); }
             if (report.Kind != ReportKind.Investigation || !report.Target.HasValue || !report.Alignment.HasValue) return;
             Record(report.Night + 1, EvidenceKind.PrivateInvestigation, _self, report.Target, alignment: report.Alignment, night: report.Night);
-            Change(report.Target.Value, report.Alignment == Faction.Antagonist ? 65 : -45);
+            Change(report.Target.Value, report.Alignment == Faction.Antagonist ? 65 : report.Alignment == Faction.Town ? -45 : 0);
             _distribution.AssertAlignment(report.Target.Value, report.Alignment.Value, 600);
         }
 
@@ -235,7 +239,24 @@ namespace SocialStim.Rules.Reasoning
             if (defendant == _self && voter != _self) Expose(verdict == Verdict.Guilty ? 8 : verdict == Verdict.Innocent ? -4 : 0);
         }
 
-        internal void ObserveDeath(CharacterId target, int day) => Record(day, EvidenceKind.Death, target, target);
+        internal void ObserveDeath(CharacterId target, int day)
+        { if (_dead.Add(target)) Record(day, EvidenceKind.Death, target, target); }
+
+        internal void ObserveNightClaimantDeath(CharacterId target, int day)
+        {
+            if (!_dead.Contains(target) || !_claims.TryGetValue(target, out RoleId role) || !_uniqueRoles.Contains(role)) return;
+            var reveal = _evidence.LastOrDefault(e => e.Kind == EvidenceKind.RoleReveal && e.Actor == target);
+            if (reveal != null && reveal.Role != role) return;
+            foreach (CharacterId survivor in _claims.Where(c => c.Key != target && !_dead.Contains(c.Key) && c.Value == role).Select(c => c.Key))
+            {
+                if (!_claimantLosses.Add((day, target, survivor))) continue;
+                int pressure = reveal == null ? 8 : _settings.ContradictionPenalty;
+                if (survivor != _self) { Change(survivor, pressure); TrustChange(survivor, -pressure); }
+                else Expose(pressure);
+                _distribution.AssertAlignment(survivor, Faction.Antagonist, pressure);
+                Record(day, EvidenceKind.ClaimantKilledAtNight, survivor, target, role: role);
+            }
+        }
 
         private void Penalize(CharacterId speaker, int penalty, int day, bool publicContradiction)
         {

@@ -9,11 +9,11 @@ namespace SocialStim.Rules.Roles
         public RoleSpec(RoleId id, string name, Faction faction, RoleCategory category,
             AbilityKind ability, int attack, int defense, int protection, int charges,
             Faction appearance, bool unique = false, bool? canClaimTruthfully = null, bool? canBluff = null,
-            bool nightImmune = false, bool stealsParityWin = false)
+            bool nightImmune = false, bool stealsParityWin = false, int firstActionNight = 1, bool guiltOnTownKill = false, bool revengeOnExecution = false)
         {
             if (string.IsNullOrWhiteSpace(id.Value) || string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Role identity and name are required.");
-            if (attack < 0 || defense < 0 || protection < 0 || charges < -1)
+            if (attack < 0 || defense < 0 || protection < 0 || charges < -1 || firstActionNight < 1)
                 throw new ArgumentOutOfRangeException(nameof(attack), "Invalid role strength or resources.");
             if (!Enum.IsDefined(typeof(Faction), faction) || !Enum.IsDefined(typeof(Faction), appearance)
                 || !Enum.IsDefined(typeof(RoleCategory), category) || !Enum.IsDefined(typeof(AbilityKind), ability))
@@ -23,6 +23,10 @@ namespace SocialStim.Rules.Roles
                 ? Faction.Town : category == RoleCategory.AntagonistKilling || category == RoleCategory.AntagonistDeception
                 || category == RoleCategory.AntagonistSupport ? Faction.Antagonist : Faction.Neutral;
             if (faction != categoryFaction) throw new ArgumentException("Role faction and category must agree.");
+            if (guiltOnTownKill && (faction != Faction.Town || ability != AbilityKind.Attack)) throw new ArgumentException("Guilt requires a Town attack role.");
+            if (revengeOnExecution && category != RoleCategory.NeutralEvil) throw new ArgumentException("Execution revenge requires a Neutral Evil role.");
+            RevengeOnExecution = revengeOnExecution;
+            FirstActionNight = firstActionNight; GuiltOnTownKill = guiltOnTownKill;
             Id = id; Name = name; Faction = faction; Category = category; Ability = ability;
             Attack = attack; Defense = defense; Protection = protection; Charges = charges;
             Appearance = appearance; Unique = unique;
@@ -58,6 +62,9 @@ namespace SocialStim.Rules.Roles
         /// <summary>Whether this role may impersonate a Town special role.</summary>
         public bool CanBluff { get; }
         /// <summary>Passive immunity to every night attack, independent of strength.</summary>
+        public bool RevengeOnExecution { get; }
+        public int FirstActionNight { get; }
+        public bool GuiltOnTownKill { get; }
         public bool NightImmune { get; }
         /// <summary>Whether this surviving role replaces an antagonist parity victory.</summary>
         public bool StealsParityWin { get; }

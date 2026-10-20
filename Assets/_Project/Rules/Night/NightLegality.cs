@@ -8,11 +8,11 @@ namespace SocialStim.Rules.Night
     public static class NightLegality
     {
         /// <summary>Checks a selection against the living night snapshot.</summary>
-        public static bool IsLegal(NightActor actor, NightOrder order, IReadOnlyList<NightActor> actors)
+        public static bool IsLegal(NightActor actor, NightOrder order, IReadOnlyList<NightActor> actors, int night = 1)
         {
             if (actor == null || order == null || order.Actor != actor.Id) return false;
             if (!order.Target.HasValue) return true;
-            if (actor.Charges == 0 || actor.Role.Ability == AbilityKind.None) return false;
+            if (night < actor.Role.FirstActionNight || actor.GuiltNight > 0 || actor.Charges == 0 || actor.Role.Ability == AbilityKind.None) return false;
             NightActor target = actors.FirstOrDefault(a => a.Id == order.Target.Value);
             if (target == null) return false;
             if (actor.Role.Ability == AbilityKind.SelfProtect) return target.Id == actor.Id;

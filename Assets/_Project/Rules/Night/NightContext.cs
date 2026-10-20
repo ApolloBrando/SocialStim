@@ -7,13 +7,15 @@ namespace SocialStim.Rules.Night
     /// <summary>Mutable pipeline context, created only after command validation.</summary>
     public sealed class NightContext
     {
-        internal NightContext(IReadOnlyList<NightActor> actors, IReadOnlyList<NightOrder> orders)
+        internal NightContext(IReadOnlyList<NightActor> actors, IReadOnlyList<NightOrder> orders, int night)
         {
-            Actors = actors; Orders = orders;
+            Actors = actors; Orders = orders; Night = night;
             foreach (NightActor actor in actors)
             { Defense.Add(actor.Id, actor.Role.Defense); Appearance.Add(actor.Id, actor.Role.Appearance); }
         }
         /// <summary>Living actors at selection time, in stable order.</summary>
+        public int Night { get; }
+        public HashSet<CharacterId> GuiltTriggered { get; } = new HashSet<CharacterId>();
         public IReadOnlyList<NightActor> Actors { get; }
         /// <summary>Validated accepted selections in stable actor order.</summary>
         public IReadOnlyList<NightOrder> Orders { get; }

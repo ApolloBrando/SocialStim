@@ -1,3 +1,4 @@
+using System.Linq;
 using SocialStim.Rules.Roles;
 
 namespace SocialStim.Rules.Night
@@ -15,8 +16,17 @@ namespace SocialStim.Rules.Night
                 if (!context.Executes(order)) continue;
                 RoleSpec role = context.Actor(order.Actor).Role;
                 if (role.Ability != AbilityKind.Attack) continue;
-                context.Reports.Add(new NightReport(order.Target.Value, ReportKind.Targeted));
-                if (!context.Actor(order.Target.Value).Role.NightImmune && role.Attack > context.Defense[order.Target.Value]) context.Deaths.Add(order.Target.Value);
+                // Several attacks are one survivor-visible event, not separate clues about attacker count.
+                if (!context.Reports.Any(r => r.Recipient == order.Target.Value && r.Kind == ReportKind.Targeted))
+                    context.Reports.Add(new NightReport(order.Target.Value, ReportKind.Targeted));
+                if (!context.Actor(order.Target.Value).Role.NightImmune && role.Attack > context.Defense[order.Target.Value]) {
+                    context.Deaths.Add(order.Target.Value);
+                    if (role.GuiltOnTownKill && context.Actor(order.Target.Value).Role.Faction == Faction.Town)
+                    {
+                        context.GuiltTriggered.Add(order.Actor);
+                        context.Reports.Add(new NightReport(order.Actor, ReportKind.Guilt, order.Target));
+                    }
+                }
                 else context.Reports.Add(new NightReport(order.Actor, ReportKind.AttackFailed, order.Target));
             }
         }

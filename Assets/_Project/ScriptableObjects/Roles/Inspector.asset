@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Inspector
   m_EditorClassIdentifier:
   _id: inspector
-  _displayName: Decryptor
+  _displayName: Sheriff
   _faction: 0
   _category: 0
   _ability: 0

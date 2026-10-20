@@ -276,10 +276,10 @@ namespace SocialStim.Presentation.Text
             _roleBadge.color = _palette.RoleColor(view.OwnRole.Faction);
             _choiceHeading.text = view.RespondTo.HasValue ? "RESPOND"
                 : view.Phase == GamePhase.Voting ? (view.Revote ? "REVOTE" : "VOTE") : "YOUR TURN";
-            _pendingStatus = $"Day {view.Day} · {ActionLabels.Phase(view.Phase)} · {view.OwnRole.Name} ({view.OwnRole.Faction}) | {(view.Alive ? "Alive" : "Spectator")}"
+            _pendingStatus = $"Day {view.Day} · {ActionLabels.Phase(view.Phase, _words)} · {view.OwnRole.Name} ({view.OwnRole.Faction}) | {(view.Alive ? "Alive" : "Spectator")}"
                 + $" | Uses: {(view.Charges < 0 ? "unlimited" : view.Charges.ToString())}\nSeed {view.Seed} | Trials {view.TrialsUsed}/{view.TrialsAllowed}";
             if (view.VotingMode == VotingMode.Gnosia)
-                _pendingStatus = $"Day {view.Day} · {ActionLabels.Phase(view.Phase)} · Round {view.DiscussionRound}/{view.DiscussionRoundsAllowed}"
+                _pendingStatus = $"Day {view.Day} · {ActionLabels.Phase(view.Phase, _words)} · Round {view.DiscussionRound}/{view.DiscussionRoundsAllowed}"
                     + $" · Window {view.PlayerWindow}/{view.WindowsPerRound} · {view.OwnRole.Name} ({view.OwnRole.Faction})"
                     + $" · {(view.Alive ? "Alive" : "Spectator")} · Seed {view.Seed}";
             ClearChoices();
@@ -490,7 +490,7 @@ namespace SocialStim.Presentation.Text
                 _status.text = _pendingStatus;
                 _castScroll.gameObject.SetActive(true);
                 RenderRoster();
-                if (!_request.View.Alive && _request.View.Phase != GamePhase.Ended)
+                if (!_request.View.Alive && _request.View.Phase != GamePhase.Ended && _request.View.Phase != GamePhase.JesterRevenge)
                 {
                     ClearChoices(); _choiceScroll.gameObject.SetActive(false);
                     _spectateAt = Time.unscaledTime + 0.8f; _autoAdvance = true;

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Coordinator
   m_EditorClassIdentifier:
   _id: coordinator
-  _displayName: Watcher
+  _displayName: Lookout
   _faction: 0
   _category: 0
   _ability: 7

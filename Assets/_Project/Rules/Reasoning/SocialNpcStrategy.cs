@@ -120,7 +120,7 @@ namespace SocialStim.Rules.Reasoning
         /// <inheritdoc />
         public CharacterId? NightTarget(KnowledgeView knowledge, IRandomSource random)
         {
-            if (knowledge.Charges == 0 || knowledge.OwnRole.Ability == AbilityKind.None) return null;
+            if (knowledge.Day < knowledge.OwnRole.FirstActionNight || knowledge.Charges == 0 || knowledge.OwnRole.Ability == AbilityKind.None) return null;
             if (knowledge.OwnRole.Ability == AbilityKind.SelfProtect)
                 return knowledge.SelfExposure >= _settings.ExposureThreshold || random.Next(100) < 45 ? knowledge.Self : (CharacterId?)null;
             var targets = knowledge.Characters.Where(c => c.Alive && c.Id != knowledge.Self && !c.IsTeammate).ToList();

@@ -29,6 +29,12 @@ namespace SocialStim.Application.Sessions
             Action<string, string, GameCommand> add = (label, interpretation, command) =>
                 options.Add(new PlayerOption($"{view.Revision}:{options.Count}", label, interpretation, command));
             if (view.Phase == GamePhase.Ended) return new PlayerInputRequest(view, options.AsReadOnly());
+            if (view.Phase == GamePhase.JesterRevenge)
+            {
+                foreach (var target in view.Characters.Where(c => view.RevengeTargets.Contains(c.Id)))
+                    add(_text.Format("ui.revengeTarget", ("name", target.Name)), _text.Format("ui.revengeHelp"), GameCommand.Revenge(target.Id));
+                return new PlayerInputRequest(view, options.AsReadOnly());
+            }
             if (!view.Alive)
             { add("Watch", "Continue the run.", GameCommand.Continue()); return new PlayerInputRequest(view, options.AsReadOnly()); }
             if (view.CounterClaimRole.HasValue)

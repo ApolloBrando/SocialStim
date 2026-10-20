@@ -43,6 +43,7 @@ namespace SocialStim.Rules.Commands
         /// <summary>Submits a judgement stance.</summary>
         public static GameCommand Judge(Verdict verdict) => new GameCommand(CommandKind.Judge, verdict: verdict);
         /// <summary>Chooses a night target, or passes.</summary>
+        public static GameCommand Revenge(CharacterId target) => new GameCommand(CommandKind.ChooseRevengeTarget, target);
         public static GameCommand Night(CharacterId? target) => new GameCommand(CommandKind.ChooseNightTarget, target);
         /// <summary>Acknowledges a defense, last words, dawn, or spectator turn.</summary>
         public static GameCommand Continue() => new GameCommand(CommandKind.Continue);

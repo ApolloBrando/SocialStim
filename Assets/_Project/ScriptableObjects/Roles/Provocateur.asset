@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Provocateur
   m_EditorClassIdentifier:
   _id: provocateur
-  _displayName: Fool
+  _displayName: Jester
   _faction: 2
   _category: 9
   _ability: 5
@@ -25,3 +25,4 @@ MonoBehaviour:
   _unique: 1
   _canClaimTruthfully: 0
   _canBluff: 1
+  _revengeOnExecution: 1

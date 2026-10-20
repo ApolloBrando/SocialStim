@@ -26,6 +26,7 @@ namespace SocialStim.Rules.Phases
         private readonly DialogueSelector _dialogue;
         private readonly GameText _text;
         private int _lastNight;
+        private readonly Dictionary<CharacterId, int> _guiltNights = new Dictionary<CharacterId, int>();
         private readonly Dictionary<(CharacterId actor, int night), NightActionClaim> _givenReports = new Dictionary<(CharacterId, int), NightActionClaim>();
         private IReadOnlyList<NightDebugRecord> _nightDiagnostics = Array.Empty<NightDebugRecord>();
         private readonly Dictionary<CharacterId, BeliefState> _beliefs = new Dictionary<CharacterId, BeliefState>();
@@ -88,14 +89,15 @@ namespace SocialStim.Rules.Phases
             KnowledgeView knowledge = Knowledge(Player);
             var actors = LivingNightActors();
             var legal = Player.Alive ? actors.Where(a => NightLegality.IsLegal(actors.First(p => p.Id == Player.Id),
-                new NightOrder(Player.Id, a.Id), actors)).Select(a => a.Id).ToList() : new List<CharacterId>();
+                new NightOrder(Player.Id, a.Id), actors, _phases.Day)).Select(a => a.Id).ToList() : new List<CharacterId>();
             return new PlayerView(_revision, _options.Seed, _phases.Day, _phases.Phase, _trials, _options.TrialsPerDay,
                 Player.Alive, Player.Role, Player.Charges, _defendant, _outcome, PlayerWon(),
                 knowledge.Characters, legal.AsReadOnly(), _transcript.ToList().AsReadOnly(), _opening, CanGiveReport(Player), _options.DiscussionRounds,
                 _options.VotingMode, _schedule?.Round ?? _discussionRounds + 1, 1,
                 1, _discussion?.RespondTo,
                 _voteCandidates.Where(id => id != Player.Id).ToList().AsReadOnly(), _options.AllowAbstain, _revoting,
-                _counterClaimRole, _followUpTo, OwnLastNight(Player));
+                _counterClaimRole, _followUpTo, OwnLastNight(Player),
+                _phases.Phase == GamePhase.JesterRevenge && _defendant == Player.Id ? RevengeTargets().AsReadOnly() : null);
         }
 
         /// <summary>Applies one legal player command; invalid input leaves state and RNG untouched.</summary>
@@ -158,6 +160,7 @@ namespace SocialStim.Rules.Phases
                 case GamePhase.LastWords:
                     if (_defendant == Player.Id) Say(Player, command);
                     Execute(); break;
+                case GamePhase.JesterRevenge: ResolveRevenge(command.Target.Value); break;
                 case GamePhase.NightSelection: ResolveNight(command); break;
                 case GamePhase.Dawn:
                     _trials = 0; _discussionRounds = 0; _opening = true; _discussion?.Reset(); _revoting = false;
@@ -173,6 +176,9 @@ namespace SocialStim.Rules.Phases
         private string ValidatePlayerCommand(GameCommand command)
         {
             if (command == null || _phases.Phase == GamePhase.Ended) return "No active input request.";
+            if (_phases.Phase == GamePhase.JesterRevenge)
+                return _defendant == Player.Id && command.Kind == CommandKind.ChooseRevengeTarget && command.Target.HasValue
+                    && RevengeTargets().Contains(command.Target.Value) ? null : "Choose a living Town revenge target.";
             if (!Player.Alive) return command.Kind == CommandKind.Continue ? null : "Dead participants may only spectate.";
             if (_counterClaimRole.HasValue)
                 return command.Kind == CommandKind.Speak && (command.Intent == SpeechIntent.StaySilent
@@ -213,7 +219,7 @@ namespace SocialStim.Rules.Phases
                         : command.Kind == CommandKind.Continue ? null : "Acknowledge last words.";
                 case GamePhase.NightSelection:
                     var actors = LivingNightActors();
-                    return command.Kind == CommandKind.ChooseNightTarget && NightLegality.IsLegal(actors.First(a => a.Id == Player.Id), new NightOrder(Player.Id, command.Target), actors) ? null : "Invalid night target or exhausted ability.";
+                    return command.Kind == CommandKind.ChooseNightTarget && NightLegality.IsLegal(actors.First(a => a.Id == Player.Id), new NightOrder(Player.Id, command.Target), actors, _phases.Day) ? null : "Invalid night target or exhausted ability.";
                 case GamePhase.Dawn: return command.Kind == CommandKind.Continue ? null : "Acknowledge dawn.";
                 default: return "This phase does not accept participant input.";
             }
@@ -365,6 +371,7 @@ namespace SocialStim.Rules.Phases
         {
             switch (report.Kind)
             {
+                case ReportKind.Guilt: return _text.Format("report.guilt");
                 case ReportKind.Investigation: return Actor(report.Target.Value).Name + " appeared " + report.Alignment + ".";
                 case ReportKind.Blocked: return "Someone blocked me. I don\'t know who.";
                 case ReportKind.AttackFailed: return "My attack failed.";
@@ -565,7 +572,25 @@ namespace SocialStim.Rules.Phases
         private void Execute()
         {
             Move(GamePhase.Execution);
-            Kill(Actor(_defendant.Value), true);
+            Participant executed = Actor(_defendant.Value);
+            Kill(executed, true);
+            if (executed.Role.RevengeOnExecution && RevengeTargets().Count > 0)
+            {
+                Move(GamePhase.JesterRevenge);
+                if (executed.Id == Player.Id) return;
+                var legal = RevengeTargets();
+                CharacterId? proposal = _strategy.Nominate(Knowledge(executed), _decisions);
+                CharacterId chosen = proposal.HasValue && legal.Contains(proposal.Value) ? proposal.Value
+                    : legal[_decisions.Next(legal.Count)];
+                ResolveRevenge(chosen); return;
+            }
+            if (!FinishIfTerminal()) StartNight();
+        }
+
+        private List<CharacterId> RevengeTargets() => Living().Where(c => c.Role.Faction == Faction.Town).Select(c => c.Id).ToList();
+        private void ResolveRevenge(CharacterId target)
+        {
+            Kill(Actor(target), false, revenge: true);
             if (!FinishIfTerminal()) StartNight();
         }
 
@@ -579,7 +604,7 @@ namespace SocialStim.Rules.Phases
             {
                 CharacterId? target = actor.Id == Player.Id ? command.Target : _strategy.NightTarget(Knowledge(actor), _decisions);
                 var order = new NightOrder(actor.Id, target);
-                orders.Add(NightLegality.IsLegal(actors.First(a => a.Id == actor.Id), order, actors) ? order : new NightOrder(actor.Id, null));
+                orders.Add(NightLegality.IsLegal(actors.First(a => a.Id == actor.Id), order, actors, _phases.Day) ? order : new NightOrder(actor.Id, null));
             }
             var killers = orders.Where(o => Actor(o.Actor).Role.Faction == Faction.Antagonist && Actor(o.Actor).Role.Ability == AbilityKind.Attack && Actor(o.Actor).Charges != 0)
                 .OrderBy(o => o.Actor.Value).ToList();
@@ -602,7 +627,7 @@ namespace SocialStim.Rules.Phases
             _lastNight = _phases.Day;
             foreach (NightOrder order in orders) _lastActions.Add(order.Actor, order);
             Move(GamePhase.NightResolution);
-            NightResolution resolution = _night.Resolve(actors, orders);
+            NightResolution resolution = _night.Resolve(actors, orders, _phases.Day);
             _nightDiagnostics = orders.OrderBy(o => o.Actor.Value).Select(order => {
                 Participant actor = Actor(order.Actor);
                 var report = new NightActionClaim(_lastNight, actor.Role.Id, actor.Role.Ability, order.Target,
@@ -611,6 +636,7 @@ namespace SocialStim.Rules.Phases
                     resolution.Visits.FirstOrDefault(v => v.Visitor == actor.Id)?.Target, resolution.SpentCharges.Contains(actor.Id));
             }).ToList().AsReadOnly();
             foreach (CharacterId id in resolution.SpentCharges) Actor(id).Charges--;
+            foreach (CharacterId id in resolution.GuiltTriggered) { Actor(id).Charges = 0; _guiltNights[id] = _phases.Day + 1; }
             foreach (CharacterId id in resolution.Deaths) Kill(Actor(id), false);
             foreach (NightReport report in resolution.Reports)
             {
@@ -638,18 +664,19 @@ namespace SocialStim.Rules.Phases
             Emit(cue, "Private: " + DescribeReport(report));
         }
 
-        private void Kill(Participant actor, bool execution)
+        private void Kill(Participant actor, bool execution, bool revenge = false)
         {
             actor.Alive = false;
             if (execution && actor.Role.Category == RoleCategory.NeutralEvil) _executionObjectives.Add(actor.Id);
             foreach (Participant observer in _cast) _beliefs[observer.Id].ObserveDeath(actor.Id, _phases.Day);
-            Emit(execution ? GameCue.ExecutionCarriedOut : GameCue.DeathReported, execution ? $"{actor.Name} was executed." : $"{actor.Name} died during the night.", target: actor.Id);
+            Emit(execution ? GameCue.ExecutionCarriedOut : GameCue.DeathReported, execution ? $"{actor.Name} was executed." : revenge ? _text.Format("event.jesterVictim", ("name", actor.Name)) : $"{actor.Name} died during the night.", target: actor.Id);
             if (_options.RevealOnDeath)
             {
                 _revealed[actor.Id] = actor.Role;
                 foreach (Participant observer in _cast) _beliefs[observer.Id].Reveal(actor.Id, actor.Role, _phases.Day);
-                Emit(GameCue.RoleRevealed, $"Revealed: {actor.Name} was {actor.Role.Name} ({actor.Role.Faction}).");
+                Emit(GameCue.RoleRevealed, $"Revealed: {actor.Name} was {actor.Role.Name} ({actor.Role.Faction}).", target: actor.Id);
             }
+            if (!execution && !revenge) foreach (Participant observer in _cast) _beliefs[observer.Id].ObserveNightClaimantDeath(actor.Id, _phases.Day);
             if (actor.Id == Player.Id) Emit(GameCue.PhaseChanged, "You died. You can keep watching.");
         }
 
@@ -662,8 +689,8 @@ namespace SocialStim.Rules.Phases
             Move(GamePhase.Ended);
             GameCue cue = _outcome == OutcomeKind.Draw ? GameCue.RunDrawn : PlayerWon() ? GameCue.VictoryAchieved : GameCue.DefeatSuffered;
             string result = _outcome == OutcomeKind.TownVictory ? "Town wins." : _outcome == OutcomeKind.AntagonistVictory
-                ? "Antagonists win." : _outcome == OutcomeKind.LoneKillerVictory ? "Anarchy wins."
-                : _outcome == OutcomeKind.InfinitumVictory ? "Infinitum steals the win." : "Draw.";
+                ? "Antagonists win." : _outcome == OutcomeKind.LoneKillerVictory ? _text.Format("outcome.serialKiller")
+                : _outcome == OutcomeKind.InfinitumVictory ? _text.Format("outcome.ego") : "Draw.";
             Emit(cue, $"Run ended: {result} Objective {(PlayerWon() ? "achieved" : "missed")}.");
             return true;
         }
@@ -684,13 +711,13 @@ namespace SocialStim.Rules.Phases
                 _beliefs[observer.Id].SuspicionValue(c.Id), _beliefs[observer.Id].TrustValue(c.Id)));
             return new KnowledgeView(observer.Id, observer.Role, observer.Personality, observer.Charges, _phases.Day,
                 characters, _results[observer.Id], _beliefs[observer.Id].Evidence, _beliefs[observer.Id].Exposure, _catalog, _lastTeamPlan,
-                _phases.Phase == GamePhase.Voting ? _voteCandidates : null, OwnLastNight(observer), CanGiveReport(observer));
+                _phases.Phase == GamePhase.Voting ? _voteCandidates : _phases.Phase == GamePhase.JesterRevenge && observer.Id == _defendant ? RevengeTargets() : null, OwnLastNight(observer), CanGiveReport(observer));
         }
 
         /// <summary>Scoped player snapshot for portable policy evaluation; never exposes another observer's mind.</summary>
         internal KnowledgeView PlayerKnowledgeForDiagnostics() => Knowledge(Player);
 
-        private List<NightActor> LivingNightActors() => Living().Select(c => new NightActor(c.Id, c.Role, c.Charges)).ToList();
+        private List<NightActor> LivingNightActors() => Living().Select(c => new NightActor(c.Id, c.Role, c.Charges, _guiltNights.TryGetValue(c.Id, out int guiltNight) ? guiltNight : 0)).ToList();
 
         private void Move(GamePhase phase)
         {
@@ -707,6 +734,7 @@ namespace SocialStim.Rules.Phases
                 case GamePhase.Voting: text = _revoting ? "Revote." : "Vote."; break;
                 case GamePhase.VoteReveal: return;
                 case GamePhase.Judgement: text = "Time to vote."; break;
+                case GamePhase.JesterRevenge: text = _text.Format("ui.jesterRevenge"); break;
                 case GamePhase.LastWords: text = "Last words."; break;
                 case GamePhase.NightSelection: text = $"Night {_phases.Day}."; break;
                 case GamePhase.Dawn: text = $"Day {_phases.Day}."; break;

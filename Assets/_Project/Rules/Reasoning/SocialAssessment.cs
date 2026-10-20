@@ -16,7 +16,8 @@ namespace SocialStim.Rules.Reasoning
             if (target.KnownFaction == Faction.Town || target.IsTeammate) return 0;
             if (target.KnownFaction == Faction.Antagonist) return 100;
             if (view.OwnRole.Unique && target.ClaimedRole == view.OwnRole.Id) return 90;
-            int strength = view.Evidence.Any(e => e.Kind == EvidenceKind.Contradiction && e.Actor == target.Id) ? 40 : 0;
+            int claimantLoss = view.Evidence.Any(e => e.Kind == EvidenceKind.ClaimantKilledAtNight && e.Actor == target.Id) ? 15 : 0;
+            int strength = claimantLoss + (view.Evidence.Any(e => e.Kind == EvidenceKind.Contradiction && e.Actor == target.Id) ? 40 : 0);
             if (view.PrivateResults.Any(r => r.Kind == ReportKind.Investigation && r.Target == target.Id && r.Alignment == Faction.Antagonist)) strength += 65;
             var witnesses = view.Evidence.Where(e => e.Kind == EvidenceKind.InvestigationClaim && e.Target == target.Id
                 && e.Alignment == Faction.Antagonist && e.Actor != view.Self).Select(e => e.Actor).Distinct();

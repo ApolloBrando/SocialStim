@@ -26,7 +26,8 @@ namespace SocialStim.Rules.Phases
                 case GamePhase.Defense: legal |= next == GamePhase.Judgement; break;
                 case GamePhase.Judgement: legal |= next == GamePhase.Execution || next == GamePhase.LastWords || next == GamePhase.Nomination || next == GamePhase.NightSelection; break;
                 case GamePhase.LastWords: legal |= next == GamePhase.Execution; break;
-                case GamePhase.Execution: legal |= next == GamePhase.NightSelection; break;
+                case GamePhase.Execution: legal |= next == GamePhase.NightSelection || next == GamePhase.JesterRevenge; break;
+                case GamePhase.JesterRevenge: legal |= next == GamePhase.NightSelection; break;
                 case GamePhase.NightSelection: legal |= next == GamePhase.NightResolution; break;
                 case GamePhase.NightResolution: legal |= next == GamePhase.Dawn; break;
                 case GamePhase.Dawn: legal |= next == GamePhase.Discussion; break;
