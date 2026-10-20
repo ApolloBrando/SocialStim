@@ -28,7 +28,11 @@ namespace SocialStim.Editor
                 foreach (var role in definitions) setup.Resolve(definitions, role.Id, new SeededRandom(1));
             }
             var dialogue = catalog.LoadDialogue();
-            foreach (var line in dialogue) SemanticMarkup.Parse(line.Text);
+            foreach (var line in dialogue)
+            {
+                try { SemanticMarkup.Parse(line.Text); }
+                catch (System.ArgumentException e) { throw new System.ArgumentException(line.Id + ": " + e.Message, e); }
+            }
             int lines = dialogue.Count;
             int names = catalog.LoadNames().Count;
             catalog.LoadReasoning();

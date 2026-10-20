@@ -14,3 +14,7 @@ configurable group rounds, response windows and plurality ballots on its feature
 Settings now use immutable preferences, versioned JSON persistence and a grouped
 modal with immediate display edits and next-run game configuration. See
 [settings contracts and Unity checks](Docs/SETTINGS.md).
+
+The [expanded span effect system](Docs/EXPANDED_EFFECTS.md) adds 32 implemented
+glyph behaviors, four lifetimes, nested validated authoring and semantic recipe assets.
+Unity adapter rendering/profiling remains pending.
