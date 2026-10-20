@@ -648,7 +648,7 @@ namespace SocialStim.Rules.Phases
             {
                 _revealed[actor.Id] = actor.Role;
                 foreach (Participant observer in _cast) _beliefs[observer.Id].Reveal(actor.Id, actor.Role, _phases.Day);
-                Emit(GameCue.RoleRevealed, $"Revealed: {actor.Name} was {actor.Role.Name} ({actor.Role.Faction}).");
+                Emit(GameCue.RoleRevealed, $"Revealed: {actor.Name} was {actor.Role.Name} ({actor.Role.Faction}).", target: actor.Id);
             }
             if (actor.Id == Player.Id) Emit(GameCue.PhaseChanged, "You died. You can keep watching.");
         }
