@@ -27,6 +27,7 @@ namespace SocialStim.Rules.Phases
         private readonly Dictionary<CharacterId, BeliefState> _beliefs = new Dictionary<CharacterId, BeliefState>();
         private readonly Dictionary<CharacterId, List<NightReport>> _results = new Dictionary<CharacterId, List<NightReport>>();
         private readonly Dictionary<CharacterId, RoleSpec> _revealed = new Dictionary<CharacterId, RoleSpec>();
+        private readonly List<string> _actionReview = new List<string>();
         private readonly List<GameObservation> _transcript = new List<GameObservation>();
         private readonly DiscussionSchedule _schedule;
         private readonly DiscussionExchange _discussion;
@@ -82,7 +83,9 @@ namespace SocialStim.Rules.Phases
                 knowledge.Characters, legal.AsReadOnly(), _transcript.ToList().AsReadOnly(), _opening, _lastActions.ContainsKey(Player.Id), _options.DiscussionRounds,
                 _options.VotingMode, _schedule?.Round ?? _discussionRounds + 1, _schedule?.Window ?? 1,
                 _options.PlayerWindowsPerRound, _discussion?.RespondTo,
-                _voteCandidates.Where(id => id != Player.Id).ToList().AsReadOnly(), _options.AllowAbstain, _revoting);
+                _voteCandidates.Where(id => id != Player.Id).ToList().AsReadOnly(), _options.AllowAbstain, _revoting, _results[Player.Id].ToList().AsReadOnly(),
+                _phases.Phase == GamePhase.Ended ? _cast.Select(c => c.Name + ": " + c.Role.Name + " (" + c.Role.Faction + ")")
+                    .Concat(_actionReview).ToList().AsReadOnly() : new List<string>().AsReadOnly());
         }
 
         /// <summary>Applies one legal player command; invalid input leaves state and RNG untouched.</summary>
@@ -91,6 +94,8 @@ namespace SocialStim.Rules.Phases
             if (_submitting) { error = "A turn is already resolving."; return false; }
             error = ValidatePlayerCommand(command);
             if (error != null) return false;
+            if (command.DialogueLine != null && !_dialogue.Options(command.Intent, SpeechContext(Player, command, null)).Any(l => l.Id == command.DialogueLine))
+            { error = "That phrasing is no longer available."; return false; }
             _submitting = true;
             try { ApplyCommand(command); return true; }
             finally { _submitting = false; }
@@ -194,11 +199,15 @@ namespace SocialStim.Rules.Phases
             bool needsTarget = SpeechContract.RequiresTarget(command.Intent);
             if (needsTarget != command.Target.HasValue) return false;
             if (needsTarget && (!command.Target.HasValue || !Living().Any(c => c.Id == command.Target && c.Id != actor.Id))) return false;
-            if (command.Intent == SpeechIntent.ClaimRole && (!command.ClaimedRole.HasValue || !_catalog.Any(r => r.Id == command.ClaimedRole.Value))) return false;
+            if (command.Intent == SpeechIntent.ClaimRole && (!command.ClaimedRole.HasValue || !actor.Role.CanClaim(command.ClaimedRole.Value)
+                || !_catalog.Any(r => r.Id == command.ClaimedRole.Value))) return false;
             if (command.Intent == SpeechIntent.ReportInvestigation && (_phases.Day <= 1 || !command.ReportedFaction.HasValue
                 || !Enum.IsDefined(typeof(Faction), command.ReportedFaction.Value))) return false;
             if (command.Intent == SpeechIntent.ReactToDeath && !_beliefs[actor.Id].Evidence.Any(e => e.Kind == EvidenceKind.Death)) return false;
             if (command.Intent == SpeechIntent.ReactToRoleReveal && !_beliefs[actor.Id].Evidence.Any(e => e.Kind == EvidenceKind.RoleReveal)) return false;
+            if (command.Intent == SpeechIntent.ReportInvestigation && !actor.Role.CanBluff
+                && !_results[actor.Id].Any(r => r.Kind == ReportKind.Investigation && r.Night == _phases.Day - 1
+                    && r.Target == command.Target && r.Alignment == command.ReportedFaction)) return false;
             return command.Intent != SpeechIntent.LastWords && command.Intent != SpeechIntent.ReportAction;
         }
 
@@ -212,13 +221,26 @@ namespace SocialStim.Rules.Phases
 
         private void Say(Participant actor, GameCommand speech, string actionReport = null)
         {
-            string claimed = speech.ClaimedRole.HasValue ? _catalog.First(r => r.Id == speech.ClaimedRole.Value).Name : "";
-            var context = new DialogueContext(actor.Id, actor.Name, speech.Target.HasValue ? Actor(speech.Target.Value).Name : "",
-                claimed, speech.ReportedFaction?.ToString() ?? actionReport ?? "", _phases.Day, actor.Role.Id, actor.Personality,
-                _phases.Phase, speech.Target, _beliefs[actor.Id].Evidence, _beliefs[actor.Id].Exposure);
-            DialogueSelection line = _dialogue.Select(speech.Intent, context);
+            DialogueContext context = SpeechContext(actor, speech, actionReport);
+            DialogueSelection line = _dialogue.Select(speech.Intent, context, speech.DialogueLine);
             foreach (Participant observer in _cast) _beliefs[observer.Id].Observe(actor.Id, speech, _phases.Day);
             Emit(GameCue.SpeechDelivered, $"{actor.Name}: {line.Text}", actor.Id, line.Metadata, speech.Target, speech.Intent, speech.ClaimedRole);
+        }
+
+        /// <summary>Public player revision used for safe request caching.</summary>
+        public int Revision => _revision;
+        /// <summary>Offers only eligible phrasings using the player's own authorized context.</summary>
+        public IReadOnlyList<DialogueSelection> PlayerPhrasings(GameCommand command)
+        {
+            if (command.Kind != CommandKind.Speak || ValidatePlayerCommand(command) != null) return new List<DialogueSelection>().AsReadOnly();
+            return _dialogue.Options(command.Intent, SpeechContext(Player, command, null));
+        }
+        private DialogueContext SpeechContext(Participant actor, GameCommand speech, string actionReport)
+        {
+            string claimed = speech.ClaimedRole.HasValue ? _catalog.First(r => r.Id == speech.ClaimedRole.Value).Name : "";
+            return new DialogueContext(actor.Id, actor.Name, speech.Target.HasValue ? Actor(speech.Target.Value).Name : "",
+                claimed, speech.ReportedFaction?.ToString() ?? actionReport ?? "", _phases.Day, actor.Role.Id, actor.Personality,
+                _phases.Phase, speech.Target, _beliefs[actor.Id].Evidence, _beliefs[actor.Id].Exposure);
         }
 
         private void SayActionReport(Participant actor)
@@ -328,6 +350,12 @@ namespace SocialStim.Rules.Phases
                     }
                 }
                 ballots.Add(new KeyValuePair<CharacterId, CharacterId?>(actor.Id, vote));
+                if (vote.HasValue)
+                {
+                    KnownCharacter considered = Knowledge(actor).Characters.First(c => c.Id == vote.Value);
+                    _actionReview.Add("Day " + _phases.Day + ": " + actor.Name + " voted " + considered.Name
+                        + "; their suspicion was " + considered.Suspicion + "/100 and credibility " + considered.Trust + "/100.");
+                }
             }
             // All ballots are chosen before any are published; there is no later-voter information advantage.
             foreach (var ballot in ballots)
@@ -452,7 +480,12 @@ namespace SocialStim.Rules.Phases
             if (Player.Alive && Player.Role.Faction == Faction.Antagonist && _lastTeamPlan != null)
                 Emit(GameCue.PhaseChanged, $"Team: {Actor(_lastTeamPlan.Killer).Name} will {( _lastTeamPlan.Target.HasValue ? "attack " + Actor(_lastTeamPlan.Target.Value).Name : "pass tonight")}.");
             _lastActions.Clear();
-            foreach (NightOrder order in orders) _lastActions.Add(order.Actor, order);
+            foreach (NightOrder order in orders)
+            {
+                _lastActions.Add(order.Actor, order);
+                _actionReview.Add("Night " + _phases.Day + ": " + Actor(order.Actor).Name + " (" + Actor(order.Actor).Role.Name + ") "
+                    + NightActionText.Selection(Actor(order.Actor).Role.Ability, order.Target.HasValue ? Actor(order.Target.Value).Name : null));
+            }
             Move(GamePhase.NightResolution);
             NightResolution resolution = _night.Resolve(actors, orders);
             foreach (CharacterId id in resolution.SpentCharges) Actor(id).Charges--;

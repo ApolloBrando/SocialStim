@@ -34,7 +34,7 @@ namespace SocialStim.Rules.Dialogue
         }
 
         /// <summary>Selects a line without ever relaxing role/trait eligibility.</summary>
-        public DialogueSelection Select(SpeechIntent intent, DialogueContext context)
+        public DialogueSelection Select(SpeechIntent intent, DialogueContext context, string preferredLine = null)
         {
             var eligible = _lines.Where(l => l.Intent == intent && (context.Traits & l.RequiredTrait) == l.RequiredTrait
                 && (!l.SpeakerRole.HasValue || l.SpeakerRole.Value == context.OwnRole) && l.Conditions.All(c => c.Matches(context))).ToList();
@@ -44,12 +44,30 @@ namespace SocialStim.Rules.Dialogue
             var candidates = eligible.Where(l => !history.Contains(l.Id)).ToList();
             while (candidates.Count == 0)
             { history.Dequeue(); candidates = eligible.Where(l => !history.Contains(l.Id)).ToList(); }
-            int ticket = _random.Next(candidates.Sum(l => l.Weight));
-            DialogueLine chosen = candidates[0];
-            foreach (DialogueLine candidate in candidates)
-            { ticket -= candidate.Weight; if (ticket < 0) { chosen = candidate; break; } }
+            DialogueLine chosen;
+            if (preferredLine != null)
+                chosen = eligible.FirstOrDefault(line => line.Id == preferredLine) ?? throw new ArgumentException("The selected line is not eligible.");
+            else
+            {
+                int ticket = _random.Next(candidates.Sum(l => l.Weight)); chosen = candidates[0];
+                foreach (DialogueLine candidate in candidates)
+                { ticket -= candidate.Weight; if (ticket < 0) { chosen = candidate; break; } }
+            }
             history.Enqueue(chosen.Id);
             while (history.Count > 3) history.Dequeue();
+            return Render(chosen, context);
+        }
+        /// <summary>Offers up to three actual eligible lines without consuming RNG or repetition history.</summary>
+        public IReadOnlyList<DialogueSelection> Options(SpeechIntent intent, DialogueContext context)
+        {
+            _recent.TryGetValue(context.SpeakerId, out Queue<string> history);
+            return _lines.Where(l => l.Intent == intent && (context.Traits & l.RequiredTrait) == l.RequiredTrait
+                && (!l.SpeakerRole.HasValue || l.SpeakerRole.Value == context.OwnRole) && l.Conditions.All(c => c.Matches(context)))
+                .OrderBy(l => history != null && history.Contains(l.Id)).ThenBy(l => l.Id, StringComparer.Ordinal)
+                .Take(3).Select(l => Render(l, context)).ToList().AsReadOnly();
+        }
+        private static DialogueSelection Render(DialogueLine chosen, DialogueContext context)
+        {
             string text = Variables.Replace(chosen.Text, match =>
             {
                 switch (match.Groups[1].Value)

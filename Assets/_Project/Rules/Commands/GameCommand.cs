@@ -8,10 +8,18 @@ namespace SocialStim.Rules.Commands
     public sealed class GameCommand
     {
         private GameCommand(CommandKind kind, CharacterId? target = null, SpeechIntent intent = SpeechIntent.StaySilent,
-            RoleId? role = null, Faction? faction = null, Verdict verdict = Verdict.Abstain)
+            RoleId? role = null, Faction? faction = null, Verdict verdict = Verdict.Abstain, string dialogueLine = null)
         {
-            Kind = kind; Target = target; Intent = intent; ClaimedRole = role;
+            DialogueLine = dialogueLine; Kind = kind; Target = target; Intent = intent; ClaimedRole = role;
             ReportedFaction = faction; Verdict = verdict;
+        }
+        /// <summary>Optional validated authored phrasing selected by the player.</summary>
+        public string DialogueLine { get; }
+        /// <summary>Copies a speech command with a chosen authored line ID.</summary>
+        public GameCommand WithDialogue(string lineId)
+        {
+            if (Kind != CommandKind.Speak || string.IsNullOrWhiteSpace(lineId)) throw new System.ArgumentException("Only speech accepts an authored line.");
+            return new GameCommand(Kind, Target, Intent, ClaimedRole, ReportedFaction, Verdict, lineId);
         }
         /// <summary>Requested command family.</summary>
         public CommandKind Kind { get; }

@@ -91,7 +91,7 @@ namespace SocialStim.Tests.EditMode
             };
             var run = RunFactory.CreateScenario(new RunOptions(123, discussionRounds: 3, votingMode: VotingMode.Trial), new[]
             {
-                new CastMemberSpec("Player", new RoleId("interrupter")),
+                new CastMemberSpec("Player", new RoleId("assassin")),
                 new CastMemberSpec("Listener1", new RoleId("inspector")),
                 new CastMemberSpec("Listener2", new RoleId("physician")),
                 new CastMemberSpec("Listener3", new RoleId("assassin")),

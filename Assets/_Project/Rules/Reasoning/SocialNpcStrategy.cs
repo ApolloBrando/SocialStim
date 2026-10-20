@@ -25,7 +25,7 @@ namespace SocialStim.Rules.Reasoning
             KnownCharacter suspect = Suspect(knowledge);
             KnownCharacter trusted = knowledge.Characters.Where(c => c.Alive && c.Id != knowledge.Self)
                 .OrderByDescending(c => c.Trust).ThenBy(c => c.Id.Value).FirstOrDefault();
-            bool deceptive = knowledge.OwnRole.Faction == Faction.Antagonist || knowledge.Personality.HasFlag(Personality.Deceptive);
+            bool deceptive = knowledge.OwnRole.CanBluff;
             if (knowledge.OwnRole.Category == RoleCategory.NeutralEvil)
             {
                 RoleSpec hostile = knowledge.RoleCatalog.FirstOrDefault(r => r.Faction == Faction.Antagonist);
@@ -39,8 +39,9 @@ namespace SocialStim.Rules.Reasoning
             candidates.Add((GameCommand.Speak(SpeechIntent.StaySilent), 8));
             candidates.Add((GameCommand.Speak(SpeechIntent.ExpressFear), 12));
             candidates.Add((GameCommand.Speak(SpeechIntent.Defend), knowledge.SelfExposure >= _settings.ExposureThreshold ? 75 : 4));
-            candidates.Add((GameCommand.Speak(SpeechIntent.ClaimRole, role: claim),
-                self.ClaimedRole.HasValue ? 3 : 18 + (deceptive ? _settings.DeceptionBonus : 0)));
+            if (knowledge.OwnRole.CanClaim(claim))
+                candidates.Add((GameCommand.Speak(SpeechIntent.ClaimRole, role: claim),
+                    self.ClaimedRole.HasValue ? 3 : 18 + (deceptive ? _settings.DeceptionBonus : 0)));
             if (knowledge.Evidence.Any(e => e.Kind == EvidenceKind.Death && e.Day >= knowledge.Day - 1))
                 candidates.Add((GameCommand.Speak(SpeechIntent.ReactToDeath), 24));
             if (knowledge.Evidence.Any(e => e.Kind == EvidenceKind.RoleReveal && e.Day >= knowledge.Day - 1))

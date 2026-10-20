@@ -6,12 +6,14 @@ using SocialStim.Rules.Commands;
 using SocialStim.Rules.Dialogue;
 using SocialStim.Rules.Phases;
 using SocialStim.Rules.Roles;
+using SocialStim.Rules.Night;
 
 namespace SocialStim.Application.Sessions
 {
     /// <summary>Application port for text or future visual clients; owns no scene references.</summary>
     public sealed class GameController
     {
+        private PlayerInputRequest _cached;
         private readonly RunSession _session;
         private readonly IReadOnlyList<RoleSpec> _catalog;
 
@@ -22,13 +24,14 @@ namespace SocialStim.Application.Sessions
         /// <summary>Builds choices without consulting hidden assignments or NPC scores.</summary>
         public PlayerInputRequest Request()
         {
+            if (_cached != null && _cached.View.Revision == _session.Revision) return _cached;
             PlayerView view = _session.GetPlayerView();
             var options = new List<PlayerOption>();
             Action<string, string, GameCommand> add = (label, interpretation, command) =>
-                options.Add(new PlayerOption($"{view.Revision}:{options.Count}", label, interpretation, command));
-            if (view.Phase == GamePhase.Ended) return new PlayerInputRequest(view, options.AsReadOnly());
+                options.Add(new PlayerOption($"{view.Revision}:{options.Count}", label, interpretation, command, _session.PlayerPhrasings(command)));
+            if (view.Phase == GamePhase.Ended) return _cached = new PlayerInputRequest(view, options.AsReadOnly());
             if (!view.Alive)
-            { add("Watch", "Continue the run.", GameCommand.Continue()); return new PlayerInputRequest(view, options.AsReadOnly()); }
+            { add("Watch", "Continue the run.", GameCommand.Continue()); return _cached = new PlayerInputRequest(view, options.AsReadOnly()); }
             switch (view.Phase)
             {
                 case GamePhase.Discussion:
@@ -54,11 +57,16 @@ namespace SocialStim.Application.Sessions
                         add($"Agree with {target.Name}", "Support their view.", GameCommand.Speak(SpeechIntent.Agree, target.Id));
                         add($"Disagree with {target.Name}", "Challenge their view.", GameCommand.Speak(SpeechIntent.Disagree, target.Id));
                         add($"Deflect toward {target.Name}", "Shift attention away from you.", GameCommand.Speak(SpeechIntent.Deflect, target.Id));
-                        if (view.Day > 1)
+                        if (view.Day > 1 && view.OwnRole.CanBluff)
                             foreach (Faction faction in Enum.GetValues(typeof(Faction)))
                                 add($"Report {target.Name} as {faction}", "State a finding. You may bluff.",
                                     GameCommand.Speak(SpeechIntent.ReportInvestigation, target.Id, faction: faction));
                     }
+                    if (!view.OwnRole.CanBluff)
+                        foreach (var report in view.PrivateResults.Where(r => r.Kind == ReportKind.Investigation && r.Night == view.Day - 1
+                            && r.Target.HasValue && view.Characters.Any(c => c.Id == r.Target && c.Alive)))
+                            add("Report " + view.Characters.First(c => c.Id == report.Target).Name + " as " + report.Alignment,
+                                "Share your actual readout.", GameCommand.Speak(SpeechIntent.ReportInvestigation, report.Target, faction: report.Alignment));
                     break;
                 case GamePhase.Voting:
                     if (view.AllowAbstain) add("Abstain", "Cast no target vote.", GameCommand.Vote(null));
@@ -94,20 +102,23 @@ namespace SocialStim.Application.Sessions
                     break;
                 case GamePhase.Dawn: add("Begin discussion", "Start the day.", GameCommand.Continue()); break;
             }
-            return new PlayerInputRequest(view, options.AsReadOnly());
+            return _cached = new PlayerInputRequest(view, options.AsReadOnly());
         }
 
         /// <summary>Rejects stale or forged option IDs before touching session state.</summary>
         public bool TryChoose(string optionId, out string error)
         {
-            PlayerOption option = Request().Options.FirstOrDefault(o => string.Equals(o.Id, optionId, StringComparison.Ordinal));
+            string[] parts = (optionId ?? "").Split(new[] { '|' }, 2);
+            PlayerOption option = Request().Options.FirstOrDefault(o => string.Equals(o.Id, parts[0], StringComparison.Ordinal));
             if (option == null) { error = "That option is no longer available."; return false; }
-            return _session.TrySubmit(option.Command, out error);
+            if (parts.Length == 1) return _session.TrySubmit(option.Command, out error);
+            if (!option.Phrasings.Any(line => line.Id == parts[1])) { error = "That phrasing is no longer available."; return false; }
+            return _session.TrySubmit(option.Command.WithDialogue(parts[1]), out error);
         }
 
         private void AddClaims(Action<string, string, GameCommand> add, PlayerView view)
         {
-            foreach (RoleSpec role in _catalog.OrderBy(r => r.Name, StringComparer.Ordinal))
+            foreach (RoleSpec role in _catalog.Where(r => view.OwnRole.CanClaim(r.Id)).OrderBy(r => r.Name, StringComparer.Ordinal))
                 add($"Claim {role.Name}", role.Id == view.OwnRole.Id
                     ? "Tell the truth."
                     : "Bluff. Contradictions may expose you.", GameCommand.Speak(SpeechIntent.ClaimRole, role: role.Id));

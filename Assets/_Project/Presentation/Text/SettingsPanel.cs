@@ -49,6 +49,8 @@ namespace SocialStim.Presentation.Text
             TextUiFactory.Fill(hint.rectTransform, Vector2.zero, new Vector2(1, 0), new Vector2(224, 20), new Vector2(-20, 60));
             _root.gameObject.SetActive(false); Group("Text & Display");
         }
+        /// <summary>Whether the settings modal currently owns input.</summary>
+        public bool IsOpen => _root != null && _root.gameObject.activeSelf;
         /// <summary>Synchronizes controls without invoking their edit callbacks.</summary>
         public void SetPreferences(GamePreferences preferences)
         { _preferences = preferences; foreach (Action refresh in _refresh) refresh(); }

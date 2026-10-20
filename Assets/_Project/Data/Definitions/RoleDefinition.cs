@@ -19,8 +19,13 @@ namespace SocialStim.Data.Definitions
         [SerializeField] private Faction _appearance;
         [SerializeField] private bool _unique;
 
+        [SerializeField] private bool _overrideClaimPermissions;
+        [SerializeField] private bool _canClaimTruthfully = true;
+        [SerializeField] private bool _canBluff;
+
         /// <summary>Creates validated runtime data without retaining this Unity object.</summary>
         public RoleSpec ToSpec() => new RoleSpec(new RoleId(_id), _displayName, _faction, _category,
-            _ability, _attack, _defense, _protection, _charges, _appearance, _unique);
+            _ability, _attack, _defense, _protection, _charges, _appearance, _unique, _overrideClaimPermissions ? _canClaimTruthfully : (bool?)null,
+            _overrideClaimPermissions ? _canBluff : (bool?)null);
     }
 }

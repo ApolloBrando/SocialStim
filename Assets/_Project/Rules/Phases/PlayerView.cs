@@ -3,6 +3,7 @@ using SocialStim.Rules.Cast;
 using SocialStim.Rules.Reasoning;
 using SocialStim.Rules.Roles;
 using SocialStim.Rules.Victory;
+using SocialStim.Rules.Night;
 
 namespace SocialStim.Rules.Phases
 {
@@ -14,16 +15,21 @@ namespace SocialStim.Rules.Phases
             IReadOnlyList<KnownCharacter> characters, IReadOnlyList<CharacterId> legalNightTargets,
             IReadOnlyList<GameObservation> transcript, bool opening = false, bool canReportAction = false, int discussionRoundsAllowed = 3, VotingMode votingMode = VotingMode.Trial,
             int discussionRound = 1, int playerWindow = 1, int windowsPerRound = 1, CharacterId? respondTo = null,
-            IReadOnlyList<CharacterId> voteTargets = null, bool allowAbstain = true, bool revote = false)
+            IReadOnlyList<CharacterId> voteTargets = null, bool allowAbstain = true, bool revote = false, IReadOnlyList<NightReport> privateResults = null, IReadOnlyList<string> afterAction = null)
         {
             Revision = revision; Seed = seed; Day = day; Phase = phase; TrialsUsed = trialsUsed; TrialsAllowed = trialsAllowed;
             Alive = alive; OwnRole = ownRole; Charges = charges; Defendant = defendant; Outcome = outcome; Won = won;
             Characters = characters; LegalNightTargets = legalNightTargets; Transcript = transcript;
+            PrivateResults = privateResults ?? new NightReport[0]; AfterAction = afterAction ?? new string[0];
             VotingMode = votingMode; DiscussionRound = discussionRound; PlayerWindow = playerWindow;
             WindowsPerRound = windowsPerRound; RespondTo = respondTo; VoteTargets = voteTargets ?? new CharacterId[0];
             AllowAbstain = allowAbstain; Revote = revote;
             Opening = opening; CanReportAction = canReportAction; DiscussionRoundsAllowed = discussionRoundsAllowed;
         }
+        /// <summary>Only the player's legitimate private reports, for truthful result selection.</summary>
+        public IReadOnlyList<NightReport> PrivateResults { get; }
+        /// <summary>Authoritative role/action review, supplied only after the run has ended.</summary>
+        public IReadOnlyList<string> AfterAction { get; }
         /// <summary>Configured daily elimination policy.</summary>
         public VotingMode VotingMode { get; }
         /// <summary>One-based public discussion round.</summary>

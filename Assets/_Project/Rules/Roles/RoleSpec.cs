@@ -8,7 +8,7 @@ namespace SocialStim.Rules.Roles
         /// <summary>Creates a role. A charge count of -1 means unlimited uses.</summary>
         public RoleSpec(RoleId id, string name, Faction faction, RoleCategory category,
             AbilityKind ability, int attack, int defense, int protection, int charges,
-            Faction appearance, bool unique = false)
+            Faction appearance, bool unique = false, bool? canClaimTruthfully = null, bool? canBluff = null)
         {
             if (string.IsNullOrWhiteSpace(id.Value) || string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Role identity and name are required.");
@@ -24,9 +24,17 @@ namespace SocialStim.Rules.Roles
             if (faction != categoryFaction) throw new ArgumentException("Role faction and category must agree.");
             Id = id; Name = name; Faction = faction; Category = category; Ability = ability;
             Attack = attack; Defense = defense; Protection = protection; Charges = charges;
+            CanClaimTruthfully = canClaimTruthfully ?? ability != AbilityKind.None;
+            CanBluff = canBluff ?? (faction == Faction.Antagonist || category == RoleCategory.NeutralEvil || category == RoleCategory.NeutralKilling);
             Appearance = appearance; Unique = unique;
         }
 
+        /// <summary>Permission to disclose the actual role.</summary>
+        public bool CanClaimTruthfully { get; }
+        /// <summary>Permission to claim a different role or fabricate a result.</summary>
+        public bool CanBluff { get; }
+        /// <summary>Shared permission used by player menus and NPC command validation.</summary>
+        public bool CanClaim(RoleId claim) => claim == Id ? CanClaimTruthfully : CanBluff;
         /// <summary>Stable role key.</summary>
         public RoleId Id { get; }
         /// <summary>Authored display name.</summary>
