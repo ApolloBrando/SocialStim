@@ -3861,6 +3861,1686 @@
       "text": "The relevant part begins now, so please ignore the unnecessarily long runway. {result}",
       "weight": 1,
       "requiredTrait": "Chatterbox"
+    },
+    {
+      "id": "npc.smug.Accuse.001",
+      "intent": "Accuse",
+      "text": "{target}, consider this your invitation to become less suspicious.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.002",
+      "intent": "Accuse",
+      "text": "I'm looking at {target}. Do try to keep up with the conversation.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.003",
+      "intent": "Accuse",
+      "text": "Obviously I want {target} examined. Subtlety seems wasted on this room.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.004",
+      "intent": "Accuse",
+      "text": "{target} has not earned my confidence, a distinction I realize may be unfamiliar.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.005",
+      "intent": "Accuse",
+      "text": "Let's start with {target}. A little scrutiny might improve matters.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.006",
+      "intent": "Accuse",
+      "text": "I suspect {target}; you're welcome to arrive at that thought in your own time.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.007",
+      "intent": "Accuse",
+      "text": "{target}, I'm offering you a chance to answer an intelligent question.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.008",
+      "intent": "Accuse",
+      "text": "My attention is on {target}. It rarely wanders without a purpose.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.009",
+      "intent": "Accuse",
+      "text": "I'd like {target} under scrutiny before the room mistakes noise for progress again.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.010",
+      "intent": "Accuse",
+      "text": "{target}, don't confuse my polished manners with trust.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.011",
+      "intent": "Accuse",
+      "text": "I'm questioning {target}. You may treat that as the useful part of this exchange.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.012",
+      "intent": "Accuse",
+      "text": "Do sit up, {target}. Your position is about to receive some attention.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.001",
+      "intent": "Defend",
+      "text": "An accusation against me deserves more preparation than that.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.002",
+      "intent": "Defend",
+      "text": "I reject the case. You may return when it has a little structure.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.003",
+      "intent": "Defend",
+      "text": "Do distinguish between failing to understand me and proving me guilty.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.004",
+      "intent": "Defend",
+      "text": "I'm delighted to answer a serious question, should one emerge.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.005",
+      "intent": "Defend",
+      "text": "You have my attention. Now make the accusation worth it.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.006",
+      "intent": "Defend",
+      "text": "I won't accept a verdict assembled from impatience.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.007",
+      "intent": "Defend",
+      "text": "If confidence were evidence, you'd have a case. Unfortunately, it isn't.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.008",
+      "intent": "Defend",
+      "text": "I'm defending myself because apparently silence would exceed the room's interpretive abilities.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.009",
+      "intent": "Defend",
+      "text": "You can question my position without congratulating yourself on a conclusion.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.010",
+      "intent": "Defend",
+      "text": "The accusation is not improved by repeating it at me.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.011",
+      "intent": "Defend",
+      "text": "I expected scrutiny. I had hoped for a better standard of it.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.012",
+      "intent": "Defend",
+      "text": "Allow me to correct the impression that your suspicion settles anything.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.001",
+      "intent": "ClaimRole",
+      "text": "My role is {role}. I trust that part was simple enough.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.002",
+      "intent": "ClaimRole",
+      "text": "I'm the {role}, since we're finally attending to relevant information.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.003",
+      "intent": "ClaimRole",
+      "text": "For the benefit of the record: {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.004",
+      "intent": "ClaimRole",
+      "text": "I'll spare you the suspense. You're speaking to the {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.005",
+      "intent": "ClaimRole",
+      "text": "Consider yourself informed: I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.006",
+      "intent": "ClaimRole",
+      "text": "My claim is {role}. Questions of comparable clarity are welcome.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.007",
+      "intent": "ClaimRole",
+      "text": "At last, something worth announcing. I'm the {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.008",
+      "intent": "ClaimRole",
+      "text": "The role you should associate with me is {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.009",
+      "intent": "ClaimRole",
+      "text": "I'm claiming {role}; do write it down correctly.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.010",
+      "intent": "ClaimRole",
+      "text": "I assume you can follow a plain declaration. I'm the {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.001",
+      "intent": "Agree",
+      "text": "{target} has made a point worth keeping. How refreshing.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.002",
+      "intent": "Agree",
+      "text": "I agree with {target}. Sensible conclusions should be acknowledged.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.003",
+      "intent": "Agree",
+      "text": "Yes, {target}. That's a considerably better direction.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.004",
+      "intent": "Agree",
+      "text": "I'm prepared to endorse {target}'s view on this occasion.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.005",
+      "intent": "Agree",
+      "text": "{target} has spared me an explanation, which we should all appreciate.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.006",
+      "intent": "Agree",
+      "text": "Credit where it's due: I support {target}'s argument.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.007",
+      "intent": "Agree",
+      "text": "I find myself agreeing with {target}. The room is improving.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.008",
+      "intent": "Agree",
+      "text": "That conclusion from {target} meets a reasonable standard.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.009",
+      "intent": "Agree",
+      "text": "Do preserve {target}'s point before it gets lost among the others.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.010",
+      "intent": "Agree",
+      "text": "{target}, you've arrived at a position I can support.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.001",
+      "intent": "Disagree",
+      "text": "No, {target}. Confidence is a presentation style, not an argument.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.002",
+      "intent": "Disagree",
+      "text": "I disagree with {target}; that conclusion requires rather more work.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.003",
+      "intent": "Disagree",
+      "text": "Do reconsider, {target}. Your point has not survived my attention.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.004",
+      "intent": "Disagree",
+      "text": "I'm not persuaded by {target}, however pleased they seem with the idea.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.005",
+      "intent": "Disagree",
+      "text": "{target}, I would suggest another draft of that position.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.006",
+      "intent": "Disagree",
+      "text": "The room may indulge {target}'s conclusion. I won't.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.007",
+      "intent": "Disagree",
+      "text": "I can't endorse {target}'s view merely because it was delivered neatly.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.008",
+      "intent": "Disagree",
+      "text": "{target}, you've mistaken finishing an explanation for establishing it.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.009",
+      "intent": "Disagree",
+      "text": "I reach a different conclusion. I appreciate that disappoints you, {target}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.010",
+      "intent": "Disagree",
+      "text": "Let's improve the discussion by not accepting {target}'s point so quickly.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.001",
+      "intent": "ReactToDeath",
+      "text": "Another empty chair. A poor substitute for competent judgement.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.002",
+      "intent": "ReactToDeath",
+      "text": "Death has made the room smaller without making it wiser.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.003",
+      "intent": "ReactToDeath",
+      "text": "A loss, plainly. Perhaps we can respond with something besides astonishment.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.004",
+      "intent": "ReactToDeath",
+      "text": "Someone is dead. I would prefer our next conclusion to survive scrutiny.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.005",
+      "intent": "ReactToDeath",
+      "text": "The casualty deserves better than a competition in sounding distressed.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.006",
+      "intent": "ReactToDeath",
+      "text": "An empty seat is no excuse to lower the standard of our thinking.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.007",
+      "intent": "ReactToDeath",
+      "text": "We have lost a person, not acquired permission to stop reasoning.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.008",
+      "intent": "ReactToDeath",
+      "text": "I dislike a death report as much as anyone. I simply don't see the use of performing surprise.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.009",
+      "intent": "ReactToDeath",
+      "text": "Less company, same predicament. We should make the remaining conversation count.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.010",
+      "intent": "ReactToDeath",
+      "text": "The silence is understandable. Let it produce thought rather than another hasty answer.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.001",
+      "intent": "VoteJustification",
+      "text": "I cast a considered vote. I recommend the practice.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.002",
+      "intent": "VoteJustification",
+      "text": "My ballot followed my judgement, a sequence some might find instructive.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.003",
+      "intent": "VoteJustification",
+      "text": "I chose deliberately rather than waiting for the loudest instruction.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.004",
+      "intent": "VoteJustification",
+      "text": "You may question my vote. I suggest beginning with a question worth answering.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.005",
+      "intent": "VoteJustification",
+      "text": "The ballot reflected my assessment, not my desire to blend into the tally.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.006",
+      "intent": "VoteJustification",
+      "text": "I did not require an audience to make my decision.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.007",
+      "intent": "VoteJustification",
+      "text": "My choice was reasoned, even if explaining that disappoints anyone hoping for theatre.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.008",
+      "intent": "VoteJustification",
+      "text": "I accept responsibility for the vote without the usual display of self-importance.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.009",
+      "intent": "VoteJustification",
+      "text": "I made the decision I could defend. A modest standard, really.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.010",
+      "intent": "VoteJustification",
+      "text": "Voting involved uncertainty. Recognizing that is preferable to pretending otherwise.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Vouch.001",
+      "intent": "Vouch",
+      "text": "I'm willing to support {target}. Try not to make me regret the courtesy.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Vouch.002",
+      "intent": "Vouch",
+      "text": "{target} deserves a fair hearing, which ought not to be a controversial standard.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Vouch.003",
+      "intent": "Vouch",
+      "text": "I'll back {target} for now. Notice the useful distinction between support and certainty.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Vouch.004",
+      "intent": "Vouch",
+      "text": "Do give {target} room to answer. Interruptions aren't achievements.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Vouch.005",
+      "intent": "Vouch",
+      "text": "My confidence extends to {target} at present, though I don't distribute it carelessly.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Vouch.006",
+      "intent": "Vouch",
+      "text": "I oppose rushing {target} out merely to give the room a sense of accomplishment.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportInvestigation.001",
+      "intent": "ReportInvestigation",
+      "text": "The finding is {result} for {target}. I assume we can record that accurately.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportInvestigation.002",
+      "intent": "ReportInvestigation",
+      "text": "My investigation of {target} returned {result}, for those awaiting information rather than speculation.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportInvestigation.003",
+      "intent": "ReportInvestigation",
+      "text": "{target} appeared {result}. There, an actual report.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportInvestigation.004",
+      "intent": "ReportInvestigation",
+      "text": "Do pay attention to the readout: {target}, {result}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportInvestigation.005",
+      "intent": "ReportInvestigation",
+      "text": "I checked {target}; the result was {result}. Interpretation can wait until everyone has heard it.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.CallForTrial.001",
+      "intent": "CallForTrial",
+      "text": "Put {target} on trial. A formal defense might finally focus the discussion.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.CallForTrial.002",
+      "intent": "CallForTrial",
+      "text": "I'd like a hearing for {target}, preferably conducted above the room's usual standard.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.CallForTrial.003",
+      "intent": "CallForTrial",
+      "text": "{target}, prepare to answer formally. I'm calling for a trial.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.CallForTrial.004",
+      "intent": "CallForTrial",
+      "text": "Open a trial for {target}. We have spent enough time circling the request.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.CallForTrial.005",
+      "intent": "CallForTrial",
+      "text": "I propose that {target} face a proper hearing instead of further conversational drift.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Deflect.001",
+      "intent": "Deflect",
+      "text": "Apply some of that impressive scrutiny to {target}, if you can manage the transfer.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Deflect.002",
+      "intent": "Deflect",
+      "text": "My position isn't the only one available for examination. Try {target}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Deflect.003",
+      "intent": "Deflect",
+      "text": "Do question {target} as well; concentrating on me is beginning to resemble a hobby.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Deflect.004",
+      "intent": "Deflect",
+      "text": "Shift your attention toward {target}. Variety might improve your questions.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Deflect.005",
+      "intent": "Deflect",
+      "text": "I'd be interested to see {target} answer before the room congratulates itself on examining me.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.StaySilent.001",
+      "intent": "StaySilent",
+      "text": "I'll refrain from improving this particular silence.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.StaySilent.002",
+      "intent": "StaySilent",
+      "text": "Nothing to add. You're welcome to use the opening productively.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.StaySilent.003",
+      "intent": "StaySilent",
+      "text": "I shall listen and reserve the right to be disappointed.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.StaySilent.004",
+      "intent": "StaySilent",
+      "text": "Do continue. I have no contribution that needs this moment.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.StaySilent.005",
+      "intent": "StaySilent",
+      "text": "For once, the floor can survive without my assistance.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ExpressFear.001",
+      "intent": "ExpressFear",
+      "text": "I find the danger quite real, despite the room's talent for making it sound abstract.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ExpressFear.002",
+      "intent": "ExpressFear",
+      "text": "I'd prefer not to discover how little competence tonight requires from our enemies.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ExpressFear.003",
+      "intent": "ExpressFear",
+      "text": "Even I can't reason an unlocked future into being safe.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ExpressFear.004",
+      "intent": "ExpressFear",
+      "text": "I'm concerned. I simply don't see the need to decorate it with trembling.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ExpressFear.005",
+      "intent": "ExpressFear",
+      "text": "The uncertainty is unpleasant; pretending it doesn't affect me would be beneath my standards.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToRoleReveal.001",
+      "intent": "ReactToRoleReveal",
+      "text": "Now that the role is public, perhaps we can retire a few cherished assumptions.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToRoleReveal.002",
+      "intent": "ReactToRoleReveal",
+      "text": "Do revise your conclusions to include the information we've actually revealed.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToRoleReveal.003",
+      "intent": "ReactToRoleReveal",
+      "text": "The role changes our picture. Defending the old one would be a curious choice.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToRoleReveal.004",
+      "intent": "ReactToRoleReveal",
+      "text": "We have a disclosed role, not a prize for whoever guessed loudest.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToRoleReveal.005",
+      "intent": "ReactToRoleReveal",
+      "text": "At last, a fact we can all discuss without confusing a claim for certainty.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.LastWords.001",
+      "intent": "LastWords",
+      "text": "Try to learn something from this. I'd hate the occasion to be entirely wasted.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.LastWords.002",
+      "intent": "LastWords",
+      "text": "I leave you my words, which should improve the average quality of the silence.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.LastWords.003",
+      "intent": "LastWords",
+      "text": "Do make your next judgement with rather more care than your last.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.LastWords.004",
+      "intent": "LastWords",
+      "text": "I'm finished. Whether the room has progressed is another question.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.LastWords.005",
+      "intent": "LastWords",
+      "text": "You may now discover the considerable inconvenience of no longer hearing my advice.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportAction.001",
+      "intent": "ReportAction",
+      "text": "An account, rather than an impression. Do note the difference. {result}",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportAction.002",
+      "intent": "ReportAction",
+      "text": "I've brought something more useful than dramatic speculation. {result}",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportAction.003",
+      "intent": "ReportAction",
+      "text": "My night report merits your undivided attention. {result}",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportAction.004",
+      "intent": "ReportAction",
+      "text": "Here is the record, presented as clearly as circumstances apparently require. {result}",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportAction.005",
+      "intent": "ReportAction",
+      "text": "I shall give the details once, so listening would be wise. {result}",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.grim.Accuse.001",
+      "intent": "Accuse",
+      "text": "{target}. That's where my suspicion rests.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Accuse.002",
+      "intent": "Accuse",
+      "text": "I don't trust {target}. Trust is getting expensive.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Accuse.003",
+      "intent": "Accuse",
+      "text": "Look at {target}. We can be wrong about them next.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Accuse.004",
+      "intent": "Accuse",
+      "text": "My doubts have a name. {target}.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Accuse.005",
+      "intent": "Accuse",
+      "text": "Keep an eye on {target}. Sleep can wait.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Accuse.006",
+      "intent": "Accuse",
+      "text": "{target} needs scrutiny. Nobody enjoys it. Do it anyway.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Accuse.007",
+      "intent": "Accuse",
+      "text": "I think {target} may be the threat. An ordinary miserable thought.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Accuse.008",
+      "intent": "Accuse",
+      "text": "Question {target}. Another uncomfortable conversation won't kill us by itself.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Accuse.009",
+      "intent": "Accuse",
+      "text": "{target}, I haven't found a reason to trust you.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Accuse.010",
+      "intent": "Accuse",
+      "text": "I'd start with {target}. Starting somewhere is all we have.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Accuse.011",
+      "intent": "Accuse",
+      "text": "Don't clear {target} to make the room feel better.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Accuse.012",
+      "intent": "Accuse",
+      "text": "I'm accusing {target}. There isn't a pleasant version of it.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Defend.001",
+      "intent": "Defend",
+      "text": "You've accused me. That isn't a finding.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Defend.002",
+      "intent": "Defend",
+      "text": "Hear my answer. The silence afterward can wait.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Defend.003",
+      "intent": "Defend",
+      "text": "I'm defending myself. I don't expect it to be cheerful.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Defend.004",
+      "intent": "Defend",
+      "text": "The case against me is still a case, not a conclusion.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Defend.005",
+      "intent": "Defend",
+      "text": "I won't confess to make the discussion shorter.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Defend.006",
+      "intent": "Defend",
+      "text": "You can listen to my defense or be wrong more efficiently.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Defend.007",
+      "intent": "Defend",
+      "text": "Pressure doesn't improve an accusation. It just makes it louder.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Defend.008",
+      "intent": "Defend",
+      "text": "I'm not accepting your verdict before you've heard me.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Defend.009",
+      "intent": "Defend",
+      "text": "Give me a hearing. We have little enough to lose by thinking.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Defend.010",
+      "intent": "Defend",
+      "text": "I dispute the blame. That's my answer, stripped down.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Defend.011",
+      "intent": "Defend",
+      "text": "Don't mistake my lack of surprise for agreement.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Defend.012",
+      "intent": "Defend",
+      "text": "I can answer. Whether anyone wants to listen is another matter.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ClaimRole.001",
+      "intent": "ClaimRole",
+      "text": "I'm the {role}. There it is.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ClaimRole.002",
+      "intent": "ClaimRole",
+      "text": "My role is {role}. No better day to say it.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ClaimRole.003",
+      "intent": "ClaimRole",
+      "text": "Put down {role} beside my name.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ClaimRole.004",
+      "intent": "ClaimRole",
+      "text": "I suppose you need the role. {role}.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ClaimRole.005",
+      "intent": "ClaimRole",
+      "text": "I'm claiming {role}. Another thing to worry about.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ClaimRole.006",
+      "intent": "ClaimRole",
+      "text": "The role I have to declare is {role}.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ClaimRole.007",
+      "intent": "ClaimRole",
+      "text": "{role}. That's what I'm telling the room.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ClaimRole.008",
+      "intent": "ClaimRole",
+      "text": "You can question this too. I'm the {role}.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ClaimRole.009",
+      "intent": "ClaimRole",
+      "text": "No grand reveal. Just my claim: {role}.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ClaimRole.010",
+      "intent": "ClaimRole",
+      "text": "Call me the {role}. Names won't make tonight shorter.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Agree.001",
+      "intent": "Agree",
+      "text": "{target} has my agreement. For what that's worth.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Agree.002",
+      "intent": "Agree",
+      "text": "I support {target}'s point. Something had to make sense.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Agree.003",
+      "intent": "Agree",
+      "text": "Yes, {target}. We can stop circling that part.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Agree.004",
+      "intent": "Agree",
+      "text": "I'm with {target} on this. No speech required.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Agree.005",
+      "intent": "Agree",
+      "text": "What {target} said will do. I agree.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Agree.006",
+      "intent": "Agree",
+      "text": "{target} makes sense to me. A small mercy.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Agree.007",
+      "intent": "Agree",
+      "text": "I'll back that conclusion, {target}. Don't expect applause.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Agree.008",
+      "intent": "Agree",
+      "text": "My answer follows {target}'s. We've reached the same unpleasant place.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Agree.009",
+      "intent": "Agree",
+      "text": "Keep {target}'s point. We haven't had a surplus of useful ones.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Agree.010",
+      "intent": "Agree",
+      "text": "I agree with {target}. That's the whole contribution.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Disagree.001",
+      "intent": "Disagree",
+      "text": "No, {target}. That doesn't make it better.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Disagree.002",
+      "intent": "Disagree",
+      "text": "I don't accept {target}'s conclusion. We can endure the disagreement.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Disagree.003",
+      "intent": "Disagree",
+      "text": "{target} hasn't convinced me. Certainty isn't contagious today.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Disagree.004",
+      "intent": "Disagree",
+      "text": "I see it differently, {target}. Neither view is comfortable.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Disagree.005",
+      "intent": "Disagree",
+      "text": "Don't count me with {target}. That's not where I stand.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Disagree.006",
+      "intent": "Disagree",
+      "text": "I oppose that point, {target}. Quietly, if possible.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Disagree.007",
+      "intent": "Disagree",
+      "text": "{target}, I can't turn a weak conclusion into a comforting one.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Disagree.008",
+      "intent": "Disagree",
+      "text": "We're apart on this, {target}. Best say it now.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Disagree.009",
+      "intent": "Disagree",
+      "text": "I won't back {target}'s argument just to finish talking.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Disagree.010",
+      "intent": "Disagree",
+      "text": "That view from {target} doesn't survive a second look for me.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReactToDeath.001",
+      "intent": "ReactToDeath",
+      "text": "Another chair we won't need.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReactToDeath.002",
+      "intent": "ReactToDeath",
+      "text": "They won't be speaking again. The room has noticed.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReactToDeath.003",
+      "intent": "ReactToDeath",
+      "text": "Death makes a tidy report out of a complicated person.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReactToDeath.004",
+      "intent": "ReactToDeath",
+      "text": "We have less company and the same questions.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReactToDeath.005",
+      "intent": "ReactToDeath",
+      "text": "Someone is gone. The meeting continues. That's the cruelty of it.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReactToDeath.006",
+      "intent": "ReactToDeath",
+      "text": "An empty place. We can stop expecting an answer from it.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReactToDeath.007",
+      "intent": "ReactToDeath",
+      "text": "There should have been another ordinary morning for them.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReactToDeath.008",
+      "intent": "ReactToDeath",
+      "text": "We all heard the report. Hearing it didn't make it easier.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReactToDeath.009",
+      "intent": "ReactToDeath",
+      "text": "The dead have run out of mistakes. We haven't.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReactToDeath.010",
+      "intent": "ReactToDeath",
+      "text": "A life ended. Nothing useful to add to that arithmetic.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.VoteJustification.001",
+      "intent": "VoteJustification",
+      "text": "I chose. Doubt came with the ballot.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.VoteJustification.002",
+      "intent": "VoteJustification",
+      "text": "My vote was a judgement, not a promise.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.VoteJustification.003",
+      "intent": "VoteJustification",
+      "text": "I used what I had. It wasn't much comfort.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.VoteJustification.004",
+      "intent": "VoteJustification",
+      "text": "The ballot was mine. So is the burden of it.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.VoteJustification.005",
+      "intent": "VoteJustification",
+      "text": "I didn't find certainty. The vote couldn't wait for it.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.VoteJustification.006",
+      "intent": "VoteJustification",
+      "text": "There was no painless choice. I made one anyway.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.VoteJustification.007",
+      "intent": "VoteJustification",
+      "text": "I meant my ballot. Regret doesn't rewrite it.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.VoteJustification.008",
+      "intent": "VoteJustification",
+      "text": "My decision came from my own assessment. No escape in that.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.VoteJustification.009",
+      "intent": "VoteJustification",
+      "text": "I voted with the information I had, not the information I wanted.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.VoteJustification.010",
+      "intent": "VoteJustification",
+      "text": "The choice is on record. I'll answer for it.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Vouch.001",
+      "intent": "Vouch",
+      "text": "Give {target} time. Time is all we're lending anyone.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Vouch.002",
+      "intent": "Vouch",
+      "text": "I'm backing {target} for now. Nothing lasts forever.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Vouch.003",
+      "intent": "Vouch",
+      "text": "{target} deserves a hearing before another empty chair.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Vouch.004",
+      "intent": "Vouch",
+      "text": "Don't rush to remove {target}. We know how final that is.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Vouch.005",
+      "intent": "Vouch",
+      "text": "I trust {target} enough to keep listening.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Vouch.006",
+      "intent": "Vouch",
+      "text": "Leave room for {target}. There are fewer people to make room for now.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReportInvestigation.001",
+      "intent": "ReportInvestigation",
+      "text": "{target} appeared {result}. That's the readout.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReportInvestigation.002",
+      "intent": "ReportInvestigation",
+      "text": "I checked {target}. It came back {result}. Another fact to carry.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReportInvestigation.003",
+      "intent": "ReportInvestigation",
+      "text": "The result for {target} was {result}. Record it.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReportInvestigation.004",
+      "intent": "ReportInvestigation",
+      "text": "My investigation returned {result} on {target}. No ceremony needed.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReportInvestigation.005",
+      "intent": "ReportInvestigation",
+      "text": "Here's the finding: {target}, {result}. Make of it what you can.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.CallForTrial.001",
+      "intent": "CallForTrial",
+      "text": "Bring {target} to trial. We may as well ask properly.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.CallForTrial.002",
+      "intent": "CallForTrial",
+      "text": "I want a hearing for {target}. Another hard conversation.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.CallForTrial.003",
+      "intent": "CallForTrial",
+      "text": "Put {target} on trial. The room won't enjoy it.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.CallForTrial.004",
+      "intent": "CallForTrial",
+      "text": "{target} should give a formal defense. That's my request.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.CallForTrial.005",
+      "intent": "CallForTrial",
+      "text": "Open the hearing for {target}. Delaying the question won't soften it.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Deflect.001",
+      "intent": "Deflect",
+      "text": "Question {target} too. I'm not the whole room.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Deflect.002",
+      "intent": "Deflect",
+      "text": "Turn toward {target}. You can return to me afterward.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Deflect.003",
+      "intent": "Deflect",
+      "text": "Some of this attention belongs on {target}.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Deflect.004",
+      "intent": "Deflect",
+      "text": "Look beyond my name. Start with {target}.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.Deflect.005",
+      "intent": "Deflect",
+      "text": "Ask {target} the same questions. Scrutiny shouldn't settle in one chair.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.StaySilent.001",
+      "intent": "StaySilent",
+      "text": "I'll leave the room its silence.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.StaySilent.002",
+      "intent": "StaySilent",
+      "text": "Nothing from me. There will be other bad moments to speak.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.StaySilent.003",
+      "intent": "StaySilent",
+      "text": "I'm listening. That will have to count.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.StaySilent.004",
+      "intent": "StaySilent",
+      "text": "No addition. We can let a thought end.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.StaySilent.005",
+      "intent": "StaySilent",
+      "text": "I'll keep this turn empty.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ExpressFear.001",
+      "intent": "ExpressFear",
+      "text": "I don't expect the night to be kind.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ExpressFear.002",
+      "intent": "ExpressFear",
+      "text": "The danger is still here. So are we, for now.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ExpressFear.003",
+      "intent": "ExpressFear",
+      "text": "I'm afraid. It's become a fairly ordinary condition.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ExpressFear.004",
+      "intent": "ExpressFear",
+      "text": "I can face the dark without trusting it.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ExpressFear.005",
+      "intent": "ExpressFear",
+      "text": "We have a future to fear. That's better than no future, I suppose.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReactToRoleReveal.001",
+      "intent": "ReactToRoleReveal",
+      "text": "The role is known now. Too late for an easy conversation.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReactToRoleReveal.002",
+      "intent": "ReactToRoleReveal",
+      "text": "A reveal. Another reason to distrust our earlier certainty.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReactToRoleReveal.003",
+      "intent": "ReactToRoleReveal",
+      "text": "We know more about them now. They don't get to hear what we make of it.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReactToRoleReveal.004",
+      "intent": "ReactToRoleReveal",
+      "text": "Put the revealed role beside the old claims. See what remains standing.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReactToRoleReveal.005",
+      "intent": "ReactToRoleReveal",
+      "text": "That changes the record. The past stays just as unpleasant.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.LastWords.001",
+      "intent": "LastWords",
+      "text": "You'll have one less voice to argue with.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.LastWords.002",
+      "intent": "LastWords",
+      "text": "Remember the words if you forget the person.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.LastWords.003",
+      "intent": "LastWords",
+      "text": "This is where my part stops. Yours won't.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.LastWords.004",
+      "intent": "LastWords",
+      "text": "Make the next choice carefully. You can't return this one.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.LastWords.005",
+      "intent": "LastWords",
+      "text": "No grand ending. Just the end I got.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReportAction.001",
+      "intent": "ReportAction",
+      "text": "Here's the account. Nothing to brighten it. {result}",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReportAction.002",
+      "intent": "ReportAction",
+      "text": "The night left this to report. {result}",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReportAction.003",
+      "intent": "ReportAction",
+      "text": "I'll read what happened and leave it there. {result}",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReportAction.004",
+      "intent": "ReportAction",
+      "text": "Another record for the living. {result}",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.ReportAction.005",
+      "intent": "ReportAction",
+      "text": "Details, since we still need them. {result}",
+      "weight": 1,
+      "requiredTrait": "Grim"
     }
   ]
 }
