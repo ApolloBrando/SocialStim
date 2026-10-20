@@ -14,12 +14,16 @@ namespace SocialStim.Rules.Reasoning
         /// <inheritdoc />
         public GameCommand Speak(KnowledgeView knowledge, IRandomSource random)
         {
+            RoleSpec decoy = knowledge.RoleCatalog.Where(r => r.Faction == Faction.Town)
+                .OrderByDescending(r => r.Ability == AbilityKind.Investigate)
+                .ThenBy(r => r.Id.Value, System.StringComparer.Ordinal).FirstOrDefault();
+            RoleId claim = decoy?.Id ?? knowledge.OwnRole.Id;
             NightReport result = knowledge.PrivateResults.LastOrDefault(r => r.Kind == ReportKind.Investigation && r.Night == knowledge.Day - 1
                 && knowledge.Characters.Any(c => c.Id == r.Target && c.Alive));
             if (result != null && random.Next(100) < 70)
                 return GameCommand.Speak(SpeechIntent.ReportInvestigation, result.Target, faction: result.Alignment);
             if (knowledge.OwnRole.Faction == Faction.Antagonist && random.Next(100) < 25)
-                return GameCommand.Speak(SpeechIntent.ClaimRole, role: new RoleId("inspector"));
+                return GameCommand.Speak(SpeechIntent.ClaimRole, role: claim);
             KnownCharacter suspect = Suspect(knowledge);
             if (knowledge.OwnRole.Faction == Faction.Antagonist && knowledge.Day > 1 && suspect != null && random.Next(100) < 25)
                 return GameCommand.Speak(SpeechIntent.ReportInvestigation, suspect.Id, faction: Faction.Antagonist);
@@ -27,7 +31,7 @@ namespace SocialStim.Rules.Reasoning
                 return GameCommand.Speak(SpeechIntent.Accuse, suspect.Id);
             int choice = random.Next(4);
             if (choice == 0) return GameCommand.Speak(SpeechIntent.ClaimRole,
-                role: knowledge.OwnRole.Faction == Faction.Antagonist ? new RoleId("inspector") : knowledge.OwnRole.Id);
+                role: knowledge.OwnRole.Faction == Faction.Antagonist ? claim : knowledge.OwnRole.Id);
             if (choice == 1 && suspect != null) return GameCommand.Speak(SpeechIntent.Accuse, suspect.Id);
             return GameCommand.Speak(choice == 2 ? SpeechIntent.ExpressFear : SpeechIntent.StaySilent);
         }
@@ -66,7 +70,14 @@ namespace SocialStim.Rules.Reasoning
                 if (unknown.Count > 0) targets = unknown;
             }
             if (targets.Count == 0) return null;
-            if (knowledge.OwnRole.Ability == AbilityKind.Protect || knowledge.OwnRole.Ability == AbilityKind.Attack)
+            if (knowledge.OwnRole.Ability == AbilityKind.Protect)
+                return targets.OrderBy(c => c.Suspicion).ThenBy(c => c.Id.Value).First().Id;
+            if (knowledge.OwnRole.Ability == AbilityKind.Attack && knowledge.OwnRole.Faction == Faction.Town)
+            {
+                KnownCharacter suspect = targets.OrderByDescending(c => c.Suspicion).ThenBy(c => c.Id.Value).First();
+                return suspect.Suspicion >= 60 ? suspect.Id : (CharacterId?)null;
+            }
+            if (knowledge.OwnRole.Ability == AbilityKind.Attack)
                 return targets.OrderBy(c => c.Suspicion).ThenBy(c => c.Id.Value).First().Id;
             return targets.OrderByDescending(c => c.Suspicion).ThenBy(c => c.Id.Value).First().Id;
         }

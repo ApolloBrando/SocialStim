@@ -71,7 +71,14 @@ namespace SocialStim.Application.PresentationCues
             float revealed = Text == null ? 0 : !_settings.Enabled || _settings.InstantText ? Text.ElementCount
                 : Math.Min(Text.ElementCount, _elapsed * _speed + _revealOffset);
             _settings = settings;
-            if (!Busy) return;
+            if (!_active) return;
+            if (!Busy)
+            {
+                // Settled continuous effects still obey newly changed accessibility settings.
+                EffectFrame retained = _profile.Sample(_elapsed, settings);
+                Frame = new EffectFrame(retained.Shake, 0, 0, 0);
+                return;
+            }
             _speed = settings.ElementsPerSecond * _speedMultiplier;
             _revealOffset = revealed - _elapsed * _speed;
             if (!settings.Enabled || settings.InstantText)

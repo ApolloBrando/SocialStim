@@ -7,8 +7,6 @@ using SocialStim.Rules.Phases;
 using SocialStim.Rules.Roles;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem.UI;
 
 namespace SocialStim.Presentation.Text
 {
@@ -46,8 +44,7 @@ namespace SocialStim.Presentation.Text
                 TMP_FontAsset font = _font != null ? _font : TMP_Settings.defaultFontAsset;
                 if (font == null) throw new InvalidOperationException("Import TMP Essential Resources using Window > TextMeshPro, or assign a TMP font asset on GameBootstrap.");
                 _catalog.LoadRoles(); _catalog.LoadDialogue(); _catalog.LoadNames(); _catalog.LoadReasoning();
-                var events = new GameObject("Event System", typeof(EventSystem), typeof(InputSystemUIInputModule));
-                events.transform.SetParent(transform, false);
+                UiEventSystem.Ensure(transform);
                 _view = gameObject.AddComponent<TextGameView>();
                 _view.Initialize(font, _effects != null ? _effects.Load() : null, UiPreferences.Load());
                 _view.RestartRequested += ShowSetup;

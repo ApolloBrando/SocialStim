@@ -48,6 +48,8 @@ namespace SocialStim.Presentation.Text
         private ScreenEffectOverlay _screenEffects;
         private Action<DisplayAcknowledgement> _onAcknowledged;
         private Button _skip;
+        private Button _effectsControl, _motionControl, _flashControl, _instantControl;
+        private Button _intensityControl, _speedControl, _optionsControl;
         private bool _wasDisplaying;
         private TextMeshProUGUI _claimSummary;
         private readonly Dictionary<CharacterId, string> _visibleClaims = new Dictionary<CharacterId, string>();
@@ -165,14 +167,14 @@ namespace SocialStim.Presentation.Text
             displayLayout.padding = new RectOffset(12, 12, 12, 12); displayLayout.spacing = 6;
             displayLayout.childControlWidth = true; displayLayout.childControlHeight = true;
             displayLayout.childForceExpandHeight = false;
-            Control(_displayOptionsPanel, "Effects: on", () => ChangeSettings(enabled: !_settings.Enabled));
-            Control(_displayOptionsPanel, "Motion: reduced", () => ChangeSettings(reduced: !_settings.ReducedMotion));
-            Control(_displayOptionsPanel, "Flash: off", () => ChangeSettings(flashes: !_settings.Flashes));
-            Control(_displayOptionsPanel, "Text: animated", () => ChangeSettings(instant: !_settings.InstantText));
-            Control(_displayOptionsPanel, "Intensity: 50%", () => ChangeSettings(intensity: _settings.Intensity >= 1 ? 0 : Mathf.Min(1, _settings.Intensity + 0.5f)));
-            Control(_displayOptionsPanel, "Speed: " + _settings.ElementsPerSecond.ToString("0"), () =>
+            _effectsControl = Control(_displayOptionsPanel, "Effects: on", () => ChangeSettings(enabled: !_settings.Enabled));
+            _motionControl = Control(_displayOptionsPanel, "Motion: reduced", () => ChangeSettings(reduced: !_settings.ReducedMotion));
+            _flashControl = Control(_displayOptionsPanel, "Flash: off", () => ChangeSettings(flashes: !_settings.Flashes));
+            _instantControl = Control(_displayOptionsPanel, "Text: animated", () => ChangeSettings(instant: !_settings.InstantText));
+            _intensityControl = Control(_displayOptionsPanel, "Intensity: 50%", () => ChangeSettings(intensity: _settings.Intensity >= 1 ? 0 : Mathf.Min(1, _settings.Intensity + 0.5f)));
+            _speedControl = Control(_displayOptionsPanel, "Speed: " + _settings.ElementsPerSecond.ToString("0"), () =>
                 ChangeSettings(speed: _settings.ElementsPerSecond < 84 ? 84 : _settings.ElementsPerSecond < 168 ? 168 : 28));
-            Control(footer, "Display options", ToggleDisplayOptions);
+            _optionsControl = Control(footer, "Display options", ToggleDisplayOptions);
             Control(_displayOptionsPanel, "Reset display defaults", ResetSettings);
             _displayOptionsPanel.gameObject.SetActive(false);
             RefreshSettingLabels();
@@ -329,20 +331,22 @@ namespace SocialStim.Presentation.Text
                 flashes ?? _settings.Flashes, intensity ?? _settings.Intensity, instant ?? _settings.InstantText, speed ?? _settings.ElementsPerSecond);
             _textEffects.SetSettings(_settings);
             _playback.Reconfigure(_settings);
-            _textEffects.SetSemanticColors(_settings.Enabled);
-            SkipAll();
-            _playback.Cancel();
+            // Preferences must not acknowledge or consume the queued conversation.
+            // Reconfigure preserves reveal position; the next Update pumps only completed lines.
+            if (_request != null)
+                _textEffects.Apply(_currentStart + _playback.VisibleUtf16, _playback.Frame, Time.unscaledTime);
+            _screenEffects.Apply(_playback.Frame, _palette);
             SettingsChanged?.Invoke(_settings);
             RefreshSettingLabels();
         }
         private void RefreshSettingLabels()
         {
-            SetControl(2, "Effects: " + (_settings.Enabled ? "on" : "off"));
-            SetControl(3, "Motion: " + (_settings.ReducedMotion ? "reduced" : "full"));
-            SetControl(4, "Flash: " + (_settings.Flashes ? "on" : "off"));
-            SetControl(5, "Text: " + (_settings.InstantText ? "instant" : "animated"));
-            SetControl(6, "Intensity: " + (_settings.Intensity * 100).ToString("0") + "%");
-            SetControl(7, "Speed: " + _settings.ElementsPerSecond.ToString("0"));
+            SetControl(_effectsControl, "Effects: " + (_settings.Enabled ? "on" : "off"));
+            SetControl(_motionControl, "Motion: " + (_settings.ReducedMotion ? "reduced" : "full"));
+            SetControl(_flashControl, "Flash: " + (_settings.Flashes ? "on" : "off"));
+            SetControl(_instantControl, "Text: " + (_settings.InstantText ? "instant" : "animated"));
+            SetControl(_intensityControl, "Intensity: " + (_settings.Intensity * 100).ToString("0") + "%");
+            SetControl(_speedControl, "Speed: " + _settings.ElementsPerSecond.ToString("0"));
         }
         private void ResetSettings()
         {
@@ -354,11 +358,11 @@ namespace SocialStim.Presentation.Text
         {
             bool open = !_displayOptionsPanel.gameObject.activeSelf;
             _displayOptionsPanel.gameObject.SetActive(open);
-            SetControl(8, open ? "Hide options" : "Display options");
-            if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(_controls[open ? 2 : 8].gameObject);
+            SetControl(_optionsControl, open ? "Hide options" : "Display options");
+            if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject((open ? _effectsControl : _optionsControl).gameObject);
         }
 
-        private void SetControl(int index, string text) => _controls[index].GetComponent<ChoiceFocusIndicator>().SetText(text);
+        private static void SetControl(Button button, string text) => button.GetComponent<ChoiceFocusIndicator>().SetText(text);
         private Button Control(Transform parent, string label, Action selected)
         {
             Button button = TextUiFactory.Button(parent, _font, label, 38);
