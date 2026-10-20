@@ -22,6 +22,7 @@ namespace SocialStim.Presentation.Text
     public sealed class TextGameView : MonoBehaviour, IGameView, IPlayerInputProvider
     {
         private TMP_FontAsset _font;
+        private TextInputActions _input;
         private TextTemplates _text;
         private TextMeshProUGUI _header, _speaker, _line, _hint;
         private RectTransform _choices, _actions, _roster;
@@ -65,7 +66,7 @@ namespace SocialStim.Presentation.Text
         public bool IsDisplaying => _current != null || _request != null && _next < _request.View.Transcript.Count;
         /// <summary>Builds reusable screen surfaces; no scene YAML is needed.</summary>
         public void Initialize(TMP_FontAsset font, IReadOnlyDictionary<PresentationCue, EffectProfile> profiles = null,
-            EffectsSettings initialSettings = null, GlyphStyleCatalog styles = null, TextTemplates text = null)
+            EffectsSettings initialSettings = null, GlyphStyleCatalog styles = null, TextTemplates text = null, InputActionReference advanceAction = null, InputActionReference cancelAction = null)
         {
             _text = text ?? SocialStim.Data.Definitions.GameText.Load();
             _font = font; _profiles = profiles ?? DefaultCueProfiles.Create(); _styles = styles ?? GlyphStyleCatalog.Default;
@@ -90,6 +91,7 @@ namespace SocialStim.Presentation.Text
             _speaker = TextUiFactory.Text("Speaker", canvas.transform, font, 20); _speaker.fontStyle = FontStyles.Bold;
             TextUiFactory.Fill(_speaker.rectTransform, new Vector2(0.08f, 0.69f), new Vector2(0.92f, 0.77f), Vector2.zero, Vector2.zero);
             _line = TextUiFactory.Text("Current line", canvas.transform, font, 22);
+            _line.raycastTarget = true; _line.gameObject.AddComponent<CurrentLinePointer>().Initialize(AdvanceLine);
             TextUiFactory.Fill(_line.rectTransform, new Vector2(0.08f, 0.36f), new Vector2(0.92f, 0.69f), Vector2.zero, Vector2.zero);
             _renderer = gameObject.AddComponent<TextEffectRenderer>(); _renderer.Initialize(_line);
             _advance = Button(canvas.transform, _text.Render("button.continue"), AdvanceLine, 42);
@@ -112,6 +114,9 @@ namespace SocialStim.Presentation.Text
             _settingsPanel.Initialize(canvas.transform, font, _text, p => { ApplyPreferences(p); PreferencesChanged?.Invoke(p); });
             _drawer = gameObject.AddComponent<AuxiliaryDrawer>();
             _drawer.Initialize(canvas.transform, font, _text, () => _settingsPanel.Toggle(_preferences), () => RestartRequested?.Invoke());
+            _input = new TextInputActions(advanceAction, cancelAction);
+            _input.Advance += AdvanceLine; _input.Cancel += CloseModal;
+            if (isActiveAndEnabled) _input.Enable();
             Palette(false); ApplyPreferences(_preferences);
         }
         /// <summary>Shows role selection for a fresh run; no saved-run Continue action is implied.</summary>
@@ -294,11 +299,6 @@ namespace SocialStim.Presentation.Text
         {
             if (_request == null) return;
             bool modal = _drawer.IsOpen || _settingsPanel.IsOpen;
-            if (!modal && Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame) AdvanceLine();
-            if (!modal && Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame && _current != null
-                && RectTransformUtility.RectangleContainsScreenPoint(_line.rectTransform, Mouse.current.position.ReadValue())) AdvanceLine();
-            if (!modal && Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame && _current != null
-                && RectTransformUtility.RectangleContainsScreenPoint(_line.rectTransform, Touchscreen.current.primaryTouch.position.ReadValue())) AdvanceLine();
             if (!modal)
             {
                 _playback.Tick(Time.unscaledDeltaTime);
@@ -329,6 +329,17 @@ namespace SocialStim.Presentation.Text
             _cues = new VisibleCueResolver(); Clear(_choiceButtons); Clear(_actionButtons); _renderer.StopEffects();
             foreach (var card in _cards.Values) { card.gameObject.SetActive(false); Destroy(card.gameObject); } _cards.Clear();
         }
-        private void OnDisable() { if (_renderer != null) ResetDisplay(); }
+        private void CloseModal()
+        {
+            _readyFrame = Time.frameCount;
+            if (_settingsPanel.IsOpen) _settingsPanel.Close(); else if (_drawer.IsOpen) _drawer.Close();
+        }
+        private void OnEnable() => _input?.Enable();
+        private void OnDisable() { _input?.Disable(); if (_renderer != null) ResetDisplay(); }
+        private void OnDestroy()
+        {
+            if (_input == null) return;
+            _input.Advance -= AdvanceLine; _input.Cancel -= CloseModal; _input.Dispose(); _input = null;
+        }
     }
 }

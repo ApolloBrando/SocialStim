@@ -20,6 +20,7 @@
     <Compile Include="../../Assets/_Project/Tests/PlayMode/PresenterDisplayTests.cs" />
     <Compile Include="../../Assets/_Project/Tests/PlayMode/CopyFixture.cs" />
     <None Include="../../Assets/_Project/Data/Dialogue/Resources/SocialStimText.json" Link="SocialStimText.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../Docs/DIALOGUE_CATALOGUE.md" Link="DIALOGUE_CATALOGUE.md" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../Assets/_Project/Data/Dialogue/StarterDialogue.json" Link="StarterDialogue.json" CopyToOutputDirectory="PreserveNewest" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageReference Include="NUnit" Version="$(NUnitVersion)" />

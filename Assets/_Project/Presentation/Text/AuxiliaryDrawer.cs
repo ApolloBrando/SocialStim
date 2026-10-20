@@ -6,7 +6,6 @@ using SocialStim.Rules.Phases;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace SocialStim.Presentation.Text
@@ -81,7 +80,6 @@ namespace SocialStim.Presentation.Text
         private void Update()
         {
             if (!IsOpen) return;
-            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) { Close(); return; }
             var selected = EventSystem.current?.currentSelectedGameObject;
             if (selected == null || !selected.transform.IsChildOf(_root)) EventSystem.current?.SetSelectedGameObject(_close.gameObject);
         }

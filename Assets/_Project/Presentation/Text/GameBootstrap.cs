@@ -8,8 +8,7 @@ using SocialStim.Rules.Phases;
 using SocialStim.Rules.Roles;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem.UI;
+using UnityEngine.InputSystem;
 
 namespace SocialStim.Presentation.Text
 {
@@ -20,6 +19,10 @@ namespace SocialStim.Presentation.Text
         [SerializeField] private TMP_FontAsset _font;
         [SerializeField] private CueProfileDefinition _effects;
         [SerializeField] private TextStyleDefinition _textStyles;
+        [SerializeField, Tooltip("Optional Input System action; cloned for the text view. Defaults to Space.")]
+        private InputActionReference _advanceAction;
+        [SerializeField, Tooltip("Optional close-modal action. Defaults to Escape / gamepad B.")]
+        private InputActionReference _cancelAction;
         private SocialStim.Rules.Dialogue.TextTemplates _text;
         private bool _preferencesDirty;
         private float _saveAt;
@@ -39,11 +42,10 @@ namespace SocialStim.Presentation.Text
                 TMP_FontAsset font = _font != null ? _font : TMP_Settings.defaultFontAsset;
                 if (font == null) throw new InvalidOperationException("Import TMP Essential Resources using Window > TextMeshPro, or assign a TMP font asset on GameBootstrap.");
                 _catalog.LoadRoles(); _catalog.LoadDialogue(); _catalog.LoadNames(); _catalog.LoadReasoning();
-                var events = new GameObject("Event System", typeof(EventSystem), typeof(InputSystemUIInputModule));
-                events.transform.SetParent(transform, false);
+                UiEventSystem.Ensure(transform);
                 _view = gameObject.AddComponent<TextGameView>();
                 _preferences = UiPreferences.Load(); _text = GameText.Load();
-                _view.Initialize(font, _effects != null ? _effects.Load() : null, _preferences.Effects, _textStyles != null ? _textStyles.Load() : null, _text);
+                _view.Initialize(font, _effects != null ? _effects.Load() : null, _preferences.Effects, _textStyles != null ? _textStyles.Load() : null, _text, _advanceAction, _cancelAction);
                 _view.ApplyPreferences(_preferences);
                 _view.RestartRequested += ShowSetup;
                 _view.PreferencesChanged += SavePreferences;

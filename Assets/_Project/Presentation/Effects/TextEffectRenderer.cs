@@ -2,12 +2,15 @@ using System;
 using SocialStim.Application.PresentationCues;
 using TMPro;
 using UnityEngine;
+using Unity.Profiling;
 
 namespace SocialStim.Presentation.Effects
 {
     /// <summary>Cached TMP span renderer. Parsing/buffer growth happen at document/layout boundaries, never during Apply.</summary>
     public sealed class TextEffectRenderer : MonoBehaviour
     {
+        private static readonly ProfilerMarker ApplyMarker = new ProfilerMarker("SocialStim.TextEffects.Apply");
+        private static readonly ProfilerMarker CaptureMarker = new ProfilerMarker("SocialStim.TextEffects.Capture");
         private TextMeshProUGUI _label;
         private SemanticText _document;
         private TextPalette _palette;
@@ -43,23 +46,29 @@ namespace SocialStim.Presentation.Effects
         public void Apply(int visibleUtf16, EffectFrame frame, float time)
         {
             if (_label == null || _document == null) return;
-            _visible = visibleUtf16; _frame = frame; _time = time;
-            Paint(_label.textInfo);
-            _label.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices | TMP_VertexDataUpdateFlags.Colors32);
+            using (ApplyMarker.Auto())
+            {
+                _visible = visibleUtf16; _frame = frame; _time = time;
+                Paint(_label.textInfo);
+                _label.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices | TMP_VertexDataUpdateFlags.Colors32);
+            }
         }
         private void Capture(TMP_TextInfo info)
         {
             if (_document == null) return;
-            if (_vertices.Length < info.meshInfo.Length) Array.Resize(ref _vertices, info.meshInfo.Length);
-            for (int mesh = 0; mesh < info.meshInfo.Length; mesh++)
+            using (CaptureMarker.Auto())
             {
-                Vector3[] source = info.meshInfo[mesh].vertices;
-                if (_vertices[mesh] == null || _vertices[mesh].Length < source.Length) _vertices[mesh] = new Vector3[source.Length];
-                Array.Copy(source, _vertices[mesh], source.Length);
+                if (_vertices.Length < info.meshInfo.Length) Array.Resize(ref _vertices, info.meshInfo.Length);
+                for (int mesh = 0; mesh < info.meshInfo.Length; mesh++)
+                {
+                    Vector3[] source = info.meshInfo[mesh].vertices;
+                    if (_vertices[mesh] == null || _vertices[mesh].Length < source.Length) _vertices[mesh] = new Vector3[source.Length];
+                    Array.Copy(source, _vertices[mesh], source.Length);
+                }
+                if (_styles.Length < info.characterCount) Array.Resize(ref _styles, info.characterCount);
+                for (int i = 0; i < info.characterCount; i++) _styles[i] = _document.StyleAt(info.characterInfo[i].index);
+                Paint(info);
             }
-            if (_styles.Length < info.characterCount) Array.Resize(ref _styles, info.characterCount);
-            for (int i = 0; i < info.characterCount; i++) _styles[i] = _document.StyleAt(info.characterInfo[i].index);
-            Paint(info);
         }
         private void Paint(TMP_TextInfo info)
         {

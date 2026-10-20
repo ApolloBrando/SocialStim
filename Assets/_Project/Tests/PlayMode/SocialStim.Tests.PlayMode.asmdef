@@ -7,7 +7,8 @@
     "GUID:cabe4a88afda5ac893854d9b44e4f96c",
     "GUID:5297d539b8915ab99a2c478cef8fdd3c",
     "UnityEngine.UI",
-    "Unity.TextMeshPro"
+    "Unity.TextMeshPro",
+    "Unity.InputSystem"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

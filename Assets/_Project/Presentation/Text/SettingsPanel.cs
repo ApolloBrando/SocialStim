@@ -5,7 +5,6 @@ using SocialStim.Presentation.Effects;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace SocialStim.Presentation.Text
@@ -81,7 +80,6 @@ namespace SocialStim.Presentation.Text
         private void Update()
         {
             if (!_root.gameObject.activeSelf) return;
-            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) { Close(); return; }
             // Keep automatic navigation inside the modal even if a control behind it was selected externally.
             GameObject selected = EventSystem.current?.currentSelectedGameObject;
             if (selected == null || !selected.transform.IsChildOf(_root)) EventSystem.current?.SetSelectedGameObject(_close.gameObject);

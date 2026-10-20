@@ -20,7 +20,7 @@ EXPECTED_DEPENDENCIES = {
         "SocialStim.Rules", "SocialStim.Application", "SocialStim.Data",
     },
     "SocialStim.Editor": {
-        "SocialStim.Rules", "SocialStim.Application", "SocialStim.Data",
+        "SocialStim.Rules", "SocialStim.Application", "SocialStim.Data", "SocialStim.Presentation",
     },
     "SocialStim.Tests.EditMode": {
         "SocialStim.Rules", "SocialStim.Application", "SocialStim.Data",
@@ -134,7 +134,7 @@ def validate() -> list[str]:
                 external.add(reference)
         require(dependencies == EXPECTED_DEPENDENCIES.get(name), f"Forbidden/missing project dependency: {name}")
         expected_external = PACKAGE_ASSEMBLIES if name == "SocialStim.Presentation" else (
-            {"UnityEngine.UI", "Unity.TextMeshPro"} if name == "SocialStim.Tests.PlayMode" else set()
+            {"UnityEngine.UI", "Unity.TextMeshPro", "Unity.InputSystem"} if name == "SocialStim.Tests.PlayMode" else set()
         )
         require(external == expected_external, f"Unexpected/missing package assembly reference: {name}")
         engine_free = name in {"SocialStim.Rules", "SocialStim.Application"}
