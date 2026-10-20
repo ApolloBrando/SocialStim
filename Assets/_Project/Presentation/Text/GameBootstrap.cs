@@ -7,6 +7,8 @@ using SocialStim.Rules.Phases;
 using SocialStim.Rules.Roles;
 using TMPro;
 using UnityEngine;
+using SocialStim.Rules.Night;
+using System.Collections.Generic;
 
 namespace SocialStim.Presentation.Text
 {
@@ -31,6 +33,13 @@ namespace SocialStim.Presentation.Text
         [SerializeField, Min(0)] private int _participantCount = 7;
         private TextGameView _view;
         private GamePresenter _presenter;
+        private RunSession _activeSession;
+
+        private void Awake()
+        {
+            QualitySettings.vSyncCount = 0;
+            UnityEngine.Application.targetFrameRate = 60;
+        }
 
         private void Start()
         {
@@ -46,7 +55,11 @@ namespace SocialStim.Presentation.Text
                 _catalog.LoadRoles(); _catalog.LoadDialogue(); _catalog.LoadNames(); _catalog.LoadReasoning();
                 UiEventSystem.Ensure(transform);
                 _view = gameObject.AddComponent<TextGameView>();
-                _view.Initialize(font, _effects != null ? _effects.Load() : null, UiPreferences.Load(), _catalog.LoadInteractionLabels());
+                Func<IReadOnlyList<NightDebugRecord>> diagnostics = null;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                diagnostics = () => _activeSession?.GetNightDiagnostics() ?? Array.Empty<NightDebugRecord>();
+#endif
+                _view.Initialize(font, _effects != null ? _effects.Load() : null, UiPreferences.Load(), _catalog.LoadInteractionLabels(), _catalog.LoadGameText(), diagnostics);
                 _view.RestartRequested += ShowSetup;
                 _view.SettingsChanged += SavePreferences;
                 ShowSetup();
@@ -58,6 +71,7 @@ namespace SocialStim.Presentation.Text
         private void ShowSetup()
         {
             _presenter?.Dispose(); _presenter = null;
+            _activeSession = null;
             _view.ShowSetup(_catalog.LoadRoles(), (_participantCount > 0 ? _participantCount.ToString() : _catalog.LoadSetup()?.Slots.Count.ToString() ?? "7")
                 + " participants · " + (_randomSeed ? "Random seed" : "Seed " + unchecked((uint)_fixedSeed)), Begin);
         }
@@ -72,9 +86,10 @@ namespace SocialStim.Presentation.Text
                     _votingMode == VotingMode.Trial ? _discussionRounds : _groupDiscussionRounds, _revealOnDeath,
                     votingMode: _votingMode, playerWindowsPerRound: _playerWindowsPerRound,
                     allowAbstain: _allowAbstain, revoteTies: _revoteTies, lastWords: _lastWords);
-                var session = RunFactory.Create(options, roles, _catalog.LoadNames(), _catalog.LoadDialogue(), reasoning: _catalog.LoadReasoning(), setup: _catalog.LoadSetup(_participantCount));
+                var session = RunFactory.Create(options, roles, _catalog.LoadNames(), _catalog.LoadDialogue(), reasoning: _catalog.LoadReasoning(), setup: _catalog.LoadSetup(_participantCount), text: _catalog.LoadGameText());
+                _activeSession = session;
                 if (_votingMode == VotingMode.Gnosia) session.TrySubmit(SocialStim.Rules.Commands.GameCommand.Continue(), out _);
-                _presenter = new GamePresenter(new GameController(session, roles, _catalog.LoadInteractionLabels()), _view, _view);
+                _presenter = new GamePresenter(new GameController(session, roles, _catalog.LoadInteractionLabels(), _catalog.LoadGameText()), _view, _view);
             }
             catch (Exception e) when (e is ArgumentException || e is InvalidOperationException || e is OverflowException)
             { _view.ShowInputError("Invalid setup: " + e.Message); }

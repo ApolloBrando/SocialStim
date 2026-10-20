@@ -88,7 +88,7 @@ fallback for each action in every voice represented in that file.
 | Field | Meaning |
 | --- | --- |
 | `id` | Globally unique stable ID; preserve when revising text |
-| `intent` | One of the 16 existing SpeechIntent names |
+| `intent` | One of the existing SpeechIntent names |
 | `text` | Authored text, with registered placeholders only |
 | `weight` | Integer 1–1000 |
 | `requiredTrait` | Exactly one NPC trait; omit or use None for player-only prose |
@@ -211,3 +211,10 @@ the fewest run-wide uses. It never discards role/evidence conditions. After all
 currently eligible lines have been used it begins another cycle, with a recent
 history of twelve lines. A pool of eight still repeats after eight uses; 970
 records are divided across voices and actions, not available to every speaker.
+
+## Clarity and structured reports
+
+See DIALOGUE_INTENTS.md for the meaning of each action and the 280-line clarity pass.
+Live previous-night reports use GameText.json and NightReportFormatter, preserving the
+recorded action, named target and actual delivered findings rather than selecting a
+random report line. NPC and player personality dialogue remains in the eight files above.

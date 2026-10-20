@@ -4,7 +4,7 @@
     {
       "id": "starter.social.accuse.aggressive",
       "intent": "Accuse",
-      "text": "{target}, answer the accusation directly. I will stand behind my challenge.",
+      "text": "I suspect {target}, and I'm standing behind that accusation. Please answer it directly.",
       "weight": 3,
       "conditions": [
         {
@@ -27,7 +27,7 @@
     {
       "id": "starter.social.vouch.claim",
       "intent": "Vouch",
-      "text": "Let {target} back that claim up. I will make sure they get a hearing.",
+      "text": "I'm defending {target}. Give them a fair chance to explain their role claim.",
       "weight": 3,
       "conditions": [
         {
@@ -46,7 +46,7 @@
     {
       "id": "npc.brave.Accuse.001",
       "intent": "Accuse",
-      "text": "{target}, face the suspicion directly. I'm putting your name forward.",
+      "text": "I'm accusing {target}. I want to hear their answer directly.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -60,7 +60,7 @@
     {
       "id": "npc.brave.Accuse.003",
       "intent": "Accuse",
-      "text": "Look here, {target}. I want your account examined.",
+      "text": "I suspect {target}. Let's examine that suspicion openly.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -74,7 +74,7 @@
     {
       "id": "npc.brave.Accuse.005",
       "intent": "Accuse",
-      "text": "{target}, I won't wave you through while I still have doubts.",
+      "text": "I don't trust {target} yet. I won't pretend otherwise.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -102,7 +102,7 @@
     {
       "id": "npc.brave.Accuse.009",
       "intent": "Accuse",
-      "text": "I'm prepared to be challenged on this: watch {target}.",
+      "text": "I suspect {target}, and I'm prepared to defend that judgement.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -123,91 +123,91 @@
     {
       "id": "npc.brave.Accuse.012",
       "intent": "Accuse",
-      "text": "I'll make the uncomfortable call. {target} needs closer attention.",
+      "text": "I'll say it plainly: I want {target} treated as a suspect.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Defend.001",
       "intent": "Defend",
-      "text": "Challenge my account directly. I can answer for myself.",
+      "text": "I deny the accusation. Ask your questions and let me answer.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Defend.002",
       "intent": "Defend",
-      "text": "I reject that accusation. Give me the case, and I'll meet it.",
+      "text": "I reject that case against me. Suspicion isn't proof.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Defend.003",
       "intent": "Defend",
-      "text": "I'm still here. You don't get to decide around me.",
+      "text": "You're accusing the wrong person. I'm here to defend myself.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Defend.004",
       "intent": "Defend",
-      "text": "Hear my defense before you turn pressure into a verdict.",
+      "text": "I dispute the charge. Hear my defense before you reach a verdict.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Defend.005",
       "intent": "Defend",
-      "text": "Say exactly what you're accusing me of. I'll address it.",
+      "text": "I deny it. Tell me exactly what you think I've done.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Defend.006",
       "intent": "Defend",
-      "text": "I can stand scrutiny. That does not mean your suspicion is correct.",
+      "text": "I can stand scrutiny. That doesn't make your accusation correct.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Defend.007",
       "intent": "Defend",
-      "text": "Hold your vote. I'm not finished answering.",
+      "text": "Don't vote against me on an unproven accusation. Hear me out.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Defend.008",
       "intent": "Defend",
-      "text": "You want me to fold under an accusation. I won't.",
+      "text": "I won't accept blame just because you press harder.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Defend.009",
       "intent": "Defend",
-      "text": "Let me defend my position on its merits.",
+      "text": "I'm defending myself. Judge the accusation on evidence, not volume.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Defend.010",
       "intent": "Defend",
-      "text": "I'll face every question you put to me. Start with one.",
+      "text": "I reject your conclusion about me. I'll face your questions directly.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Defend.011",
       "intent": "Defend",
-      "text": "I'm defending myself, and I expect a fair hearing.",
+      "text": "I deny the accusation, and I expect a fair hearing.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Defend.012",
       "intent": "Defend",
-      "text": "I will not accept blame simply because the room demands a name.",
+      "text": "I'm not your convenient suspect. You still need to prove the case against me.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -242,7 +242,7 @@
     {
       "id": "npc.brave.ClaimRole.005",
       "intent": "ClaimRole",
-      "text": "I'll be the one to say it first: I'm the {role}.",
+      "text": "I'm claiming {role}. I'll answer questions about that claim.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -305,7 +305,7 @@
     {
       "id": "npc.brave.Agree.004",
       "intent": "Agree",
-      "text": "Stay with that point, {target}. You've got my support.",
+      "text": "I support the point {target} just made. You've got my agreement.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -340,7 +340,7 @@
     {
       "id": "npc.brave.Agree.009",
       "intent": "Agree",
-      "text": "My answer is yes, {target}. I share your view.",
+      "text": "I agree with {target}'s view on this question.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -564,42 +564,42 @@
     {
       "id": "npc.brave.Vouch.001",
       "intent": "Vouch",
-      "text": "Give {target} a fair hearing. I'll stand with them while they speak.",
+      "text": "I'm defending {target}. Give them a fair hearing.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Vouch.002",
       "intent": "Vouch",
-      "text": "I support {target}, and I'm not whispering it.",
+      "text": "I support {target}. I won't let that be mistaken for silence.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Vouch.003",
       "intent": "Vouch",
-      "text": "{target} has my backing for now. Challenge that if you need to.",
+      "text": "{target} has my backing for now. Hear their answer.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Vouch.004",
       "intent": "Vouch",
-      "text": "I'm willing to put my judgement behind {target}.",
+      "text": "I don't support blaming {target}. I'll stand behind that position.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Vouch.005",
       "intent": "Vouch",
-      "text": "Don't crowd {target} out. Let them answer on their own feet.",
+      "text": "I'm on {target}'s side of this. Let them defend themselves.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Vouch.006",
       "intent": "Vouch",
-      "text": "I'll defend {target}'s right to remain in this discussion.",
+      "text": "Don't rush to condemn {target}. I'm speaking in their defense.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -676,35 +676,35 @@
     {
       "id": "npc.brave.Deflect.001",
       "intent": "Deflect",
-      "text": "Turn these questions toward {target} too. Don't leave gaps in the scrutiny.",
+      "text": "I reject the accusation against me. I'm accusing {target} instead.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Deflect.002",
       "intent": "Deflect",
-      "text": "I can answer, but {target} also needs to face the room.",
+      "text": "I deny the charge. Put the same scrutiny on {target}; I suspect them.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Deflect.003",
       "intent": "Deflect",
-      "text": "Challenge {target} with the same force you're bringing to me.",
+      "text": "I'm defending myself and challenging {target}. Hear both points clearly.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Deflect.004",
       "intent": "Deflect",
-      "text": "Widen your focus. I want {target} questioned now.",
+      "text": "Don't treat me as guilty. I want {target} to answer my accusation.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Deflect.005",
       "intent": "Deflect",
-      "text": "Move the attention to {target} for a turn. They need to answer as well.",
+      "text": "I dispute the case against me. My challenge is to {target}.",
       "weight": 1,
       "requiredTrait": "Brave"
     },

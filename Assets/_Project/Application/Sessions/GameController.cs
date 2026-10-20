@@ -15,10 +15,11 @@ namespace SocialStim.Application.Sessions
         private readonly RunSession _session;
         private readonly InteractionLabels _copy;
         private readonly IReadOnlyList<RoleSpec> _catalog;
+        private readonly GameText _text;
 
         /// <summary>Wires an isolated session to the public role catalog used for claims.</summary>
-        public GameController(RunSession session, IEnumerable<RoleSpec> catalog, InteractionLabels copy = null)
-        { _copy = copy ?? InteractionLabels.Default; _session = session ?? throw new ArgumentNullException(nameof(session)); _catalog = catalog.ToList().AsReadOnly(); }
+        public GameController(RunSession session, IEnumerable<RoleSpec> catalog, InteractionLabels copy = null, GameText text = null)
+        { _text = text ?? GameText.Default; _copy = copy ?? InteractionLabels.Default; _session = session ?? throw new ArgumentNullException(nameof(session)); _catalog = catalog.ToList().AsReadOnly(); }
 
         /// <summary>Builds choices without consulting hidden assignments or NPC scores.</summary>
         public PlayerInputRequest Request()
@@ -111,8 +112,14 @@ namespace SocialStim.Application.Sessions
                 && !view.Characters.Any(c => c.Alive && c.ClaimedRole == r.Id)).OrderBy(r => r.Name, StringComparer.Ordinal))
                 if (!view.Characters.First(c => c.Id == view.PlayerId).ClaimedRole.HasValue)
                     add(role.Name, "", GameCommand.Speak(SpeechIntent.ClaimRole, role: role.Id));
-            if (view.Phase == GamePhase.Discussion && !view.RespondTo.HasValue && view.CanReportAction && view.OwnRole.CanClaimTruthfully)
-                add(_copy.Report, "", GameCommand.ReportLastAction());
+            if (view.Phase == GamePhase.Discussion && view.CanReportAction)
+            {
+                RoleSpec asserted = _catalog.First(r => r.Id == view.Characters.First(c => c.Id == view.PlayerId).ClaimedRole);
+                if (view.OwnRole.CanBluff && asserted.Ability == AbilityKind.Investigate && view.LastNightAction?.Target != null)
+                    foreach (Faction faction in Enum.GetValues(typeof(Faction)))
+                        add(_text.Format("ui.giveReport") + " — " + faction, "", GameCommand.ReportLastAction(faction));
+                else add(_text.Format("ui.giveReport"), "", GameCommand.ReportLastAction());
+            }
         }
     }
 }

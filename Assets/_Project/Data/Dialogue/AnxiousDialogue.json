@@ -4,7 +4,7 @@
     {
       "id": "npc.anxious.Accuse.001",
       "intent": "Accuse",
-      "text": "Um, {target}... I keep coming back to you. Sorry.",
+      "text": "Um, {target}... I suspect you. I'm sorry, but I need to say it.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
@@ -18,21 +18,21 @@
     {
       "id": "npc.anxious.Accuse.003",
       "intent": "Accuse",
-      "text": "I hate saying names. {target}, yours keeps getting stuck.",
+      "text": "I hate accusing anyone, but I suspect {target}.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Accuse.004",
       "intent": "Accuse",
-      "text": "Could we watch {target}? Just... carefully, please.",
+      "text": "I don't trust {target} yet. Could we question them carefully?",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Accuse.005",
       "intent": "Accuse",
-      "text": "Sorry, {target}. You make me think we're missing something dangerous.",
+      "text": "Sorry, {target}. I think you might be a threat.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
@@ -46,14 +46,14 @@
     {
       "id": "npc.anxious.Accuse.007",
       "intent": "Accuse",
-      "text": "What if it's {target} and we just let it happen?",
+      "text": "I'm worried {target} could be the threat. We shouldn't ignore that possibility.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Accuse.008",
       "intent": "Accuse",
-      "text": "This might sound awful. I think {target} needs a closer look.",
+      "text": "This feels awful to say, but I'm accusing {target}.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
@@ -67,7 +67,7 @@
     {
       "id": "npc.anxious.Accuse.010",
       "intent": "Accuse",
-      "text": "Please don't get angry, {target}, but I'm questioning your side of this.",
+      "text": "Please don't be angry, {target}. I don't think we should trust you yet.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
@@ -88,77 +88,77 @@
     {
       "id": "npc.anxious.Defend.001",
       "intent": "Defend",
-      "text": "Wait, me? I... please let me get the words straight.",
+      "text": "Wait, me? I deny that accusation. Please let me explain.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Defend.002",
       "intent": "Defend",
-      "text": "I'm sorry, but you've got the wrong person. I think... no, I know that.",
+      "text": "I'm sorry, but you've accused the wrong person. I'm sure of that much.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Defend.003",
       "intent": "Defend",
-      "text": "Could you not decide while I'm still trying to explain?",
+      "text": "I don't accept the accusation against me. Could you hear my side before deciding?",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Defend.004",
       "intent": "Defend",
-      "text": "I sound guilty when I'm scared. That doesn't make the accusation true.",
+      "text": "I'm frightened, not guilty just because I sound frightened.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Defend.005",
       "intent": "Defend",
-      "text": "Please, I'm asking for one moment before this becomes a verdict.",
+      "text": "Please don't condemn me. Suspicion alone doesn't prove I did anything.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Defend.006",
       "intent": "Defend",
-      "text": "No, no. I didn't... you're treating a suspicion like an answer.",
+      "text": "No, no. I deny it. You're treating a suspicion like proof.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Defend.007",
       "intent": "Defend",
-      "text": "I can't make myself sound calm. I can still answer you.",
+      "text": "I can't sound calm, but I can say this: I didn't do what you're accusing me of.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Defend.008",
       "intent": "Defend",
-      "text": "Sorry. Starting again. I disagree with the accusation against me.",
+      "text": "Sorry. Starting again. I dispute the accusation against me.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Defend.009",
       "intent": "Defend",
-      "text": "If I stumble over this, please don't count that as proof.",
+      "text": "Please don't take my stumbling as evidence. I'm denying the accusation.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Defend.010",
       "intent": "Defend",
-      "text": "I was afraid you'd turn to me. Please hear my actual answer.",
+      "text": "I was afraid you'd suspect me. That doesn't mean your accusation is right.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Defend.011",
       "intent": "Defend",
-      "text": "Could someone slow this down? I'm defending myself, not refusing.",
+      "text": "I'm defending myself, not refusing to answer. Please don't vote against me yet.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
@@ -242,7 +242,7 @@
     {
       "id": "npc.anxious.Agree.001",
       "intent": "Agree",
-      "text": "Yes, {target}. I was thinking that, but... less clearly.",
+      "text": "I agree with {target}'s point. I was thinking that too, just... less clearly.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
@@ -263,7 +263,7 @@
     {
       "id": "npc.anxious.Agree.004",
       "intent": "Agree",
-      "text": "That helps a little, {target}. I'm with you on this.",
+      "text": "I'm backing what {target} just said. That helps me decide.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
@@ -277,14 +277,14 @@
     {
       "id": "npc.anxious.Agree.006",
       "intent": "Agree",
-      "text": "Could we keep what {target} said? I think it's useful.",
+      "text": "I support {target}'s point. Please count me as agreeing.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Agree.007",
       "intent": "Agree",
-      "text": "{target}, yes. That's the part I couldn't get out.",
+      "text": "Yes, I agree with {target}. That's what I was trying to say.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
@@ -298,7 +298,7 @@
     {
       "id": "npc.anxious.Agree.009",
       "intent": "Agree",
-      "text": "Oh... right, {target}. I think you're making sense.",
+      "text": "I think {target}'s argument makes sense. I agree with it.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
@@ -522,42 +522,42 @@
     {
       "id": "npc.anxious.Vouch.001",
       "intent": "Vouch",
-      "text": "I'd... I'd like us to give {target} a little room.",
+      "text": "I'd... I'd like to defend {target}. Please don't rush to blame them.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Vouch.002",
       "intent": "Vouch",
-      "text": "Please don't rush past {target}. I'm willing to support them.",
+      "text": "I'm supporting {target}. Please hear their defense before deciding.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Vouch.003",
       "intent": "Vouch",
-      "text": "Maybe backing {target} is a risk. I'm taking it for now.",
+      "text": "I know it could be a mistake, but I trust {target} for now.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Vouch.004",
       "intent": "Vouch",
-      "text": "I don't usually volunteer for this, but I trust {target}.",
+      "text": "I don't usually speak up, but I'm defending {target} here.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Vouch.005",
       "intent": "Vouch",
-      "text": "Can we leave {target} out of the rush to blame someone? Please.",
+      "text": "Please don't condemn {target} yet. I don't support that accusation.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Vouch.006",
       "intent": "Vouch",
-      "text": "Sorry if this is unpopular. I'm standing with {target} for now.",
+      "text": "Sorry if this is unpopular. I'm backing {target}, not the accusation against them.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
@@ -634,35 +634,35 @@
     {
       "id": "npc.anxious.Deflect.001",
       "intent": "Deflect",
-      "text": "Wait, why just me? Could we ask {target} too?",
+      "text": "I... I deny the accusation against me. I'm suspicious of {target} instead.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Deflect.002",
       "intent": "Deflect",
-      "text": "I'm getting lost under these questions. Please turn some toward {target}.",
+      "text": "Please don't assume I'm guilty. I think {target} should answer our suspicions.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Deflect.003",
       "intent": "Deflect",
-      "text": "What about {target}? Sorry, but they need to answer as well.",
+      "text": "I dispute the blame aimed at me. What about {target}? I suspect them.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Deflect.004",
       "intent": "Deflect",
-      "text": "Could the attention move to {target} for a moment? I need you to look wider.",
+      "text": "Wait. I don't accept the accusation against me, and I want us to question {target}.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },
     {
       "id": "npc.anxious.Deflect.005",
       "intent": "Deflect",
-      "text": "I... I think you're overlooking {target} while staring at me.",
+      "text": "I know this sounds defensive, but I deny it. My suspicion is on {target}.",
       "weight": 1,
       "requiredTrait": "Anxious"
     },

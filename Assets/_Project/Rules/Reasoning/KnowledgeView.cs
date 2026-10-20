@@ -13,7 +13,7 @@ namespace SocialStim.Rules.Reasoning
         public KnowledgeView(CharacterId self, RoleSpec ownRole, Personality personality, int charges,
             int day, IEnumerable<KnownCharacter> characters, IEnumerable<NightReport> privateResults,
             IEnumerable<EvidenceRecord> evidence = null, int selfExposure = 0, IEnumerable<RoleSpec> roleCatalog = null, TeamNightPlan teamPlan = null,
-            IEnumerable<CharacterId> nominationCandidates = null)
+            IEnumerable<CharacterId> nominationCandidates = null, NightActionClaim lastNightAction = null, bool canGiveReport = false)
         {
             Self = self; OwnRole = ownRole; Personality = personality; Charges = charges; Day = day;
             Characters = characters.OrderBy(c => c.Id.Value).ToList().AsReadOnly();
@@ -23,6 +23,7 @@ namespace SocialStim.Rules.Reasoning
             RoleCatalog = (roleCatalog ?? new[] { ownRole }).OrderBy(r => r.Id.Value, System.StringComparer.Ordinal).ToList().AsReadOnly();
             TeamPlan = ownRole.Faction == Faction.Antagonist ? teamPlan : null;
             NominationCandidates = nominationCandidates?.Distinct().ToList().AsReadOnly();
+            LastNightAction = lastNightAction; CanGiveReport = canGiveReport;
         }
         /// <summary>Observer identity.</summary>
         public CharacterId Self { get; }
@@ -48,5 +49,7 @@ namespace SocialStim.Rules.Reasoning
         public TeamNightPlan TeamPlan { get; }
         /// <summary>Public legal targets in a restricted revote; null means all living opponents.</summary>
         public IReadOnlyList<CharacterId> NominationCandidates { get; }
+        public NightActionClaim LastNightAction { get; }
+        public bool CanGiveReport { get; }
     }
 }

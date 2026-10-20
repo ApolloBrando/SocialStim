@@ -5,6 +5,7 @@ using SocialStim.Presentation.Effects;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 namespace SocialStim.Presentation.Text
 {
@@ -17,13 +18,18 @@ namespace SocialStim.Presentation.Text
         private bool _self;
         private bool _alive;
         private RoleSpec _claimedRole;
+        private Button _button;
+        private bool _selected;
+        public event Action<CharacterId> Selected;
         public CharacterId Id { get; private set; }
 
         public void Initialize(CharacterId id, TMP_FontAsset font)
         {
             Id = id;
-            _surface = gameObject.AddComponent<Image>(); _surface.raycastTarget = false;
+            _surface = gameObject.AddComponent<Image>(); _surface.raycastTarget = true;
             TextUiFactory.Border((RectTransform)transform);
+            _button = gameObject.AddComponent<Button>(); _button.targetGraphic = _surface;
+            _button.onClick.AddListener(() => Selected?.Invoke(Id));
             _label = TextUiFactory.Text("Identity", transform, font, 14);
             _label.alignment = TextAlignmentOptions.MidlineLeft;
             _label.overflowMode = TextOverflowModes.Ellipsis;
@@ -31,29 +37,32 @@ namespace SocialStim.Presentation.Text
             _claim = TextUiFactory.Text("Claimed role", transform, font, 14);
             _claim.alignment = TextAlignmentOptions.MidlineRight;
             TextUiFactory.Fill(_claim.rectTransform, new Vector2(0.72f, 0), Vector2.one, Vector2.zero, new Vector2(-8, 0));
-            var layout = gameObject.AddComponent<LayoutElement>(); layout.minWidth = 180; layout.preferredWidth = 210; layout.preferredHeight = 44;
+            var layout = gameObject.AddComponent<LayoutElement>(); layout.minWidth = 180; layout.preferredWidth = 210; layout.preferredHeight = 64;
         }
 
-        public void Render(KnownCharacter participant, bool self, TextPalette palette, RoleSpec claimedRole = null)
+        public void Render(KnownCharacter participant, bool self, TextPalette palette, RoleSpec claimedRole = null,
+            bool selectable = false, bool selected = false, string annotation = "", SocialStim.Rules.Dialogue.GameText words = null)
         {
+            words = words ?? SocialStim.Rules.Dialogue.GameText.Default;
             _self = self;
             _alive = participant.Alive; _claimedRole = claimedRole;
-            _label.text = participant.Name + (self ? " (you)" : "")
-                + "\n" + (!participant.Alive ? "DEAD" : participant.IsTeammate ? "TEAMMATE" : "ALIVE");
+            _selected = selected; _button.interactable = selectable;
+            _label.text = (participant.Id.Value + 1) + ". " + participant.Name + (self ? " " + words.Format("ui.you") : "")
+                + "\n" + (words.Format(!participant.Alive ? "ui.dead" : participant.IsTeammate ? "ui.teammate" : "ui.alive"))
+                + (string.IsNullOrEmpty(annotation) ? "" : "\n" + annotation);
             _claim.text = claimedRole == null ? "" : claimedRole.Name.Substring(0, System.Math.Min(3, claimedRole.Name.Length)).ToUpperInvariant();
             Theme(palette);
         }
 
         public void Theme(TextPalette palette)
         {
-            _surface.color = _self ? palette.FocusBackground : palette.Panel;
-            GetComponent<Outline>().effectColor = palette.Frame;
+            _surface.color = _selected ? Color.Lerp(palette.Panel, palette.Accent(SocialStim.Application.PresentationCues.SemanticStyle.Participant), 0.18f) : _self ? palette.FocusBackground : palette.Panel;
+            GetComponent<Outline>().effectColor = _selected ? palette.Accent(SocialStim.Application.PresentationCues.SemanticStyle.Evidence) : palette.Frame;
             Color dead = palette.Night ? new Color(0.65f, 0.65f, 0.65f) : new Color(0.38f, 0.38f, 0.38f);
             _label.color = _alive ? palette.Foreground : dead;
             _claim.color = !_alive ? dead : _claimedRole == null ? palette.Muted
-                : palette.Accent(_claimedRole.Faction == Faction.Town ? SocialStim.Application.PresentationCues.SemanticStyle.Evidence
-                    : _claimedRole.Faction == Faction.Antagonist ? SocialStim.Application.PresentationCues.SemanticStyle.Danger
-                    : SocialStim.Application.PresentationCues.SemanticStyle.Fear);
+                : palette.RoleColor(_claimedRole.Faction);
         }
+        public void SetSelectable(bool selectable) { if (_button != null) _button.interactable = selectable; }
     }
 }

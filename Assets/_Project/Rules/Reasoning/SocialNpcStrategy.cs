@@ -42,6 +42,7 @@ namespace SocialStim.Rules.Reasoning
         /// <inheritdoc />
         public GameCommand Speak(KnowledgeView knowledge, IRandomSource random)
         {
+            if (knowledge.CanGiveReport) return GameCommand.ReportLastAction();
             var candidates = new List<(GameCommand command, int utility)>();
             KnownCharacter suspect = SocialAssessment.Suspect(knowledge, random);
             KnownCharacter trusted = knowledge.Characters.Where(c => c.Alive && c.Id != knowledge.Self)
@@ -64,9 +65,9 @@ namespace SocialStim.Rules.Reasoning
             NightReport result = knowledge.PrivateResults.LastOrDefault(r => r.Kind == ReportKind.Investigation
                 && r.Night == knowledge.Day - 1 && knowledge.Characters.Any(c => c.Alive && c.Id == r.Target)
                 && !HasReported(knowledge, r.Target.Value));
-            if (result != null) candidates.Add((GameCommand.Speak(SpeechIntent.ReportInvestigation, result.Target, faction: result.Alignment), 90));
+            if (result != null && knowledge.LastNightAction == null) candidates.Add((GameCommand.Speak(SpeechIntent.ReportInvestigation, result.Target, faction: result.Alignment), 90));
             GameCommand fabrication = ClaimPolicy.FabricatedInvestigation(knowledge, random);
-            if (fabrication != null) candidates.Add((fabrication, 45 + _settings.DeceptionBonus));
+            if (fabrication != null && knowledge.LastNightAction == null) candidates.Add((fabrication, 45 + _settings.DeceptionBonus));
             if (suspect != null)
             {
                 int threat = SocialAssessment.Threat(knowledge, suspect), evidence = SocialAssessment.CaseStrength(knowledge, suspect);

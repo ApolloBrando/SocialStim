@@ -29,6 +29,8 @@ namespace SocialStim.Rules.Reasoning
         private readonly Dictionary<(int, CharacterId, bool), float> _socialBudget = new Dictionary<(int, CharacterId, bool), float>();
         private readonly HashSet<(int, CharacterId, CharacterId, bool)> _stances = new HashSet<(int, CharacterId, CharacterId, bool)>();
         private readonly HashSet<CharacterId> _revealed = new HashSet<CharacterId>();
+        private readonly List<(CharacterId speaker, NightActionClaim claim)> _actionReports = new List<(CharacterId, NightActionClaim)>();
+        private readonly HashSet<(int, CharacterId, CharacterId)> _reportConflicts = new HashSet<(int, CharacterId, CharacterId)>();
 
         internal BeliefState(IEnumerable<CharacterId> characters, Personality personality, IRandomSource random,
             CharacterId self, RoleSpec ownRole, SetupKnowledge setup, IReadOnlyList<RoleSpec> catalog,
@@ -58,6 +60,7 @@ namespace SocialStim.Rules.Reasoning
 
         internal void Observe(CharacterId speaker, GameCommand speech, int day)
         {
+            if (speech.NightReport != null) { ObserveActionReport(speaker, speech.NightReport, day); return; }
             int influence = Math.Max(0, (int)Math.Round(_settings.AssertionWeight * (_trust[speaker] * 10 + 25) / 75));
             if ((_personality == Personality.Anxious || _personality == Personality.Slow)) influence += _settings.GullibleBonus;
             if ((_personality == Personality.Anxious || _personality == Personality.Grim)) influence = Math.Max(0, influence - 2);
@@ -108,9 +111,9 @@ namespace SocialStim.Rules.Reasoning
                 ObserveReport(speaker, speech.Target.Value, speech.ReportedFaction.Value, day, influence);
         }
 
-        private void ObserveReport(CharacterId speaker, CharacterId target, Faction alignment, int day, int influence)
+        private void ObserveReport(CharacterId speaker, CharacterId target, Faction alignment, int day, int influence, int? reportedNight = null)
         {
-            int night = day - 1;
+            int night = reportedNight ?? day - 1;
             if (_reports.Any(r => r.Speaker == speaker && r.Target == target && r.Night == night && r.Alignment == alignment)) return;
             if (_reports.Any(r => r.Speaker == speaker && r.Target == target && r.Night == night && r.Alignment != alignment))
                 Penalize(speaker, _settings.ContradictionPenalty, day, true);
@@ -131,12 +134,61 @@ namespace SocialStim.Rules.Reasoning
             }
         }
 
+        private void ObserveActionReport(CharacterId speaker, NightActionClaim claim, int day)
+        {
+            if (_actionReports.Any(r => r.speaker == speaker && r.claim.Signature == claim.Signature)) return;
+            Record(day, EvidenceKind.NightActionClaim, speaker, claim.Target, SpeechIntent.ReportAction, claim.Role, night: claim.Night, nightReport: claim);
+            if (_actionReports.Any(r => r.speaker == speaker && r.claim.Night == claim.Night)
+                || _claims.TryGetValue(speaker, out RoleId declared) && declared != claim.Role)
+                Penalize(speaker, _settings.ContradictionPenalty, day, true);
+            if (speaker != _self && claim.Target.HasValue && !claim.Blocked)
+            {
+                bool seenElsewhere = _privateReports.Any(r => r.Kind == ReportKind.VisitorSeen && r.Night == claim.Night
+                    && r.Target == speaker && r.Subject != claim.Target);
+                bool missingVisitor = _privateReports.Any(r => r.Kind == ReportKind.NoVisitors && r.Night == claim.Night && r.Target == claim.Target);
+                if (seenElsewhere || missingVisitor) Penalize(speaker, _settings.ContradictionPenalty, day, false);
+            }
+            int credibility = Math.Max(1, (int)Math.Round(_settings.AssertionWeight * (_trust[speaker] + 2.5f) / 7.5f));
+            foreach (ReportedNightResult result in claim.Results)
+            {
+                if (result.Kind == ReportKind.Investigation && result.Target.HasValue && result.Alignment.HasValue)
+                {
+                    Record(day, EvidenceKind.InvestigationClaim, speaker, result.Target, SpeechIntent.ReportInvestigation,
+                        alignment: result.Alignment, night: claim.Night);
+                    ObserveReport(speaker, result.Target.Value, result.Alignment.Value, day, credibility, claim.Night);
+                }
+                if (speaker != _self && result.Kind == ReportKind.VisitorSeen && result.Target.HasValue && result.Subject.HasValue
+                    && _evidence.Any(e => e.Kind == EvidenceKind.Death && e.Target == result.Subject && e.Day == claim.Night))
+                {
+                    // A visit to a casualty is a lead, not proof of an attack or a hidden-role reveal.
+                    Change(result.Target.Value, credibility * 0.6f);
+                    _distribution.AssertAlignment(result.Target.Value, Faction.Antagonist, credibility);
+                }
+            }
+            _actionReports.Add((speaker, claim));
+            foreach (var first in _actionReports.Where(r => r.claim.Night == claim.Night))
+                foreach (var second in _actionReports.Where(r => r.claim.Night == claim.Night && r.speaker.Value > first.speaker.Value))
+                {
+                    bool conflicts = first.claim.Results.Any(r => r.Kind == ReportKind.VisitorSeen && r.Target == second.speaker
+                            && second.claim.Target.HasValue && !second.claim.Blocked && r.Subject != second.claim.Target)
+                        || second.claim.Results.Any(r => r.Kind == ReportKind.VisitorSeen && r.Target == first.speaker
+                            && first.claim.Target.HasValue && !first.claim.Blocked && r.Subject != first.claim.Target)
+                        || first.claim.Results.Any(r => r.Kind == ReportKind.NoVisitors && r.Target == second.claim.Target && second.claim.Target.HasValue && !second.claim.Blocked)
+                        || second.claim.Results.Any(r => r.Kind == ReportKind.NoVisitors && r.Target == first.claim.Target && first.claim.Target.HasValue && !first.claim.Blocked);
+                    if (conflicts && _reportConflicts.Add((claim.Night, first.speaker, second.speaker)))
+                    { Penalize(first.speaker, 5, day, true); Penalize(second.speaker, 5, day, true); }
+                }
+        }
+
         internal void Receive(NightReport report)
         {
             if (report.Recipient != _self) throw new ArgumentException("A belief model cannot read another observer's private report.");
             if (_privateReports.Any(r => r.Kind == report.Kind && r.Night == report.Night && r.Target == report.Target
                 && r.Alignment == report.Alignment && r.Subject == report.Subject)) return;
             _privateReports.Add(report);
+            if (report.Kind == ReportKind.VisitorSeen && report.Target.HasValue && report.Subject.HasValue
+                && _evidence.Any(e => e.Kind == EvidenceKind.Death && e.Target == report.Subject && e.Day == report.Night))
+            { Change(report.Target.Value, 20); _distribution.AssertAlignment(report.Target.Value, Faction.Antagonist, 35); }
             if (report.Kind != ReportKind.Investigation || !report.Target.HasValue || !report.Alignment.HasValue) return;
             Record(report.Night + 1, EvidenceKind.PrivateInvestigation, _self, report.Target, alignment: report.Alignment, night: report.Night);
             Change(report.Target.Value, report.Alignment == Faction.Antagonist ? 65 : -45);
@@ -193,8 +245,8 @@ namespace SocialStim.Rules.Reasoning
         }
 
         private void Record(int day, EvidenceKind kind, CharacterId actor, CharacterId? target = null,
-            SpeechIntent? intent = null, RoleId? role = null, Faction? alignment = null, Verdict? verdict = null, int night = 0)
-            => _evidence.Add(new EvidenceRecord(_evidence.Count, day, kind, actor, target, intent, role, alignment, verdict, night));
+            SpeechIntent? intent = null, RoleId? role = null, Faction? alignment = null, Verdict? verdict = null, int night = 0, NightActionClaim nightReport = null)
+            => _evidence.Add(new EvidenceRecord(_evidence.Count, day, kind, actor, target, intent, role, alignment, verdict, night, nightReport));
         private void Social(CharacterId listenerSpeaker, CharacterId origin, CharacterId target, int day, bool pressure, int influence, bool echo)
         {
             // The same source cannot manufacture corroboration by repeating itself or attracting echoes.

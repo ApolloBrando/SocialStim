@@ -19,6 +19,7 @@
     <Compile Include="../../Assets/_Project/Tests/EditMode/*.cs" />
     <Compile Include="../../Assets/_Project/Tests/PlayMode/PresenterDisplayTests.cs" />
     <None Include="../../Assets/_Project/Data/Dialogue/*Dialogue.json" Link="%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../Assets/_Project/Data/Dialogue/GameText.json" Link="GameText.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../Assets/_Project/ScriptableObjects/Catalogs/StarterCatalog.asset" Link="StarterCatalog.asset" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../Assets/_Project/ScriptableObjects/Roles/*.asset" Link="Roles/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />

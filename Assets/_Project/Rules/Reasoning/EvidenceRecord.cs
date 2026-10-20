@@ -2,6 +2,7 @@ using SocialStim.Rules.Cast;
 using SocialStim.Rules.Commands;
 using SocialStim.Rules.Dialogue;
 using SocialStim.Rules.Roles;
+using SocialStim.Rules.Night;
 
 namespace SocialStim.Rules.Reasoning
 {
@@ -10,9 +11,9 @@ namespace SocialStim.Rules.Reasoning
     {
         internal EvidenceRecord(int sequence, int day, EvidenceKind kind, CharacterId actor,
             CharacterId? target = null, SpeechIntent? intent = null, RoleId? role = null,
-            Faction? alignment = null, Verdict? verdict = null, int night = 0)
+            Faction? alignment = null, Verdict? verdict = null, int night = 0, NightActionClaim nightReport = null)
         { Sequence = sequence; Day = day; Kind = kind; Actor = actor; Target = target;
-            Intent = intent; Role = role; Alignment = alignment; Verdict = verdict; Night = night; }
+            Intent = intent; Role = role; Alignment = alignment; Verdict = verdict; Night = night; NightReport = nightReport; }
         /// <summary>Local chronological sequence.</summary>
         public int Sequence { get; }
         /// <summary>Public day when this evidence was received.</summary>
@@ -33,5 +34,6 @@ namespace SocialStim.Rules.Reasoning
         public Verdict? Verdict { get; }
         /// <summary>Night associated with an investigation assertion/result.</summary>
         public int Night { get; }
+        public NightActionClaim NightReport { get; }
     }
 }

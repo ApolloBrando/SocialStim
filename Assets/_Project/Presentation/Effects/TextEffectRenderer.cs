@@ -85,7 +85,7 @@ namespace SocialStim.Presentation.Effects
                 int mesh = character.materialReferenceIndex, vertex = character.vertexIndex;
                 Vector3[] baseline = _vertices[mesh];
                 if (baseline == null || vertex + 3 >= baseline.Length) continue;
-                Color32 color = _palette.Accent(_semanticColors ? _styles[i] : SemanticStyle.Default);
+                Color32 color = _palette.Accent(_semanticColors || (int)_styles[i] >= (int)SemanticStyle.Participant ? _styles[i] : SemanticStyle.Default);
                 if (character.index >= _visible) color.a = 0;
                 float continuous = _settings.Enabled && !_settings.ReducedMotion && _styles[i] == SemanticStyle.Fear && Time.unscaledTime - _motionStarted < 1.5f
                     ? 0.2f * _settings.Intensity : 0;

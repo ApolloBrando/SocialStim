@@ -4,7 +4,7 @@
     {
       "id": "npc.slow.Accuse.001",
       "intent": "Accuse",
-      "text": "Wait... I think the name I meant was {target}.",
+      "text": "Wait... the person I suspect is {target}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -25,7 +25,7 @@
     {
       "id": "npc.slow.Accuse.004",
       "intent": "Accuse",
-      "text": "Could we look at {target}? Slowly. I want to understand.",
+      "text": "I suspect {target}. I'd like us to examine that carefully.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -39,7 +39,7 @@
     {
       "id": "npc.slow.Accuse.006",
       "intent": "Accuse",
-      "text": "So... when we ask who seems wrong, my answer is {target}.",
+      "text": "So... my answer is that {target} seems suspicious.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -60,7 +60,7 @@
     {
       "id": "npc.slow.Accuse.009",
       "intent": "Accuse",
-      "text": "The person I want checked... {target}. I remembered the name.",
+      "text": "The person I want us to question is {target}. I don't trust them yet.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -88,84 +88,84 @@
     {
       "id": "npc.slow.Defend.001",
       "intent": "Defend",
-      "text": "Me... right. I don't think the case against me is right.",
+      "text": "Me... right. I deny the accusation against me.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.002",
       "intent": "Defend",
-      "text": "Give me a second. I'm finding the start of my answer.",
+      "text": "Give me a second. My answer is no: I didn't do what you're accusing me of.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.003",
       "intent": "Defend",
-      "text": "Wait... you've reached a verdict, but I'm still at the accusation.",
+      "text": "Wait... you haven't proved I'm guilty. Don't decide yet.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.004",
       "intent": "Defend",
-      "text": "I heard my name. I need time to explain my side.",
+      "text": "I heard my name. I'm defending myself against that accusation.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.005",
       "intent": "Defend",
-      "text": "I'm slow getting the words out. That isn't the same as having no answer.",
+      "text": "I'm taking time to answer. That isn't an admission of guilt.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.006",
       "intent": "Defend",
-      "text": "So I'm defending myself now... yes. Please hear me through.",
+      "text": "So... my defense is that your suspicion isn't proof against me.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.007",
       "intent": "Defend",
-      "text": "Can we take the claim against me one piece at a time?",
+      "text": "I don't accept the accusation. Can we take it one part at a time?",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.008",
       "intent": "Defend",
-      "text": "I don't agree that I'm guilty. Was that the question?",
+      "text": "No... I don't agree that I'm guilty. That's my answer.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.009",
       "intent": "Defend",
-      "text": "Hold on... I want my answer included before you decide.",
+      "text": "Hold on. I dispute the case against me. Please hear me through.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.010",
       "intent": "Defend",
-      "text": "The bit about blaming me... I need to push back on that.",
+      "text": "The part where you blame me... I don't accept that.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.011",
       "intent": "Defend",
-      "text": "I haven't finished thinking through your case. Don't call that agreement.",
+      "text": "I'm still thinking through your questions. I haven't agreed with your accusation.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.012",
       "intent": "Defend",
-      "text": "Wait for my answer, please. I can get there.",
+      "text": "Please wait. I'm denying the accusation, even if the words come slowly.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -221,7 +221,7 @@
     {
       "id": "npc.slow.ClaimRole.008",
       "intent": "ClaimRole",
-      "text": "I've got the name ready this time: {role}.",
+      "text": "I've got the words ready this time: my role is {role}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -256,14 +256,14 @@
     {
       "id": "npc.slow.Agree.003",
       "intent": "Agree",
-      "text": "Wait, I wanted to support {target}. Did we move on already?",
+      "text": "Wait, I wanted to agree with {target}'s point. Did we move on already?",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Agree.004",
       "intent": "Agree",
-      "text": "So we're saying what {target} said... I can go with that.",
+      "text": "I've thought about what {target} said. I agree with it.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -291,7 +291,7 @@
     {
       "id": "npc.slow.Agree.008",
       "intent": "Agree",
-      "text": "Oh... that's what you meant, {target}. Then yes.",
+      "text": "Oh... I understand your point now, {target}. I agree.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -522,7 +522,7 @@
     {
       "id": "npc.slow.Vouch.001",
       "intent": "Vouch",
-      "text": "Could we wait on {target}? I think they deserve the time.",
+      "text": "I... think we should keep hearing {target}. I'm not ready to blame them.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -536,28 +536,28 @@
     {
       "id": "npc.slow.Vouch.003",
       "intent": "Vouch",
-      "text": "{target}... I'd like us to keep hearing from them.",
+      "text": "{target} has my backing. I don't want them condemned yet.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Vouch.004",
       "intent": "Vouch",
-      "text": "I don't want to rush this. Give {target} another chance.",
+      "text": "I don't support the accusation against {target}. Let's hear their side.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Vouch.005",
       "intent": "Vouch",
-      "text": "So I'm backing someone now. That someone is {target}.",
+      "text": "So... the person I'm defending is {target}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Vouch.006",
       "intent": "Vouch",
-      "text": "Before the subject goes away... I trust {target} for the moment.",
+      "text": "Before we move on... I trust {target} for now.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -634,35 +634,35 @@
     {
       "id": "npc.slow.Deflect.001",
       "intent": "Deflect",
-      "text": "Wait... why don't those questions go to {target} too?",
+      "text": "Wait... I deny that accusation. I suspect {target} instead.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Deflect.002",
       "intent": "Deflect",
-      "text": "I'm still answering, but... have you asked {target}?",
+      "text": "I'm not accepting the blame. The person I want questioned is {target}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Deflect.003",
       "intent": "Deflect",
-      "text": "Maybe move over to {target} for a bit. There's more than me here.",
+      "text": "Let me say both parts... I deny it, and I suspect {target}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Deflect.004",
       "intent": "Deflect",
-      "text": "So the attention is on me... I'd turn some toward {target}.",
+      "text": "I dispute the accusation against me. We should examine {target} instead.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Deflect.005",
       "intent": "Deflect",
-      "text": "Could we take a look at {target} before coming back to this?",
+      "text": "Hold on. I don't think I'm your answer. I'm accusing {target}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -844,7 +844,7 @@
     {
       "id": "npc.slow.counterclaim.01",
       "intent": "CounterClaim",
-      "text": "Wait... that is what I am. The {role}.",
+      "text": "Wait... I dispute that claim. I am the {role}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -879,14 +879,14 @@
     {
       "id": "npc.slow.counterclaim.06",
       "intent": "CounterClaim",
-      "text": "Could you repeat that... actually, no. I heard it. I am the {role}.",
+      "text": "I heard the role claim. I need to challenge it... I am the {role}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.counterclaim.07",
       "intent": "CounterClaim",
-      "text": "I was about to say... I am the {role}. Somebody got there first.",
+      "text": "Someone claimed my role first... but I am the {role}. I challenge that claim.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
