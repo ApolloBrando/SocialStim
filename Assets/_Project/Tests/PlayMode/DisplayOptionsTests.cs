@@ -1,6 +1,7 @@
 using System.Linq;
 using NUnit.Framework;
 using SocialStim.Application.PresentationCues;
+using SocialStim.Application.Settings;
 using SocialStim.Presentation.Text;
 using TMPro;
 using UnityEngine;
@@ -20,25 +21,19 @@ namespace SocialStim.Tests.PlayMode
             {
                 var view = root.AddComponent<TextGameView>();
                 view.Initialize(TMP_Settings.defaultFontAsset, initialSettings: new EffectsSettings(elementsPerSecond: 28));
+                view.ApplyPreferences(new GamePreferences(new EffectsSettings(elementsPerSecond: 28)));
                 var buttons = root.GetComponentsInChildren<Button>(true);
-                Button speed = buttons.Single(b => Label(b).StartsWith("Speed:", System.StringComparison.Ordinal));
-                Button toggle = buttons.Single(b => Label(b) == "Display options");
-                Button reset = buttons.Single(b => Label(b) == "Reset display defaults");
-                Assert.That(speed.gameObject.activeInHierarchy, Is.False);
-                Assert.That(reset.gameObject.activeInHierarchy, Is.False);
-                toggle.onClick.Invoke();
-                Assert.That(speed.gameObject.activeInHierarchy, Is.True);
-                Assert.That(reset.gameObject.activeInHierarchy, Is.True);
-                EffectsSettings saved = null;
-                view.SettingsChanged += settings => saved = settings;
-                reset.onClick.Invoke();
-                Assert.That(saved, Is.Not.Null);
-                Assert.That(saved.ElementsPerSecond, Is.EqualTo(84));
-                Assert.That(saved.ReducedMotion, Is.True);
-                Assert.That(saved.Flashes, Is.False);
-                Assert.That(Label(speed), Does.Contain("84"));
-                toggle.onClick.Invoke();
-                Assert.That(speed.gameObject.activeInHierarchy, Is.False);
+                Button toggle = buttons.Single(b => Label(b) == "Settings");
+                var modal = root.transform.Find("Text Canvas/Settings Modal");
+                Assert.That(modal.gameObject.activeInHierarchy, Is.False);
+                toggle.onClick.Invoke(); Assert.That(modal.gameObject.activeInHierarchy, Is.True);
+                GamePreferences saved = null; view.PreferencesChanged += p => saved = p;
+                buttons.Single(b => Label(b) == "Data").onClick.Invoke();
+                root.GetComponentsInChildren<Button>(true).Single(b => Label(b) == "Reset all defaults").onClick.Invoke();
+                Assert.That(saved, Is.Not.Null); Assert.That(saved.Effects.ElementsPerSecond, Is.EqualTo(84));
+                Assert.That(saved.Effects.ReducedMotion, Is.True); Assert.That(saved.Effects.Flashes, Is.False);
+                buttons.Single(b => Label(b) == "Close settings").onClick.Invoke();
+                Assert.That(modal.gameObject.activeInHierarchy, Is.False);
             }
             finally { Object.DestroyImmediate(root); }
         }

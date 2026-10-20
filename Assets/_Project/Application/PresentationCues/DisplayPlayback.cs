@@ -12,6 +12,9 @@ namespace SocialStim.Application.PresentationCues
         private float _elapsed;
         private float _duration;
         private float _speed;
+        private float _speedMultiplier;
+        private float _visibleElements;
+        private float _pauseAfter;
         private double _clock;
         private double _nextFlash;
         private bool _permitFlash;
@@ -35,6 +38,7 @@ namespace SocialStim.Application.PresentationCues
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
             _sequence = sequence; _acknowledge = acknowledge; _elapsed = 0; Frame = default; VisibleUtf16 = 0; Busy = true; _active = true;
             _permitFlash = _clock >= _nextFlash; _flashStarted = false;
+            _speedMultiplier = speedMultiplier; _pauseAfter = pauseAfter; _visibleElements = 0;
             _speed = settings.ElementsPerSecond * speedMultiplier;
             _duration = !settings.Enabled ? 0 : Math.Max(settings.InstantText ? 0 : text.ElementCount / _speed, profile.Duration)
                 + (settings.InstantText ? 0 : pauseAfter);
@@ -53,12 +57,27 @@ namespace SocialStim.Application.PresentationCues
                 Frame = new EffectFrame(retained.Shake, 0, 0, 0);
                 return;
             }
+            _visibleElements = Math.Min(Text.ElementCount, _visibleElements + seconds * _speed);
             VisibleUtf16 = !_settings.Enabled || _settings.InstantText ? Text.Text.Length
-                : Text.EndOfElements((int)(_elapsed * _speed));
+                : Math.Max(VisibleUtf16, Text.EndOfElements((int)_visibleElements));
             Frame = _profile.Sample(_elapsed, _settings);
             if (!_permitFlash) Frame = new EffectFrame(Frame.Shake, Frame.Border, Frame.Vignette, 0);
             else if (Frame.Flash > 0 && !_flashStarted) { _nextFlash = _clock + 2; _flashStarted = true; }
             if (_elapsed >= _duration) Finish(DisplayCompletion.Completed);
+        }
+        /// <summary>Applies accessibility/speed without skipping queued observations or restarting the line.</summary>
+        public void UpdateSettings(EffectsSettings settings)
+        {
+            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            if (!_active || Text == null) return;
+            _speed = settings.ElementsPerSecond * _speedMultiplier;
+            if (settings.InstantText || !settings.Enabled)
+            { _visibleElements = Text.ElementCount; VisibleUtf16 = Text.Text.Length; }
+            if (Busy)
+                _duration = Math.Max(_profile.Duration, _elapsed + (Text.ElementCount - _visibleElements) / _speed
+                    + (settings.InstantText ? 0 : _pauseAfter));
+            EffectFrame sample = _profile.Sample(_elapsed, settings);
+            Frame = new EffectFrame(sample.Shake, sample.Border, sample.Vignette, 0);
         }
         public void Skip() { if (Busy) Finish(DisplayCompletion.Skipped); }
         public void Cancel()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SocialStim.Application.Input;
+using SocialStim.Application.Settings;
 using SocialStim.Application.PresentationCues;
 using SocialStim.Rules.Phases;
 using SocialStim.Rules.Dialogue;
@@ -24,7 +25,6 @@ namespace SocialStim.Presentation.Text
         private TextMeshProUGUI _status;
         private TextMeshProUGUI _choiceHeading;
         private TextMeshProUGUI _conversationHeading;
-        private RectTransform _displayOptionsPanel;
         private Image _canvasSurface;
         private TextMeshProUGUI _transcript;
         private RectTransform _choices;
@@ -39,6 +39,9 @@ namespace SocialStim.Presentation.Text
         private readonly DisplayPlayback _playback = new DisplayPlayback();
         private VisibleCueResolver _cues = new VisibleCueResolver();
         private IReadOnlyDictionary<PresentationCue, EffectProfile> _profiles;
+        private GamePreferences _preferences = new GamePreferences();
+        private SettingsPanel _settingsPanel;
+        private CanvasScaler _scaler;
         private EffectsSettings _settings = new EffectsSettings();
         private PlayerInputRequest _request;
         private int _next;
@@ -66,6 +69,7 @@ namespace SocialStim.Presentation.Text
         public event Action<string> OptionChosen;
         public event Action RestartRequested;
         public event Action<EffectsSettings> SettingsChanged;
+        public event Action<GamePreferences> PreferencesChanged;
         public bool IsDisplaying => _playback.Busy || _request != null && _next < _request.View.Transcript.Count;
 
         public void Initialize(TMP_FontAsset font, IReadOnlyDictionary<PresentationCue, EffectProfile> profiles = null, EffectsSettings initialSettings = null)
@@ -97,7 +101,7 @@ namespace SocialStim.Presentation.Text
             var canvas = new GameObject("Text Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             canvas.transform.SetParent(transform, false);
             canvas.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
-            var scaler = canvas.GetComponent<CanvasScaler>();
+            var scaler = canvas.GetComponent<CanvasScaler>(); _scaler = scaler;
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1280, 800); scaler.matchWidthOrHeight = 0.5f;
             _canvasSurface = canvas.AddComponent<Image>();
@@ -157,25 +161,9 @@ namespace SocialStim.Presentation.Text
             var footerLayout = footer.gameObject.AddComponent<HorizontalLayoutGroup>();
             footerLayout.spacing = 6; footerLayout.childControlWidth = true; footerLayout.childControlHeight = true; footerLayout.childForceExpandWidth = false;
             _skip = Control(footer, "Skip [Space]", SkipAll);
-            _displayOptionsPanel = TextUiFactory.Rect("Display Options", canvas.transform);
-            TextUiFactory.Fill(_displayOptionsPanel, new Vector2(1, 0), new Vector2(1, 0), new Vector2(-300, 70), new Vector2(-32, 400));
-            _surfaces.Add(_displayOptionsPanel.gameObject.AddComponent<Image>());
-            TextUiFactory.Border(_displayOptionsPanel);
-            var displayLayout = _displayOptionsPanel.gameObject.AddComponent<VerticalLayoutGroup>();
-            displayLayout.padding = new RectOffset(12, 12, 12, 12); displayLayout.spacing = 6;
-            displayLayout.childControlWidth = true; displayLayout.childControlHeight = true;
-            displayLayout.childForceExpandHeight = false;
-            Control(_displayOptionsPanel, "Effects: on", () => ChangeSettings(enabled: !_settings.Enabled));
-            Control(_displayOptionsPanel, "Motion: reduced", () => ChangeSettings(reduced: !_settings.ReducedMotion));
-            Control(_displayOptionsPanel, "Flash: off", () => ChangeSettings(flashes: !_settings.Flashes));
-            Control(_displayOptionsPanel, "Text: animated", () => ChangeSettings(instant: !_settings.InstantText));
-            Control(_displayOptionsPanel, "Intensity: 50%", () => ChangeSettings(intensity: _settings.Intensity >= 1 ? 0 : Mathf.Min(1, _settings.Intensity + 0.5f)));
-            Control(_displayOptionsPanel, "Speed: " + _settings.ElementsPerSecond.ToString("0"), () =>
-                ChangeSettings(speed: _settings.ElementsPerSecond < 84 ? 84 : _settings.ElementsPerSecond < 168 ? 168 : 28));
-            Control(footer, "Display options", ToggleDisplayOptions);
-            Control(_displayOptionsPanel, "Reset display defaults", ResetSettings);
-            _displayOptionsPanel.gameObject.SetActive(false);
-            RefreshSettingLabels();
+            Control(footer, "Settings", ToggleDisplayOptions);
+            _settingsPanel = gameObject.AddComponent<SettingsPanel>();
+            _settingsPanel.Initialize(canvas.transform, font, p => { ApplyPreferences(p); PreferencesChanged?.Invoke(p); });
             RectTransform overlay = TextUiFactory.Rect("Effects Overlay", canvas.transform);
             TextUiFactory.Fill(overlay, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             _screenEffects = overlay.gameObject.AddComponent<ScreenEffectOverlay>(); _screenEffects.raycastTarget = false;
@@ -323,40 +311,19 @@ namespace SocialStim.Presentation.Text
             if (_choiceScroll != null) _choiceScroll.gameObject.SetActive(true);
             if (_screenEffects != null) _screenEffects.Apply(default, _palette);
         }
-        private void ChangeSettings(bool? enabled = null, bool? reduced = null, bool? flashes = null, bool? instant = null, float? intensity = null, float? speed = null)
+        /// <summary>Applies presentation preferences immediately; run configuration is consumed only by New run.</summary>
+        public void ApplyPreferences(GamePreferences preferences)
         {
-            _settings = new EffectsSettings(enabled ?? _settings.Enabled, reduced ?? _settings.ReducedMotion,
-                flashes ?? _settings.Flashes, intensity ?? _settings.Intensity, instant ?? _settings.InstantText, speed ?? _settings.ElementsPerSecond);
-            _textEffects.SetSemanticColors(_settings.Enabled);
-            SkipAll();
-            _playback.Cancel();
+            _preferences = preferences; _settings = preferences.Effects;
+            _playback.UpdateSettings(_settings);
+            if (_textEffects != null) _textEffects.SetSemanticColors(_settings.Enabled && !preferences.Colorblind);
+            if (_transcript != null) _transcript.fontSize = preferences.TextSize;
+            if (_scaler != null) _scaler.referenceResolution = new Vector2(1280, 800) / preferences.UiScale;
+            if (_settingsPanel != null) _settingsPanel.SetPreferences(preferences);
             SettingsChanged?.Invoke(_settings);
-            RefreshSettingLabels();
         }
-        private void RefreshSettingLabels()
-        {
-            SetControl(2, "Effects: " + (_settings.Enabled ? "on" : "off"));
-            SetControl(3, "Motion: " + (_settings.ReducedMotion ? "reduced" : "full"));
-            SetControl(4, "Flash: " + (_settings.Flashes ? "on" : "off"));
-            SetControl(5, "Text: " + (_settings.InstantText ? "instant" : "animated"));
-            SetControl(6, "Intensity: " + (_settings.Intensity * 100).ToString("0") + "%");
-            SetControl(7, "Speed: " + _settings.ElementsPerSecond.ToString("0"));
-        }
-        private void ResetSettings()
-        {
-            var defaults = new EffectsSettings();
-            ChangeSettings(defaults.Enabled, defaults.ReducedMotion, defaults.Flashes, defaults.InstantText,
-                defaults.Intensity, defaults.ElementsPerSecond);
-        }
-        private void ToggleDisplayOptions()
-        {
-            bool open = !_displayOptionsPanel.gameObject.activeSelf;
-            _displayOptionsPanel.gameObject.SetActive(open);
-            SetControl(8, open ? "Hide options" : "Display options");
-            if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(_controls[open ? 2 : 8].gameObject);
-        }
+        private void ToggleDisplayOptions() => _settingsPanel.Toggle(_preferences);
 
-        private void SetControl(int index, string text) => _controls[index].GetComponent<ChoiceFocusIndicator>().SetText(text);
         private Button Control(Transform parent, string label, Action selected)
         {
             Button button = TextUiFactory.Button(parent, _font, label, 38);
@@ -376,6 +343,7 @@ namespace SocialStim.Presentation.Text
             foreach (Button button in _controls) ThemeButton(button);
             foreach (Button button in _buttons) ThemeButton(button);
             foreach (ParticipantCard card in _cards.Values) card.Theme(_palette);
+            if (_settingsPanel != null) _settingsPanel.SetPalette(_palette);
             if (_transcript != null) _transcript.color = _palette.Foreground;
             if (_textEffects != null) _textEffects.SetPalette(_palette);
         }
