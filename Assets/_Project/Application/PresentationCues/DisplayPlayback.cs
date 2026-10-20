@@ -40,7 +40,7 @@ namespace SocialStim.Application.PresentationCues
             _permitFlash = _clock >= _nextFlash; _flashStarted = false;
             _speedMultiplier = speedMultiplier; _pauseAfter = pauseAfter; _revealOffset = 0;
             _speed = settings.ElementsPerSecond * speedMultiplier;
-            _duration = !settings.Enabled ? 0 : Math.Max(settings.InstantText ? 0 : text.ElementCount / _speed, profile.Duration)
+            _duration = !settings.Enabled ? 0 : Math.Max(settings.InstantText || text.ElementCount == 0 ? 0 : _speed == 0 ? float.PositiveInfinity : text.ElementCount / _speed, profile.Duration)
                 + (settings.InstantText ? 0 : pauseAfter);
             if (!settings.Enabled || settings.InstantText) VisibleUtf16 = text.Text.Length;
             if (_duration == 0) Finish(DisplayCompletion.Completed);
@@ -58,7 +58,7 @@ namespace SocialStim.Application.PresentationCues
                 return;
             }
             VisibleUtf16 = !_settings.Enabled || _settings.InstantText ? Text.Text.Length
-                : Text.EndOfElements((int)(_elapsed * _speed + _revealOffset));
+                : Text.EndOfElements((int)Math.Min(Text.ElementCount, _elapsed * _speed + _revealOffset));
             Frame = _profile.Sample(_elapsed, _settings);
             if (!_permitFlash) Frame = new EffectFrame(Frame.Shake, Frame.Border, Frame.Vignette, 0, Frame.ColorWash, Frame.EdgeGlow);
             else if (Frame.Flash > 0 && !_flashStarted) { _nextFlash = _clock + 2; _flashStarted = true; }
@@ -87,7 +87,8 @@ namespace SocialStim.Application.PresentationCues
                 _duration = settings.Enabled ? Math.Max(_elapsed, _profile.Duration) : _elapsed;
             }
             else if (revealed < Text.ElementCount)
-                _duration = Math.Max(_profile.Duration, _elapsed + (Text.ElementCount - revealed) / _speed) + _pauseAfter;
+                _duration = Math.Max(_profile.Duration, _speed == 0 ? float.PositiveInfinity : _elapsed + (Text.ElementCount - revealed) / _speed) + _pauseAfter;
+            else _duration = Math.Max(_elapsed, _profile.Duration) + _pauseAfter;
             Frame = _profile.Sample(_elapsed, settings);
             if (!_permitFlash) Frame = new EffectFrame(Frame.Shake, Frame.Border, Frame.Vignette, 0, Frame.ColorWash, Frame.EdgeGlow);
         }

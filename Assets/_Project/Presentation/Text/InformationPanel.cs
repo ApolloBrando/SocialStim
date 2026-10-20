@@ -57,8 +57,12 @@ namespace SocialStim.Presentation.Text
             foreach (var row in rows)
             {
                 var heading = TextUiFactory.Text("Heading", _content, _font, 18); heading.text = row.Item1;
+                heading.textWrappingMode = TextWrappingModes.Normal;
+                heading.gameObject.AddComponent<LayoutElement>().minWidth = 0;
                 heading.fontStyle = FontStyles.Bold; heading.color = row.Item3;
                 var body = TextUiFactory.Text("Body", _content, _font, 16); body.text = row.Item2; body.color = palette.Foreground;
+                body.textWrappingMode = TextWrappingModes.Normal; body.overflowMode = TextOverflowModes.Overflow;
+                body.gameObject.AddComponent<LayoutElement>().minWidth = 0;
                 if (highlights != null)
                 {
                     var renderer = body.gameObject.AddComponent<TextEffectRenderer>(); renderer.Initialize(body);

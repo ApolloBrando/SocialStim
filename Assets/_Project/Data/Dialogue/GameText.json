@@ -22,7 +22,7 @@
     },
     {
       "key": "ui.legendBody",
-      "text": "Blue: names and reports. Amber: accusations and votes. Teal: defense and support. Purple: counterclaims and refutations. Role badges: Town green, Antagonist red, Neutral orange. A claim is not proof of a role. Selected players have a blue frame; dead players are grey."
+      "text": "Speaker names and living player-list names share a character colour. Names mentioned inside sentences use blue. Character colours do not indicate factions. Underlined action labels identify each statement; reply descriptions name the point being supported or challenged. Role badges: Town green, Antagonist red, Neutral orange. A claim is not proof. Dead players are grey."
     },
     {
       "key": "intent.Accuse",
@@ -79,6 +79,54 @@
     {
       "key": "ui.statement",
       "text": "STATEMENT"
+    },
+    {
+      "key": "ui.actionFirst",
+      "text": "Choose an action, then a player"
+    },
+    {
+      "key": "ui.pickForAction",
+      "text": "{action} — choose a player [1–9]"
+    },
+    {
+      "key": "ui.rolesShortcut",
+      "text": "Roles [F1]"
+    },
+    {
+      "key": "ui.latest",
+      "text": "Latest dialogue"
+    },
+    {
+      "key": "ui.textSpeed",
+      "text": "Text speed: {percent}%"
+    },
+    {
+      "key": "ui.speedHelp",
+      "text": "0% pauses reveal · arrows adjust · 100% normal"
+    },
+    {
+      "key": "ui.agreeContext",
+      "text": "Support this statement: {statement}"
+    },
+    {
+      "key": "ui.disagreeContext",
+      "text": "Challenge this statement: {statement}"
+    },
+    {
+      "key": "ui.contextAccuse",
+      "text": "{speaker} accused {target}."
+    },
+    {
+      "key": "ui.contextDefense",
+      "text": "{speaker} defended {target}."
+    },
+    {
+      "key": "ui.contextSelfDefense",
+      "text": "{speaker} defended themselves."
+    },
+    {
+      "key": "ui.contextRefute",
+      "text": "{speaker} refuted an accusation and accused {target}."
     },
     {
       "key": "ui.giveReport",

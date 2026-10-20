@@ -15,9 +15,15 @@ namespace SocialStim.Presentation.Text
             {
                 return new EffectsSettings(Flag("enabled", true), Flag("reduced", true), Flag("flashes", false),
                     PlayerPrefs.GetFloat(Prefix + "intensity", 0.5f), Flag("instant", false),
-                    PlayerPrefs.GetFloat(Prefix + "speed", 84));
+                    LoadSpeed());
             }
             catch (ArgumentException) { return new EffectsSettings(); }
+        }
+        private static float LoadSpeed()
+        {
+            float value = PlayerPrefs.GetFloat(Prefix + "speed", EffectsSettings.NormalTextSpeed);
+            return float.IsNaN(value) || float.IsInfinity(value) ? EffectsSettings.NormalTextSpeed
+                : Mathf.Clamp(value, 0, EffectsSettings.SpeedForPercent(200));
         }
         private static bool Flag(string name, bool fallback)
         {
@@ -33,7 +39,6 @@ namespace SocialStim.Presentation.Text
             PlayerPrefs.SetInt(Prefix + "instant", settings.InstantText ? 1 : 0);
             PlayerPrefs.SetFloat(Prefix + "intensity", settings.Intensity);
             PlayerPrefs.SetFloat(Prefix + "speed", settings.ElementsPerSecond);
-            PlayerPrefs.Save();
         }
     }
 }

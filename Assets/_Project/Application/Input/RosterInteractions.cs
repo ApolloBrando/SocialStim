@@ -11,6 +11,16 @@ namespace SocialStim.Application.Input
     {
         public static IReadOnlyList<PlayerOption> ForTarget(PlayerInputRequest request, CharacterId target, string category = null)
             => request.Options.Where(o => o.Target == target && (category == null || o.Category == category)).ToList().AsReadOnly();
+        /// <summary>One click submits only an unambiguous legal target action. Discussion requires choosing Accuse/Defend first.</summary>
+        public static PlayerOption DirectChoice(PlayerInputRequest request, CharacterId target, string category)
+        {
+            var actions = ForTarget(request, target, category == "Targets" ? null : category);
+            if (category == null) actions = actions.Where(o => o.Kind != Rules.Commands.CommandKind.Speak).ToList().AsReadOnly();
+            return actions.Count == 1 ? actions[0] : null;
+        }
+        public static GameObservation ReplyStatement(IEnumerable<GameObservation> transcript, CharacterId speaker, int day)
+            => transcript.LastOrDefault(o => o.Day == day && o.Speaker == speaker && o.Cue == GameCue.SpeechDelivered
+                && (o.Intent == SpeechIntent.Accuse || o.Intent == SpeechIntent.Deflect || o.Intent == SpeechIntent.Defend || o.Intent == SpeechIntent.Vouch));
         public static string Label(PlayerOption option, GameText text, string name) => option.Kind == Rules.Commands.CommandKind.Speak
             && option.Intent == SpeechIntent.Accuse ? text.Format("ui.accuseTarget", ("name", name))
             : option.Kind == Rules.Commands.CommandKind.Speak && option.Intent == SpeechIntent.Vouch
