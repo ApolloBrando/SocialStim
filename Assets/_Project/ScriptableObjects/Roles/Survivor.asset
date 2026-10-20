@@ -21,7 +21,7 @@ MonoBehaviour:
   _defense: 0
   _protection: 1
   _charges: -1
-  _appearance: 2
+  _appearance: 0
   _unique: 1
   _canClaimTruthfully: 0
   _canBluff: 1

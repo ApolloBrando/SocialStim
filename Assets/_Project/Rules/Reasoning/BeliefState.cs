@@ -129,7 +129,7 @@ namespace SocialStim.Rules.Reasoning
             _reports.Add(new ReportAssertion(speaker, target, night, alignment));
             if (speaker != _self)
             {
-                Change(target, alignment == Faction.Antagonist ? influence + 6 : -influence);
+                Change(target, alignment == Faction.Antagonist ? influence + 6 : alignment == Faction.Town ? -influence : 0);
                 _distribution.AssertAlignment(target, alignment, influence * 3);
             }
         }
@@ -191,7 +191,7 @@ namespace SocialStim.Rules.Reasoning
             { Change(report.Target.Value, 20); _distribution.AssertAlignment(report.Target.Value, Faction.Antagonist, 35); }
             if (report.Kind != ReportKind.Investigation || !report.Target.HasValue || !report.Alignment.HasValue) return;
             Record(report.Night + 1, EvidenceKind.PrivateInvestigation, _self, report.Target, alignment: report.Alignment, night: report.Night);
-            Change(report.Target.Value, report.Alignment == Faction.Antagonist ? 65 : -45);
+            Change(report.Target.Value, report.Alignment == Faction.Antagonist ? 65 : report.Alignment == Faction.Town ? -45 : 0);
             _distribution.AssertAlignment(report.Target.Value, report.Alignment.Value, 600);
         }
 
