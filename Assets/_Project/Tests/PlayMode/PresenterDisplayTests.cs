@@ -22,7 +22,7 @@ namespace SocialStim.Tests.PlayMode
             var killer = new RoleSpec(new RoleId("assassin"), "Assassin", Faction.Antagonist, RoleCategory.AntagonistKilling, AbilityKind.Attack, 1, 0, 0, -1, Faction.Antagonist);
             var roles = new[] { town, killer };
             var lines = Enum.GetValues(typeof(SpeechIntent)).Cast<SpeechIntent>().Select(intent => new DialogueLine(intent.ToString(), intent, "PLACEHOLDER: line")).ToList();
-            var run = RunFactory.CreateScenario(new RunOptions(123), new[] {
+            var run = RunFactory.CreateScenario(new RunOptions(123, votingMode: VotingMode.Trial), new[] {
                 new CastMemberSpec("Player", town.Id), new CastMemberSpec("Town", town.Id), new CastMemberSpec("Killer", killer.Id),
             }, roles, lines);
             var adapter = new FakeDisplay();

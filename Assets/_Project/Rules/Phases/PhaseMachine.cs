@@ -18,7 +18,10 @@ namespace SocialStim.Rules.Phases
             bool legal = next == GamePhase.Ended && Phase != GamePhase.Ended;
             switch (Phase)
             {
-                case GamePhase.Discussion: legal |= next == GamePhase.Nomination; break;
+                case GamePhase.Discussion: legal |= next == GamePhase.Nomination || next == GamePhase.Voting; break;
+                case GamePhase.Voting: legal |= next == GamePhase.VoteReveal; break;
+                case GamePhase.VoteReveal: legal |= next == GamePhase.Voting || next == GamePhase.LastWords
+                    || next == GamePhase.Execution || next == GamePhase.NightSelection; break;
                 case GamePhase.Nomination: legal |= next == GamePhase.Defense || next == GamePhase.NightSelection; break;
                 case GamePhase.Defense: legal |= next == GamePhase.Judgement; break;
                 case GamePhase.Judgement: legal |= next == GamePhase.LastWords || next == GamePhase.Nomination || next == GamePhase.NightSelection; break;
