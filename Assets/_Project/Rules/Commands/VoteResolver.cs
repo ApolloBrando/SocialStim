@@ -25,7 +25,7 @@ namespace SocialStim.Rules.Commands
             var counts = ballots.Where(v => v.HasValue).GroupBy(v => v.Value).OrderBy(g => g.Key.Value)
                 .ToDictionary(g => g.Key, g => g.Count());
             int maximum = counts.Values.DefaultIfEmpty(0).Max();
-            var leaders = counts.Where(p => p.Value == maximum).Select(p => p.Key).ToList().AsReadOnly();
+            var leaders = counts.Where(p => p.Value == maximum).Select(p => p.Key).OrderBy(id => id.Value).ToList().AsReadOnly();
             return new PluralityResult(leaders.Count == 1 ? leaders[0] : (CharacterId?)null,
                 leaders.Count > 1 ? leaders : new List<CharacterId>().AsReadOnly(),
                 new ReadOnlyDictionary<CharacterId, int>(counts), ballots.Count(v => !v.HasValue));

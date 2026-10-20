@@ -337,7 +337,7 @@ namespace SocialStim.Rules.Phases
                     + (ballot.Value.HasValue ? Actor(ballot.Value.Value).Name : "to abstain") + ".", ballot.Key, target: ballot.Value);
             }
             _ballot = VoteResolver.Plurality(ballots.Select(b => b.Value));
-            string tally = string.Join(" · ", _ballot.Counts.Select(pair => Actor(pair.Key).Name + ": " + pair.Value));
+            string tally = string.Join(" · ", _ballot.Counts.OrderBy(pair => pair.Key.Value).Select(pair => Actor(pair.Key).Name + ": " + pair.Value));
             Emit(GameCue.VoteTallied, (tally.Length > 0 ? tally : "No votes cast") + " · Abstentions: " + _ballot.Abstentions + ".");
             _defendant = _ballot.Winner;
             if (!_defendant.HasValue) Emit(GameCue.VoteTied, _ballot.Tied.Count > 0 ? "The vote is tied." : "Everyone abstained.");

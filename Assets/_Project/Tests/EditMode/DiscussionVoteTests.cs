@@ -226,6 +226,8 @@ namespace SocialStim.Tests.EditMode
             Assert.That(result.Winner, Is.Null);
             Assert.That(result.Tied.Select(id => id.Value), Is.EqualTo(new[] { 1, 9 }));
             Assert.That(result.Abstentions, Is.EqualTo(1));
+            var reversed = VoteResolver.Plurality(new CharacterId?[] { null, new CharacterId(1), new CharacterId(9) });
+            Assert.That(reversed.Tied, Is.EqualTo(result.Tied));
             Assert.That(VoteResolver.Plurality(new CharacterId?[0]).Winner, Is.Null);
         }
     }
