@@ -413,3 +413,7 @@ Trial Mode. No scene YAML or existing metadata GUID is rewritten.
 This is the Phase 1A loop foundation, not the complete interaction/UI rewrite.
 Current-menu replacement, reason-tagged phrasing, current-line presentation and
 the drawer remain subsequent work. No main commit/merge is performed.
+
+Settings now use immutable preferences, versioned JSON persistence and a grouped
+modal with immediate display edits and next-run game configuration. See
+[settings contracts and Unity checks](Docs/SETTINGS.md).

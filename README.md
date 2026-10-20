@@ -10,3 +10,7 @@ Phase 0 fixes are on `phase/0-audit-fixes`; Unity verification remains pending.
 
 The [Phase 1A discussion/voting foundation](Docs/DISCUSSION_VOTING.md) adds
 configurable group rounds, response windows and plurality ballots on its feature branch.
+
+Settings now use immutable preferences, versioned JSON persistence and a grouped
+modal with immediate display edits and next-run game configuration. See
+[settings contracts and Unity checks](Docs/SETTINGS.md).
