@@ -21,6 +21,13 @@ namespace SocialStim.Rules.Reasoning
             var witnesses = view.Evidence.Where(e => e.Kind == EvidenceKind.InvestigationClaim && e.Target == target.Id
                 && e.Alignment == Faction.Antagonist && e.Actor != view.Self).Select(e => e.Actor).Distinct();
             strength += witnesses.Sum(id => view.Characters.First(c => c.Id == id).TrustValue >= 5 ? 22 : 8);
+            var casualties = view.Evidence.Where(e => e.Kind == EvidenceKind.Death && e.Target.HasValue).ToList();
+            if (view.PrivateResults.Any(r => r.Kind == ReportKind.VisitorSeen && r.Target == target.Id
+                && casualties.Any(d => d.Target == r.Subject && d.Day == r.Night))) strength += 18;
+            strength += Math.Min(24, view.Evidence.Where(e => e.Kind == EvidenceKind.NightActionClaim && e.NightReport != null && e.Actor != target.Id
+                && e.NightReport.Results.Any(r => r.Kind == ReportKind.VisitorSeen && r.Target == target.Id
+                    && casualties.Any(d => d.Target == r.Subject && d.Day == e.Night)))
+                .Select(e => e.Actor).Distinct().Count() * 12);
             var revealedEvil = view.Evidence.Where(e => e.Kind == EvidenceKind.RoleReveal && e.Alignment == Faction.Antagonist)
                 .Select(e => e.Target ?? e.Actor).ToList();
             // Corroborated historical choices are stronger than the number of people repeating a rumor.

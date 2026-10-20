@@ -24,6 +24,10 @@ namespace SocialStim.Rules.Phases
         private readonly IWinCondition _winCondition;
         private readonly IRandomSource _decisions;
         private readonly DialogueSelector _dialogue;
+        private readonly GameText _text;
+        private int _lastNight;
+        private readonly Dictionary<(CharacterId actor, int night), NightActionClaim> _givenReports = new Dictionary<(CharacterId, int), NightActionClaim>();
+        private IReadOnlyList<NightDebugRecord> _nightDiagnostics = Array.Empty<NightDebugRecord>();
         private readonly Dictionary<CharacterId, BeliefState> _beliefs = new Dictionary<CharacterId, BeliefState>();
         private readonly Dictionary<CharacterId, List<NightReport>> _results = new Dictionary<CharacterId, List<NightReport>>();
         private readonly Dictionary<CharacterId, RoleSpec> _revealed = new Dictionary<CharacterId, RoleSpec>();
@@ -50,12 +54,13 @@ namespace SocialStim.Rules.Phases
         private readonly HashSet<CharacterId> _executionObjectives = new HashSet<CharacterId>();
 
         internal RunSession(RunOptions options, List<Participant> cast, IReadOnlyList<RoleSpec> catalog,
-            IEnumerable<DialogueLine> dialogue, INpcStrategy strategy, IWinCondition winCondition, ReasoningSettings reasoning)
+            IEnumerable<DialogueLine> dialogue, INpcStrategy strategy, IWinCondition winCondition, ReasoningSettings reasoning, GameText text = null)
         {
             _schedule = options.VotingMode == VotingMode.Gnosia
                 ? new DiscussionSchedule(options.DiscussionRounds, options.PlayerWindowsPerRound) : null;
             _discussion = _schedule == null ? null : new DiscussionExchange(_schedule, new CharacterId(0));
             _options = options; _cast = cast; _catalog = catalog; _strategy = strategy; _winCondition = winCondition;
+            _text = text ?? GameText.Default;
             _decisions = new SeededRandom(options.Seed ^ 0xA341316Cu);
             _dialogue = new DialogueSelector(dialogue, new SeededRandom(options.Seed ^ 0xC8013EA4u));
             // The role list discloses these initial totals; hidden deaths never recalculate them.
@@ -74,6 +79,8 @@ namespace SocialStim.Rules.Phases
 
         /// <summary>Only public/player-private observations are ever emitted on this event.</summary>
         public event Action<GameObservation> Observation;
+        /// <summary>Privileged read-only diagnostics for developer tools; intentionally reveals secret night actions.</summary>
+        public IReadOnlyList<NightDebugRecord> GetNightDiagnostics() => _nightDiagnostics;
 
         /// <summary>Returns a detached read-only player snapshot; no arbitrary-observer query exists.</summary>
         public PlayerView GetPlayerView()
@@ -84,11 +91,11 @@ namespace SocialStim.Rules.Phases
                 new NightOrder(Player.Id, a.Id), actors)).Select(a => a.Id).ToList() : new List<CharacterId>();
             return new PlayerView(_revision, _options.Seed, _phases.Day, _phases.Phase, _trials, _options.TrialsPerDay,
                 Player.Alive, Player.Role, Player.Charges, _defendant, _outcome, PlayerWon(),
-                knowledge.Characters, legal.AsReadOnly(), _transcript.ToList().AsReadOnly(), _opening, _lastActions.ContainsKey(Player.Id), _options.DiscussionRounds,
+                knowledge.Characters, legal.AsReadOnly(), _transcript.ToList().AsReadOnly(), _opening, CanGiveReport(Player), _options.DiscussionRounds,
                 _options.VotingMode, _schedule?.Round ?? _discussionRounds + 1, 1,
                 1, _discussion?.RespondTo,
                 _voteCandidates.Where(id => id != Player.Id).ToList().AsReadOnly(), _options.AllowAbstain, _revoting,
-                _counterClaimRole, _followUpTo);
+                _counterClaimRole, _followUpTo, OwnLastNight(Player));
         }
 
         /// <summary>Applies one legal player command; invalid input leaves state and RNG untouched.</summary>
@@ -135,7 +142,7 @@ namespace SocialStim.Rules.Phases
                     _opening = false;
                     if (Player.Alive)
                     {
-                        if (command.Kind == CommandKind.ReportLastAction) SayActionReport(Player);
+                        if (command.Kind == CommandKind.ReportLastAction) SayActionReport(Player, command.ReportedFaction);
                         else Say(Player, command);
                     }
                     foreach (Participant actor in Living().Where(c => c.Id != Player.Id).ToList()) SayNpc(actor);
@@ -174,13 +181,17 @@ namespace SocialStim.Rules.Phases
             switch (_phases.Phase)
             {
                 case GamePhase.Discussion:
+                    if (command.Kind == CommandKind.ReportLastAction)
+                        return CanGiveReport(Player) && (!command.ReportedFaction.HasValue || Player.Role.CanBluff
+                            && Enum.IsDefined(typeof(Faction), command.ReportedFaction.Value)
+                            && _catalog.Any(r => r.Id == _beliefs[Player.Id].Claim(Player.Id) && r.Ability == AbilityKind.Investigate))
+                            ? null : "Claim a role and report the previous night once.";
                     if (_discussion?.RespondTo != null)
                         return SpeechLegal(Player, command) && (command.Intent == SpeechIntent.Defend || command.Intent == SpeechIntent.Accuse
                             || command.Intent == SpeechIntent.Deflect || command.Intent == SpeechIntent.Agree || command.Intent == SpeechIntent.Disagree
                             || command.Intent == SpeechIntent.ClaimRole || command.Intent == SpeechIntent.StaySilent)
                             ? null : "Respond to the public accusation first.";
                     if (command.Kind == CommandKind.Continue && _opening) return null;
-                    if (command.Kind == CommandKind.ReportLastAction) return _lastActions.ContainsKey(Player.Id) ? null : "There is no previous night action.";
                     return SpeechLegal(Player, command) ? null : "Invalid discussion statement.";
                 case GamePhase.Voting:
                     return command.Kind == CommandKind.Vote && ((!command.Target.HasValue && _options.AllowAbstain)
@@ -243,6 +254,8 @@ namespace SocialStim.Rules.Phases
         private GameCommand SayNpc(Participant actor)
         {
             GameCommand speech = _strategy.Speak(Knowledge(actor), _decisions);
+            if (speech?.Kind == CommandKind.ReportLastAction && CanGiveReport(actor))
+            { var report = BuildPublicReport(actor, speech.ReportedFaction); PublishReport(actor, report); return GameCommand.PublishReport(report); }
             if (speech == null || !SpeechLegal(actor, speech)) speech = GameCommand.Speak(SpeechIntent.StaySilent);
             Say(actor, speech);
             FollowUps(actor, speech);
@@ -308,13 +321,44 @@ namespace SocialStim.Rules.Phases
             }
         }
 
-        private void SayActionReport(Participant actor)
+        private void SayActionReport(Participant actor, Faction? chosenResult = null)
         {
-            NightOrder order = _lastActions[actor.Id];
-            string report = NightActionText.Selection(actor.Role.Ability, order.Target.HasValue ? Actor(order.Target.Value).Name : null);
-            foreach (NightReport result in _results[actor.Id].Where(r => r.Night == _phases.Day - 1))
-                report += " " + DescribeReport(result);
-            Say(actor, GameCommand.Speak(SpeechIntent.ReportAction, order.Target), report);
+            PublishReport(actor, BuildPublicReport(actor, chosenResult));
+        }
+        private bool CanGiveReport(Participant actor) => actor.Alive && _lastNight > 0 && _lastActions.ContainsKey(actor.Id)
+            && _beliefs[actor.Id].Claim(actor.Id).HasValue && !_givenReports.ContainsKey((actor.Id, _lastNight));
+
+        private NightActionClaim OwnLastNight(Participant actor) => actor.Alive && _lastNight > 0 && _lastActions.TryGetValue(actor.Id, out NightOrder order)
+            ? new NightActionClaim(_lastNight, actor.Role.Id, actor.Role.Ability, order.Target,
+                _results[actor.Id].Where(r => r.Night == _lastNight).Select(r => new ReportedNightResult(r.Kind, r.Target, r.Alignment, r.Subject))) : null;
+
+        private NightActionClaim BuildPublicReport(Participant actor, Faction? chosenResult = null)
+        {
+            NightActionClaim own = OwnLastNight(actor);
+            RoleSpec asserted = _catalog.First(r => r.Id == _beliefs[actor.Id].Claim(actor.Id).Value);
+            if (asserted.Id == actor.Role.Id) return own;
+            // A cover story can use the liar's own selected target, not another participant's hidden orders/results.
+            var results = new List<ReportedNightResult>();
+            if (own.Blocked) results.Add(new ReportedNightResult(ReportKind.Blocked));
+            else if (own.Target.HasValue)
+            {
+                if (asserted.Ability == AbilityKind.Investigate)
+                    results.Add(new ReportedNightResult(ReportKind.Investigation, own.Target, chosenResult ?? Faction.Town));
+                if (asserted.Ability == AbilityKind.Watch)
+                    results.Add(new ReportedNightResult(ReportKind.NoVisitors, own.Target, subject: own.Target));
+                if (asserted.Ability == AbilityKind.Protect)
+                    results.Add(new ReportedNightResult(ReportKind.ProtectionApplied, own.Target));
+            }
+            return new NightActionClaim(_lastNight, asserted.Id, asserted.Ability, own.Target, results);
+        }
+
+        private void PublishReport(Participant actor, NightActionClaim report)
+        {
+            _givenReports[(actor.Id, report.Night)] = report;
+            var command = GameCommand.PublishReport(report);
+            string prose = NightReportFormatter.Format(report, _catalog.First(r => r.Id == report.Role).Name, id => Actor(id).Name, _text);
+            foreach (Participant observer in _cast) _beliefs[observer.Id].Observe(actor.Id, command, _phases.Day);
+            Emit(GameCue.SpeechDelivered, actor.Name + ": " + prose, actor.Id, target: report.Target, intent: SpeechIntent.ReportAction, nightReport: report);
         }
 
         private string DescribeReport(NightReport report)
@@ -336,26 +380,7 @@ namespace SocialStim.Rules.Phases
         {
             foreach (Participant actor in Living().Where(c => c.Id != Player.Id).ToList())
             {
-                RoleId? claim = _beliefs[actor.Id].Claim(actor.Id);
-                if (!claim.HasValue || !_lastActions.ContainsKey(actor.Id)) continue;
-                RoleSpec asserted = _catalog.First(r => r.Id == claim.Value);
-                if (asserted.Id == actor.Role.Id)
-                {
-                    NightReport finding = _results[actor.Id].LastOrDefault(r => r.Kind == ReportKind.Investigation && r.Night == _phases.Day - 1);
-                    if (finding != null && Actor(finding.Target.Value).Alive && finding.Target != actor.Id)
-                        Say(actor, GameCommand.Speak(SpeechIntent.ReportInvestigation, finding.Target, faction: finding.Alignment));
-                    else SayActionReport(actor);
-                }
-                else
-                {
-                    // False reports use the public claim and visible cast, never another actor's private results.
-                    GameCommand fabrication = ClaimPolicy.FabricatedInvestigation(Knowledge(actor), _decisions);
-                    if (fabrication != null)
-                        Say(actor, fabrication);
-                    else
-                        Say(actor, GameCommand.Speak(SpeechIntent.ReportAction),
-                            NightActionText.Claimed(asserted.Ability));
-                }
+                if (CanGiveReport(actor)) PublishReport(actor, BuildPublicReport(actor));
             }
         }
 
@@ -382,7 +407,7 @@ namespace SocialStim.Rules.Phases
             _discussion.PlayerActed(); _reactionBudget = 2; _reacted.Clear();
             if (Player.Alive)
             {
-                if (command.Kind == CommandKind.ReportLastAction) SayActionReport(Player);
+                if (command.Kind == CommandKind.ReportLastAction) SayActionReport(Player, command.ReportedFaction);
                 else { Say(Player, command); FollowUps(Player, command); }
             }
             BeginNextExchange(command);
@@ -520,7 +545,7 @@ namespace SocialStim.Rules.Phases
             foreach (KeyValuePair<CharacterId, Verdict> ballot in ballots)
             {
                 foreach (Participant observer in _cast) _beliefs[observer.Id].ObserveVote(ballot.Key, _defendant.Value, ballot.Value, _phases.Day);
-                Emit(GameCue.PhaseChanged, $"{Actor(ballot.Key).Name}: {ballot.Value}.");
+                Emit(GameCue.BallotRevealed, $"{Actor(ballot.Key).Name}: {ballot.Value}.", ballot.Key, target: _defendant);
             }
             if (VoteResolver.IsGuilty(ballots.Select(b => b.Value)))
             {
@@ -574,9 +599,17 @@ namespace SocialStim.Rules.Phases
             if (Player.Alive && Player.Role.Faction == Faction.Antagonist && _lastTeamPlan != null)
                 Emit(GameCue.PhaseChanged, $"Team: {Actor(_lastTeamPlan.Killer).Name} will {( _lastTeamPlan.Target.HasValue ? "attack " + Actor(_lastTeamPlan.Target.Value).Name : "pass tonight")}.");
             _lastActions.Clear();
+            _lastNight = _phases.Day;
             foreach (NightOrder order in orders) _lastActions.Add(order.Actor, order);
             Move(GamePhase.NightResolution);
             NightResolution resolution = _night.Resolve(actors, orders);
+            _nightDiagnostics = orders.OrderBy(o => o.Actor.Value).Select(order => {
+                Participant actor = Actor(order.Actor);
+                var report = new NightActionClaim(_lastNight, actor.Role.Id, actor.Role.Ability, order.Target,
+                    resolution.Reports.Where(r => r.Recipient == actor.Id).Select(r => new ReportedNightResult(r.Kind, r.Target, r.Alignment, r.Subject)));
+                return new NightDebugRecord(actor.Id, actor.Name, report,
+                    resolution.Visits.FirstOrDefault(v => v.Visitor == actor.Id)?.Target, resolution.SpentCharges.Contains(actor.Id));
+            }).ToList().AsReadOnly();
             foreach (CharacterId id in resolution.SpentCharges) Actor(id).Charges--;
             foreach (CharacterId id in resolution.Deaths) Kill(Actor(id), false);
             foreach (NightReport report in resolution.Reports)
@@ -651,7 +684,7 @@ namespace SocialStim.Rules.Phases
                 _beliefs[observer.Id].SuspicionValue(c.Id), _beliefs[observer.Id].TrustValue(c.Id)));
             return new KnowledgeView(observer.Id, observer.Role, observer.Personality, observer.Charges, _phases.Day,
                 characters, _results[observer.Id], _beliefs[observer.Id].Evidence, _beliefs[observer.Id].Exposure, _catalog, _lastTeamPlan,
-                _phases.Phase == GamePhase.Voting ? _voteCandidates : null);
+                _phases.Phase == GamePhase.Voting ? _voteCandidates : null, OwnLastNight(observer), CanGiveReport(observer));
         }
 
         /// <summary>Scoped player snapshot for portable policy evaluation; never exposes another observer's mind.</summary>
@@ -683,9 +716,9 @@ namespace SocialStim.Rules.Phases
         }
 
         private void Emit(GameCue cue, string text, CharacterId? speaker = null, DialogueMetadata metadata = null,
-            CharacterId? target = null, SpeechIntent? intent = null, RoleId? claimedRole = null)
+            CharacterId? target = null, SpeechIntent? intent = null, RoleId? claimedRole = null, NightActionClaim nightReport = null)
         {
-            var observation = new GameObservation(_transcript.Count, _phases.Day, cue, text, speaker, metadata, target, intent, claimedRole);
+            var observation = new GameObservation(_transcript.Count, _phases.Day, cue, text, speaker, metadata, target, intent, claimedRole, nightReport);
             _transcript.Add(observation); Observation?.Invoke(observation);
         }
     }

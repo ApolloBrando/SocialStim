@@ -11,28 +11,28 @@
     {
       "id": "npc.chatterbox.Accuse.002",
       "intent": "Accuse",
-      "text": "{target} keeps coming to mind, and before I wander off into another theory, I want their account examined.",
+      "text": "I suspect {target}. Before I wander into another theory, I'd like us to hear their answer.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Accuse.003",
       "intent": "Accuse",
-      "text": "Can we look at {target}, because I have several concerns and I'd rather start there than explain all my possible explanations for having them.",
+      "text": "I don't trust {target} yet. Can we question them before I bury the point in another explanation?",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Accuse.004",
       "intent": "Accuse",
-      "text": "I'm going to say {target}, then let someone answer, which is difficult for me but probably necessary.",
+      "text": "I'm accusing {target}. I'll stop there long enough for them to answer.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Accuse.005",
       "intent": "Accuse",
-      "text": "You know how a thought follows you between rooms? Mine is about {target}, and I'd like us to take it seriously.",
+      "text": "My suspicion keeps returning to {target}. I want the room to consider them as a suspect.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
@@ -67,7 +67,7 @@
     {
       "id": "npc.chatterbox.Accuse.010",
       "intent": "Accuse",
-      "text": "There are too many possibilities in my head, but the one I'm bringing to the room concerns {target}.",
+      "text": "I have too many possibilities in my head, but my accusation right now is against {target}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
@@ -81,91 +81,91 @@
     {
       "id": "npc.chatterbox.Accuse.012",
       "intent": "Accuse",
-      "text": "I started this thought intending to be brief, anyway, {target} is the person I want us to examine.",
+      "text": "I suspect {target}. That's the point I meant to reach before this sentence got away from me.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.001",
       "intent": "Defend",
-      "text": "I can explain my side, though I should warn you that getting to the relevant bit may take me a moment.",
+      "text": "I deny the accusation against me. I have more to say, naturally, but that's the important part.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.002",
       "intent": "Defend",
-      "text": "Before you decide against me, I need to answer the accusation, and I promise the answer is somewhere near the beginning this time.",
+      "text": "You've accused the wrong person. Please hear my answer before deciding what you think it means.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.003",
       "intent": "Defend",
-      "text": "I'm not refusing to defend myself; I'm trying to choose which part needs saying first, because apparently they can't all go first.",
+      "text": "I'm defending myself here: my habit of talking too much doesn't prove your accusation.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.004",
       "intent": "Defend",
-      "text": "Let me finish my account before you call it a confession, since those are very different things and I object to the confusion.",
+      "text": "I dispute the case against me. An explanation isn't a confession, even when it takes me a while.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.005",
       "intent": "Defend",
-      "text": "You're asking me to answer and then interrupting the answer, which makes this less a defense and more a frustrating duet.",
+      "text": "I deny it. Let me answer your questions one at a time so we can actually get somewhere.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.006",
       "intent": "Defend",
-      "text": "I disagree with the case against me, and I can discuss it without every extra word becoming another charge.",
+      "text": "I disagree with the accusation against me. Please judge the case rather than the length of my answer.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.007",
       "intent": "Defend",
-      "text": "Please hear my actual position rather than the shortened version of it that sounds worse and also leaves most of me out.",
+      "text": "Don't condemn me on suspicion alone. I want you to hear my side before reaching that decision.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.008",
       "intent": "Defend",
-      "text": "I talk when I'm pressed, then talk about talking, but somewhere beneath that I am still defending myself.",
+      "text": "I'm nervous and talking too much, but I'm still saying the accusation against me is wrong.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.009",
       "intent": "Defend",
-      "text": "Could we separate my long answer from the accusation itself? The answer being long doesn't make the accusation correct.",
+      "text": "My long answer doesn't make me guilty. I reject the accusation, however many words that takes.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.010",
       "intent": "Defend",
-      "text": "I want a fair hearing, preferably one where I get through the main point before somebody decides they know my ending.",
+      "text": "I don't accept your conclusion about me. Give me a fair hearing and I'll try to stay on the point.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.011",
       "intent": "Defend",
-      "text": "I'll defend my position, and I'll try very hard to notice when I've answered the question instead of starting a second one.",
+      "text": "I dispute the accusation. Ask me one question and let me finish the answer before the next one.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.012",
       "intent": "Defend",
-      "text": "If you could hold the verdict until I reach the end of this explanation, I'd appreciate it considerably.",
+      "text": "Please don't vote against me yet. I deny the charge, and I want that heard clearly.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
@@ -249,7 +249,7 @@
     {
       "id": "npc.chatterbox.Agree.002",
       "intent": "Agree",
-      "text": "{target} has put words around the thing I was trying to get at, only with rather fewer words than I would have used.",
+      "text": "I agree with {target}'s point. They've said what I was trying to express, in fewer words.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
@@ -291,14 +291,14 @@
     {
       "id": "npc.chatterbox.Agree.008",
       "intent": "Agree",
-      "text": "Put me down as supporting {target}, and please don't let the rest of my sentence obscure that simple answer.",
+      "text": "I'm supporting the point {target} just made. Please don't let the rest of my sentence obscure that.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Agree.009",
       "intent": "Agree",
-      "text": "I'd like to underline the point from {target}, verbally, since I don't think we're actually handing around pens.",
+      "text": "I'd like to underline {target}'s point because I agree with it. Verbally, since we aren't handing around pens.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
@@ -522,42 +522,42 @@
     {
       "id": "npc.chatterbox.Vouch.001",
       "intent": "Vouch",
-      "text": "I want to back {target}, and I'll try not to drown that endorsement in a discussion of what endorsements ought to mean.",
+      "text": "I'm defending {target}. I don't want that simple point buried in the amount I tend to say.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Vouch.002",
       "intent": "Vouch",
-      "text": "Could we give {target} a fair hearing, ideally one long enough to finish a thought, something I have strong personal feelings about.",
+      "text": "Please hear {target}'s defense. I'm supporting them, and giving them time seems a reasonable place to start.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Vouch.003",
       "intent": "Vouch",
-      "text": "I'm supporting {target} for now, which is a judgement I'm making rather than an invitation to stop asking questions forever.",
+      "text": "I'm backing {target} for now. That doesn't mean I think we should stop asking sensible questions.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Vouch.004",
       "intent": "Vouch",
-      "text": "{target} deserves another chance to speak, and I can make room by stopping shortly after this sentence ends.",
+      "text": "I don't support condemning {target}. Let them answer the accusation before we decide.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Vouch.005",
       "intent": "Vouch",
-      "text": "Put my support beside {target}, with the usual uncertainty that comes from being a person rather than an answer sheet.",
+      "text": "My support is with {target}. It's a judgement under uncertainty, but it is still my judgement.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Vouch.006",
       "intent": "Vouch",
-      "text": "I'd rather keep listening to {target} than hurry toward a decision about them, so that is the position I'm backing.",
+      "text": "I'm defending {target} rather than joining the accusation. I wanted to make that distinction clear.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
@@ -634,35 +634,35 @@
     {
       "id": "npc.chatterbox.Deflect.001",
       "intent": "Deflect",
-      "text": "Before we spend the whole discussion on me, could some of these questions go toward {target}, who is also in this conversation?",
+      "text": "I deny the accusation against me, and I want to turn the question toward {target}. I suspect them.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Deflect.002",
       "intent": "Deflect",
-      "text": "I can keep answering for a very long time, but that would leave us remarkably little attention for {target}.",
+      "text": "Let me be clear before I wander: I reject the charge against me, and I'm accusing {target}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Deflect.003",
       "intent": "Deflect",
-      "text": "Let's move the spotlight toward {target} for a moment, since the room is larger than the patch of it I'm standing in.",
+      "text": "I don't accept the case against me. We should be questioning {target}, which is the other point I'm trying to make.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Deflect.004",
       "intent": "Deflect",
-      "text": "I'd like you to question {target} as well, rather than making my tendency to elaborate the only thing we examine today.",
+      "text": "I'm defending myself, but I'm also raising a suspicion of {target}. Please don't lose that second part in my answer.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Deflect.005",
       "intent": "Deflect",
-      "text": "Can we widen the discussion to include {target}? I realize I'm saying this while contributing further to the discussion about me.",
+      "text": "I deny it. I want us to examine {target} instead of treating me as the only possible suspect.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },

@@ -1,0 +1,24 @@
+using System.Collections.Generic;
+using System.Linq;
+using SocialStim.Rules.Cast;
+using SocialStim.Rules.Dialogue;
+using SocialStim.Rules.Phases;
+
+namespace SocialStim.Application.Input
+{
+    /// <summary>Portable roster projections derived only from legal choices and scoped public history.</summary>
+    public static class RosterInteractions
+    {
+        public static IReadOnlyList<PlayerOption> ForTarget(PlayerInputRequest request, CharacterId target, string category = null)
+            => request.Options.Where(o => o.Target == target && (category == null || o.Category == category)).ToList().AsReadOnly();
+        public static string Label(PlayerOption option, GameText text, string name) => option.Kind == Rules.Commands.CommandKind.Speak
+            && option.Intent == SpeechIntent.Accuse ? text.Format("ui.accuseTarget", ("name", name))
+            : option.Kind == Rules.Commands.CommandKind.Speak && option.Intent == SpeechIntent.Vouch
+                ? text.Format("ui.defendTarget", ("name", name)) : option.Label;
+        public static IReadOnlyList<GameObservation> PublicRecord(PlayerView view, CharacterId participant)
+            => view.Transcript.Where(o => o.Cue == GameCue.SpeechDelivered || o.Cue == GameCue.BallotRevealed
+                || o.Cue == GameCue.NominationMade || o.Cue == GameCue.RoleRevealed || o.Cue == GameCue.DeathReported || o.Cue == GameCue.ExecutionCarriedOut)
+                .Where(o => o.Speaker == participant || o.Target == participant || o.NightReport != null
+                    && o.NightReport.Results.Any(r => r.Target == participant || r.Subject == participant)).ToList().AsReadOnly();
+    }
+}

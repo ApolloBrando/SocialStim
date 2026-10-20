@@ -5,6 +5,7 @@ namespace SocialStim.Application.PresentationCues
     {
         None, Dawn, Dusk, Speech, Accusation, Nomination, Defense, Trial, Guilty, Innocent,
         Execution, Reveal, Death, Targeted, Blocked, Investigation, Tie, Victory, Defeat, Draw,
-        PlayerKilled, NearExposure, NarrowEscape, TeammateLost, ContradictedClaim, ResourcesDepleted, FinalThree
+        PlayerKilled, NearExposure, NarrowEscape, TeammateLost, ContradictedClaim, ResourcesDepleted, FinalThree,
+        Claim, CounterClaim, Agreement, Disagreement, Refutation, Fear, LastWords, Ballot, Tally, Protection, ActionReport
     }
 }

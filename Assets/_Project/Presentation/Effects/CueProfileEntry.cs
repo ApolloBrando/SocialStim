@@ -7,6 +7,8 @@ namespace SocialStim.Presentation.Effects
     public sealed class CueProfileEntry
     {
         public PresentationCue cue;
+        public bool overrideTone;
+        public EffectTone tone;
         public EffectTrackDefinition[] tracks = Array.Empty<EffectTrackDefinition>();
     }
 }

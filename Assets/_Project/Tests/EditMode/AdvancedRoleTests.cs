@@ -163,13 +163,13 @@ namespace SocialStim.Tests.EditMode
         {
             RunSession run = Run(new ScenarioStrategy(), "physician", "inspector", "assassin", "citizen", "survivor");
             Assert.That(run.TrySubmit(GameCommand.ReportLastAction(), out _), Is.False);
-            Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(null));
+            Submit(run, GameCommand.Speak(SpeechIntent.ClaimRole, role: new RoleId("physician"))); Submit(run, GameCommand.Nominate(null));
             Submit(run, GameCommand.Night(new CharacterId(1))); Submit(run, GameCommand.Continue());
             Submit(run, GameCommand.ReportLastAction());
             var line = run.GetPlayerView().Transcript.Last(e => e.Speaker == new CharacterId(0));
             Assert.That(line.Intent, Is.EqualTo(SpeechIntent.ReportAction));
             Assert.That(line.Target, Is.EqualTo(new CharacterId(1)));
-            Assert.That(run.GetPlayerView().CanReportAction, Is.True);
+            Assert.That(run.GetPlayerView().CanReportAction, Is.False, "A report is given once for the previous night.");
         }
 
         [Test]
@@ -184,7 +184,7 @@ namespace SocialStim.Tests.EditMode
             Submit(run, GameCommand.Night(null)); Submit(run, GameCommand.Continue());
             Assert.That(run.GetPlayerView().Opening, Is.True);
             Assert.That(run.GetPlayerView().Transcript.Any(e => e.Day == 2 && e.Speaker == new CharacterId(1)
-                && e.Intent == SpeechIntent.ReportInvestigation), Is.True);
+                && e.NightReport != null && e.NightReport.Results.Any(r => r.Kind == ReportKind.Investigation)), Is.True);
         }
 
         [Test]
@@ -228,10 +228,11 @@ namespace SocialStim.Tests.EditMode
                 Roles(), TestContent.Lines(), new FalseInvestigators());
             Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(null));
             Submit(run, GameCommand.Night(null)); Submit(run, GameCommand.Continue());
-            var reports = run.GetPlayerView().Transcript.Where(e => e.Day == 2 && e.Intent == SpeechIntent.ReportInvestigation
+            var reports = run.GetPlayerView().Transcript.Where(e => e.Day == 2 && e.NightReport != null
                 && (e.Speaker == new CharacterId(1) || e.Speaker == new CharacterId(2))).ToList();
             Assert.That(reports.Count, Is.EqualTo(1), "Teammates must not all impersonate the same investigator.");
-            Assert.That(reports.All(e => e.Target != new CharacterId(1) && e.Target != new CharacterId(2)), Is.True);
+            Assert.That(reports.All(e => e.NightReport.Results.All(r => r.Kind != ReportKind.Investigation
+                || r.Alignment != Faction.Antagonist || r.Target != new CharacterId(1) && r.Target != new CharacterId(2))), Is.True);
         }
 
         [Test]

@@ -10,13 +10,13 @@
     {
       "id": "starter.Accuse.002",
       "intent": "Accuse",
-      "text": "My concern is with {target}.",
+      "text": "I don't trust {target} yet.",
       "weight": 1
     },
     {
       "id": "starter.Accuse.003",
       "intent": "Accuse",
-      "text": "I question the account from {target}.",
+      "text": "I suspect {target} and want them questioned.",
       "weight": 1
     },
     {
@@ -34,7 +34,7 @@
     {
       "id": "starter.Defend.003",
       "intent": "Defend",
-      "text": "I ask you to review my account.",
+      "text": "I reject the accusation against me. Please hear my defense.",
       "weight": 1
     },
     {
@@ -88,7 +88,7 @@
     {
       "id": "starter.Vouch.003",
       "intent": "Vouch",
-      "text": "I consider {target} worth hearing.",
+      "text": "I'm defending {target}. Let them answer before deciding.",
       "weight": 1
     },
     {
@@ -112,13 +112,13 @@
     {
       "id": "starter.Agree.001",
       "intent": "Agree",
-      "text": "I agree with {target}.",
+      "text": "I agree with the point {target} just made.",
       "weight": 1
     },
     {
       "id": "starter.Agree.002",
       "intent": "Agree",
-      "text": "I support the position of {target}.",
+      "text": "I support {target}'s argument.",
       "weight": 1
     },
     {
@@ -148,19 +148,19 @@
     {
       "id": "starter.Deflect.001",
       "intent": "Deflect",
-      "text": "I want to question {target} as well.",
+      "text": "I deny the accusation against me. I suspect {target} instead.",
       "weight": 1
     },
     {
       "id": "starter.Deflect.002",
       "intent": "Deflect",
-      "text": "I ask that you examine {target} too.",
+      "text": "I reject the case against me, and I want {target} questioned.",
       "weight": 1
     },
     {
       "id": "starter.Deflect.003",
       "intent": "Deflect",
-      "text": "I would direct these questions to {target}.",
+      "text": "I dispute the accusation. My own accusation is against {target}.",
       "weight": 1
     },
     {
@@ -184,19 +184,19 @@
     {
       "id": "starter.ExpressFear.001",
       "intent": "ExpressFear",
-      "text": "Our safety has not been established.",
+      "text": "I'm worried about whether any of us are safe.",
       "weight": 1
     },
     {
       "id": "starter.ExpressFear.002",
       "intent": "ExpressFear",
-      "text": "I cannot rule out further attacks.",
+      "text": "I'm afraid there could be another attack.",
       "weight": 1
     },
     {
       "id": "starter.ExpressFear.003",
       "intent": "ExpressFear",
-      "text": "We have not identified every threat.",
+      "text": "I'm frightened that we haven't found every threat.",
       "weight": 1
     },
     {
@@ -226,7 +226,7 @@
     {
       "id": "starter.ReactToRoleReveal.002",
       "intent": "ReactToRoleReveal",
-      "text": "We should review the revealed account.",
+      "text": "Now that their role is public, we should review what they claimed.",
       "weight": 1
     },
     {
@@ -367,7 +367,7 @@
     {
       "id": "starter.Accuse.004",
       "intent": "Accuse",
-      "text": "I want to examine {target} further.",
+      "text": "I think {target} could be a threat.",
       "weight": 1
     },
     {
@@ -391,7 +391,7 @@
     {
       "id": "starter.Vouch.004",
       "intent": "Vouch",
-      "text": "I ask you to reconsider {target}.",
+      "text": "I don't support the accusation against {target}.",
       "weight": 1
     },
     {
@@ -415,7 +415,7 @@
     {
       "id": "starter.Deflect.004",
       "intent": "Deflect",
-      "text": "I suggest we also consider {target}.",
+      "text": "I don't accept that blame. I think we should examine {target} instead.",
       "weight": 1
     },
     {
@@ -427,7 +427,7 @@
     {
       "id": "starter.ExpressFear.004",
       "intent": "ExpressFear",
-      "text": "I consider our position uncertain.",
+      "text": "I don't feel safe with so much still uncertain.",
       "weight": 1
     },
     {
@@ -463,7 +463,7 @@
     {
       "id": "player.counterclaim.01",
       "intent": "CounterClaim",
-      "text": "I am the actual {role}.",
+      "text": "I challenge that role claim. I am the {role}.",
       "weight": 1
     },
     {
@@ -481,7 +481,7 @@
     {
       "id": "player.counterclaim.04",
       "intent": "CounterClaim",
-      "text": "We cannot both be the {role}.",
+      "text": "I dispute your claim. I am the {role}.",
       "weight": 1
     }
   ]

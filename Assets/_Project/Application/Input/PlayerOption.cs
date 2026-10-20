@@ -1,5 +1,6 @@
 using SocialStim.Rules.Commands;
 using SocialStim.Rules.Dialogue;
+using SocialStim.Rules.Cast;
 
 namespace SocialStim.Application.Input
 {
@@ -15,7 +16,7 @@ namespace SocialStim.Application.Input
         /// <summary>Qualitative social meaning, not a promise of exact NPC scores.</summary>
         public string Interpretation { get; }
         /// <summary>Presentation navigation only; choosing a category never submits a command.</summary>
-        public string Category => Command.Kind == CommandKind.ReportLastAction ? "Claim Role" : Command.Kind != CommandKind.Speak ? "Actions"
+        public string Category => Command.Kind == CommandKind.ReportLastAction ? "Report" : Command.Kind != CommandKind.Speak ? "Actions"
             : Command.Intent == SpeechIntent.ClaimRole ? "Claim Role"
             : Command.Intent == SpeechIntent.Accuse ? "Accuse"
             : Command.Intent == SpeechIntent.Vouch ? "Defend" : "Actions";
@@ -23,5 +24,9 @@ namespace SocialStim.Application.Input
         public bool HasSubmenu => Category != "Actions";
         public string Family => Command.Kind == CommandKind.Speak ? ActionLabels.Speech(Command.Intent) : Command.Kind == CommandKind.ReportLastAction ? "Report last night" : "Actions";
         internal GameCommand Command { get; }
+        /// <summary>Public, already-validated UI target; never a hidden NPC selection.</summary>
+        public CharacterId? Target => Command.Target;
+        public CommandKind Kind => Command.Kind;
+        public SpeechIntent Intent => Command.Intent;
     }
 }

@@ -1,0 +1,356 @@
+{
+  "entries": [
+    {
+      "key": "ui.you",
+      "text": "(you)"
+    },
+    {
+      "key": "ui.dead",
+      "text": "DEAD"
+    },
+    {
+      "key": "ui.alive",
+      "text": "ALIVE"
+    },
+    {
+      "key": "ui.teammate",
+      "text": "TEAMMATE"
+    },
+    {
+      "key": "ui.legend",
+      "text": "COLOUR KEY"
+    },
+    {
+      "key": "ui.legendBody",
+      "text": "Blue: names and reports. Amber: accusations and votes. Teal: defense and support. Purple: counterclaims and refutations. Role badges: Town green, Antagonist red, Neutral orange. A claim is not proof of a role. Selected players have a blue frame; dead players are grey."
+    },
+    {
+      "key": "intent.Accuse",
+      "text": "ACCUSE"
+    },
+    {
+      "key": "intent.Defend",
+      "text": "DEFEND"
+    },
+    {
+      "key": "intent.Vouch",
+      "text": "DEFEND"
+    },
+    {
+      "key": "intent.Deflect",
+      "text": "REFUTE"
+    },
+    {
+      "key": "intent.Agree",
+      "text": "AGREE"
+    },
+    {
+      "key": "intent.Disagree",
+      "text": "DISAGREE"
+    },
+    {
+      "key": "intent.ClaimRole",
+      "text": "CLAIM"
+    },
+    {
+      "key": "intent.CounterClaim",
+      "text": "COUNTERCLAIM"
+    },
+    {
+      "key": "intent.ReportAction",
+      "text": "REPORT"
+    },
+    {
+      "key": "intent.ReportInvestigation",
+      "text": "REPORT"
+    },
+    {
+      "key": "intent.CallForTrial",
+      "text": "ACCUSE"
+    },
+    {
+      "key": "intent.ExpressFear",
+      "text": "CONCERN"
+    },
+    {
+      "key": "intent.LastWords",
+      "text": "LAST WORDS"
+    },
+    {
+      "key": "ui.statement",
+      "text": "STATEMENT"
+    },
+    {
+      "key": "ui.giveReport",
+      "text": "Give report"
+    },
+    {
+      "key": "ui.reportPending",
+      "text": "No night to report yet"
+    },
+    {
+      "key": "ui.reportDone",
+      "text": "Report already given"
+    },
+    {
+      "key": "ui.selectTarget",
+      "text": "Choose a player from the list"
+    },
+    {
+      "key": "ui.targetActions",
+      "text": "Actions for {name}"
+    },
+    {
+      "key": "ui.history",
+      "text": "Public record"
+    },
+    {
+      "key": "ui.historyEmpty",
+      "text": "No public statements or votes recorded yet."
+    },
+    {
+      "key": "ui.back",
+      "text": "Back"
+    },
+    {
+      "key": "ui.roles",
+      "text": "Roles"
+    },
+    {
+      "key": "ui.roleGuide",
+      "text": "ROLE REFERENCE"
+    },
+    {
+      "key": "ui.close",
+      "text": "Close"
+    },
+    {
+      "key": "ui.debug",
+      "text": "Night debug"
+    },
+    {
+      "key": "ui.debugTitle",
+      "text": "NIGHT DEBUG — reveals secret actions"
+    },
+    {
+      "key": "ui.debugEmpty",
+      "text": "No night has resolved yet."
+    },
+    {
+      "key": "ui.debugRow",
+      "text": "Night {night}: {name} — {action} — {target}\n{details}"
+    },
+    {
+      "key": "ui.pass",
+      "text": "Pass"
+    },
+    {
+      "key": "ui.visited",
+      "text": "Visit completed"
+    },
+    {
+      "key": "ui.noVisit",
+      "text": "No completed visit"
+    },
+    {
+      "key": "ui.blocked",
+      "text": "Blocked"
+    },
+    {
+      "key": "ui.spent",
+      "text": "Charge spent"
+    },
+    {
+      "key": "ui.notSpent",
+      "text": "No charge spent"
+    },
+    {
+      "key": "ui.morning",
+      "text": "Morning"
+    },
+    {
+      "key": "ui.afternoon",
+      "text": "Afternoon"
+    },
+    {
+      "key": "ui.evening",
+      "text": "Evening"
+    },
+    {
+      "key": "ui.night",
+      "text": "Night"
+    },
+    {
+      "key": "ui.accuseTarget",
+      "text": "Accuse {name}"
+    },
+    {
+      "key": "ui.defendTarget",
+      "text": "Defend {name}"
+    },
+    {
+      "key": "ui.mark",
+      "text": "Mark as a suspect"
+    },
+    {
+      "key": "ui.unmark",
+      "text": "Clear my suspect mark"
+    },
+    {
+      "key": "ui.myMark",
+      "text": "YOUR SUSPECT"
+    },
+    {
+      "key": "ui.confirm",
+      "text": "Confirm: {action}"
+    },
+    {
+      "key": "ui.inspect",
+      "text": "SELECT AN ACTION OR PLAYER"
+    },
+    {
+      "key": "ui.recordDay",
+      "text": "Day {day}"
+    },
+    {
+      "key": "ui.selectable",
+      "text": "SELECTABLE"
+    },
+    {
+      "key": "ui.selected",
+      "text": "SELECTED"
+    },
+    {
+      "key": "ui.previous",
+      "text": "Previous page"
+    },
+    {
+      "key": "ui.next",
+      "text": "Next page"
+    },
+    {
+      "key": "report.heading",
+      "text": "Night {night} — {role} report."
+    },
+    {
+      "key": "report.pass",
+      "text": "I chose not to use my ability."
+    },
+    {
+      "key": "report.none",
+      "text": "I had no active night ability."
+    },
+    {
+      "key": "report.investigate",
+      "text": "I chose to investigate {target}."
+    },
+    {
+      "key": "report.protect",
+      "text": "I chose to protect {target}."
+    },
+    {
+      "key": "report.block",
+      "text": "I chose to block {target}."
+    },
+    {
+      "key": "report.attack",
+      "text": "I chose to attack {target}."
+    },
+    {
+      "key": "report.selfProtect",
+      "text": "I chose to protect myself."
+    },
+    {
+      "key": "report.forge",
+      "text": "I chose to forge evidence against {target}."
+    },
+    {
+      "key": "report.watch",
+      "text": "I chose to watch {target}."
+    },
+    {
+      "key": "report.blocked",
+      "text": "I was blocked; I could not complete my action."
+    },
+    {
+      "key": "report.blockedBlock",
+      "text": "I was blocked too, but my own selected block still took effect."
+    },
+    {
+      "key": "report.investigation",
+      "text": "The investigation result for {target} was {result}."
+    },
+    {
+      "key": "report.visitor",
+      "text": "I saw {visitor} visit {subject}. I could not see which ability they used."
+    },
+    {
+      "key": "report.noVisitors",
+      "text": "I saw no other visitors to {target}."
+    },
+    {
+      "key": "report.protection",
+      "text": "My protection was applied to {target}. This does not tell me whether anyone attacked them."
+    },
+    {
+      "key": "report.attackFailed",
+      "text": "My attack did not kill {target}."
+    },
+    {
+      "key": "report.targeted",
+      "text": "I survived a night attack. I do not know who attacked me."
+    },
+    {
+      "key": "report.forgery",
+      "text": "I made {target} appear Antagonist to investigations for that night."
+    },
+    {
+      "key": "report.noResult",
+      "text": "I received no further result confirming what happened to the target."
+    },
+    {
+      "key": "role.inspector",
+      "text": "TOWN — Decryptor\nInvestigate one other participant each night. You receive their apparent alignment, which can be affected by forged evidence. Goal: help Town eliminate its threats."
+    },
+    {
+      "key": "role.physician",
+      "text": "TOWN — Physician\nProtect one other participant at night. Protection can stop attacks up to its strength; applying protection does not prove an attack happened. Goal: help Town eliminate its threats."
+    },
+    {
+      "key": "role.citizen",
+      "text": "TOWN — Solarian\nNo active night ability. Use discussion, reports and votes to find the threats. Cannot claim an acting role. Goal: help Town win."
+    },
+    {
+      "key": "role.vigilante",
+      "text": "TOWN — Nullifier\nLimited night attacks against one other participant. Passing preserves a charge. Choose carefully: a suspicion is not proof. Goal: help Town win."
+    },
+    {
+      "key": "role.coordinator",
+      "text": "TOWN — Watcher\nWatch another participant at night. Learn who visited them, not what ability each visitor used. A living counterclaimant is a legal target. Goal: help Town win."
+    },
+    {
+      "key": "role.assassin",
+      "text": "ANTAGONIST — Archon\nThe faction chooses one night attack. You know your Antagonist teammates. A living player killer controls the team's target or pass. May bluff a Town special role. Goal: secure an Antagonist victory."
+    },
+    {
+      "key": "role.interrupter",
+      "text": "ANTAGONIST — Singer\nChoose another participant to block at night. A successful block can prevent their action. You know your Antagonist teammates and may bluff a Town special role. Goal: secure an Antagonist victory."
+    },
+    {
+      "key": "role.forger",
+      "text": "ANTAGONIST — Aperture\nForge evidence against one participant so their investigation appearance becomes Antagonist for that night. You know your teammates and may bluff a Town special role. Goal: secure an Antagonist victory."
+    },
+    {
+      "key": "role.lone-killer",
+      "text": "NEUTRAL — Anarchy\nMake an independent night attack. You have no Antagonist teammate knowledge. Goal: be the last survivor; Anarchy and the night-immune Infinitum alone form a stalemate."
+    },
+    {
+      "key": "role.survivor",
+      "text": "NEUTRAL — Infinitum\nNo active night ability; immune to night attacks and appears Town to investigations. Goal: survive until a normal Antagonist victory, which you replace. Surviving a Town victory is not your win."
+    },
+    {
+      "key": "role.provocateur",
+      "text": "NEUTRAL — Fool\nNo active night ability. Goal: be executed by the day vote. Dying at night does not fulfill your objective. May bluff a Town special role."
+    }
+  ]
+}

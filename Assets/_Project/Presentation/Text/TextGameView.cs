@@ -8,6 +8,7 @@ using SocialStim.Rules.Phases;
 using SocialStim.Rules.Dialogue;
 using SocialStim.Rules.Cast;
 using SocialStim.Rules.Roles;
+using SocialStim.Rules.Night;
 using SocialStim.Presentation.Effects;
 using TMPro;
 using UnityEngine;
@@ -32,6 +33,8 @@ namespace SocialStim.Presentation.Text
         private ScrollRect _transcriptScroll;
         private ScrollRect _choiceScroll;
         private readonly List<Button> _buttons = new List<Button>();
+        private readonly Dictionary<Button, Faction> _roleButtonFactions = new Dictionary<Button, Faction>();
+        private readonly Dictionary<Button, EffectTone> _buttonTones = new Dictionary<Button, EffectTone>();
         private readonly List<Button> _controls = new List<Button>();
         private readonly List<Image> _surfaces = new List<Image>();
         private readonly List<TextMeshProUGUI> _labels = new List<TextMeshProUGUI>();
@@ -45,6 +48,17 @@ namespace SocialStim.Presentation.Text
         private int _next;
         private int _currentStart;
         private TextPalette _palette;
+        private GameText _words = GameText.Default;
+        private InformationPanel _information;
+        private Func<IReadOnlyList<NightDebugRecord>> _diagnostics;
+        private DaylightBackdrop _backdrop;
+        private TextMeshProUGUI _timeLabel;
+        private Image _timeFill;
+        private TextMeshProUGUI _roleBadge;
+        private CharacterId? _selectedTarget;
+        private readonly HashSet<CharacterId> _suspectMarks = new HashSet<CharacterId>();
+        private EffectTone _activeTone;
+        private EffectTone _headingTone;
         private TextEffectRenderer _textEffects;
         private ScreenEffectOverlay _screenEffects;
         private Action<DisplayAcknowledgement> _onAcknowledged;
@@ -59,7 +73,6 @@ namespace SocialStim.Presentation.Text
         private int _menuPage;
         private int _choicesReadyFrame = -1;
         private int _displayDay = 1;
-        private int _daySpeeches;
         private RectTransform _castPanel;
         private ScrollRect _castScroll;
         private string _pendingStatus;
@@ -69,8 +82,10 @@ namespace SocialStim.Presentation.Text
         public event Action<EffectsSettings> SettingsChanged;
         public bool IsDisplaying => _playback.Busy || _request != null && _next < _request.View.Transcript.Count;
 
-        public void Initialize(TMP_FontAsset font, IReadOnlyDictionary<PresentationCue, EffectProfile> profiles = null, EffectsSettings initialSettings = null, InteractionLabels copy = null)
+        public void Initialize(TMP_FontAsset font, IReadOnlyDictionary<PresentationCue, EffectProfile> profiles = null, EffectsSettings initialSettings = null, InteractionLabels copy = null,
+            GameText words = null, Func<IReadOnlyList<NightDebugRecord>> diagnostics = null)
         {
+            _words = words ?? GameText.Default; _diagnostics = diagnostics;
             _copy = copy ?? InteractionLabels.Default;
             _settings = initialSettings ?? new EffectsSettings();
             _font = font; _profiles = profiles ?? DefaultCueProfiles.Create();
@@ -81,9 +96,10 @@ namespace SocialStim.Presentation.Text
                     GameObservation observation = _request.View.Transcript[_next];
                     if (observation.Cue == GameCue.SpeechDelivered && !_palette.Night)
                     {
-                        _daySpeeches++;
-                        float expected = Mathf.Max(1, _request.View.Characters.Count * _request.View.DiscussionRoundsAllowed);
-                        ApplyPalette(false, Mathf.Max(_palette.DayProgress, 0.6f * Mathf.Clamp01(_daySpeeches / expected)));
+                        float progress = _request.View.Phase == GamePhase.Discussion
+                            ? Daylight.DiscussionProgress(_request.View.DiscussionRound, _request.View.DiscussionRoundsAllowed)
+                            : Daylight.Progress(_request.View.Phase, _request.View.TrialsUsed, _request.View.TrialsAllowed);
+                        ApplyPalette(false, Mathf.Max(_palette.DayProgress, progress));
                     }
 
                 }
@@ -96,6 +112,17 @@ namespace SocialStim.Presentation.Text
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1280, 800); scaler.matchWidthOrHeight = 0.5f;
             _canvasSurface = canvas.AddComponent<Image>();
+            RectTransform sky = TextUiFactory.Rect("Daylight sky", canvas.transform);
+            TextUiFactory.Fill(sky, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            _backdrop = sky.gameObject.AddComponent<DaylightBackdrop>(); _backdrop.raycastTarget = false;
+            RectTransform daylight = TextUiFactory.Rect("Daylight progress", canvas.transform);
+            TextUiFactory.Fill(daylight, new Vector2(0.42f, 1), new Vector2(0.70f, 1), new Vector2(0, -55), new Vector2(0, -25));
+            _timeLabel = TextUiFactory.Text("Time of day", daylight, font, 14);
+            var fill = TextUiFactory.Rect("Progress", daylight);
+            TextUiFactory.Fill(fill, Vector2.zero, new Vector2(1, 0), Vector2.zero, new Vector2(0, 3));
+            _timeFill = fill.gameObject.AddComponent<Image>();
+            _roleBadge = TextUiFactory.Text("Your role", canvas.transform, font, 14);
+            TextUiFactory.Fill(_roleBadge.rectTransform, new Vector2(0.71f, 1), new Vector2(0.85f, 1), new Vector2(0, -60), new Vector2(0, -20));
             var title = TextUiFactory.Text("Title", canvas.transform, font, 30); title.text = "SocialStim";
             title.fontStyle = FontStyles.Bold; title.characterSpacing = 1.2f; _labels.Add(title);
             TextUiFactory.Fill(title.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(32, -61), new Vector2(-200, -20));
@@ -164,12 +191,17 @@ namespace SocialStim.Presentation.Text
             _speedControl = Control(_displayOptionsPanel, "Speed: " + _settings.ElementsPerSecond.ToString("0"), () =>
                 ChangeSettings(speed: _settings.ElementsPerSecond < 84 ? 84 : _settings.ElementsPerSecond < 168 ? 168 : 28));
             _optionsControl = Control(footer, "Display options", ToggleDisplayOptions);
+            Control(footer, _words.Format("ui.roles"), ShowRoleReference);
+            if (_diagnostics != null) Control(footer, _words.Format("ui.debug"), ShowNightDebug);
             Control(_displayOptionsPanel, "Reset display defaults", ResetSettings);
             _displayOptionsPanel.gameObject.SetActive(false);
             RefreshSettingLabels();
             RectTransform overlay = TextUiFactory.Rect("Effects Overlay", canvas.transform);
             TextUiFactory.Fill(overlay, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             _screenEffects = overlay.gameObject.AddComponent<ScreenEffectOverlay>(); _screenEffects.raycastTarget = false;
+            RectTransform information = TextUiFactory.Rect("Reference panel", canvas.transform);
+            TextUiFactory.Fill(information, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            _information = information.gameObject.AddComponent<InformationPanel>(); _information.Initialize(font, _words.Format("ui.close"));
             ApplyPalette(false);
         }
 
@@ -177,6 +209,7 @@ namespace SocialStim.Presentation.Text
         {
             ResetDisplay(); ClearChoices(); ApplyPalette(false);
             _roles.Clear();
+            _roleBadge.gameObject.SetActive(false);
             foreach (RoleSpec role in roles) { _roles.Add(role.Id, role); }
             _status.text = "A new run · " + seedDescription;
             _conversationHeading.text = "SETTLE IN";
@@ -206,6 +239,7 @@ namespace SocialStim.Presentation.Text
                     string description = side == Faction.Town ? "Find the threats."
                         : side == Faction.Antagonist ? "Protect your team. Mislead the town." : "Follow your own goal.";
                     AddButton(side + " roles", description, () => ShowRoleGroups(roles, start, side));
+                    _roleButtonFactions[_buttons.Last()] = side; ThemeButton(_buttons.Last());
                 }
             }
             else
@@ -216,6 +250,7 @@ namespace SocialStim.Presentation.Text
                     RoleId id = role.Id;
                     AddButton(role.Name, ActionLabels.Ability(role.Ability)
                         + (role.Charges > 0 ? " · " + role.Charges + " uses" : ""), () => start(id));
+                    _roleButtonFactions[_buttons.Last()] = role.Faction; ThemeButton(_buttons.Last());
                 }
             }
             _choiceScroll.verticalNormalizedPosition = 1;
@@ -230,6 +265,9 @@ namespace SocialStim.Presentation.Text
             TextUiFactory.Fill((RectTransform)_transcriptScroll.transform, Vector2.zero, new Vector2(0.51f, 1), new Vector2(32, 82), new Vector2(-10, -130));
             TextUiFactory.Fill((RectTransform)_choiceScroll.transform, new Vector2(0.51f, 0), new Vector2(0.79f, 1), new Vector2(10, 82), new Vector2(-32, -130));
             var view = request.View;
+            _roleBadge.gameObject.SetActive(true);
+            _roleBadge.text = view.OwnRole.Name + "\n" + view.OwnRole.Faction;
+            _roleBadge.color = _palette.RoleColor(view.OwnRole.Faction);
             _choiceHeading.text = view.RespondTo.HasValue ? "RESPOND"
                 : view.Phase == GamePhase.Voting ? (view.Revote ? "REVOTE" : "VOTE") : "YOUR TURN";
             _pendingStatus = $"Day {view.Day} · {ActionLabels.Phase(view.Phase)} · {view.OwnRole.Name} ({view.OwnRole.Faction}) | {(view.Alive ? "Alive" : "Spectator")}"
@@ -239,7 +277,8 @@ namespace SocialStim.Presentation.Text
                     + $" · Window {view.PlayerWindow}/{view.WindowsPerRound} · {view.OwnRole.Name} ({view.OwnRole.Faction})"
                     + $" · {(view.Alive ? "Alive" : "Spectator")} · Seed {view.Seed}";
             ClearChoices();
-            _menuCategory = null; _menuPage = 0;
+            _menuCategory = null; _menuPage = 0; _selectedTarget = null;
+            foreach (ParticipantCard card in _cards.Values) card.SetSelectable(false);
             _status.text = "Listening…";
             _choiceScroll.gameObject.SetActive(false);
             _wasDisplaying = true;
@@ -252,11 +291,15 @@ namespace SocialStim.Presentation.Text
 
         private void Update()
         {
-            if (IsDisplaying && Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame) SkipAll();
+            if (_information != null && _information.IsOpen)
+            {
+                if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) _information.Close();
+            }
+            else if (IsDisplaying && Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame) SkipAll();
             _playback.Tick(Time.unscaledDeltaTime);
             Pump();
             if (_wasDisplaying && !IsDisplaying) UpdateChoiceState();
-            if (_autoAdvance && !IsDisplaying && Time.unscaledTime >= _spectateAt)
+            if (_autoAdvance && !IsDisplaying && !_information.IsOpen && Time.unscaledTime >= _spectateAt)
             {
                 _autoAdvance = false;
                 if (_request != null && !_request.View.Alive && _request.Options.Count == 1)
@@ -267,14 +310,14 @@ namespace SocialStim.Presentation.Text
         {
             if (_request == null) return;
             _textEffects.Apply(_currentStart + _playback.VisibleUtf16, _playback.Frame, Time.unscaledTime);
-            _screenEffects.Apply(_playback.Frame, _palette);
+            _screenEffects.Apply(_playback.Frame, _palette, _activeTone);
         }
         private void Pump()
         {
             while (_request != null && !_playback.Busy && _next < _request.View.Transcript.Count)
             {
                 var observation = _request.View.Transcript[_next];
-                if (observation.Day != _displayDay) { _displayDay = observation.Day; _daySpeeches = 0; ApplyPalette(false); }
+                if (observation.Day != _displayDay) { _displayDay = observation.Day; ApplyPalette(false); }
                 if (observation.Cue == GameCue.NightFalls) ApplyPalette(true);
                 if (observation.Cue == GameCue.DawnBreaks) ApplyPalette(false);
                 if (!_palette.Night && observation.Cue == GameCue.TrialStarted)
@@ -285,15 +328,24 @@ namespace SocialStim.Presentation.Text
                 SemanticText line;
                 try { line = SemanticMarkup.Parse(observation.Text); }
                 catch (ArgumentException) { line = SemanticText.Literal(observation.Text); }
-                bool roleClaim = observation.Intent == SpeechIntent.ClaimRole || observation.Intent == SpeechIntent.CounterClaim;
-                if (roleClaim) line = new SemanticText("[CLAIM] " + line.Text,
-                    new[] { new SemanticSpan(0, 8 + line.Text.Length, SemanticStyle.Evidence) });
+                line = ActionAppearance.Label(line, observation.Intent, _words);
+                line = ParticipantNameStyler.Highlight(line, _request.View.Characters.Select(c => c.Name));
                 if (_shown.Length > 0) _shown.Append("\n\n");
                 _currentStart = _shown.Length;
                 _shown.Append(line.Text);
                 foreach (SemanticSpan span in line.Spans) _spans.Add(new SemanticSpan(span.Start + _currentStart, span.Length, span.Style));
                 _textEffects.SetDocument(new SemanticText(_shown.ToString(), _spans), _currentStart, _palette);
                 EffectProfile profile = _profiles[_cues.Resolve(observation, _request.View)];
+                _activeTone = profile.Tone;
+                if (observation.Cue == GameCue.SpeechDelivered)
+                {
+                    _conversationHeading.text = observation.Intent.HasValue && _words.Entries.TryGetValue("intent." + observation.Intent.Value, out string action) ? action : _words.Format("ui.statement");
+                    if (observation.Speaker.HasValue) _conversationHeading.text += " · " + _request.View.Characters.First(c => c.Id == observation.Speaker.Value).Name;
+                    if (observation.Target.HasValue && observation.Target != observation.Speaker) _conversationHeading.text += " → " + _request.View.Characters.First(c => c.Id == observation.Target.Value).Name;
+                    _headingTone = ActionAppearance.Tone(observation.Intent);
+                    _conversationHeading.color = _palette.Situation(_headingTone);
+                }
+                else { _headingTone = EffectTone.Neutral; _conversationHeading.text = "CONVERSATION"; _conversationHeading.color = _palette.Foreground; }
                 var pacing = new SpeechPacing(observation);
                 _playback.Begin(observation.Sequence, line, profile, _settings, _onAcknowledged, pacing.Pause, pacing.Speed);
                 Canvas.ForceUpdateCanvases();
@@ -311,7 +363,9 @@ namespace SocialStim.Presentation.Text
         {
             _playback.Cancel(); _request = null; _next = 0; _currentStart = 0;
             _shown.Clear(); _spans.Clear(); _cues = new VisibleCueResolver(); _wasDisplaying = false;
-            _autoAdvance = false; _displayDay = 1; _daySpeeches = 0; _pendingStatus = null;
+            _headingTone = EffectTone.Neutral;
+            _autoAdvance = false; _displayDay = 1; _pendingStatus = null; _selectedTarget = null; _suspectMarks.Clear();
+            if (_information != null && _information.IsOpen) _information.Close();
             foreach (ParticipantCard card in _cards.Values) { card.gameObject.SetActive(false); Destroy(card.gameObject); }
             _cards.Clear();
             if (_castScroll != null) _castScroll.gameObject.SetActive(false);
@@ -328,7 +382,7 @@ namespace SocialStim.Presentation.Text
             // Reconfigure preserves reveal position; the next Update pumps only completed lines.
             if (_request != null)
                 _textEffects.Apply(_currentStart + _playback.VisibleUtf16, _playback.Frame, Time.unscaledTime);
-            _screenEffects.Apply(_playback.Frame, _palette);
+            _screenEffects.Apply(_playback.Frame, _palette, _activeTone);
             SettingsChanged?.Invoke(_settings);
             RefreshSettingLabels();
         }
@@ -364,6 +418,14 @@ namespace SocialStim.Presentation.Text
         private void ApplyPalette(bool night, float progress = 0)
         {
             _palette = new TextPalette(night, progress);
+            if (_backdrop != null) _backdrop.Apply(_palette, _request == null);
+            if (_timeLabel != null)
+            {
+                _timeLabel.text = _words.Format(night ? "ui.night" : progress < 0.25f ? "ui.morning" : progress < 0.65f ? "ui.afternoon" : "ui.evening");
+                _timeLabel.color = _palette.Foreground;
+                _timeFill.color = _palette.Accent(SemanticStyle.Evidence);
+                _timeFill.rectTransform.anchorMax = new Vector2(night ? 1 : Mathf.Max(0.04f, progress), 0);
+            }
             if (_canvasSurface != null) _canvasSurface.color = _palette.Background;
             foreach (Image surface in _surfaces)
             {
@@ -372,18 +434,24 @@ namespace SocialStim.Presentation.Text
                 if (outline != null) outline.effectColor = _palette.Frame;
             }
             foreach (TextMeshProUGUI label in _labels) label.color = _palette.Foreground;
+            if (_conversationHeading != null) _conversationHeading.color = _palette.Situation(_headingTone);
             foreach (Button button in _controls) ThemeButton(button);
             foreach (Button button in _buttons) ThemeButton(button);
             foreach (ParticipantCard card in _cards.Values) card.Theme(_palette);
+            if (_roleBadge != null && _request != null) _roleBadge.color = _palette.RoleColor(_request.View.OwnRole.Faction);
             if (_transcript != null) _transcript.color = _palette.Foreground;
             if (_textEffects != null) _textEffects.SetPalette(_palette);
         }
         private void ThemeButton(Button button)
         {
             button.GetComponent<ChoiceFocusIndicator>().SetSurfaceColors(_palette.ButtonBackground, _palette.FocusBackground);
-            button.GetComponent<Outline>().effectColor = _palette.Frame;
+            EffectTone tone = _buttonTones.TryGetValue(button, out EffectTone value) ? value : EffectTone.Neutral;
+            if (tone != EffectTone.Neutral)
+                button.GetComponent<ChoiceFocusIndicator>().SetSurfaceColors(Color.Lerp(_palette.ButtonBackground, _palette.Situation(tone), 0.09f),
+                    Color.Lerp(_palette.ButtonBackground, _palette.Situation(tone), 0.19f));
+            button.GetComponent<Outline>().effectColor = tone == EffectTone.Neutral ? _palette.Frame : _palette.Situation(tone);
             foreach (var label in button.GetComponentsInChildren<TextMeshProUGUI>(true))
-                label.color = label.name == "Detail" ? _palette.Muted : _palette.Foreground;
+                label.color = label.name == "Detail" ? _palette.Muted : _roleButtonFactions.TryGetValue(button, out Faction faction) ? _palette.RoleColor(faction) : tone == EffectTone.Neutral ? _palette.Foreground : _palette.Situation(tone);
         }
         private void AddButton(string label, string detail, Action selected)
         {
@@ -393,6 +461,7 @@ namespace SocialStim.Presentation.Text
         private void ClearChoices()
         {
             foreach (Button button in _buttons) { button.interactable = false; button.gameObject.SetActive(false); Destroy(button.gameObject); }
+            foreach (Button button in _buttons) { _buttonTones.Remove(button); _roleButtonFactions.Remove(button); }
             _buttons.Clear();
         }
         private void UpdateChoiceState()
@@ -406,17 +475,7 @@ namespace SocialStim.Presentation.Text
                     ApplyPalette(Daylight.IsNight(_request.View.Phase), Mathf.Max(_palette.DayProgress, Daylight.Progress(_request.View.Phase, _request.View.TrialsUsed, _request.View.TrialsAllowed)));
                 _status.text = _pendingStatus;
                 _castScroll.gameObject.SetActive(true);
-                foreach (var participant in _request.View.Characters)
-                {
-                    if (!_cards.TryGetValue(participant.Id, out ParticipantCard card))
-                    {
-                        RectTransform root = TextUiFactory.Rect("Participant " + participant.Id.Value, _castPanel);
-                        card = root.gameObject.AddComponent<ParticipantCard>();
-                        card.Initialize(participant.Id, _font); _cards.Add(participant.Id, card);
-                    }
-                    RoleSpec claim = participant.ClaimedRole.HasValue && _roles.TryGetValue(participant.ClaimedRole.Value, out RoleSpec known) ? known : null;
-                    card.Render(participant, participant.Id == _request.View.PlayerId, _palette, claim);
-                }
+                RenderRoster();
                 if (!_request.View.Alive && _request.View.Phase != GamePhase.Ended)
                 {
                     ClearChoices(); _choiceScroll.gameObject.SetActive(false);
@@ -431,39 +490,155 @@ namespace SocialStim.Presentation.Text
             _choicesReadyFrame = Time.frameCount;
             ClearChoices();
             var options = _request.Options.AsEnumerable();
-            var entries = new List<Tuple<string, string, Action>>();
-            if (_menuCategory == null)
+            var entries = new List<Tuple<string, string, Action, EffectTone>>();
+            void Entry(string label, string detail, Action selected, EffectTone tone = EffectTone.Neutral)
+                => entries.Add(Tuple.Create(label, detail, selected, tone));
+            if (_selectedTarget.HasValue)
             {
-                foreach (PlayerOption option in options.Where(o => !o.HasSubmenu))
+                CharacterId target = _selectedTarget.Value;
+                string name = _request.View.Characters.First(c => c.Id == target).Name;
+                _choiceHeading.text = _words.Format("ui.targetActions", ("name", name));
+                AddButton(_words.Format("ui.back"), "", () => { _selectedTarget = null; _menuCategory = null; BuildMenu(); });
+                var actions = RosterInteractions.ForTarget(_request, target, _menuCategory == "Targets" ? null : _menuCategory);
+                foreach (PlayerOption option in actions)
                 {
                     string id = option.Id;
-                    entries.Add(Tuple.Create(option.Label, option.Interpretation, (Action)(() => SubmitOption(id))));
+                    string caption = RosterInteractions.Label(option, _words, name);
+                    Entry(actions.Count == 1 ? _words.Format("ui.confirm", ("action", caption)) : caption, option.Interpretation, (Action)(() => SubmitOption(id)), OptionTone(option));
+                }
+                Entry(_words.Format("ui.history"), "", (Action)(() => ShowPublicRecord(target)));
+                if (target != _request.View.PlayerId)
+                    Entry(_words.Format(_suspectMarks.Contains(target) ? "ui.unmark" : "ui.mark"), "", (Action)(() => {
+                        if (!_suspectMarks.Add(target)) _suspectMarks.Remove(target); BuildMenu();
+                    }));
+            }
+            else if (_menuCategory == null)
+            {
+                _choiceHeading.text = _request.View.RespondTo.HasValue ? _copy.DefendSelf : _words.Format("ui.inspect");
+                foreach (PlayerOption option in options.Where(o => !o.HasSubmenu && (!o.Target.HasValue || o.Kind == SocialStim.Rules.Commands.CommandKind.Speak)))
+                {
+                    string id = option.Id;
+                    Entry(option.Label, option.Interpretation, (Action)(() => SubmitOption(id)), OptionTone(option));
                 }
                 foreach (var group in options.Where(o => o.HasSubmenu).GroupBy(o => o.Category))
                 {
                     string category = group.Key;
-                    entries.Add(Tuple.Create(_copy.Group(category), "", (Action)(() => { _menuCategory = category; _menuPage = 0; BuildMenu(); })));
+                    if (category == "Report" && group.Count() == 1)
+                    {
+                        string id = group.First().Id;
+                        Entry(_words.Format("ui.giveReport"), "", (Action)(() => SubmitOption(id)), EffectTone.Evidence);
+                    }
+                    else Entry(category == "Report" ? _words.Format("ui.giveReport") : _copy.Group(category), "", (Action)(() => { _menuCategory = category; _selectedTarget = null; _menuPage = 0; BuildMenu(); }), category == "Accuse" ? EffectTone.Pressure : category == "Defend" ? EffectTone.Reassurance : EffectTone.Evidence);
+                }
+                if (options.Any(o => !o.HasSubmenu && o.Target.HasValue && o.Kind != SocialStim.Rules.Commands.CommandKind.Speak))
+                    Entry(_words.Format("ui.selectTarget"), "", (Action)(() => { _menuCategory = "Targets"; _menuPage = 0; BuildMenu(); }));
+                if (_request.View.Phase == GamePhase.Discussion && !_request.View.CounterClaimRole.HasValue && _request.View.Characters.First(c => c.Id == _request.View.PlayerId).ClaimedRole.HasValue
+                    && !_request.View.CanReportAction)
+                {
+                    AddButton(_words.Format("ui.giveReport"), _words.Format(_request.View.LastNightAction == null ? "ui.reportPending" : "ui.reportDone"), () => { });
+                    _buttons.Last().interactable = false;
                 }
             }
             else
             {
-                AddButton(_copy.Back, "", () => { _menuCategory = null; _menuPage = 0; BuildMenu(); });
-                foreach (PlayerOption option in options.Where(o => o.Category == _menuCategory))
+                AddButton(_copy.Back, "", () => { _menuCategory = null; _selectedTarget = null; _menuPage = 0; BuildMenu(); });
+                bool targeting = _menuCategory == "Targets" || options.Any(o => o.Category == _menuCategory && o.Target.HasValue);
+                _choiceHeading.text = targeting ? _words.Format("ui.selectTarget") : _menuCategory == "Report" ? _words.Format("ui.giveReport") : _copy.Group(_menuCategory);
+                foreach (PlayerOption option in options.Where(o => o.Category == _menuCategory && !o.Target.HasValue))
                 {
                     string id = option.Id;
-                    entries.Add(Tuple.Create(option.Label, option.Interpretation, (Action)(() => SubmitOption(id))));
+                    Entry(option.Label, option.Interpretation, (Action)(() => SubmitOption(id)), OptionTone(option));
                 }
             }
-            foreach (var entry in entries.Skip(_menuPage * 6).Take(6)) AddButton(entry.Item1, entry.Item2, entry.Item3);
-            if (_menuPage > 0) AddButton("Previous page", "", () => { _menuPage--; BuildMenu(); });
-            if ((_menuPage + 1) * 6 < entries.Count) AddButton("Next page", "", () => { _menuPage++; BuildMenu(); });
+            foreach (var entry in entries.Skip(_menuPage * 6).Take(6))
+            {
+                AddButton(entry.Item1, entry.Item2, entry.Item3);
+                _buttonTones[_buttons.Last()] = entry.Item4; ThemeButton(_buttons.Last());
+                if (_menuCategory == "Claim Role")
+                {
+                    RoleSpec role = _roles.Values.FirstOrDefault(r => r.Name == entry.Item1);
+                    if (role != null) { _roleButtonFactions[_buttons.Last()] = role.Faction; ThemeButton(_buttons.Last()); }
+                }
+            }
+            if (_menuPage > 0) AddButton(_words.Format("ui.previous"), "", () => { _menuPage--; BuildMenu(); });
+            if ((_menuPage + 1) * 6 < entries.Count) AddButton(_words.Format("ui.next"), "", () => { _menuPage++; BuildMenu(); });
+            RenderRoster();
             _choiceScroll.verticalNormalizedPosition = 1;
-            FocusFirstChoice();
+            if (!_information.IsOpen) FocusFirstChoice();
+        }
+
+        private static EffectTone OptionTone(PlayerOption option)
+        {
+            if (option.Kind == SocialStim.Rules.Commands.CommandKind.Speak) return ActionAppearance.Tone(option.Intent);
+            if (option.Kind == SocialStim.Rules.Commands.CommandKind.ReportLastAction) return EffectTone.Evidence;
+            if (option.Kind == SocialStim.Rules.Commands.CommandKind.Vote || option.Kind == SocialStim.Rules.Commands.CommandKind.Judge
+                || option.Kind == SocialStim.Rules.Commands.CommandKind.Nominate) return EffectTone.Judgement;
+            return EffectTone.Neutral;
+        }
+
+        private void RenderRoster()
+        {
+            if (_request == null) return;
+            foreach (var participant in _request.View.Characters)
+            {
+                if (!_cards.TryGetValue(participant.Id, out ParticipantCard card))
+                {
+                    RectTransform root = TextUiFactory.Rect("Participant " + participant.Id.Value, _castPanel);
+                    card = root.gameObject.AddComponent<ParticipantCard>(); card.Initialize(participant.Id, _font);
+                    card.Selected += SelectRosterParticipant; _cards.Add(participant.Id, card);
+                }
+                string category = _menuCategory == "Targets" ? null : _menuCategory;
+                bool legal = RosterInteractions.ForTarget(_request, participant.Id, category).Count > 0;
+                bool selectable = !IsDisplaying && (_menuCategory == null || _selectedTarget.HasValue || legal);
+                string annotation = _selectedTarget == participant.Id ? _words.Format("ui.selected")
+                    : _suspectMarks.Contains(participant.Id) ? _words.Format("ui.myMark")
+                    : _menuCategory != null && legal ? _words.Format("ui.selectable") : "";
+                RoleSpec claim = participant.ClaimedRole.HasValue && _roles.TryGetValue(participant.ClaimedRole.Value, out RoleSpec known) ? known : null;
+                card.Render(participant, participant.Id == _request.View.PlayerId, _palette, claim, selectable, _selectedTarget == participant.Id, annotation, _words);
+            }
+        }
+        private void SelectRosterParticipant(CharacterId target)
+        {
+            if (IsDisplaying || _information.IsOpen || Time.frameCount <= _choicesReadyFrame) return;
+            _selectedTarget = target; _menuPage = 0; BuildMenu();
+        }
+        private void ShowRoleReference()
+        {
+            _information.Open(_words.Format("ui.roleGuide"), _roles.Values.OrderBy(r => r.Faction).ThenBy(r => r.Name, StringComparer.Ordinal)
+                .Select(r => Tuple.Create(r.Name, _words.Entries.TryGetValue("role." + r.Id.Value, out string description)
+                    ? description : r.Faction + " · " + ActionLabels.Ability(r.Ability), _palette.RoleColor(r.Faction))).Prepend(Tuple.Create(_words.Format("ui.legend"), _words.Format("ui.legendBody"), _palette.Foreground)), _palette);
+        }
+        private void ShowPublicRecord(CharacterId target)
+        {
+            var record = RosterInteractions.PublicRecord(_request.View, target);
+            var rows = record.Select(o => Tuple.Create(_words.Format("ui.recordDay", ("day", o.Day.ToString())), Plain(o.Text), _palette.Foreground)).ToList();
+            if (rows.Count == 0) rows.Add(Tuple.Create("", _words.Format("ui.historyEmpty"), _palette.Muted));
+            _information.Open(_request.View.Characters.First(c => c.Id == target).Name + " — " + _words.Format("ui.history"), rows, _palette,
+                _request.View.Characters.Select(c => c.Name));
+        }
+        private void ShowNightDebug()
+        {
+            if (_diagnostics == null) return;
+            var records = _diagnostics();
+            Func<CharacterId, string> name = id => _request?.View.Characters.FirstOrDefault(c => c.Id == id)?.Name
+                ?? records.FirstOrDefault(r => r.Actor == id)?.Name ?? id.Value.ToString();
+            var rows = records.Where(r => r.Actor.Value != 0).Select(r => Tuple.Create(r.Name,
+                _words.Format("ui.debugRow", ("night", r.Action.Night.ToString()), ("name", r.Name),
+                    ("action", ActionLabels.Ability(r.Action.Ability)), ("target", r.Action.Target.HasValue ? name(r.Action.Target.Value) : _words.Format("ui.pass")),
+                    ("details", NightReportFormatter.Format(r.Action, _roles[r.Action.Role].Name, name, _words)
+                        + "\n" + _words.Format(r.VisitTarget.HasValue ? "ui.visited" : "ui.noVisit")
+                        + " · " + _words.Format(r.SpentCharge ? "ui.spent" : "ui.notSpent"))), _palette.Foreground)).ToList();
+            if (rows.Count == 0) rows.Add(Tuple.Create("", _words.Format("ui.debugEmpty"), _palette.Muted));
+            _information.Open(_words.Format("ui.debugTitle"), rows, _palette);
+        }
+        private static string Plain(string text)
+        {
+            try { return SemanticMarkup.Parse(text).Text; } catch (ArgumentException) { return text; }
         }
 
         private void SubmitOption(string id)
         {
-            if (!IsDisplaying && Time.frameCount > _choicesReadyFrame) OptionChosen?.Invoke(id);
+            if (!IsDisplaying && !_information.IsOpen && Time.frameCount > _choicesReadyFrame) OptionChosen?.Invoke(id);
         }
 
         private void FocusFirstChoice()

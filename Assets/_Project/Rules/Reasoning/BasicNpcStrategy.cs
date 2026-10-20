@@ -14,17 +14,18 @@ namespace SocialStim.Rules.Reasoning
         /// <inheritdoc />
         public GameCommand Speak(KnowledgeView knowledge, IRandomSource random)
         {
+            if (knowledge.CanGiveReport) return GameCommand.ReportLastAction();
             RoleSpec decoy = ClaimPolicy.Proactive(knowledge);
             RoleId claim = decoy?.Id ?? knowledge.OwnRole.Id;
             NightReport result = knowledge.PrivateResults.LastOrDefault(r => r.Kind == ReportKind.Investigation && r.Night == knowledge.Day - 1
                 && knowledge.Characters.Any(c => c.Id == r.Target && c.Alive));
-            if (result != null && random.Next(100) < 70)
+            if (result != null && knowledge.LastNightAction == null && random.Next(100) < 70)
                 return GameCommand.Speak(SpeechIntent.ReportInvestigation, result.Target, faction: result.Alignment);
             if (knowledge.OwnRole.CanBluff && decoy != null && random.Next(100) < 25)
                 return GameCommand.Speak(SpeechIntent.ClaimRole, role: claim);
             KnownCharacter suspect = SocialAssessment.Suspect(knowledge, random);
             GameCommand fabrication = ClaimPolicy.FabricatedInvestigation(knowledge, random);
-            if (fabrication != null && random.Next(100) < 25) return fabrication;
+            if (fabrication != null && knowledge.LastNightAction == null && random.Next(100) < 25) return fabrication;
             if (suspect != null && (SocialAssessment.Threat(knowledge, suspect) >= 45))
                 return GameCommand.Speak(SpeechIntent.Accuse, suspect.Id);
             int choice = random.Next(4);

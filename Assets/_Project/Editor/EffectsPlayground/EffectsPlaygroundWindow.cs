@@ -1,5 +1,6 @@
 using System;
 using SocialStim.Application.PresentationCues;
+using SocialStim.Presentation.Effects;
 using UnityEditor;
 using UnityEngine;
 
@@ -17,6 +18,8 @@ namespace SocialStim.Editor.EffectsPlayground
         private double _last;
         private int _sequence;
         private GUIStyle _style;
+        private CueProfileDefinition _definitions;
+        private EffectTone _tone;
         [MenuItem("Tools/SocialStim/Effects Playground")]
         public static void Open() => GetWindow<EffectsPlaygroundWindow>("SocialStim Effects");
         private void OnEnable()
@@ -27,6 +30,7 @@ namespace SocialStim.Editor.EffectsPlayground
         private void OnGUI()
         {
             _cue = (PresentationCue)EditorGUILayout.EnumPopup("Visible cue", _cue);
+            _definitions = (CueProfileDefinition)EditorGUILayout.ObjectField("Profile overrides", _definitions, typeof(CueProfileDefinition), false);
             _source = EditorGUILayout.TextArea(_source, GUILayout.Height(72));
             _night = EditorGUILayout.Toggle("Night palette", _night);
             _reduced = EditorGUILayout.Toggle("Reduced motion", _reduced);
@@ -39,28 +43,36 @@ namespace SocialStim.Editor.EffectsPlayground
             if (GUILayout.Button("Cancel")) _playback.Cancel();
             EditorGUILayout.EndHorizontal();
             Rect rect = GUILayoutUtility.GetRect(100, 220, GUILayout.ExpandWidth(true));
-            Color background = _night ? new Color(0.075f, 0.09f, 0.105f) : new Color(0.975f, 0.955f, 0.87f);
-            Color ink = _night ? new Color(0.94f, 0.92f, 0.86f) : new Color(0.16f, 0.14f, 0.13f);
+            var palette = new TextPalette(_night);
+            Color background = palette.Background;
+            Color ink = palette.Foreground;
+            Color accent = palette.Situation(_tone);
             EditorGUI.DrawRect(rect, background);
             EffectFrame frame = _playback.Frame;
-            Color edge = Color.Lerp(background, ink, frame.Border);
+            Color wash = accent; wash.a = frame.ColorWash; EditorGUI.DrawRect(rect, wash);
+            Color edge = Color.Lerp(background, accent, frame.Border);
             EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, 2), edge);
             EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - 2, rect.width, 2), edge);
             EditorGUI.DrawRect(new Rect(rect.x, rect.y, 2, rect.height), edge);
             EditorGUI.DrawRect(new Rect(rect.xMax - 2, rect.y, 2, rect.height), edge);
             for (int i = 0; i < 8; i++)
             {
-                Color vignette = ink; vignette.a = frame.Vignette * 0.15f * (1 - i / 8f);
+                Color vignette = Color.Lerp(Color.black, accent, 0.15f); vignette.a = frame.Vignette * 0.3f * (1 - i / 8f);
                 EditorGUI.DrawRect(new Rect(rect.x + i * 2, rect.y + i * 2, rect.width - i * 4, 2), vignette);
                 EditorGUI.DrawRect(new Rect(rect.x + i * 2, rect.yMax - 2 - i * 2, rect.width - i * 4, 2), vignette);
+                Color glow = accent; glow.a = frame.EdgeGlow * (1 - i / 8f);
+                EditorGUI.DrawRect(new Rect(rect.x + i * 2, rect.y + i * 2, rect.width - i * 4, 2), glow);
+                EditorGUI.DrawRect(new Rect(rect.x + i * 2, rect.yMax - 2 - i * 2, rect.width - i * 4, 2), glow);
+                EditorGUI.DrawRect(new Rect(rect.x + i * 2, rect.y + i * 2, 2, rect.height - i * 4), glow);
+                EditorGUI.DrawRect(new Rect(rect.xMax - 2 - i * 2, rect.y + i * 2, 2, rect.height - i * 4), glow);
             }
             string text = _playback.Text == null ? "Preview" : _playback.Text.Text.Substring(0, _playback.VisibleUtf16);
             _style.normal.textColor = ink;
             float shake = Mathf.Sin(_playback.Elapsed * 27) * frame.Shake * 3;
             GUI.Label(new Rect(rect.x + 16 + shake, rect.y + 16, rect.width - 32, rect.height - 32), text, _style);
-            Color flash = ink; flash.a = frame.Flash; EditorGUI.DrawRect(rect, flash);
+            Color flash = accent; flash.a = frame.Flash; EditorGUI.DrawRect(rect, flash);
             EditorGUILayout.LabelField(_result);
-            EditorGUILayout.HelpBox("Default profiles. Check scene overrides and TMP rendering in Play Mode.", MessageType.Info);
+            EditorGUILayout.HelpBox("Preview uses the selected overrides or defaults. Check full-screen geometry and TMP rendering in Play Mode.", MessageType.Info);
         }
         private void Play()
         {
@@ -68,7 +80,9 @@ namespace SocialStim.Editor.EffectsPlayground
             try
             {
                 var text = SemanticMarkup.Parse(_source);
-                _playback.Begin(++_sequence, text, DefaultCueProfiles.Create()[_cue],
+                EffectProfile profile = (_definitions == null ? DefaultCueProfiles.Create() : _definitions.Load())[_cue];
+                _tone = profile.Tone;
+                _playback.Begin(++_sequence, text, profile,
                     new EffectsSettings(reducedMotion: _reduced, flashes: _flash, intensity: _intensity, instantText: _instant),
                     acknowledgement => _result = $"Display {acknowledgement.Sequence}: {acknowledgement.Completion}");
             }

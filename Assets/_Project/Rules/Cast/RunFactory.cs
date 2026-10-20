@@ -15,7 +15,7 @@ namespace SocialStim.Rules.Cast
     {
         /// <summary>Creates the requested setup; the legacy seven-person template is used when none is supplied.</summary>
         public static RunSession Create(RunOptions options, IEnumerable<RoleSpec> roles, IEnumerable<string> names,
-            IEnumerable<DialogueLine> dialogue, INpcStrategy strategy = null, ReasoningSettings reasoning = null, RoleList setup = null)
+            IEnumerable<DialogueLine> dialogue, INpcStrategy strategy = null, ReasoningSettings reasoning = null, RoleList setup = null, GameText text = null)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
             var catalog = ValidateCatalog(roles);
@@ -40,13 +40,13 @@ namespace SocialStim.Rules.Cast
             var members = new List<CastMemberSpec>();
             for (int i = 0; i < assigned.Count; i++)
                 members.Add(new CastMemberSpec(availableNames[i], assigned[i].Id));
-            return CreateScenario(options, members, catalog, dialogue, strategy, reasoning: reasoning);
+            return CreateScenario(options, members, catalog, dialogue, strategy, reasoning: reasoning, text: text);
         }
 
         /// <summary>Builds an explicit starting scenario without exposing session secrets afterward.</summary>
         public static RunSession CreateScenario(RunOptions options, IEnumerable<CastMemberSpec> members,
             IEnumerable<RoleSpec> roles, IEnumerable<DialogueLine> dialogue, INpcStrategy strategy = null, IWinCondition winCondition = null,
-            ReasoningSettings reasoning = null)
+            ReasoningSettings reasoning = null, GameText text = null)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
             var catalog = ValidateCatalog(roles);
@@ -87,7 +87,7 @@ namespace SocialStim.Rules.Cast
             if (winCondition == null && catalog.Any(r => r.StealsParityWin || (int)r.Category > (int)RoleCategory.NeutralBenign))
                 winCondition = new CapabilityWinCondition();
             var settings = reasoning ?? new ReasoningSettings();
-            return new RunSession(options, cast, catalog, dialogue, strategy ?? new SocialNpcStrategy(settings), winCondition ?? new StarterWinCondition(), settings);
+            return new RunSession(options, cast, catalog, dialogue, strategy ?? new SocialNpcStrategy(settings), winCondition ?? new StarterWinCondition(), settings, text);
         }
 
         private static List<RoleSpec> ValidateCatalog(IEnumerable<RoleSpec> roles)

@@ -3,6 +3,7 @@ using SocialStim.Rules.Cast;
 using SocialStim.Rules.Reasoning;
 using SocialStim.Rules.Roles;
 using SocialStim.Rules.Victory;
+using SocialStim.Rules.Night;
 
 namespace SocialStim.Rules.Phases
 {
@@ -15,7 +16,7 @@ namespace SocialStim.Rules.Phases
             IReadOnlyList<GameObservation> transcript, bool opening = false, bool canReportAction = false, int discussionRoundsAllowed = 3, VotingMode votingMode = VotingMode.Trial,
             int discussionRound = 1, int playerWindow = 1, int windowsPerRound = 1, CharacterId? respondTo = null,
             IReadOnlyList<CharacterId> voteTargets = null, bool allowAbstain = true, bool revote = false,
-            RoleId? counterClaimRole = null, CharacterId? followUpTo = null)
+            RoleId? counterClaimRole = null, CharacterId? followUpTo = null, NightActionClaim lastNightAction = null)
         {
             Revision = revision; Seed = seed; Day = day; Phase = phase; TrialsUsed = trialsUsed; TrialsAllowed = trialsAllowed;
             Alive = alive; OwnRole = ownRole; Charges = charges; Defendant = defendant; Outcome = outcome; Won = won;
@@ -24,6 +25,7 @@ namespace SocialStim.Rules.Phases
             WindowsPerRound = windowsPerRound; RespondTo = respondTo; VoteTargets = voteTargets ?? new CharacterId[0];
             AllowAbstain = allowAbstain; Revote = revote;
             CounterClaimRole = counterClaimRole; FollowUpTo = followUpTo;
+            LastNightAction = lastNightAction;
             Opening = opening; CanReportAction = canReportAction; DiscussionRoundsAllowed = discussionRoundsAllowed;
         }
         /// <summary>Configured daily elimination policy.</summary>
@@ -49,6 +51,8 @@ namespace SocialStim.Rules.Phases
         /// <summary>The player may take the opening or yield it to one random NPC.</summary>
         public bool Opening { get; }
         public bool CanReportAction { get; }
+        /// <summary>Only the player's own recorded action and legitimately delivered results.</summary>
+        public NightActionClaim LastNightAction { get; }
         /// <summary>Configured discussion length for presentation progress.</summary>
         public int DiscussionRoundsAllowed { get; }
         /// <summary>Request generation, used to reject stale input.</summary>

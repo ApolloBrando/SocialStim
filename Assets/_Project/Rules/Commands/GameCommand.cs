@@ -1,6 +1,7 @@
 using SocialStim.Rules.Cast;
 using SocialStim.Rules.Dialogue;
 using SocialStim.Rules.Roles;
+using SocialStim.Rules.Night;
 
 namespace SocialStim.Rules.Commands
 {
@@ -8,10 +9,11 @@ namespace SocialStim.Rules.Commands
     public sealed class GameCommand
     {
         private GameCommand(CommandKind kind, CharacterId? target = null, SpeechIntent intent = SpeechIntent.StaySilent,
-            RoleId? role = null, Faction? faction = null, Verdict verdict = Verdict.Abstain)
+            RoleId? role = null, Faction? faction = null, Verdict verdict = Verdict.Abstain, NightActionClaim nightReport = null)
         {
             Kind = kind; Target = target; Intent = intent; ClaimedRole = role;
             ReportedFaction = faction; Verdict = verdict;
+            NightReport = nightReport;
         }
         /// <summary>Requested command family.</summary>
         public CommandKind Kind { get; }
@@ -25,11 +27,15 @@ namespace SocialStim.Rules.Commands
         public Faction? ReportedFaction { get; }
         /// <summary>Judgement stance.</summary>
         public Verdict Verdict { get; }
+        /// <summary>Public attributed account; not a true-role or private-result lookup.</summary>
+        public NightActionClaim NightReport { get; }
+        /// <summary>Builds an attributed structured night report for session-owned publication.</summary>
+        internal static GameCommand PublishReport(NightActionClaim report) => new GameCommand(CommandKind.Speak, report.Target, SpeechIntent.ReportAction, nightReport: report);
         /// <summary>Builds a truthful or deceptive attributed statement.</summary>
         public static GameCommand Speak(SpeechIntent intent, CharacterId? target = null, RoleId? role = null, Faction? faction = null)
             => new GameCommand(CommandKind.Speak, target, intent, role, faction);
         /// <summary>Publicly reports the observer's recorded selection and legitimate results from last night.</summary>
-        public static GameCommand ReportLastAction() => new GameCommand(CommandKind.ReportLastAction);
+        public static GameCommand ReportLastAction(Faction? claimedResult = null) => new GameCommand(CommandKind.ReportLastAction, faction: claimedResult);
         /// <summary>Nominates a participant, or abstains.</summary>
         public static GameCommand Nominate(CharacterId? target) => new GameCommand(CommandKind.Nominate, target);
         /// <summary>Casts a daily plurality ballot; null is an abstention when enabled.</summary>

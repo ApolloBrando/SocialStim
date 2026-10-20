@@ -24,8 +24,17 @@ namespace SocialStim.Application.PresentationCues
                 }
                 switch (observation.Intent)
                 {
-                    case SpeechIntent.Accuse: case SpeechIntent.CallForTrial: case SpeechIntent.Deflect: return PresentationCue.Accusation;
-                    case SpeechIntent.Defend: return PresentationCue.Defense;
+                    case SpeechIntent.Accuse: case SpeechIntent.CallForTrial: return PresentationCue.Accusation;
+                    case SpeechIntent.Deflect: return PresentationCue.Refutation;
+                    case SpeechIntent.Defend: case SpeechIntent.Vouch: return PresentationCue.Defense;
+                    case SpeechIntent.ClaimRole: return PresentationCue.Claim;
+                    case SpeechIntent.CounterClaim: return PresentationCue.CounterClaim;
+                    case SpeechIntent.Agree: return PresentationCue.Agreement;
+                    case SpeechIntent.Disagree: return PresentationCue.Disagreement;
+                    case SpeechIntent.ReportInvestigation: return PresentationCue.Investigation;
+                    case SpeechIntent.ReportAction: return PresentationCue.ActionReport;
+                    case SpeechIntent.ExpressFear: return PresentationCue.Fear;
+                    case SpeechIntent.LastWords: return PresentationCue.LastWords;
                     default: return PresentationCue.Speech;
                 }
             }
@@ -48,9 +57,12 @@ namespace SocialStim.Application.PresentationCues
                 case GameCue.RoleRevealed: return PresentationCue.Reveal;
                 case GameCue.PlayerTargetedAtNight: return PresentationCue.NarrowEscape;
                 case GameCue.AbilityBlocked: return PresentationCue.Blocked;
-                case GameCue.ProtectionApplied: return view.Charges == 0 ? PresentationCue.ResourcesDepleted : PresentationCue.None;
+                case GameCue.ProtectionApplied: return PresentationCue.Protection;
                 case GameCue.InvestigationResultReceived: return PresentationCue.Investigation;
                 case GameCue.VoteTied: return PresentationCue.Tie;
+                case GameCue.RevoteStarted: return PresentationCue.Tie;
+                case GameCue.BallotRevealed: return PresentationCue.Ballot;
+                case GameCue.VoteTallied: return PresentationCue.Tally;
                 case GameCue.VictoryAchieved: return PresentationCue.Victory;
                 case GameCue.DefeatSuffered: return PresentationCue.Defeat;
                 case GameCue.RunDrawn: return PresentationCue.Draw;

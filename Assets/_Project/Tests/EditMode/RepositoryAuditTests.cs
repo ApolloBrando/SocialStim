@@ -129,13 +129,13 @@ namespace SocialStim.Tests.EditMode
                 new[] { "physician", "inspector", "assassin", "citizen", "survivor" }
                     .Select((id, i) => new CastMemberSpec("Person" + i, new RoleId(id))),
                 AdvancedRoleTests.Roles(), TestContent.AuthoredLines(), new ScenarioStrategy());
-            foreach (var command in new[] { GameCommand.Speak(SpeechIntent.StaySilent), GameCommand.Nominate(null),
+            foreach (var command in new[] { GameCommand.Speak(SpeechIntent.ClaimRole, role: new RoleId("physician")), GameCommand.Nominate(null),
                 GameCommand.Night(new CharacterId(1)), GameCommand.Continue(), GameCommand.ReportLastAction() })
                 Assert.That(run.TrySubmit(command, out string error), Is.True, error);
             string text = run.GetPlayerView().Transcript.Last(o => o.Intent == SpeechIntent.ReportAction).Text;
             Assert.That(text.StartsWith("Person0: ", StringComparison.Ordinal), Is.True);
             Assert.That(text.Split(new[] { "Person0" }, StringSplitOptions.None).Length, Is.EqualTo(2));
-            Assert.That(text, Does.Contain("tried to protect Person1"));
+            Assert.That(text, Does.Contain("chose to protect Person1"));
             Assert.That(text.Contains("PLACEHOLDER"), Is.False);
         }
 

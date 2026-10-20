@@ -18,21 +18,21 @@
     {
       "id": "npc.grim.Accuse.003",
       "intent": "Accuse",
-      "text": "Look at {target}. We can be wrong about them next.",
+      "text": "I suspect {target}. An unpleasant place to start.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Accuse.004",
       "intent": "Accuse",
-      "text": "My doubts have a name. {target}.",
+      "text": "The person I suspect is {target}. There's no better way to say it.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Accuse.005",
       "intent": "Accuse",
-      "text": "Keep an eye on {target}. Sleep can wait.",
+      "text": "Keep questioning {target}. I don't trust them yet.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -67,14 +67,14 @@
     {
       "id": "npc.grim.Accuse.010",
       "intent": "Accuse",
-      "text": "I'd start with {target}. Starting somewhere is all we have.",
+      "text": "I'd start by questioning {target}. That's where my suspicion is.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Accuse.011",
       "intent": "Accuse",
-      "text": "Don't clear {target} to make the room feel better.",
+      "text": "I don't think we should trust {target} yet. Comfort won't make them safe.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -88,84 +88,84 @@
     {
       "id": "npc.grim.Defend.001",
       "intent": "Defend",
-      "text": "You've accused me. That isn't a finding.",
+      "text": "I deny it. You've made an accusation, not proved a case.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Defend.002",
       "intent": "Defend",
-      "text": "Hear my answer. The silence afterward can wait.",
+      "text": "I dispute the blame. Hear me before you decide.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Defend.003",
       "intent": "Defend",
-      "text": "I'm defending myself. I don't expect it to be cheerful.",
+      "text": "I'm defending myself. You haven't shown I'm guilty.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Defend.004",
       "intent": "Defend",
-      "text": "The case against me is still a case, not a conclusion.",
+      "text": "I reject the accusation. A suspicion isn't a conclusion.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Defend.005",
       "intent": "Defend",
-      "text": "I won't confess to make the discussion shorter.",
+      "text": "I won't confess to something I deny just to shorten the discussion.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Defend.006",
       "intent": "Defend",
-      "text": "You can listen to my defense or be wrong more efficiently.",
+      "text": "Don't condemn me yet. You still need to hear my defense.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Defend.007",
       "intent": "Defend",
-      "text": "Pressure doesn't improve an accusation. It just makes it louder.",
+      "text": "I deny the accusation. Raising your voice won't prove it.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Defend.008",
       "intent": "Defend",
-      "text": "I'm not accepting your verdict before you've heard me.",
+      "text": "I won't accept that verdict against me. The case is unproven.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Defend.009",
       "intent": "Defend",
-      "text": "Give me a hearing. We have little enough to lose by thinking.",
+      "text": "I dispute the charge. Give me a hearing, however unpleasant.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Defend.010",
       "intent": "Defend",
-      "text": "I dispute the blame. That's my answer, stripped down.",
+      "text": "I deny the blame. That's my answer, stripped down.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Defend.011",
       "intent": "Defend",
-      "text": "Don't mistake my lack of surprise for agreement.",
+      "text": "I'm not agreeing with the accusation. I just expected to be suspected.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Defend.012",
       "intent": "Defend",
-      "text": "I can answer. Whether anyone wants to listen is another matter.",
+      "text": "I reject the case against me. Whether anyone listens is another matter.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -256,7 +256,7 @@
     {
       "id": "npc.grim.Agree.003",
       "intent": "Agree",
-      "text": "Yes, {target}. We can stop circling that part.",
+      "text": "I agree with {target}'s point. We can stop circling it.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -277,7 +277,7 @@
     {
       "id": "npc.grim.Agree.006",
       "intent": "Agree",
-      "text": "{target} makes sense to me. A small mercy.",
+      "text": "What {target} said makes sense to me. I agree.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -291,14 +291,14 @@
     {
       "id": "npc.grim.Agree.008",
       "intent": "Agree",
-      "text": "My answer follows {target}'s. We've reached the same unpleasant place.",
+      "text": "I reach the same conclusion as {target}. An unpleasant agreement.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Agree.009",
       "intent": "Agree",
-      "text": "Keep {target}'s point. We haven't had a surplus of useful ones.",
+      "text": "I support {target}'s point. Useful ones have been scarce.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -312,7 +312,7 @@
     {
       "id": "npc.grim.Disagree.001",
       "intent": "Disagree",
-      "text": "No, {target}. That doesn't make it better.",
+      "text": "I disagree with {target}'s point. It doesn't convince me.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -333,14 +333,14 @@
     {
       "id": "npc.grim.Disagree.004",
       "intent": "Disagree",
-      "text": "I see it differently, {target}. Neither view is comfortable.",
+      "text": "I don't accept {target}'s conclusion. Neither answer is comfortable.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Disagree.005",
       "intent": "Disagree",
-      "text": "Don't count me with {target}. That's not where I stand.",
+      "text": "Don't count me as agreeing with {target}'s point.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -354,14 +354,14 @@
     {
       "id": "npc.grim.Disagree.007",
       "intent": "Disagree",
-      "text": "{target}, I can't turn a weak conclusion into a comforting one.",
+      "text": "I reject {target}'s argument. Calling it reassuring won't strengthen it.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Disagree.008",
       "intent": "Disagree",
-      "text": "We're apart on this, {target}. Best say it now.",
+      "text": "I disagree with {target}'s point. Best say it now.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -522,42 +522,42 @@
     {
       "id": "npc.grim.Vouch.001",
       "intent": "Vouch",
-      "text": "Give {target} time. Time is all we're lending anyone.",
+      "text": "Don't condemn {target} yet. I want to hear them through.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Vouch.002",
       "intent": "Vouch",
-      "text": "I'm backing {target} for now. Nothing lasts forever.",
+      "text": "I'm backing {target} for now. That's where I stand.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Vouch.003",
       "intent": "Vouch",
-      "text": "{target} deserves a hearing before another empty chair.",
+      "text": "Don't condemn {target} yet. I support their right to a defense.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Vouch.004",
       "intent": "Vouch",
-      "text": "Don't rush to remove {target}. We know how final that is.",
+      "text": "I oppose the accusation against {target}. We can be careful, at least.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Vouch.005",
       "intent": "Vouch",
-      "text": "I trust {target} enough to keep listening.",
+      "text": "I trust {target} enough to speak in their defense.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Vouch.006",
       "intent": "Vouch",
-      "text": "Leave room for {target}. There are fewer people to make room for now.",
+      "text": "I'm supporting {target}. Hear them before deciding who to lose.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -634,35 +634,35 @@
     {
       "id": "npc.grim.Deflect.001",
       "intent": "Deflect",
-      "text": "Question {target} too. I'm not the whole room.",
+      "text": "I deny it. Question {target} instead; I suspect them.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Deflect.002",
       "intent": "Deflect",
-      "text": "Turn toward {target}. You can return to me afterward.",
+      "text": "I reject the blame. My accusation is against {target}.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Deflect.003",
       "intent": "Deflect",
-      "text": "Some of this attention belongs on {target}.",
+      "text": "Don't call me guilty. I want {target} examined.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Deflect.004",
       "intent": "Deflect",
-      "text": "Look beyond my name. Start with {target}.",
+      "text": "I dispute the case against me. Start looking at {target}.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Deflect.005",
       "intent": "Deflect",
-      "text": "Ask {target} the same questions. Scrutiny shouldn't settle in one chair.",
+      "text": "I deny your accusation. Now hear mine: I suspect {target}.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -886,7 +886,7 @@
     {
       "id": "npc.grim.counterclaim.07",
       "intent": "CounterClaim",
-      "text": "We were short on trouble, apparently. I am the actual {role}.",
+      "text": "I challenge that claim. I'm the {role}. Another problem to deal with.",
       "weight": 1,
       "requiredTrait": "Grim"
     },

@@ -16,6 +16,7 @@ namespace SocialStim.Data.Definitions
     {
         [SerializeField] private RoleDefinition[] _roles;
         [SerializeField] private TextAsset _dialogue;
+        [SerializeField] private TextAsset _gameText;
         [SerializeField] private TextAsset[] _npcDialogue = Array.Empty<TextAsset>();
         [SerializeField] private string[] _names;
         [SerializeField] private ReasoningDefinition _reasoning;
@@ -24,6 +25,8 @@ namespace SocialStim.Data.Definitions
             "Agree", "Disagree", "Back", "Report last night", "Defend yourself", "PLAYERS" };
         /// <summary>Loads editable interaction wording without retaining mutable asset arrays.</summary>
         public InteractionLabels LoadInteractionLabels() => new InteractionLabels(_interactionLabels);
+        /// <summary>Loads editable interface, role-guide and report prose.</summary>
+        public GameText LoadGameText() => _gameText != null ? GameTextDocument.Parse(_gameText.text) : GameText.Default;
         public RoleList LoadSetup(int participants = 0) => _setup != null ? _setup.Load(participants)
             : participants > 0 ? RoleList.ForPopulation(participants) : null;
 
