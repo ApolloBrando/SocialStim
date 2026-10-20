@@ -12,13 +12,34 @@ namespace SocialStim.Rules.Phases
         internal PlayerView(int revision, uint seed, int day, GamePhase phase, int trialsUsed, int trialsAllowed,
             bool alive, RoleSpec ownRole, int charges, CharacterId? defendant, OutcomeKind outcome, bool won,
             IReadOnlyList<KnownCharacter> characters, IReadOnlyList<CharacterId> legalNightTargets,
-            IReadOnlyList<GameObservation> transcript, bool opening = false, bool canReportAction = false, int discussionRoundsAllowed = 3)
+            IReadOnlyList<GameObservation> transcript, bool opening = false, bool canReportAction = false, int discussionRoundsAllowed = 3, VotingMode votingMode = VotingMode.Trial,
+            int discussionRound = 1, int playerWindow = 1, int windowsPerRound = 1, CharacterId? respondTo = null,
+            IReadOnlyList<CharacterId> voteTargets = null, bool allowAbstain = true, bool revote = false)
         {
             Revision = revision; Seed = seed; Day = day; Phase = phase; TrialsUsed = trialsUsed; TrialsAllowed = trialsAllowed;
             Alive = alive; OwnRole = ownRole; Charges = charges; Defendant = defendant; Outcome = outcome; Won = won;
             Characters = characters; LegalNightTargets = legalNightTargets; Transcript = transcript;
+            VotingMode = votingMode; DiscussionRound = discussionRound; PlayerWindow = playerWindow;
+            WindowsPerRound = windowsPerRound; RespondTo = respondTo; VoteTargets = voteTargets ?? new CharacterId[0];
+            AllowAbstain = allowAbstain; Revote = revote;
             Opening = opening; CanReportAction = canReportAction; DiscussionRoundsAllowed = discussionRoundsAllowed;
         }
+        /// <summary>Configured daily elimination policy.</summary>
+        public VotingMode VotingMode { get; }
+        /// <summary>One-based public discussion round.</summary>
+        public int DiscussionRound { get; }
+        /// <summary>One-based ordinary player window in this round.</summary>
+        public int PlayerWindow { get; }
+        /// <summary>Configured ordinary player windows per round.</summary>
+        public int WindowsPerRound { get; }
+        /// <summary>Public speaker requiring a priority response, never a private hostile selection.</summary>
+        public CharacterId? RespondTo { get; }
+        /// <summary>Legal public candidates for this ballot, excluding the player.</summary>
+        public IReadOnlyList<CharacterId> VoteTargets { get; }
+        /// <summary>Whether a deliberate abstention is allowed.</summary>
+        public bool AllowAbstain { get; }
+        /// <summary>Whether the current ballot is the one permitted tie revote.</summary>
+        public bool Revote { get; }
         /// <summary>The player may take the opening or yield it to one random NPC.</summary>
         public bool Opening { get; }
         public bool CanReportAction { get; }

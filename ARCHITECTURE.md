@@ -393,3 +393,42 @@ Application/Settings owns immutable display/game preferences, versioned JSON mig
 ## Mission phase 4
 
 CouncilKnowledge carries only observer-authorized inputs and public run-local skills. CouncilHypothesisSampler builds constrained assignments; CouncilInference marginalizes importance-weighted likelihoods from CouncilSocialEvidence. Cached distributions, credibility and affinity feed CouncilNpcStrategy and a public-stance vote forecast. The session owns no UI clock. Private diagnostic decisions appear only in completed after-action reports or explicit development inspection. CouncilSimulation drives the same validated player port and aggregates completed-run metrics. See docs/AI_DESIGN.md.
+## Mission part two: audit baseline and first repairs
+
+The controlling phase plan is [Docs/AUDIT.md](Docs/AUDIT.md). Future discussion,
+role, settings, inference, dialogue and effect systems described there are planned,
+not implemented. Work uses phase branches/PRs and never writes directly to main.
+
+DisplayPlayback now separates acknowledgement completion from retained text-motion
+lifetime. Explicit continuous TextShake tracks keep ticking after reveal/skip;
+Cancel or replacement removes them. Screen channels remain bounded, and continuous
+flash is rejected. EffectSequence and inspector conversion preserve this policy.
+The existing timed pulse contract is unchanged for non-continuous tracks.
+
+TextGameView groups all display settings in a separate panel with reset defaults.
+Default reveal speed is 84 text elements/second; existing saved choices remain
+valid. Policy changes clear any retained animation. Day/night palettes are unchanged.
+Both NPC strategies veto hostile Town choices against hard observer-known Town
+alignment, independent of stale suspicion. These repairs do not implement the
+mission's joint-world inference or new role catalog.
+
+## Mission Phase 1A: discussion and plurality vote
+
+See [Docs/DISCUSSION_VOTING.md](Docs/DISCUSSION_VOTING.md) for the implemented
+contract, explicit UI limitations and manual checklist. Gnosia mode is the new
+run default. Trial Mode remains an explicit alternative; legacy regression
+fixtures select Trial instead of silently changing their behavioral contract.
+
+DiscussionSchedule counts ordinary windows. DiscussionExchange owns the public
+speaking queue and priority responses, independent of authoritative role state.
+RunSession supplies scoped strategy decisions and emits existing speech evidence.
+PluralityResult is a detached public tally; no ballot is published until all
+voters decide. Appended Voting/VoteReveal phases guard the single-revote and
+elimination boundary. PlayerView exposes public round/window/response/candidate
+state, and GameController creates valid revision-scoped choices. New bootstrap
+fields use default group rounds of five while preserving old scene fields for
+Trial Mode. No scene YAML or existing metadata GUID is rewritten.
+
+This is the Phase 1A loop foundation, not the complete interaction/UI rewrite.
+Current-menu replacement, reason-tagged phrasing, current-line presentation and
+the drawer remain subsequent work. No main commit/merge is performed.

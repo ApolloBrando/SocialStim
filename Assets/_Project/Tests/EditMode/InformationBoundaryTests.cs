@@ -16,7 +16,7 @@ namespace SocialStim.Tests.EditMode
         public void HiddenRolePermutationDoesNotChangeInitialKnowledge()
         {
             var roles = TestContent.Roles();
-            Func<string[], PlayerView> build = ids => RunFactory.CreateScenario(new RunOptions(31),
+            Func<string[], PlayerView> build = ids => RunFactory.CreateScenario(new RunOptions(31, votingMode: VotingMode.Trial),
                 ids.Select((id, index) => new CastMemberSpec("Person" + index, new RoleId(id))), roles, TestContent.Lines(), new ScenarioStrategy()).GetPlayerView();
             PlayerView first = build(new[] { "inspector", "physician", "interrupter", "assassin", "survivor" });
             PlayerView second = build(new[] { "inspector", "assassin", "survivor", "physician", "interrupter" });
@@ -32,7 +32,7 @@ namespace SocialStim.Tests.EditMode
         [Test]
         public void BasicStrategyRemainsSwappable()
         {
-            var run = RunFactory.Create(new RunOptions(55), TestContent.Roles(), TestContent.Names(), TestContent.Lines(), new BasicNpcStrategy());
+            var run = RunFactory.Create(new RunOptions(55, votingMode: VotingMode.Trial), TestContent.Roles(), TestContent.Names(), TestContent.Lines(), new BasicNpcStrategy());
             Assert.That(run.GetPlayerView().Characters.Count, Is.EqualTo(7));
             Assert.That(run.GetPlayerView().Characters.All(c => !c.RevealedRole.HasValue), Is.True);
         }

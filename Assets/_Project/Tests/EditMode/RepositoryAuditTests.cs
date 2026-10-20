@@ -26,7 +26,7 @@ namespace SocialStim.Tests.EditMode
             var roles = AdvancedRoleTests.Roles();
             var setup = RoleList.ForPopulation(count);
             var names = Enumerable.Range(0, count).Select(i => "Person" + i).ToArray();
-            var options = new RunOptions(147, new RoleId("citizen"));
+            var options = new RunOptions(147, new RoleId("citizen"), votingMode: VotingMode.Trial);
             var run = RunFactory.Create(options, roles, names, TestContent.Lines(), setup: setup);
             var again = RunFactory.Create(options, roles, names, TestContent.Lines(), setup: setup);
             var assigned = setup.Resolve(roles, options.PlayerRole, new SeededRandom(147));
@@ -125,7 +125,7 @@ namespace SocialStim.Tests.EditMode
         [Test]
         public void RecordedReportUsesNaturalTextAndAttributesTheSpeakerOnce()
         {
-            var run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1),
+            var run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1, votingMode: VotingMode.Trial),
                 new[] { "physician", "inspector", "assassin", "citizen", "survivor" }
                     .Select((id, i) => new CastMemberSpec("Person" + i, new RoleId(id))),
                 AdvancedRoleTests.Roles(), DialogueDocument.Parse(ReadDialogue()), new ScenarioStrategy());

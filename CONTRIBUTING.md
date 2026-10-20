@@ -1,6 +1,14 @@
 # Contributing
 
-## Workflow
+## Current mission rules
+
+The Mission part two supersedes historical main-publication permissions below.
+Never commit to main. Use one phase branch and PR per phase (split large phases).
+Do not merge automatically or rewrite history. Remove confirmed dead/duplicate
+code when appropriate and enumerate every deletion in the PR; uncertain code stays.
+See [Docs/AUDIT.md](Docs/AUDIT.md) for the current work plan.
+
+## Historical foundation workflow
 
 Work only in `ApolloBrando/SocialStim`. One milestone normally gets one feature
 branch and PR. The owner has permitted direct `main` publication for this test

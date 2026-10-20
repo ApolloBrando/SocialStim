@@ -33,7 +33,7 @@ namespace SocialStim.Tests.EditMode
         private static void Submit(RunSession run, GameCommand command)
         { bool accepted = run.TrySubmit(command, out string error); Assert.That(accepted, Is.True, error); }
         private static RunSession Run(ScenarioStrategy strategy, params string[] roles) => RunFactory.CreateScenario(
-            new RunOptions(42, discussionRounds: 1), roles.Select((id, i) => new CastMemberSpec("Person" + i, new RoleId(id))),
+            new RunOptions(42, discussionRounds: 1, votingMode: VotingMode.Trial), roles.Select((id, i) => new CastMemberSpec("Person" + i, new RoleId(id))),
             Roles(), TestContent.Lines(), strategy);
 
         [Test]
@@ -177,7 +177,7 @@ namespace SocialStim.Tests.EditMode
         {
             var strategy = new ScenarioStrategy { Target = k => k.OwnRole.Ability == AbilityKind.Investigate ? new CharacterId(3) : (CharacterId?)null };
             // Claim through a dedicated permitted strategy; all other decisions retain the deterministic scenario policy.
-            RunSession run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1),
+            RunSession run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1, votingMode: VotingMode.Trial),
                 new[] { "citizen", "inspector", "assassin", "physician", "survivor" }.Select((id, i) => new CastMemberSpec("Person" + i, new RoleId(id))),
                 Roles(), TestContent.Lines(), new ClaimingStrategy(strategy));
             Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(null));
@@ -192,7 +192,7 @@ namespace SocialStim.Tests.EditMode
         {
             var strategy = new ScenarioStrategy { Nominee = new CharacterId(0), Verdict = Verdict.Guilty };
             var members = new[] { "provocateur", "inspector", "physician", "interrupter", "assassin", "citizen" };
-            RunSession run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1, maximumDays: 2),
+            RunSession run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1, maximumDays: 2, votingMode: VotingMode.Trial),
                 members.Select((id, i) => new CastMemberSpec("Person" + i, new RoleId(id))), Roles(), TestContent.Lines(), strategy);
             Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(null));
             Submit(run, GameCommand.Speak(SpeechIntent.Defend)); Submit(run, GameCommand.Continue());
@@ -212,7 +212,7 @@ namespace SocialStim.Tests.EditMode
         {
             var strategy = new ScenarioStrategy { Target = k => k.OwnRole.Ability == AbilityKind.Attack ? new CharacterId(0) : (CharacterId?)null };
             var members = new[] { "provocateur", "inspector", "physician", "interrupter", "assassin", "citizen" };
-            RunSession run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1, maximumDays: 1),
+            RunSession run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1, maximumDays: 1, votingMode: VotingMode.Trial),
                 members.Select((id, i) => new CastMemberSpec("Person" + i, new RoleId(id))), Roles(), TestContent.Lines(), strategy);
             Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(null)); Submit(run, GameCommand.Night(null));
             Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.Ended));
@@ -222,7 +222,7 @@ namespace SocialStim.Tests.EditMode
         [Test]
         public void FabricatedMorningReportsDoNotAccidentallyExposeKnownTeammates()
         {
-            var run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1),
+            var run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1, votingMode: VotingMode.Trial),
                 new[] { "citizen", "forger", "assassin", "physician", "inspector", "survivor" }
                     .Select((id, i) => new CastMemberSpec("Person" + i, new RoleId(id))),
                 Roles(), TestContent.Lines(), new FalseInvestigators());
@@ -242,7 +242,7 @@ namespace SocialStim.Tests.EditMode
             }).ToList();
             var strategy = new ScenarioStrategy { Target = k => k.OwnRole.Ability == AbilityKind.Attack && k.Charges != 0
                 ? new CharacterId(4) : (CharacterId?)null };
-            var run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1),
+            var run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1, votingMode: VotingMode.Trial),
                 new[] { "inspector", "spent-assassin", "assassin", "physician", "citizen", "interrupter", "survivor" }
                     .Select((id, i) => new CastMemberSpec("Person" + i, new RoleId(id))),
                 roles, TestContent.Lines(), strategy);
