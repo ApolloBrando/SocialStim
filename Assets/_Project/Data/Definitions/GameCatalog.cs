@@ -16,6 +16,7 @@ namespace SocialStim.Data.Definitions
     {
         [SerializeField] private RoleDefinition[] _roles;
         [SerializeField] private TextAsset _dialogue;
+        [SerializeField] private TextAsset[] _npcDialogue = Array.Empty<TextAsset>();
         [SerializeField] private string[] _names;
         [SerializeField] private ReasoningDefinition _reasoning;
         [SerializeField] private RoleListDefinition _setup;
@@ -35,7 +36,12 @@ namespace SocialStim.Data.Definitions
         public IReadOnlyList<DialogueLine> LoadDialogue()
         {
             if (_dialogue == null) throw new InvalidOperationException("Catalog needs a dialogue JSON asset.");
-            var lines = DialogueDocument.Parse(_dialogue.text);
+            if (_npcDialogue == null || _npcDialogue.Any(asset => asset == null))
+                throw new InvalidOperationException("Catalog contains a missing NPC dialogue file.");
+            var lines = DialogueDocument.ParseMany(new[] { _dialogue.text }.Concat(_npcDialogue.Select(asset => asset.text)));
+            foreach (Personality trait in Enum.GetValues(typeof(Personality)))
+                if (trait != Personality.None && !lines.Any(line => line.RequiredTrait == trait))
+                    throw new InvalidOperationException("Catalog needs a dialogue pool for " + trait + ".");
             var roles = LoadRoles();
             foreach (DialogueLine line in lines)
             {

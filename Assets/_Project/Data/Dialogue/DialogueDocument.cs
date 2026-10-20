@@ -17,6 +17,15 @@ namespace SocialStim.Data.Dialogue
         [DataMember(Name = "schemaVersion", IsRequired = true)] private int _schemaVersion = default;
         [DataMember(Name = "lines", IsRequired = true)] private DialogueRecord[] _lines = default;
 
+        /// <summary>Combines existing-schema files and validates IDs/fallbacks across the entire catalogue.</summary>
+        public static IReadOnlyList<DialogueLine> ParseMany(IEnumerable<string> documents)
+        {
+            if (documents == null) throw new ArgumentNullException(nameof(documents));
+            var lines = documents.SelectMany(Parse).ToList().AsReadOnly();
+            _ = new DialogueSelector(lines, new SeededRandom(1));
+            return lines;
+        }
+
         /// <summary>Parses definitions and validates eligibility fallbacks without consuming a run's stream.</summary>
         public static IReadOnlyList<DialogueLine> Parse(string json)
         {

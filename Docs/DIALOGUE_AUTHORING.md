@@ -1,178 +1,194 @@
-# Dialogue authoring specification
+# Dialogue authoring guide
 
-The current starter document has 70 natural, editable prototype lines.
-Version 2 supports the conditions below; version 1 still loads without conditions.
-A runtime loader, schema validator and editor menu validate content. No runtime
-generative AI is used. Conditions are registered predicates, never code.
-See [CONTENT_GUIDE.md](CONTENT_GUIDE.md) for the full editing map and role workflow.
+The existing schema-2 dialogue format now separates neutral player prose from seven
+NPC voices. No runtime generator, new data format, strategy framework or authoring tool
+was introduced. All text remains hand-authored, reviewable JSON.
 
-## Format
+## Files and counts
 
-Use hand-authored UTF-8 JSON under `Assets/_Project/Data/Dialogue`. JSON supports
-quoted text, structured conditions, validation, and version control without CSV
-escaping/column growth. ScriptableObjects hold role/setup/style definitions;
-the dialogue importer produces validated plain records for runtime selection.
-Adding a line requires no code change. Adding a new semantic action may require
-its own command/AI implementation; content cannot invent new game mechanics.
+All files are in `Assets/_Project/Data/Dialogue`:
 
-Each file has a `schemaVersion` and `lines` array. Each line has:
+| File | Audience | Lines |
+| --- | --- | ---: |
+| `StarterDialogue.json` | Player only; no trait | 68 |
+| `AnxiousDialogue.json` | Anxious NPCs | 120 |
+| `BraveDialogue.json` | Brave NPCs | 122 |
+| `SlowDialogue.json` | Slow NPCs | 120 |
+| `ChatterboxDialogue.json` | Chatterbox NPCs | 120 |
+| `SmugDialogue.json` | Smug NPCs | 120 |
+| `GrimDialogue.json` | Grim NPCs | 120 |
+| `JokesterDialogue.json` | Jokester NPCs | 120 |
+| **Total** | **842 NPC + 68 player** | **910** |
+
+The catalogue retains its original `_dialogue` reference for player content and adds
+seven `_npcDialogue` TextAsset references. Existing references and metadata GUIDs are
+preserved. Edit the appropriate JSON directly. `DialogueDocument.ParseMany` combines
+these existing-schema documents and validates IDs/fallbacks across files. The native
+content validator and build gate use the same GameCatalog loading path.
+
+All 70 original IDs remain: 68 now identify neutral player lines; the two former
+personality-gated lines live in BraveDialogue with their conditions/metadata preserved
+and their old trait predicates mapped to Brave. The word `aggressive` in one old ID
+is a stable historical identifier, not an eighth trait. No IDs or names were deleted.
+
+## Single trait and assignment
+
+The existing `Personality` enum is the only trait set: Anxious, Brave, Slow,
+Chatterbox, Smug, Grim and Jokester. It is no longer a flags enum. None denotes the
+player or an unassigned scenario slot; NPCs cannot retain None in a created run.
+Combined or unknown values are rejected.
+
+RunFactory uses the existing SeededRandom and shuffle implementation with a separate
+seeded stream. Every bag contains the seven traits once. A new bag is shuffled only
+when the previous one is exhausted. A small cast has no repeats; every complete group
+of seven NPCs contains all traits. Role/faction assignments never select a trait.
+Scenario authors may specify a trait through the existing CastMemberSpec parameter,
+but cannot repeat one before the current bag is exhausted or give a trait to slot zero.
+The trait is not added to the UI or public roster snapshot.
+
+## Reused behavior parameters
+
+Only the existing personality checks were remapped. No utility formula, decision,
+role ability, target policy, settings value or parameter was added or retuned.
+
+| Trait | Existing branches reused |
+| --- | --- |
+| Anxious | Gullible assertion bonus; cautious evidence/vote threshold |
+| Brave | Aggressive accusation bonus; loyal support/reluctance to condemn trusted people |
+| Slow | Gullible assertion bonus |
+| Chatterbox | Existing baseline behavior; verbosity is expressed in dialogue |
+| Smug | Aggressive accusation bonus; existing deceptive-personality branch |
+| Grim | Existing cautious evidence/vote threshold |
+| Jokester | Existing deceptive-personality branch |
+
+Legacy parameter names such as GullibleBonus remain technical names for existing
+weights, not a second trait set. There is no talkativeness parameter or per-trait
+default text-effect mapping in this baseline. Those systems were not invented here.
+A trait does not establish a faction: all seven can be assigned to any eligible role.
+
+## Voice rules
+
+- Anxious: fragmented, hesitant, apologetic, worried; pressure disrupts fluency.
+- Brave: direct, protective, willing to answer and act; fear is admitted without retreat.
+- Slow: deliberate pauses, delayed responses, literal phrasing and requests for time.
+- Chatterbox: longer winding sentences, digressions and over-explanation.
+- Smug: polished superiority, condescension and restrained sarcasm.
+- Grim: brief, resigned, dry and fatalistic.
+- Jokester: absurd images and jokes that still carry the intended action.
+
+Do not turn a stylistic accusation into fabricated evidence. Most current actions
+supply only intent/target/asserted role/result. Write within those facts.
+
+## Existing fields
+
+Every document has `schemaVersion` and a `lines` array. Schema versions 1 and 2 still
+parse; version 2 is used by the authored files. A file must have an unrestricted
+fallback for each action in every voice represented in that file.
 
 | Field | Meaning |
 | --- | --- |
-| `id` | Stable unique identifier, never reused for different content |
-| `intent` | Registered speech intent identifier |
-| `text` | Authored text; opaque to Rules |
-| `weight` | Positive integer selection weight |
-| `requiredTrait` | Optional speaker flag or comma-separated flags; all are required |
-| `speakerRole` | Optional speaker's own known role ID for eligibility |
-| `conditions` | Optional version 2 array of AND-combined registered predicates |
-| `metadata` | Optional emotion/expression, portrait and audio keys; text UI ignores them |
+| `id` | Globally unique stable ID; preserve when revising text |
+| `intent` | One of the 16 existing SpeechIntent names |
+| `text` | Authored text, with registered placeholders only |
+| `weight` | Integer 1–1000 |
+| `requiredTrait` | Exactly one NPC trait; omit or use None for player-only prose |
+| `speakerRole` | Optional constraint on the speaker's own known role |
+| `conditions` | Optional schema-2 AND-combined predicates |
+| `metadata` | Optional emotionKey, portraitKey, audioKey |
 
-Version 1 supports only the two original optional eligibility fields above. Missing
-`requiredTrait` means no trait restriction; missing `speakerRole` means any role.
-Unknown and duplicate JSON properties are rejected. A `conditions` array requires
-`schemaVersion: 2`; `variables` arrays remain unsupported because substitutions
-are validated directly in text. Intent, target and assertion validity are checked
-before selection. No target's hidden role enters the context.
-
-This is the implemented format. A complete document also needs an unrestricted
-fallback for every intent; copy the starter document before adding variants:
+For example, this is one line record to insert into a complete Anxious document:
 
 ```json
 {
-  "schemaVersion": 2,
-  "lines": [
-    {
-      "id": "accuse.direct.005",
-      "intent": "accuse",
-      "text": "{target}, can we hear your side?",
-      "weight": 1,
-      "conditions": [
-        { "kind": "phase", "value": "Discussion" },
-        { "kind": "hasTarget", "flag": true }
-      ],
-      "metadata": { "emotionKey": "suspicious" }
-    }
-  ]
+  "id": "npc.anxious.Accuse.013",
+  "intent": "Accuse",
+  "text": "Um, {target}... could we look more carefully at you?",
+  "weight": 1,
+  "requiredTrait": "Anxious"
 }
 ```
 
-Supported variables are `{speaker}`, `{target}`, `{role}`, `{result}`, and `{day}`;
-`{role}` means the role being asserted in this speech context, not necessarily a
-true secret role. Other contexts expose explicit values only when allowed.
-The current text view has rich text disabled. Future markup views must escape
-substitutions before interpreting styles. No reflected
-property access or arbitrary string-to-code evaluation is permitted.
+Do not copy the same text to another ID or trait. A generic player line is never
+an NPC fallback. `speakerTrait` conditions, when present, must match requiredTrait.
+Names parse case-insensitively; role IDs remain case-sensitive.
 
-## Version 2 conditions
+## Existing predicates and placeholders
 
-Each condition has `kind` and only the parameter shown below. Predicates use
-speaker-authorized context before the current statement is published. Thus a
-line cannot qualify for `targetAccused` merely by delivering its own accusation.
-
-| Kind | Parameter | Meaning |
+| Condition | Parameter | Permitted meaning |
 | --- | --- | --- |
-| `phase` | `value`: phase name | Current public phase; must be reachable for this intent |
-| `minimumDay` | `number`: integer >= 1 | Inclusive lower day bound |
-| `maximumDay` | `number`: integer >= 1 | Inclusive upper day bound |
-| `hasTarget` | `flag`: boolean | Matches whether the intent supplies a target |
-| `hasAssertion` | `flag`: boolean | Matches a role claim or asserted investigation result |
-| `speakerTrait` | `value`: trait flags | Requires all named speaker traits |
-| `speakerRole` | `value`: catalog role ID | Tests the speaker's own known role |
-| `observedDeath` | None | Speaker has observed a public death |
-| `observedRoleReveal` | None | Speaker has observed a public role reveal |
-| `targetAccused` | None | Target was previously accused/called for trial/deflected toward |
-| `targetHasClaim` | None | Target has publicly claimed a role |
-| `speakerUnderPressure` | `number`: 0-100 | Speaker's estimate of visible pressure reaches the threshold |
+| phase | value: phase name | Reachable current phase |
+| minimumDay / maximumDay | number | Inclusive day bounds |
+| hasTarget / hasAssertion | flag | Presence of an action target/assertion |
+| speakerTrait | value: single trait | Same exact voice as requiredTrait |
+| speakerRole | value: role ID | Speaker's own role |
+| observedDeath / observedRoleReveal | None | Speaker has observed that public event |
+| targetAccused / targetHasClaim | None | Public evidence before the current statement |
+| speakerUnderPressure | number: 0–100 | Existing visible-pressure threshold |
 
-Phase/trait/kind names parse without case sensitivity; role IDs are case-sensitive.
-Day bounds are inclusive. Investigation reports cannot occur before Day 2.
-Accusations and other discussion intents cannot select a NightSelection line;
-defense supports Defend/ClaimRole, and LastWords supports its own intent.
+Available substitutions remain `{speaker}`, `{target}`, `{role}`, `{result}` and
+`{day}`. Asserted roles/results are not certified truth. Do not use `{readout}`,
+`{evidence}`, private target roles or arbitrary property expressions. Unknown tokens,
+malformed braces, invalid conditions and unsupported fields fail loading.
 
-Impossible day bounds, phase/intent combinations, presence requirements and
-conflicting own-role predicates fail at import with the line ID. Unknown kinds,
-wrong parameter types, unsupported versions, and unknown catalog role references
-also fail. Keep an unrestricted fallback for **every** intent: no trait, own-role,
-or condition restrictions. A conditional-only intent pool is invalid.
+The current schema has **no reasonType, truthfulness, stat-gate, archetype, cooldown or
+requires/forbids fields**. Such fields would be rejected. None were added under this
+task's prohibition on new systems/formats. Existing eligibility conditions and the
+three-ID recent-line memory are reused. Reason-specific player choices cannot be
+implemented honestly without a reason-bearing decision/menu contract.
 
-## Writing by intent
+## Selection and fallback
 
-Counts below are starting totals per intent for a small cast, not per role or
-trait. Add variants after playtests expose gaps. Keep generic fallback lines for
-each usable intent; do not require an exact personality/role match for every
-line. Fallback selection must not invent facts or reveal hidden information.
+1. Select the exact `(intent, requiredTrait)` pool. None is player-only.
+2. Keep only lines whose own-role and context predicates actually match.
+3. Prefer the most specific matching context tier; otherwise use broader matching
+   lines, ending in the same trait/action's unrestricted pool.
+4. Use the existing integer weights and dedicated seeded dialogue stream.
+5. Exclude the speaker's three recent IDs; when all eligible IDs are recent, expire
+   the oldest exclusions. This never changes trait, role, day or evidence eligibility.
 
-| Intent | Tone and length | Required context | Initial variants |
-| --- | --- | --- | --- |
-| `accuse` | Direct or skeptical; 1-2 sentences | Target; evidence category when mentioned | 8-12 |
-| `defend` | Reactive or composed; 1-2 sentences | Accusation/defense context | 8-12 |
-| `claimRole` | Clear assertion; 1-2 sentences | Claimed role ID, truthful or deceptive | 6-10 |
-| `reportInvestigation` | Specific and fallible; 1-2 sentences | Asserted target/result/day | 6-10 |
-| `vouch` | Qualified confidence; 1 sentence | Target and stated basis if mentioned | 6-8 |
-| `callForTrial` | Decisive; 1-2 sentences | Eligible target | 8-12 |
-| `voteJustification` | Brief explanation; 1 sentence | Vote, target, known or alleged basis | 6-8 |
-| `agree` | Supportive without adding facts; 1 sentence | Public target being supported | 6-8 |
-| `disagree` | Skeptical without hidden proof; 1 sentence | Public target being challenged | 6-8 |
-| `deflect` | Evasive or counteraccusing; 1-2 sentences | Current accusation, optional counter-target | 8-12 |
-| `staySilent` | Short authored silence indication | Speaker's deliberate silence intent | 5-8 |
-| `expressFear` | Restrained or alarmed; 1-2 sentences | Public danger context | 5-8 |
-| `reactToDeath` | Grief, fear, or suspicion; 1-2 sentences | Observed death | 5-8 |
-| `reactToRoleReveal` | Surprise or reassessment; 1-2 sentences | Publicly revealed role | 5-8 |
-| `lastWords` | Characterful, not omniscient; 1-3 sentences | Condemned speaker | 8-12 |
+Missing own-voice content fails validation/loading or selection. It never borrows
+from another trait or from neutral player prose. Narrator/system observations do not
+pass through these trait pools and are unchanged.
 
-Personality tags influence phrasing, not supernatural access to facts. Aggression
-can make an accusation blunt; caution can qualify a report; gullibility can
-make a vouch overconfident. Avoid every cautious character repeating one hedge.
-The same intent can support sincere, mistaken, and deceptive assertions.
+## Player wording and rendering limit
 
-## Selection and validation
+Player templates are plain, neutral and at most 14 words; the current maximum is
+8. They contain no effects, exclamation marks, rhetorical questions or personality
+metadata gates. Applicable old phase/evidence/pressure gates and presentation metadata
+remain intact. The player is not assigned an NPC personality.
 
-The reasoning strategy first chooses an intent, target, and assertion. Selection
-filters lines by permitted context, then uses integer weights and a dedicated
-seeded dialogue stream. Track recent IDs per speaker during the run. When all eligible lines
-are recent, relax the oldest repetition exclusion before using a valid fallback.
-Never relax a condition that protects knowledge or factual eligibility.
+The existing UI chooses semantic intent/target, not a particular authored phrase.
+There is no CHAT/ACCUSE/DEFEND phrasing menu in this baseline. UI work was explicitly
+out of scope, so this task neutralizes the shared dialogue that the player actually
+speaks without constructing a new menu or inventing supported reason types.
 
-Importer errors include line IDs when available: duplicate IDs/properties,
-unknown intents, unsupported fields, unknown role conditions, unknown variables,
-invalid weights, malformed JSON, unsupported schema versions, and missing
-fallback coverage. Document-level errors cannot always identify a line. An invalid
-asset fails loading rather than silently creating an empty pool. Run the editor
-validation command before play. Weights are integers in [1, 1000].
+ReportAction passes the existing recorded account through `{result}`. Its source
+template is short, but the injected account can exceed 14 words. Rewriting night
+reports or changing disclosure behavior would exceed this task's scope. Other
+current substitutions are checked with representative multiword names and role text.
 
-The starter lines are editable prototype prose. Speaker attribution is added
-once by RunSession; omit a name prefix from each line. Selection does not parse markup.
+## Validation and coverage
 
-## Presentation boundary
+```sh
+python3 Tools/validate_scaffold.py --write-dialogue-coverage
+python3 -m unittest discover -s Tools -p 'test_*.py'
+```
 
-Presentation supports the exact semantic syntax below. Rules keep text opaque;
-style never changes an intent, evidence or eligibility. Planning names such as
-shout and whisper are not supported tags.
+The existing validator now checks all eight documents together and verifies the
+freshness of `Docs/DIALOGUE_COVERAGE.md`. It reports every trait/action count and
+100-line minimum. Frequent actions require eight lines; every other registered
+action requires three. Every pool needs an unrestricted fallback. The current pools
+exceed those floors: accuse/defend have 12, most frequent actions 10, vouch 6 and
+other actions 5, plus the two retained conditional Brave lines.
 
-All key information must remain readable with effects, motion, flashes, and
-color distinctions disabled. Effect profiles must never change a line's factual
-meaning or reveal a secret through style selection.
+Normalized equality and word-bigram Jaccard similarity >= 0.8 flag lexical duplicate
+or near-duplicate text across the entire database. This is a review aid, not proof
+of semantic originality. NPC authored lines are capped at 40 words. Player lines
+are capped at 14 and cannot contain markup/exclamations. Canonical NPC prose uses
+no effect markup; this keeps it below the existing sparse-markup ceiling.
 
-## Milestone 05 semantic markup
-
-Presentation parses `<emphasis>`, `<fear>`, `<calm>`,
-`<evidence>`, and `<danger>` with matching closing tags. Use `<<` for a literal
-less-than sign. Raw TMP/HTML tags are rejected. Rules and dialogue selection
-continue treating the text as opaque; markup never changes evidence or intent.
-The editor content validator checks syntax, and runtime has a literal fallback
-for malformed display text. See `Docs/EFFECTS.md` for the complete cheat sheet.
-
-## Recorded night-action reports
-
-Milestone 03 adds ReportAction alongside ReportInvestigation. ReportAction is
-available from Day 2 and substitutes the attributed report into {result}. A
-recorded pass has no target; a targeted action may refer to self or someone who
-died. hasTarget true/false conditions both work for this intent, and hasAssertion
-is true. Keep an unrestricted fallback. The committed catalog has 70 lines.
-
-The player chooses the automatic report through Report last night's action.
-This discloses their own recorded selection and legitimately received results.
-Morning role claimants speak before the next player opening; false claimants
-may fabricate from their public claimed role. Presentation labels and the
-unverified claim board do not certify an assertion as true.
+Shared C# tests cover actual volume, all actions, voice isolation including fallback,
+no substitution residue, name constraints, fair seeded assignment, role independence,
+repetition and preserved old IDs/gates. The full-catalogue smoke suite loads every
+file. Tools/SocialStim/Validate Starter Content and native build validation load the
+same catalogue references. Unity execution remains a separate verification gate.

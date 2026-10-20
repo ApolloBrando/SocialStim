@@ -13,11 +13,13 @@ namespace SocialStim.Rules.Dialogue
     {
         private readonly IReadOnlyList<DialogueLine> _lines;
         private readonly IRandomSource _random;
+        private readonly Dictionary<(SpeechIntent, Personality), IReadOnlyList<DialogueLine>> _pools
+            = new Dictionary<(SpeechIntent, Personality), IReadOnlyList<DialogueLine>>();
         private readonly Dictionary<CharacterId, Queue<string>> _recent = new Dictionary<CharacterId, Queue<string>>();
         private static readonly Regex Variables = new Regex(@"\{([^{}]*)\}");
         private static readonly HashSet<string> AllowedVariables = new HashSet<string> { "speaker", "target", "role", "result", "day" };
 
-        /// <summary>Validates content and generic fallback coverage for every registered intent.</summary>
+        /// <summary>Validates content and same-trait fallback coverage for every represented voice.</summary>
         public DialogueSelector(IEnumerable<DialogueLine> lines, IRandomSource random)
         {
             if (lines == null) throw new ArgumentNullException(nameof(lines));
@@ -37,18 +39,35 @@ namespace SocialStim.Rules.Dialogue
                 if (literal.IndexOf('{') >= 0 || literal.IndexOf('}') >= 0)
                     throw new ArgumentException($"{line.Id}: malformed placeholder.");
             }
-            foreach (SpeechIntent intent in Enum.GetValues(typeof(SpeechIntent)))
-                if (!_lines.Any(l => l.Intent == intent && l.RequiredTrait == Personality.None && !l.SpeakerRole.HasValue && l.Conditions.Count == 0))
-                    throw new ArgumentException($"Missing unrestricted dialogue fallback for {intent}.");
-            foreach (var group in _lines.GroupBy(l => l.Intent)) checked { _ = group.Sum(l => l.Weight); }
+            if (_lines.Count == 0) throw new ArgumentException("Dialogue catalogue is empty.");
+            foreach (var group in _lines.GroupBy(line => (line.Intent, line.RequiredTrait)))
+            {
+                var pool = group.ToList().AsReadOnly();
+                checked { _ = pool.Sum(line => line.Weight); }
+                _pools.Add(group.Key, pool);
+            }
+            foreach (Personality trait in _lines.Select(line => line.RequiredTrait).Distinct())
+                foreach (SpeechIntent intent in Enum.GetValues(typeof(SpeechIntent)))
+                    if (!_pools.TryGetValue((intent, trait), out var pool)
+                        || !pool.Any(line => !line.SpeakerRole.HasValue && line.Conditions.Count == 0))
+                        throw new ArgumentException($"Missing unrestricted {trait}/{intent} dialogue fallback.");
         }
 
         /// <summary>Selects a line without ever relaxing role/trait eligibility.</summary>
         public DialogueSelection Select(SpeechIntent intent, DialogueContext context)
         {
-            var eligible = _lines.Where(l => l.Intent == intent && (context.Traits & l.RequiredTrait) == l.RequiredTrait
-                && (!l.SpeakerRole.HasValue || l.SpeakerRole.Value == context.OwnRole) && l.Conditions.All(c => c.Matches(context))).ToList();
-            if (eligible.Count == 0) throw new InvalidOperationException($"No eligible line for {intent}.");
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            if (!_pools.TryGetValue((intent, context.Traits), out var pool))
+                throw new InvalidOperationException($"No dialogue pool for {context.Traits}/{intent}.");
+            // Trait is an immutable pool boundary: None is the player's pool, never
+            // an NPC fallback. Role/evidence/day gates are never discarded either.
+            var matching = pool.Where(line => (!line.SpeakerRole.HasValue || line.SpeakerRole.Value == context.OwnRole)
+                && line.Conditions.All(condition => condition.Matches(context))).ToList();
+            if (matching.Count == 0) throw new InvalidOperationException($"No eligible {context.Traits} line for {intent}.");
+            // Prefer the most context-specific matching tier, then broader matching
+            // tiers, ending in this same trait's unrestricted action pool.
+            int specificity = matching.Max(line => line.Conditions.Count + (line.SpeakerRole.HasValue ? 1 : 0));
+            var eligible = matching.Where(line => line.Conditions.Count + (line.SpeakerRole.HasValue ? 1 : 0) == specificity).ToList();
             if (!_recent.TryGetValue(context.SpeakerId, out Queue<string> history))
             { history = new Queue<string>(); _recent.Add(context.SpeakerId, history); }
             var candidates = eligible.Where(l => !history.Contains(l.Id)).ToList();

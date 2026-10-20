@@ -1,0 +1,845 @@
+{
+  "schemaVersion": 2,
+  "lines": [
+    {
+      "id": "npc.smug.Accuse.001",
+      "intent": "Accuse",
+      "text": "{target}, consider this your invitation to become less suspicious.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.002",
+      "intent": "Accuse",
+      "text": "I'm looking at {target}. Do try to keep up with the conversation.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.003",
+      "intent": "Accuse",
+      "text": "Obviously I want {target} examined. Subtlety seems wasted on this room.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.004",
+      "intent": "Accuse",
+      "text": "{target} has not earned my confidence, a distinction I realize may be unfamiliar.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.005",
+      "intent": "Accuse",
+      "text": "Let's start with {target}. A little scrutiny might improve matters.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.006",
+      "intent": "Accuse",
+      "text": "I suspect {target}; you're welcome to arrive at that thought in your own time.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.007",
+      "intent": "Accuse",
+      "text": "{target}, I'm offering you a chance to answer an intelligent question.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.008",
+      "intent": "Accuse",
+      "text": "My attention is on {target}. It rarely wanders without a purpose.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.009",
+      "intent": "Accuse",
+      "text": "I'd like {target} under scrutiny before the room mistakes noise for progress again.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.010",
+      "intent": "Accuse",
+      "text": "{target}, don't confuse my polished manners with trust.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.011",
+      "intent": "Accuse",
+      "text": "I'm questioning {target}. You may treat that as the useful part of this exchange.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Accuse.012",
+      "intent": "Accuse",
+      "text": "Do sit up, {target}. Your position is about to receive some attention.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.001",
+      "intent": "Defend",
+      "text": "An accusation against me deserves more preparation than that.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.002",
+      "intent": "Defend",
+      "text": "I reject the case. You may return when it has a little structure.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.003",
+      "intent": "Defend",
+      "text": "Do distinguish between failing to understand me and proving me guilty.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.004",
+      "intent": "Defend",
+      "text": "I'm delighted to answer a serious question, should one emerge.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.005",
+      "intent": "Defend",
+      "text": "You have my attention. Now make the accusation worth it.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.006",
+      "intent": "Defend",
+      "text": "I won't accept a verdict assembled from impatience.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.007",
+      "intent": "Defend",
+      "text": "If confidence were evidence, you'd have a case. Unfortunately, it isn't.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.008",
+      "intent": "Defend",
+      "text": "I'm defending myself because apparently silence would exceed the room's interpretive abilities.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.009",
+      "intent": "Defend",
+      "text": "You can question my position without congratulating yourself on a conclusion.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.010",
+      "intent": "Defend",
+      "text": "The accusation is not improved by repeating it at me.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.011",
+      "intent": "Defend",
+      "text": "I expected scrutiny. I had hoped for a better standard of it.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Defend.012",
+      "intent": "Defend",
+      "text": "Allow me to correct the impression that your suspicion settles anything.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.001",
+      "intent": "ClaimRole",
+      "text": "My role is {role}. I trust that part was simple enough.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.002",
+      "intent": "ClaimRole",
+      "text": "I'm the {role}, since we're finally attending to relevant information.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.003",
+      "intent": "ClaimRole",
+      "text": "For the benefit of the record: {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.004",
+      "intent": "ClaimRole",
+      "text": "I'll spare you the suspense. You're speaking to the {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.005",
+      "intent": "ClaimRole",
+      "text": "Consider yourself informed: I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.006",
+      "intent": "ClaimRole",
+      "text": "My claim is {role}. Questions of comparable clarity are welcome.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.007",
+      "intent": "ClaimRole",
+      "text": "At last, something worth announcing. I'm the {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.008",
+      "intent": "ClaimRole",
+      "text": "The role you should associate with me is {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.009",
+      "intent": "ClaimRole",
+      "text": "I'm claiming {role}; do write it down correctly.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ClaimRole.010",
+      "intent": "ClaimRole",
+      "text": "I assume you can follow a plain declaration. I'm the {role}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.001",
+      "intent": "Agree",
+      "text": "{target} has made a point worth keeping. How refreshing.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.002",
+      "intent": "Agree",
+      "text": "I agree with {target}. Sensible conclusions should be acknowledged.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.003",
+      "intent": "Agree",
+      "text": "Yes, {target}. That's a considerably better direction.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.004",
+      "intent": "Agree",
+      "text": "I'm prepared to endorse {target}'s view on this occasion.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.005",
+      "intent": "Agree",
+      "text": "{target} has spared me an explanation, which we should all appreciate.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.006",
+      "intent": "Agree",
+      "text": "Credit where it's due: I support {target}'s argument.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.007",
+      "intent": "Agree",
+      "text": "I find myself agreeing with {target}. The room is improving.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.008",
+      "intent": "Agree",
+      "text": "That conclusion from {target} meets a reasonable standard.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.009",
+      "intent": "Agree",
+      "text": "Do preserve {target}'s point before it gets lost among the others.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Agree.010",
+      "intent": "Agree",
+      "text": "{target}, you've arrived at a position I can support.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.001",
+      "intent": "Disagree",
+      "text": "No, {target}. Confidence is a presentation style, not an argument.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.002",
+      "intent": "Disagree",
+      "text": "I disagree with {target}; that conclusion requires rather more work.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.003",
+      "intent": "Disagree",
+      "text": "Do reconsider, {target}. Your point has not survived my attention.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.004",
+      "intent": "Disagree",
+      "text": "I'm not persuaded by {target}, however pleased they seem with the idea.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.005",
+      "intent": "Disagree",
+      "text": "{target}, I would suggest another draft of that position.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.006",
+      "intent": "Disagree",
+      "text": "The room may indulge {target}'s conclusion. I won't.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.007",
+      "intent": "Disagree",
+      "text": "I can't endorse {target}'s view merely because it was delivered neatly.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.008",
+      "intent": "Disagree",
+      "text": "{target}, you've mistaken finishing an explanation for establishing it.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.009",
+      "intent": "Disagree",
+      "text": "I reach a different conclusion. I appreciate that disappoints you, {target}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Disagree.010",
+      "intent": "Disagree",
+      "text": "Let's improve the discussion by not accepting {target}'s point so quickly.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.001",
+      "intent": "ReactToDeath",
+      "text": "Another empty chair. A poor substitute for competent judgement.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.002",
+      "intent": "ReactToDeath",
+      "text": "Death has made the room smaller without making it wiser.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.003",
+      "intent": "ReactToDeath",
+      "text": "A loss, plainly. Perhaps we can respond with something besides astonishment.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.004",
+      "intent": "ReactToDeath",
+      "text": "Someone is dead. I would prefer our next conclusion to survive scrutiny.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.005",
+      "intent": "ReactToDeath",
+      "text": "The casualty deserves better than a competition in sounding distressed.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.006",
+      "intent": "ReactToDeath",
+      "text": "An empty seat is no excuse to lower the standard of our thinking.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.007",
+      "intent": "ReactToDeath",
+      "text": "We have lost a person, not acquired permission to stop reasoning.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.008",
+      "intent": "ReactToDeath",
+      "text": "I dislike a death report as much as anyone. I simply don't see the use of performing surprise.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.009",
+      "intent": "ReactToDeath",
+      "text": "Less company, same predicament. We should make the remaining conversation count.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToDeath.010",
+      "intent": "ReactToDeath",
+      "text": "The silence is understandable. Let it produce thought rather than another hasty answer.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.001",
+      "intent": "VoteJustification",
+      "text": "I cast a considered vote. I recommend the practice.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.002",
+      "intent": "VoteJustification",
+      "text": "My ballot followed my judgement, a sequence some might find instructive.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.003",
+      "intent": "VoteJustification",
+      "text": "I chose deliberately rather than waiting for the loudest instruction.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.004",
+      "intent": "VoteJustification",
+      "text": "You may question my vote. I suggest beginning with a question worth answering.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.005",
+      "intent": "VoteJustification",
+      "text": "The ballot reflected my assessment, not my desire to blend into the tally.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.006",
+      "intent": "VoteJustification",
+      "text": "I did not require an audience to make my decision.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.007",
+      "intent": "VoteJustification",
+      "text": "My choice was reasoned, even if explaining that disappoints anyone hoping for theatre.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.008",
+      "intent": "VoteJustification",
+      "text": "I accept responsibility for the vote without the usual display of self-importance.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.009",
+      "intent": "VoteJustification",
+      "text": "I made the decision I could defend. A modest standard, really.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.VoteJustification.010",
+      "intent": "VoteJustification",
+      "text": "Voting involved uncertainty. Recognizing that is preferable to pretending otherwise.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Vouch.001",
+      "intent": "Vouch",
+      "text": "I'm willing to support {target}. Try not to make me regret the courtesy.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Vouch.002",
+      "intent": "Vouch",
+      "text": "{target} deserves a fair hearing, which ought not to be a controversial standard.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Vouch.003",
+      "intent": "Vouch",
+      "text": "I'll back {target} for now. Notice the useful distinction between support and certainty.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Vouch.004",
+      "intent": "Vouch",
+      "text": "Do give {target} room to answer. Interruptions aren't achievements.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Vouch.005",
+      "intent": "Vouch",
+      "text": "My confidence extends to {target} at present, though I don't distribute it carelessly.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Vouch.006",
+      "intent": "Vouch",
+      "text": "I oppose rushing {target} out merely to give the room a sense of accomplishment.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportInvestigation.001",
+      "intent": "ReportInvestigation",
+      "text": "The finding is {result} for {target}. I assume we can record that accurately.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportInvestigation.002",
+      "intent": "ReportInvestigation",
+      "text": "My investigation of {target} returned {result}, for those awaiting information rather than speculation.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportInvestigation.003",
+      "intent": "ReportInvestigation",
+      "text": "{target} appeared {result}. There, an actual report.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportInvestigation.004",
+      "intent": "ReportInvestigation",
+      "text": "Do pay attention to the readout: {target}, {result}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportInvestigation.005",
+      "intent": "ReportInvestigation",
+      "text": "I checked {target}; the result was {result}. Interpretation can wait until everyone has heard it.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.CallForTrial.001",
+      "intent": "CallForTrial",
+      "text": "Put {target} on trial. A formal defense might finally focus the discussion.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.CallForTrial.002",
+      "intent": "CallForTrial",
+      "text": "I'd like a hearing for {target}, preferably conducted above the room's usual standard.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.CallForTrial.003",
+      "intent": "CallForTrial",
+      "text": "{target}, prepare to answer formally. I'm calling for a trial.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.CallForTrial.004",
+      "intent": "CallForTrial",
+      "text": "Open a trial for {target}. We have spent enough time circling the request.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.CallForTrial.005",
+      "intent": "CallForTrial",
+      "text": "I propose that {target} face a proper hearing instead of further conversational drift.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Deflect.001",
+      "intent": "Deflect",
+      "text": "Apply some of that impressive scrutiny to {target}, if you can manage the transfer.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Deflect.002",
+      "intent": "Deflect",
+      "text": "My position isn't the only one available for examination. Try {target}.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Deflect.003",
+      "intent": "Deflect",
+      "text": "Do question {target} as well; concentrating on me is beginning to resemble a hobby.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Deflect.004",
+      "intent": "Deflect",
+      "text": "Shift your attention toward {target}. Variety might improve your questions.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.Deflect.005",
+      "intent": "Deflect",
+      "text": "I'd be interested to see {target} answer before the room congratulates itself on examining me.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.StaySilent.001",
+      "intent": "StaySilent",
+      "text": "I'll refrain from improving this particular silence.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.StaySilent.002",
+      "intent": "StaySilent",
+      "text": "Nothing to add. You're welcome to use the opening productively.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.StaySilent.003",
+      "intent": "StaySilent",
+      "text": "I shall listen and reserve the right to be disappointed.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.StaySilent.004",
+      "intent": "StaySilent",
+      "text": "Do continue. I have no contribution that needs this moment.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.StaySilent.005",
+      "intent": "StaySilent",
+      "text": "For once, the floor can survive without my assistance.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ExpressFear.001",
+      "intent": "ExpressFear",
+      "text": "I find the danger quite real, despite the room's talent for making it sound abstract.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ExpressFear.002",
+      "intent": "ExpressFear",
+      "text": "I'd prefer not to discover how little competence tonight requires from our enemies.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ExpressFear.003",
+      "intent": "ExpressFear",
+      "text": "Even I can't reason an unlocked future into being safe.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ExpressFear.004",
+      "intent": "ExpressFear",
+      "text": "I'm concerned. I simply don't see the need to decorate it with trembling.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ExpressFear.005",
+      "intent": "ExpressFear",
+      "text": "The uncertainty is unpleasant; pretending it doesn't affect me would be beneath my standards.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToRoleReveal.001",
+      "intent": "ReactToRoleReveal",
+      "text": "Now that the role is public, perhaps we can retire a few cherished assumptions.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToRoleReveal.002",
+      "intent": "ReactToRoleReveal",
+      "text": "Do revise your conclusions to include the information we've actually revealed.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToRoleReveal.003",
+      "intent": "ReactToRoleReveal",
+      "text": "The role changes our picture. Defending the old one would be a curious choice.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToRoleReveal.004",
+      "intent": "ReactToRoleReveal",
+      "text": "We have a disclosed role, not a prize for whoever guessed loudest.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReactToRoleReveal.005",
+      "intent": "ReactToRoleReveal",
+      "text": "At last, a fact we can all discuss without confusing a claim for certainty.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.LastWords.001",
+      "intent": "LastWords",
+      "text": "Try to learn something from this. I'd hate the occasion to be entirely wasted.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.LastWords.002",
+      "intent": "LastWords",
+      "text": "I leave you my words, which should improve the average quality of the silence.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.LastWords.003",
+      "intent": "LastWords",
+      "text": "Do make your next judgement with rather more care than your last.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.LastWords.004",
+      "intent": "LastWords",
+      "text": "I'm finished. Whether the room has progressed is another question.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.LastWords.005",
+      "intent": "LastWords",
+      "text": "You may now discover the considerable inconvenience of no longer hearing my advice.",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportAction.001",
+      "intent": "ReportAction",
+      "text": "An account, rather than an impression. Do note the difference. {result}",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportAction.002",
+      "intent": "ReportAction",
+      "text": "I've brought something more useful than dramatic speculation. {result}",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportAction.003",
+      "intent": "ReportAction",
+      "text": "My night report merits your undivided attention. {result}",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportAction.004",
+      "intent": "ReportAction",
+      "text": "Here is the record, presented as clearly as circumstances apparently require. {result}",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    },
+    {
+      "id": "npc.smug.ReportAction.005",
+      "intent": "ReportAction",
+      "text": "I shall give the details once, so listening would be wise. {result}",
+      "weight": 1,
+      "requiredTrait": "Smug"
+    }
+  ]
+}

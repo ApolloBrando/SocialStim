@@ -36,6 +36,9 @@ namespace SocialStim.Rules.Dialogue
             foreach (DialogueConditionKind presence in new[] { DialogueConditionKind.HasTarget, DialogueConditionKind.HasAssertion })
                 if (Conditions.Where(c => c.Kind == presence).Select(c => c.Flag).Distinct().Count() > 1)
                     throw new ArgumentException($"{id}: contradictory presence conditions.");
+            if (Conditions.Any(condition => condition.Kind == DialogueConditionKind.SpeakerTrait
+                && !string.Equals(condition.Value, requiredTrait.ToString(), StringComparison.OrdinalIgnoreCase)))
+                throw new ArgumentException($"{id}: trait condition must match the single voice pool.");
             var ownRoles = Conditions.Where(c => c.Kind == DialogueConditionKind.SpeakerRole).Select(c => c.Value).ToList();
             if (speakerRole.HasValue) ownRoles.Add(speakerRole.Value.Value);
             if (ownRoles.Distinct(StringComparer.Ordinal).Count() > 1) throw new ArgumentException($"{id}: contradictory own-role conditions.");

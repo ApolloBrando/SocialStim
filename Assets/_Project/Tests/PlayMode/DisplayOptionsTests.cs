@@ -61,8 +61,9 @@ namespace SocialStim.Tests.PlayMode
                 var evil = new RoleSpec(new RoleId("evil"), "Evil", Faction.Antagonist,
                     RoleCategory.AntagonistKilling, AbilityKind.Attack, 1, 0, 0, -1, Faction.Antagonist);
                 var roles = new[] { town, evil };
-                var lines = Enum.GetValues(typeof(SpeechIntent)).Cast<SpeechIntent>()
-                    .Select(intent => new DialogueLine(intent.ToString(), intent, "An authored test line."));
+                var lines = Enum.GetValues(typeof(Personality)).Cast<Personality>()
+                    .SelectMany(trait => Enum.GetValues(typeof(SpeechIntent)).Cast<SpeechIntent>()
+                        .Select(intent => new DialogueLine(trait + "." + intent, intent, "An authored test line.", requiredTrait: trait)));
                 var run = RunFactory.CreateScenario(new RunOptions(42), new[] {
                     new CastMemberSpec("Player", town.Id), new CastMemberSpec("Town", town.Id),
                     new CastMemberSpec("Evil", evil.Id)

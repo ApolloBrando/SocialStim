@@ -1,0 +1,845 @@
+{
+  "schemaVersion": 2,
+  "lines": [
+    {
+      "id": "npc.jokester.Accuse.001",
+      "intent": "Accuse",
+      "text": "{target}, you're on my suspicion menu. No substitutions.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Accuse.002",
+      "intent": "Accuse",
+      "text": "I'm pointing at {target}. Imagine a tiny courtroom trumpet.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Accuse.003",
+      "intent": "Accuse",
+      "text": "Put a question mark over {target}. Preferably one too large to duck.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Accuse.004",
+      "intent": "Accuse",
+      "text": "{target} has my attention, which is usually reserved for faulty vending machines.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Accuse.005",
+      "intent": "Accuse",
+      "text": "I suspect {target}. The announcement comes without complimentary biscuits.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Accuse.006",
+      "intent": "Accuse",
+      "text": "Time to inspect {target}. Somebody hand me a metaphorical magnifying spoon.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Accuse.007",
+      "intent": "Accuse",
+      "text": "{target}, I'm not buying the all-clear. My imaginary wallet stays shut.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Accuse.008",
+      "intent": "Accuse",
+      "text": "My suspicion has parked beside {target}. Terrible parking, serious question.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Accuse.009",
+      "intent": "Accuse",
+      "text": "Let's give {target} a closer look. Eyebrows at the ready.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Accuse.010",
+      "intent": "Accuse",
+      "text": "{target}, your application for automatic trust is still in the paper shredder queue.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Accuse.011",
+      "intent": "Accuse",
+      "text": "I nominate {target} for an awkward conversation. The trophy is a question mark.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Accuse.012",
+      "intent": "Accuse",
+      "text": "I'm accusing {target}, with considerably fewer juggling skills than this moment deserves.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Defend.001",
+      "intent": "Defend",
+      "text": "I object to being today's mystery casserole. Hear my side first.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Defend.002",
+      "intent": "Defend",
+      "text": "You've put me in the guilty cupboard. I'd like the key and a hearing.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Defend.003",
+      "intent": "Defend",
+      "text": "I'm defending myself, not auditioning for the role of convenient answer.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Defend.004",
+      "intent": "Defend",
+      "text": "Hold the verdict confetti. I haven't answered yet.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Defend.005",
+      "intent": "Defend",
+      "text": "My defense would go better without everyone supplying their own ending.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Defend.006",
+      "intent": "Defend",
+      "text": "Please stop wrapping me in blame like a sandwich. Let me speak.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Defend.007",
+      "intent": "Defend",
+      "text": "I'm not accepting guilt just because the accusation has good stage lighting.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Defend.008",
+      "intent": "Defend",
+      "text": "This case against me needs a hearing, not a decorative ribbon.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Defend.009",
+      "intent": "Defend",
+      "text": "Could we unstick the guilty label long enough to examine it?",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Defend.010",
+      "intent": "Defend",
+      "text": "I dispute the accusation. My imaginary lawyer has also dropped their sandwich in protest.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Defend.011",
+      "intent": "Defend",
+      "text": "You can question me without turning my forehead into a verdict board.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Defend.012",
+      "intent": "Defend",
+      "text": "Wait for the defense before pressing the big dramatic button.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ClaimRole.001",
+      "intent": "ClaimRole",
+      "text": "I'm the {role}. Try to contain your ceremonial kazoo.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ClaimRole.002",
+      "intent": "ClaimRole",
+      "text": "My role is {role}. The badge is imaginary; the claim isn't optional.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ClaimRole.003",
+      "intent": "ClaimRole",
+      "text": "For today's identity announcement, please welcome the {role}: me.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ClaimRole.004",
+      "intent": "ClaimRole",
+      "text": "I'm claiming {role}. No drumroll budget, unfortunately.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ClaimRole.005",
+      "intent": "ClaimRole",
+      "text": "Under the very convincing outfit of being myself, I'm the {role}.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ClaimRole.006",
+      "intent": "ClaimRole",
+      "text": "The answer to the role-shaped hole in this conversation is {role}.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ClaimRole.007",
+      "intent": "ClaimRole",
+      "text": "My official declaration is {role}. Please file under things I actually said.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ClaimRole.008",
+      "intent": "ClaimRole",
+      "text": "Introducing your {role}, now available in this inconvenient room.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ClaimRole.009",
+      "intent": "ClaimRole",
+      "text": "I'm the {role}. I'd offer a business card, but we seem more focused on survival.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ClaimRole.010",
+      "intent": "ClaimRole",
+      "text": "Write {role} beside my name. Leave room for the tiny hat I'll mentally add.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Agree.001",
+      "intent": "Agree",
+      "text": "{target} has my agreement and a deeply imaginary gold star.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Agree.002",
+      "intent": "Agree",
+      "text": "I'm boarding {target}'s argument. Please keep all elbows inside the conclusion.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Agree.003",
+      "intent": "Agree",
+      "text": "Yes to {target}. My objection department is out having lunch.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Agree.004",
+      "intent": "Agree",
+      "text": "I'll support {target}'s point. It seems sturdier than my usual collection of bad jokes.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Agree.005",
+      "intent": "Agree",
+      "text": "{target}, you've got my vote of conversational approval. Different department from the actual ballot.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Agree.006",
+      "intent": "Agree",
+      "text": "I'm with {target} on that thought. We can share the metaphorical umbrella.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Agree.007",
+      "intent": "Agree",
+      "text": "That makes sense, {target}. A suspiciously useful thing to bring to a meeting.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Agree.008",
+      "intent": "Agree",
+      "text": "Count me beside {target}. I promise not to lean on the argument too hard.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Agree.009",
+      "intent": "Agree",
+      "text": "I agree with {target}; the sentence can now put its feet up.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Agree.010",
+      "intent": "Agree",
+      "text": "{target}'s point has landed in my yes bucket. Please admire the organizational system.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Disagree.001",
+      "intent": "Disagree",
+      "text": "{target}, that conclusion and I are seeing other people.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Disagree.002",
+      "intent": "Disagree",
+      "text": "I'm not boarding {target}'s argument. It appears to be missing a wheel.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Disagree.003",
+      "intent": "Disagree",
+      "text": "No from me, {target}. I'll have the disagreement without the dramatic sauce.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Disagree.004",
+      "intent": "Disagree",
+      "text": "{target}, I can't make that point fit through the door marked convincing.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Disagree.005",
+      "intent": "Disagree",
+      "text": "I'm sending {target}'s conclusion back to the kitchen.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Disagree.006",
+      "intent": "Disagree",
+      "text": "I disagree with {target}. My imaginary committee reached the same result after snacks.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Disagree.007",
+      "intent": "Disagree",
+      "text": "That doesn't work for me, {target}. Neither does my emergency tap-dance plan.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Disagree.008",
+      "intent": "Disagree",
+      "text": "{target}'s point gets a raised eyebrow, not my support.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Disagree.009",
+      "intent": "Disagree",
+      "text": "I'm on the other side of that argument, {target}. The seating is equally uncomfortable.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Disagree.010",
+      "intent": "Disagree",
+      "text": "{target}, your conclusion has failed to charm the small skeptic living behind my eyes.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReactToDeath.001",
+      "intent": "ReactToDeath",
+      "text": "I can't joke an empty chair back into a person. Annoying limit on the profession.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReactToDeath.002",
+      "intent": "ReactToDeath",
+      "text": "There should be someone here to groan at that last joke. That's the part I keep noticing.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReactToDeath.003",
+      "intent": "ReactToDeath",
+      "text": "Death has terrible timing and no sense of audience participation.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReactToDeath.004",
+      "intent": "ReactToDeath",
+      "text": "I'd like to return this morning report. Apparently the universe doesn't keep receipts.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReactToDeath.005",
+      "intent": "ReactToDeath",
+      "text": "One less person to steal the good chair. I'd rather still have the competition.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReactToDeath.006",
+      "intent": "ReactToDeath",
+      "text": "The room has a gap no amount of nonsense can comfortably sit in.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReactToDeath.007",
+      "intent": "ReactToDeath",
+      "text": "I'm making jokes because the alternative sounds a lot like falling apart quietly.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReactToDeath.008",
+      "intent": "ReactToDeath",
+      "text": "Someone's gone, and my usual supply of ridiculous comparisons has nothing useful to put there.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReactToDeath.009",
+      "intent": "ReactToDeath",
+      "text": "I was prepared for a bad morning. This one has exceeded the brochure.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReactToDeath.010",
+      "intent": "ReactToDeath",
+      "text": "No punchline for that death. Some things don't deserve one.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.VoteJustification.001",
+      "intent": "VoteJustification",
+      "text": "I cast the vote myself. No trained pigeon was consulted.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.VoteJustification.002",
+      "intent": "VoteJustification",
+      "text": "My ballot was a judgement call, not something I found inside a fortune dumpling.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.VoteJustification.003",
+      "intent": "VoteJustification",
+      "text": "I weighed my choice. The scales were metaphorical and only mildly crooked.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.VoteJustification.004",
+      "intent": "VoteJustification",
+      "text": "That vote came from my own assessment, despite the terrible wrapping paper of my explanation.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.VoteJustification.005",
+      "intent": "VoteJustification",
+      "text": "I chose with what I knew. My crystal ball remains an ordinary bowl.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.VoteJustification.006",
+      "intent": "VoteJustification",
+      "text": "The ballot was serious. I realize the person holding it makes that harder to believe.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.VoteJustification.007",
+      "intent": "VoteJustification",
+      "text": "My vote wasn't a joke, even if explaining it makes me reach for one.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.VoteJustification.008",
+      "intent": "VoteJustification",
+      "text": "I made the decision I could defend, then resisted drawing a face on the ballot.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.VoteJustification.009",
+      "intent": "VoteJustification",
+      "text": "I didn't outsource my choice to the room's loudest weather system.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.VoteJustification.010",
+      "intent": "VoteJustification",
+      "text": "That was my call. The invisible marching band had nothing to do with it.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Vouch.001",
+      "intent": "Vouch",
+      "text": "I'll back {target}. Consider me an extremely talkative support beam.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Vouch.002",
+      "intent": "Vouch",
+      "text": "Give {target} another hearing. I can supply imaginary velvet ropes if that helps.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Vouch.003",
+      "intent": "Vouch",
+      "text": "I'm lending {target} my trust for now. The interest rate is one fair chance.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Vouch.004",
+      "intent": "Vouch",
+      "text": "{target} has my support, and I haven't even put a silly hat on the endorsement.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Vouch.005",
+      "intent": "Vouch",
+      "text": "Let's not pack {target} into the blame suitcase just yet.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Vouch.006",
+      "intent": "Vouch",
+      "text": "I'm standing with {target}, metaphorically. Physically I'm trying not to trip over the mood.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReportInvestigation.001",
+      "intent": "ReportInvestigation",
+      "text": "My check on {target} returned {result}. The readout did not include a complimentary joke.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReportInvestigation.002",
+      "intent": "ReportInvestigation",
+      "text": "Investigation update: {target} appeared {result}. Cue the very restrained information trumpet.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReportInvestigation.003",
+      "intent": "ReportInvestigation",
+      "text": "The result for {target} was {result}. Please imagine this announcement wearing sensible shoes.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReportInvestigation.004",
+      "intent": "ReportInvestigation",
+      "text": "I checked {target}; the answer came back {result}. My eyebrows have been informed.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReportInvestigation.005",
+      "intent": "ReportInvestigation",
+      "text": "Here's the finding, without a magic trick in the middle: {target}, {result}.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.CallForTrial.001",
+      "intent": "CallForTrial",
+      "text": "I'd like {target} on trial. The imaginary courtroom is now accepting uncomfortable questions.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.CallForTrial.002",
+      "intent": "CallForTrial",
+      "text": "Bring {target} to a hearing. I'll keep the ceremonial duck out of it.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.CallForTrial.003",
+      "intent": "CallForTrial",
+      "text": "I'm calling for a formal defense from {target}, with fewer sound effects than usual.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.CallForTrial.004",
+      "intent": "CallForTrial",
+      "text": "Let's put {target} on trial before this conversation grows moss and asks for a chair.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.CallForTrial.005",
+      "intent": "CallForTrial",
+      "text": "{target}, I'm requesting a hearing. No tap-dancing through the paperwork.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Deflect.001",
+      "intent": "Deflect",
+      "text": "Could the suspicion spotlight visit {target}? It's starting to burn a hole in my imaginary hat.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Deflect.002",
+      "intent": "Deflect",
+      "text": "Point some of those questions at {target}. My corner of the room has enough question marks.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Deflect.003",
+      "intent": "Deflect",
+      "text": "Let's hear {target} answer too. I'm not the only item on the awkwardness buffet.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Deflect.004",
+      "intent": "Deflect",
+      "text": "Move the attention to {target} for a turn. I need a break from starring in this terrible play.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.Deflect.005",
+      "intent": "Deflect",
+      "text": "{target} could use some scrutiny as well. Sharing is caring, according to suspiciously cheerful posters.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.StaySilent.001",
+      "intent": "StaySilent",
+      "text": "I'll put the joke machine in standby for a turn.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.StaySilent.002",
+      "intent": "StaySilent",
+      "text": "Nothing from me. Enjoy this limited edition silence.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.StaySilent.003",
+      "intent": "StaySilent",
+      "text": "I'm listening. Try not to alert anyone; they'll expect it regularly.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.StaySilent.004",
+      "intent": "StaySilent",
+      "text": "I'll sit on my next comment. Metaphorically. It has sharp corners.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.StaySilent.005",
+      "intent": "StaySilent",
+      "text": "My mouth is temporarily closed for maintenance.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ExpressFear.001",
+      "intent": "ExpressFear",
+      "text": "My survival plan currently consists of looking busy and hoping danger hates paperwork.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ExpressFear.002",
+      "intent": "ExpressFear",
+      "text": "I'm scared enough to consider hiding behind a chair. My tactical training is clearly extensive.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ExpressFear.003",
+      "intent": "ExpressFear",
+      "text": "Tonight is making my stomach rehearse a circus act without permission.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ExpressFear.004",
+      "intent": "ExpressFear",
+      "text": "I'd feel safer if the dark had a customer complaints desk.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ExpressFear.005",
+      "intent": "ExpressFear",
+      "text": "My brave face appears to have been shipped to the wrong address.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReactToRoleReveal.001",
+      "intent": "ReactToRoleReveal",
+      "text": "The role is out of the box. Please don't mistake the box for a fresh theory.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReactToRoleReveal.002",
+      "intent": "ReactToRoleReveal",
+      "text": "That reveal has rearranged my mental furniture. Some of it was inflatable.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReactToRoleReveal.003",
+      "intent": "ReactToRoleReveal",
+      "text": "Now we know the role, our old assumptions need their luggage checked.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReactToRoleReveal.004",
+      "intent": "ReactToRoleReveal",
+      "text": "Time to compare the revealed role with the claims. I'll keep the imaginary scoreboard legible.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReactToRoleReveal.005",
+      "intent": "ReactToRoleReveal",
+      "text": "The information puzzle has another piece. Someone stop me trying to eat the corners.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.LastWords.001",
+      "intent": "LastWords",
+      "text": "Please remember me as slightly funnier than I actually managed.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.LastWords.002",
+      "intent": "LastWords",
+      "text": "This is a terrible venue for a farewell tour.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.LastWords.003",
+      "intent": "LastWords",
+      "text": "I'll leave you my finest unfinished joke. It starts with making a better next decision.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.LastWords.004",
+      "intent": "LastWords",
+      "text": "If there's an exit survey, I'm giving the experience one deeply offended star.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.LastWords.005",
+      "intent": "LastWords",
+      "text": "End of my act. Please don't let the next one be another funeral.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReportAction.001",
+      "intent": "ReportAction",
+      "text": "Night account incoming. Please lower all ceremonial eyebrows. {result}",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReportAction.002",
+      "intent": "ReportAction",
+      "text": "Here's the report, straight from the department of inconvenient experiences. {result}",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReportAction.003",
+      "intent": "ReportAction",
+      "text": "I've removed the juggling intermission from these details. {result}",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReportAction.004",
+      "intent": "ReportAction",
+      "text": "The night paperwork has arrived wearing its serious little shoes. {result}",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.ReportAction.005",
+      "intent": "ReportAction",
+      "text": "Allow me to unpack the actual account before the imaginary suitcase bites. {result}",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    }
+  ]
+}
