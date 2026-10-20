@@ -39,12 +39,12 @@ namespace SocialStim.Application.PresentationCues
             {
                 EffectStep step = _steps[i];
                 float local = time - step.Delay;
-                if (step.Channel != channel || local < 0 || local >= step.Duration) continue;
+                if (step.Channel != channel || local < 0 || !step.Continuous && local >= step.Duration) continue;
                 float progress = local / step.Duration;
                 float pulse = 1 - Math.Abs(progress * 2 - 1);
                 float envelope = step.Envelope == EffectEnvelope.Sine ? (float)Math.Sin(progress * Math.PI)
                     : step.Envelope == EffectEnvelope.Smooth ? pulse * pulse * (3 - 2 * pulse) : pulse;
-                float value = step.Amount * envelope;
+                float value = step.Amount * (step.Continuous ? 1 : envelope);
                 if (step.Blend == EffectBlend.Add) addition += value;
                 else if (step.Priority >= priority) { replacement = value; priority = step.Priority; }
             }

@@ -44,7 +44,7 @@ namespace SocialStim.Rules.Reasoning
         public Verdict Judge(KnowledgeView knowledge, CharacterId defendant, IRandomSource random)
         {
             KnownCharacter target = knowledge.Characters.First(c => c.Id == defendant);
-            if (target.IsTeammate) return Verdict.Innocent;
+            if (target.IsTeammate || knowledge.OwnRole.Faction == Faction.Town && ConfirmedTown(target)) return Verdict.Innocent;
             int threshold = knowledge.Personality.HasFlag(Personality.Cautious) ? 42 : 30;
             if (knowledge.Personality.HasFlag(Personality.Loyal)) threshold += 6;
             if (knowledge.OwnRole.Faction == Faction.Antagonist) threshold -= 12;
@@ -59,7 +59,7 @@ namespace SocialStim.Rules.Reasoning
                 return random.Next(100) < 65 ? knowledge.Self : (CharacterId?)null;
             var targets = knowledge.Characters.Where(c => c.Alive && c.Id != knowledge.Self).ToList();
             if (knowledge.OwnRole.Ability == AbilityKind.Attack)
-                targets = targets.Where(c => !c.IsTeammate).ToList();
+                targets = targets.Where(c => !c.IsTeammate && (knowledge.OwnRole.Faction != Faction.Town || !ConfirmedTown(c))).ToList();
             if (knowledge.OwnRole.Ability == AbilityKind.Investigate)
             {
                 var unknown = targets.Where(c => !knowledge.PrivateResults.Any(r => r.Kind == ReportKind.Investigation && r.Target == c.Id)).ToList();
@@ -71,8 +71,10 @@ namespace SocialStim.Rules.Reasoning
             return targets.OrderByDescending(c => c.Suspicion).ThenBy(c => c.Id.Value).First().Id;
         }
 
+        private static bool ConfirmedTown(KnownCharacter character) => character.KnownFaction == Faction.Town;
         private static KnownCharacter Suspect(KnowledgeView knowledge) => knowledge.Characters
-            .Where(c => c.Alive && c.Id != knowledge.Self && !c.IsTeammate)
+            .Where(c => c.Alive && c.Id != knowledge.Self && !c.IsTeammate
+                && (knowledge.OwnRole.Faction != Faction.Town || !ConfirmedTown(c)))
             .OrderByDescending(c => c.Suspicion).ThenBy(c => c.Id.Value).FirstOrDefault();
     }
 }

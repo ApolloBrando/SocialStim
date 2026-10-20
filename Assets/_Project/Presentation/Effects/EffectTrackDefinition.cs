@@ -14,6 +14,7 @@ namespace SocialStim.Presentation.Effects
         public int priority;
         public EffectBlend blend;
         public EffectEnvelope envelope;
-        public EffectStep ToStep() => new EffectStep(channel, duration, amount, priority, blend, delay, envelope);
+        [SerializeField] private bool _continuous;
+        public EffectStep ToStep() => new EffectStep(channel, duration, amount, priority, blend, delay, envelope, _continuous);
     }
 }
