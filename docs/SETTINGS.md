@@ -10,7 +10,7 @@ Modern council play uses grouped native uGUI sliders, toggles and buttons in the
 - Start/Apply appears only when the draft validates. Corrections restore it without reopening the page. Every individual control has a reset; Data offers Reset All.
 - Game changes affect new runs. Continue resumes only the current in-memory run.
 - The six point-buy stats must total exactly 30; difficulty/stat behavior is connected in the AI phase on its stacked branch.
-- Free Time remains off until its social exchanges are implemented. No nonfunctional toggle is exposed.
+- Day discussion/voting and night actions are the only gameplay periods; there is no additional activity setting.
 
 Preferences use version 2 JSON at `Application.persistentDataPath/settings-v2.json`. The file holds display and setup preferences only: no cast assignment, transcript, resource state, relationship or ongoing run. Values clamp individually; malformed data recovers to defaults with a warning. Version 0/1 JSON and the existing PlayerPrefs UI format migrate; an old default speed of 28 becomes 84, custom speeds survive. Unknown future versions load defaults with a warning. Explicit preference changes may replace that file.
 

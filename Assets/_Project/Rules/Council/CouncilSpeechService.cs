@@ -27,7 +27,6 @@ namespace SocialStim.Rules.Council
                         && _world.Events.Any(e => e.Kind == CouncilEventKind.Claim && e.Claim == action.Claim && e.Actor != actor.Id)
                         ? SpeechIntent.CounterClaim : SpeechIntent.ClaimRole;
                 case CouncilActionKind.Report: return action.Readout.HasValue ? SpeechIntent.ReportInvestigation : SpeechIntent.ReportAction;
-                case CouncilActionKind.FreeTime: return SpeechIntent.FreeTime;
                 default: return SpeechIntent.Chat;
             }
         }

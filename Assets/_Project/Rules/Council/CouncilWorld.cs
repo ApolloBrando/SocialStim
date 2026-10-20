@@ -78,7 +78,7 @@ namespace SocialStim.Rules.Council
             IReadOnlyDictionary<RoleId, int> roles = Options.Visibility != SetupVisibility.Full ? null
                 : new ReadOnlyDictionary<RoleId, int>(Actors.GroupBy(a => a.StartingRole.Id).ToDictionary(g => g.Key, g => g.Count()));
             var stats = new ReadOnlyDictionary<CharacterId, CharacterStats>(Actors.ToDictionary(a => a.Id, a => a.Stats));
-            var events = Events.Where(e => e.Public || e.Kind == CouncilEventKind.FreeTime && e.Recipient == observer.Id)
+            var events = Events.Where(e => e.Public)
                 .Select((e, i) => e.Scoped(i)).ToList().AsReadOnly();
             var raw = new CouncilKnowledge(observer.Id, observer.Role, observer.Traits, Day, Round, observer.Charges,
                 observer.SelfHealUsed, characters, events, observer.Results.ToList().AsReadOnly(), Catalog, counts, roles,

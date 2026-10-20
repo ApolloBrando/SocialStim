@@ -1,5 +1,36 @@
 namespace SocialStim.Rules.Dialogue
 {
     /// <summary>Initial semantic speech intents shared by players and NPCs.</summary>
-    public enum SpeechIntent { Accuse, Defend, ClaimRole, ReportInvestigation, Vouch, CallForTrial, Agree, Disagree, Deflect, StaySilent, ExpressFear, ReactToDeath, ReactToRoleReveal, LastWords, VoteJustification, ReportAction, Question, Answer, Banter, Chat, CounterClaim, Thank, Apologize, Doubt, Plead, Whisper, FreeTime, AnnounceVote, ChangeVote, Gloat, Stall }
+    public enum SpeechIntent {
+        Accuse = 0,
+        Defend = 1,
+        ClaimRole = 2,
+        ReportInvestigation = 3,
+        Vouch = 4,
+        CallForTrial = 5,
+        Agree = 6,
+        Disagree = 7,
+        Deflect = 8,
+        StaySilent = 9,
+        ExpressFear = 10,
+        ReactToDeath = 11,
+        ReactToRoleReveal = 12,
+        LastWords = 13,
+        VoteJustification = 14,
+        ReportAction = 15,
+        Question = 16,
+        Answer = 17,
+        Banter = 18,
+        Chat = 19,
+        CounterClaim = 20,
+        Thank = 21,
+        Apologize = 22,
+        Doubt = 23,
+        Plead = 24,
+        Whisper = 25,
+        AnnounceVote = 27,
+        ChangeVote = 28,
+        Gloat = 29,
+        Stall = 30,
+    }
 }

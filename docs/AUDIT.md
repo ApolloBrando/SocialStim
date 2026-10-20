@@ -126,7 +126,7 @@ ownership; reveal/advance separation; simulation outcomes and stalls.
 4. Stats, affinity, reason-coded inference/utility and simulation.
 5. Curated voices and >=3500 static lines in authored batches with measured coverage.
 6. Persistent effect catalog, markup/styles and playground.
-7. Optional Free Time/extra roles after core integration.
+7. Optional extra roles after core integration; gameplay remains day/night only.
 
 Each phase has a feature branch/PR; dependent branches stack with an explicit
 base. Never write main or merge a PR. Main Menu Continue means only the active

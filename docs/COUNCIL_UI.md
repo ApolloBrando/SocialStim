@@ -44,7 +44,7 @@ scoping so private event counts do not leak.
 
 The New Run editor and grouped settings are completed in Phase 3. Stats,
 inference, relationship evolution and detailed NPC decision explanations are
-Phase 4. Free Time remains off by default until its social effects are wired.
+Phase 4. Only day discussion/voting and night actions remain in scope.
 The larger reason-tagged content catalog is Phase 5; the initial extended
 fallback catalog is not represented as meeting the final volume target.
 

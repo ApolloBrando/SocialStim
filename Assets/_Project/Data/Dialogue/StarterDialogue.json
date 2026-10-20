@@ -741,30 +741,6 @@
       "weight": 1
     },
     {
-      "id": "mission.FreeTime.001",
-      "intent": "FreeTime",
-      "text": "Mind if I sit here?",
-      "weight": 1
-    },
-    {
-      "id": "mission.FreeTime.002",
-      "intent": "FreeTime",
-      "text": "How are you holding up?",
-      "weight": 1
-    },
-    {
-      "id": "mission.FreeTime.003",
-      "intent": "FreeTime",
-      "text": "You look like you could use company.",
-      "weight": 1
-    },
-    {
-      "id": "mission.FreeTime.004",
-      "intent": "FreeTime",
-      "text": "Want to talk for a minute?",
-      "weight": 1
-    },
-    {
       "id": "mission.AnnounceVote.001",
       "intent": "AnnounceVote",
       "text": "I've made my choice.",

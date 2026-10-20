@@ -30,7 +30,6 @@ namespace SocialStim.Application.Council
                 var view = Snapshot; var self = view.Knowledge.Self;
                 if (view.Phase == CouncilPhase.Vote) return view.VoteTargets;
                 if (view.Phase == CouncilPhase.Night) return view.NightTargets;
-                if (view.Phase == CouncilPhase.FreeTime) return view.Knowledge.Characters.Where(c => c.Alive && c.Id != self).Select(c => c.Id).ToList().AsReadOnly();
                 if (view.Phase != CouncilPhase.Discussion || Step != InteractionStep.Target) return new List<CharacterId>().AsReadOnly();
                 return view.Knowledge.Characters.Where(c => c.Alive && (_kind == CouncilActionKind.Defend || c.Id != self))
                     .Select(c => c.Id).ToList().AsReadOnly();
@@ -63,8 +62,6 @@ namespace SocialStim.Application.Council
                         add("Last words", Plain(line.Text), new CouncilAction(CouncilActionKind.Chat, lineId: line.Id, intent: SpeechIntent.LastWords));
                 add("Continue", action: new CouncilAction(CouncilActionKind.Continue)); return list.AsReadOnly();
             }
-            if (view.Phase == CouncilPhase.FreeTime)
-            { add("Pass", action: new CouncilAction(CouncilActionKind.Pass)); return list.AsReadOnly(); }
             if (!alive)
             { add("Watch", action: new CouncilAction(CouncilActionKind.Continue)); return list.AsReadOnly(); }
             if (Step == InteractionStep.Claims)
@@ -128,7 +125,6 @@ namespace SocialStim.Application.Council
             if (revision != view.Revision || !Targets.Contains(target)) { error = "Choose a valid target."; return false; }
             if (view.Phase == CouncilPhase.Vote) return Submit(new CouncilAction(CouncilActionKind.Vote, target), out error);
             if (view.Phase == CouncilPhase.Night) return Submit(new CouncilAction(CouncilActionKind.Night, target), out error);
-            if (view.Phase == CouncilPhase.FreeTime) return Submit(new CouncilAction(CouncilActionKind.FreeTime, target), out error);
             return Prepare(new CouncilAction(_kind, target), out error);
         }
 

@@ -35,9 +35,7 @@ namespace SocialStim.Rules.Council
                             ? null : "Invalid night target.";
                     case CouncilPhase.Morning: case CouncilPhase.Elimination:
                         return action.Kind == CouncilActionKind.Continue ? null : "Continue to the next stage.";
-                    case CouncilPhase.FreeTime:
-                        return action.Kind == CouncilActionKind.FreeTime && action.Target.HasValue && action.Target != actor.Id
-                            && world.Actor(action.Target.Value).Alive || action.Kind == CouncilActionKind.Pass ? null : "Choose someone to visit.";
+
                 }
             }
             if (action.Kind == CouncilActionKind.Pass) return action.Target.HasValue || action.Claim.HasValue

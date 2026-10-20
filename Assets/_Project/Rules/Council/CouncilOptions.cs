@@ -8,16 +8,16 @@ namespace SocialStim.Rules.Council
     public sealed class CouncilOptions
     {
         public CouncilOptions(uint seed, int rounds = 5, int playerWindows = 1, bool revote = true, bool abstain = true,
-            bool revealRoles = true, bool lastWords = true, bool freeTime = false, int freeTimeActions = 1,
+            bool revealRoles = true, bool lastWords = true,
             bool promoteEvil = true, bool backlash = true, bool selfHeal = true, bool notifyLull = true,
             int nullifierCharges = 2, bool forgerReadsClear = false, int maximumDays = 30,
             SetupVisibility visibility = SetupVisibility.FactionCounts, NeutralParityMode parity = NeutralParityMode.Neither, AiDifficulty difficulty = AiDifficulty.Normal,
             StatsMode statsMode = StatsMode.Random, CharacterStats playerStats = null, int sampleBudget = 0)
         {
-            if (rounds < 3 || rounds > 7 || playerWindows < 1 || playerWindows > 2 || freeTimeActions < 1 || freeTimeActions > 2
+            if (rounds < 3 || rounds > 7 || playerWindows < 1 || playerWindows > 2
                 || nullifierCharges < 0 || nullifierCharges > 10 || maximumDays < 1) throw new ArgumentException("Run setting out of range.");
             Seed = seed; Rounds = rounds; PlayerWindows = playerWindows; Revote = revote; Abstain = abstain;
-            RevealRoles = revealRoles; LastWords = lastWords; FreeTime = freeTime; FreeTimeActions = freeTimeActions;
+            RevealRoles = revealRoles; LastWords = lastWords;
             PromoteEvil = promoteEvil; Backlash = backlash; SelfHeal = selfHeal; NotifyLull = notifyLull;
             NullifierCharges = nullifierCharges; ForgerReadsClear = forgerReadsClear; MaximumDays = maximumDays;
             Visibility = visibility; Parity = parity; Ai = new AiPolicy(difficulty, sampleBudget); StatsMode = statsMode;
@@ -26,7 +26,7 @@ namespace SocialStim.Rules.Council
         }
         /// <summary>Copies the complete configuration for an independent deterministic batch run.</summary>
         public CouncilOptions WithSeed(uint seed) => new CouncilOptions(seed, Rounds, PlayerWindows, Revote, Abstain,
-            RevealRoles, LastWords, FreeTime, FreeTimeActions, PromoteEvil, Backlash, SelfHeal, NotifyLull,
+            RevealRoles, LastWords, PromoteEvil, Backlash, SelfHeal, NotifyLull,
             NullifierCharges, ForgerReadsClear, MaximumDays, Visibility, Parity, Ai.Difficulty, StatsMode, PlayerStats, Ai.Samples);
         public AiPolicy Ai { get; }
         public StatsMode StatsMode { get; }
@@ -38,8 +38,6 @@ namespace SocialStim.Rules.Council
         public bool Abstain { get; }
         public bool RevealRoles { get; }
         public bool LastWords { get; }
-        public bool FreeTime { get; }
-        public int FreeTimeActions { get; }
         public bool PromoteEvil { get; }
         public bool Backlash { get; }
         public bool SelfHeal { get; }

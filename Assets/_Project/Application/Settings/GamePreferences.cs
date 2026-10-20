@@ -60,7 +60,7 @@ namespace SocialStim.Application.Settings
         }
         public CouncilOptions Options(uint seed) => new CouncilOptions(seed, Get(GameSetting.Rounds), Get(GameSetting.Windows),
             On(GameSetting.Revote), On(GameSetting.Abstain), On(GameSetting.RevealRoles), On(GameSetting.LastWords),
-            On(GameSetting.FreeTime), Get(GameSetting.FreeTimeActions), On(GameSetting.PromoteEvil), On(GameSetting.Backlash),
+            On(GameSetting.PromoteEvil), On(GameSetting.Backlash),
             On(GameSetting.SelfHeal), On(GameSetting.NotifyLull), Get(GameSetting.NullifierCharges), On(GameSetting.ForgerReadsClear),
             Get(GameSetting.MaximumDays), (SetupVisibility)Get(GameSetting.Visibility), (Rules.Victory.NeutralParityMode)Get(GameSetting.InfinitumParity), (AiDifficulty)Get(GameSetting.Difficulty),
             (StatsMode)Get(GameSetting.StatsMode), new CharacterStats(Get(GameSetting.Charisma), Get(GameSetting.Intuition),
@@ -76,7 +76,7 @@ namespace SocialStim.Application.Settings
                 case GameSetting.EvilCount: case GameSetting.NeutralCount: return -1;
                 case GameSetting.Rounds: return 5;
                 case GameSetting.Windows: case GameSetting.Revote: case GameSetting.Abstain: case GameSetting.RevealRoles:
-                case GameSetting.LastWords: case GameSetting.FreeTimeActions: case GameSetting.PromoteEvil:
+                case GameSetting.LastWords: case GameSetting.PromoteEvil:
                 case GameSetting.Backlash: case GameSetting.SelfHeal: case GameSetting.NotifyLull:
                 case GameSetting.Visibility: case GameSetting.Difficulty: return 1;
                 case GameSetting.NullifierCharges: return 2;
@@ -93,7 +93,7 @@ namespace SocialStim.Application.Settings
                 case GameSetting.PlayerCount: return Clamp(value, 5, capacity);
                 case GameSetting.EvilCount: case GameSetting.NeutralCount: return Clamp(value, -1, capacity - 1);
                 case GameSetting.Rounds: return Clamp(value, 3, 7);
-                case GameSetting.Windows: case GameSetting.FreeTimeActions: return Clamp(value, 1, 2);
+                case GameSetting.Windows: return Clamp(value, 1, 2);
                 case GameSetting.NullifierCharges: return Clamp(value, 0, 10);
                 case GameSetting.MaximumDays: return Clamp(value, 1, 100);
                 case GameSetting.Visibility: case GameSetting.StatsMode: case GameSetting.InfinitumParity: return Clamp(value, 0, 2);

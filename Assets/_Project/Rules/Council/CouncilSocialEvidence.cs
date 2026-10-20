@@ -44,11 +44,7 @@ namespace SocialStim.Rules.Council
                     double charm = 0.5 + knowledge.Skill(speaker).Get(StatKind.Charm) / 10.0;
                     _affinity[speaker] += (defending ? 0.10 : accusing ? -0.13 : e.Intent == SpeechIntent.Agree ? 0.07 : 0) * charm;
                 }
-                if (e.Kind == CouncilEventKind.FreeTime && e.Recipient == knowledge.Self)
-                {
-                    CharacterId other = speaker == knowledge.Self ? target : speaker;
-                    _affinity[other] += 0.16 * (0.5 + knowledge.Skill(other).Get(StatKind.Charm) / 10.0);
-                }
+
             }
             foreach (var e in knowledge.Events.Where(e => e.Actor.HasValue && e.Target.HasValue))
             {

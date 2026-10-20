@@ -86,8 +86,6 @@ namespace SocialStim.Rules.Council
                 case CouncilPhase.Night:
                     var target = strategy.NightTarget(k, random);
                     return new CouncilAction(CouncilActionKind.Night, target.HasValue && view.NightTargets.Contains(target.Value) ? target : null);
-                case CouncilPhase.FreeTime:
-                    return new CouncilAction(CouncilActionKind.FreeTime, k.Characters.Where(c => c.Alive && c.Id != k.Self).Select(c => (CharacterId?)c.Id).FirstOrDefault());
                 default: return new CouncilAction(CouncilActionKind.Continue);
             }
         }

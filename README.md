@@ -11,3 +11,6 @@ Core mission contracts and authoring: [roles/setup/night rules](docs/ROLES.md).
 [Settings and new-run editor](docs/SETTINGS.md).
 
 [NPC reasoning and simulation](docs/AI_DESIGN.md).
+
+The [current gameplay scope](MISSION_SCOPE.md) is day discussion/voting and night
+role actions only. The previously proposed Free Time activity is cancelled.

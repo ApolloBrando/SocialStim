@@ -20,7 +20,6 @@ namespace SocialStim.Rules.Council
         private readonly CouncilNightDirector _night;
         private readonly MissionWinCondition _win = new MissionWinCondition();
         private bool _submitting;
-        private int _freeTimeUsed;
         internal CouncilSession(CouncilWorld world, IEnumerable<DialogueLine> dialogue, ICouncilStrategy strategy)
         {
             _world = world; _speech = new CouncilSpeechService(world, dialogue);
@@ -103,14 +102,7 @@ namespace SocialStim.Rules.Council
                 case CouncilPhase.Elimination:
                     if (action.Intent == SpeechIntent.LastWords) _speech.Say(_world.Player, action);
                     if (_world.Outcome != OutcomeKind.Ongoing) Finish();
-                    else if (_world.Options.FreeTime) { _world.Phase = CouncilPhase.FreeTime; _freeTimeUsed = 0; }
                     else StartNight();
-                    break;
-                case CouncilPhase.FreeTime:
-                    if (action.Target.HasValue) _world.Emit(CouncilEventKind.FreeTime,
-                        "You spend time with " + _world.Actor(action.Target.Value).Name + ".", _world.Player.Id, action.Target,
-                        recipient: _world.Player.Id);
-                    if (++_freeTimeUsed >= _world.Options.FreeTimeActions) StartNight();
                     break;
                 case CouncilPhase.Night:
                     _night.Resolve(action.Target);
