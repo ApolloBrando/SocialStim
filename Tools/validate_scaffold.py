@@ -57,8 +57,10 @@ def validate() -> list[str]:
         ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
         cwd=ROOT, check=True, capture_output=True,
     )
-    files = sorted({ROOT / name for name in result.stdout.decode("utf-8").split("\0")
-                    if name and (ROOT / name).is_file()})
+    # Deduplicate names before making Path objects: WindowsPath equality folds
+    # case and would otherwise conceal exactly the collisions being checked.
+    names = sorted(set(result.stdout.decode("utf-8").split("\0")))
+    files = [ROOT / name for name in names if name and (ROOT / name).is_file()]
     folded: dict[str, str] = {}
     for path in files:
         relative = path.relative_to(ROOT).as_posix()
@@ -94,9 +96,10 @@ def validate() -> list[str]:
         require(Path(str(path) + ".meta").is_file(), f"Missing metadata: {path.relative_to(ROOT)}")
 
     # Unity's built-in references use reserved zero-prefixed GUIDs. Every other
-    # serialized project reference must resolve to committed metadata.
+    # serialized project-owned reference must resolve to committed metadata.
+    # Vendor assets imported outside _Project can refer to package-owned scripts.
     for path in files:
-        if path.suffix not in {".asset", ".unity", ".prefab"}:
+        if not path.is_relative_to(PROJECT) or path.suffix not in {".asset", ".unity", ".prefab"}:
             continue
         for guid in re.findall(r"\bguid: ([0-9a-f]{32})\b", path.read_text(encoding="utf-8")):
             require(guid in guids or guid.startswith("0000000000000000"),

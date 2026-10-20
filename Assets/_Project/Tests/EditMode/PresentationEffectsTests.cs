@@ -217,7 +217,10 @@ namespace SocialStim.Tests.EditMode
         [Test]
         public void PeacefulMorningDoesNotTriggerACasualtyEffect()
         {
-            var run = TestContent.Scenario("inspector", "physician", "interrupter", "assassin", "survivor");
+            var run = RunFactory.CreateScenario(new RunOptions(123, discussionRounds: 1, votingMode: VotingMode.Trial),
+                new[] { "inspector", "physician", "interrupter", "assassin", "survivor" }
+                    .Select((role, id) => new CastMemberSpec("Person" + id, new SocialStim.Rules.Roles.RoleId(role))),
+                TestContent.Roles(), TestContent.Lines(), new ScenarioStrategy());
             foreach (var command in new[] { GameCommand.Speak(SpeechIntent.StaySilent),
                 GameCommand.Nominate(null), GameCommand.Night(null) })
                 Assert.That(run.TrySubmit(command, out string error), Is.True, error);

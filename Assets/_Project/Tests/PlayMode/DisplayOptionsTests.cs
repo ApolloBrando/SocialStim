@@ -1,6 +1,6 @@
+using System;
 using System.Linq;
 using NUnit.Framework;
-using System;
 using SocialStim.Application.PresentationCues;
 using SocialStim.Application.Sessions;
 using SocialStim.Rules.Cast;

@@ -63,10 +63,6 @@ before making the next choices available. The view never resolves votes or night
 | CI | Fix branches lacked push checks; superseded runs could keep consuming workers | Add fix/** trigger, cancellation group, 15-minute timeout, validator regressions and a post-build hygiene check |
 | Mission scope | This baseline's old mission still requested cancelled Free Time | Reapply day/night-only direction; add current working conventions, including owner-managed README files |
 
-The single C# failure in the first repair CI run was a newly added test-case typo:
-it passed full-motion settings while expecting reduced-motion output. Its inputs
-were corrected; the runtime was not weakened to satisfy the bad assertion.
-
 ## Redundancy and cleanup choices
 
 - Both audit reports were retained; the colliding `Docs/AUDIT.md` becomes
