@@ -1,5 +1,7 @@
 # Roster, reports and readability
 
+The interaction details below describe the original roster revision. The later QoL update removes the target confirmation, Public record and suspect-mark UI, distinguishes speaker colours from name mentions, and simplifies action colours. See QOL_UI_UX_RESEARCH.md for current interaction behavior.
+
 ## Delivered interaction
 
 The native uGUI roster selects accusation, defense, nomination, vote and night targets from the current validated request. Clicking a name opens its available actions, public record and a personal suspect mark. Target selection and inspection never advance authoritative state; an action confirmation does. Legal targets are not hidden behind the old six-choice pager. Dead entries stay grey. A selected player has a blue frame and SELECTED annotation.

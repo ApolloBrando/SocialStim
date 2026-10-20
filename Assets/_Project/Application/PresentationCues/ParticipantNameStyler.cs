@@ -27,6 +27,20 @@ namespace SocialStim.Application.PresentationCues
             }
             return new SemanticText(text.Text, spans);
         }
+        /// <summary>Only the attributed leading speaker name uses character identity colour; mentions keep their shared style.</summary>
+        public static SemanticText Dialogue(SemanticText text, IEnumerable<string> names, string speaker, int characterIndex)
+        {
+            SemanticText highlighted = Highlight(text, names);
+            if (string.IsNullOrEmpty(speaker) || !text.Text.StartsWith(speaker + ":", StringComparison.Ordinal)) return highlighted;
+            var spans = highlighted.Spans.ToList();
+            spans.Add(new SemanticSpan(0, speaker.Length, SpeakerStyle(characterIndex)));
+            return new SemanticText(text.Text, spans);
+        }
+        public static SemanticStyle SpeakerStyle(int characterIndex)
+        {
+            if (characterIndex < 0) throw new ArgumentOutOfRangeException(nameof(characterIndex));
+            return (SemanticStyle)((int)SemanticStyle.Speaker0 + characterIndex % 12);
+        }
         private static bool Word(char value) => char.IsLetterOrDigit(value) || value == '_' || value == '-';
     }
 }

@@ -34,6 +34,8 @@ namespace SocialStim.Presentation.Text
         private TextGameView _view;
         private GamePresenter _presenter;
         private RunSession _activeSession;
+        private bool _preferencesDirty;
+        private float _savePreferencesAt;
 
         private void Awake()
         {
@@ -97,12 +99,23 @@ namespace SocialStim.Presentation.Text
 
         private void SavePreferences(SocialStim.Application.PresentationCues.EffectsSettings settings)
         {
-            try { UiPreferences.Store(settings); }
+            try { UiPreferences.Store(settings); _preferencesDirty = true; _savePreferencesAt = Time.unscaledTime + 0.5f; }
             catch (PlayerPrefsException exception) { _view.ShowInputError("Preferences could not be kept: " + exception.Message); }
+        }
+
+        private void Update() { if (_preferencesDirty && Time.unscaledTime >= _savePreferencesAt) FlushPreferences(); }
+        private void OnApplicationPause(bool paused) { if (paused) FlushPreferences(); }
+        private void OnApplicationQuit() { FlushPreferences(); }
+        private void FlushPreferences()
+        {
+            if (!_preferencesDirty) return;
+            try { PlayerPrefs.Save(); _preferencesDirty = false; }
+            catch (PlayerPrefsException exception) { Debug.LogWarning(exception.Message, this); _preferencesDirty = false; }
         }
 
         private void OnDestroy()
         {
+            FlushPreferences();
             _presenter?.Dispose();
             if (_view != null)
             {

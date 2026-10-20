@@ -46,14 +46,34 @@ namespace SocialStim.Presentation.Effects
                 default: return Foreground;
             }
         }
+        /// <summary>Stable seat-based identity palette, independent of assigned or claimed roles.</summary>
+        public Color Character(int index)
+        {
+            switch (index % 12)
+            {
+                case 0: return Night ? new Color(0.91f, 0.72f, 1f) : new Color(0.40f, 0.17f, 0.55f);
+                case 1: return Night ? new Color(1f, 0.69f, 0.79f) : new Color(0.58f, 0.12f, 0.29f);
+                case 2: return Night ? new Color(0.50f, 0.89f, 0.73f) : new Color(0.04f, 0.36f, 0.24f);
+                case 3: return Night ? new Color(1f, 0.79f, 0.54f) : new Color(0.49f, 0.27f, 0.05f);
+                case 4: return Night ? new Color(0.82f, 0.88f, 0.49f) : new Color(0.34f, 0.37f, 0.06f);
+                case 5: return Night ? new Color(0.73f, 0.75f, 1f) : new Color(0.28f, 0.26f, 0.58f);
+                case 6: return Night ? new Color(1f, 0.70f, 0.62f) : new Color(0.57f, 0.23f, 0.15f);
+                case 7: return Night ? new Color(0.73f, 0.85f, 0.83f) : new Color(0.23f, 0.35f, 0.33f);
+                case 8: return Night ? new Color(0.96f, 0.72f, 0.94f) : new Color(0.49f, 0.20f, 0.46f);
+                case 9: return Night ? new Color(0.80f, 0.81f, 0.70f) : new Color(0.33f, 0.33f, 0.24f);
+                case 10: return Night ? new Color(1f, 0.84f, 0.69f) : new Color(0.46f, 0.29f, 0.20f);
+                default: return Night ? new Color(0.76f, 0.81f, 0.94f) : new Color(0.29f, 0.33f, 0.44f);
+            }
+        }
         public Color Accent(SemanticStyle style)
         {
+            if ((int)style >= (int)SemanticStyle.Speaker0 && (int)style <= (int)SemanticStyle.Speaker11) return Character((int)style - (int)SemanticStyle.Speaker0);
             switch (style)
             {
-                case SemanticStyle.ActionPressure: return Situation(EffectTone.Pressure);
-                case SemanticStyle.ActionSupport: return Situation(EffectTone.Reassurance);
-                case SemanticStyle.ActionChallenge: return Situation(EffectTone.Challenge);
-                case SemanticStyle.ActionEvidence: return Situation(EffectTone.Evidence);
+                case SemanticStyle.ActionPressure: return Muted;
+                case SemanticStyle.ActionSupport: return Muted;
+                case SemanticStyle.ActionChallenge: return Muted;
+                case SemanticStyle.ActionEvidence: return Muted;
                 case SemanticStyle.Emphasis: return Foreground;
                 case SemanticStyle.Fear: return Night ? new Color(0.84f, 0.72f, 0.96f) : new Color(0.36f, 0.12f, 0.42f);
                 case SemanticStyle.Calm: return Night ? new Color(0.6f, 0.86f, 0.77f) : new Color(0.04f, 0.28f, 0.22f);

@@ -9,6 +9,7 @@ namespace SocialStim.Presentation.Effects
     public sealed class TextEffectRenderer : MonoBehaviour
     {
         private TextMeshProUGUI _label;
+        private ActionUnderlineGraphic _underlines;
         private SemanticText _document;
         private TextPalette _palette;
         private Vector3[][] _vertices = Array.Empty<Vector3[]>();
@@ -28,6 +29,13 @@ namespace SocialStim.Presentation.Effects
             if (label == null) throw new ArgumentNullException(nameof(label));
             if (_label != null) _label.OnPreRenderText -= Capture;
             _label = label; _label.OnPreRenderText += Capture;
+            if (_underlines == null)
+            {
+                var root = new GameObject("Action underlines", typeof(RectTransform)); root.transform.SetParent(label.transform, false);
+                var rect = (RectTransform)root.transform; rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
+                rect.offsetMin = Vector2.zero; rect.offsetMax = Vector2.zero;
+                _underlines = root.AddComponent<ActionUnderlineGraphic>(); _underlines.raycastTarget = false;
+            }
         }
         public void SetDocument(SemanticText document, int animatedStart, TextPalette palette)
         {
@@ -59,6 +67,7 @@ namespace SocialStim.Presentation.Effects
             _wasMoving = moving;
             _visible = visibleUtf16; _frame = frame; _time = time; _dirty = false;
             Paint(_label.textInfo);
+            _underlines.Configure(_label, _document, _visible, _palette.Muted);
             _label.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices | TMP_VertexDataUpdateFlags.Colors32);
         }
         private void Capture(TMP_TextInfo info)
@@ -75,6 +84,8 @@ namespace SocialStim.Presentation.Effects
             if (_styles.Length < info.characterCount) Array.Resize(ref _styles, info.characterCount);
             for (int i = 0; i < info.characterCount; i++) _styles[i] = _document.StyleAt(info.characterInfo[i].index);
             Paint(info);
+            _underlines.Configure(_label, _document, _visible, _palette.Muted);
+            _underlines.SetVerticesDirty();
         }
         private void Paint(TMP_TextInfo info)
         {
