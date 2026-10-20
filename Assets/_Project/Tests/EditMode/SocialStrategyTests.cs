@@ -102,5 +102,42 @@ namespace SocialStim.Tests.EditMode
                 Array.Empty<KnownCharacter>(), Array.Empty<NightReport>(), new[] { foreign }, teamPlan: plan);
             Assert.That(town.TeamPlan, Is.Null); Assert.That(town.Evidence, Is.Empty);
         }
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TownKillerTargetsStrongestSuspectAndPassesWithoutEnoughEvidence(bool basic)
+        {
+            var role = TestContent.Role("guard", Faction.Town, RoleCategory.TownKilling, AbilityKind.Attack, attack: 1, charges: 2);
+            INpcStrategy strategy = basic ? (INpcStrategy)new BasicNpcStrategy() : new SocialNpcStrategy();
+            foreach (int high in new[] { 30, 90 })
+            {
+                var view = new KnowledgeView(new CharacterId(0), role, Personality.None, 2, 2, new[] {
+                    new KnownCharacter(new CharacterId(0), "Self", true, 0),
+                    new KnownCharacter(new CharacterId(1), "Low suspicion", true, 5),
+                    new KnownCharacter(new CharacterId(2), "High suspicion", true, high),
+                }, Array.Empty<NightReport>());
+                Assert.That(strategy.NightTarget(view, new SeededRandom(4)),
+                    Is.EqualTo(high >= 60 ? new CharacterId(2) : (CharacterId?)null));
+            }
+        }
+
+        [Test]
+        public void BasicStrategyBluffsWithTheActualCustomCatalogue()
+        {
+            var town = TestContent.Role("custom-investigator", Faction.Town, RoleCategory.TownInvestigative, AbilityKind.Investigate);
+            var evil = TestContent.Role("custom-killer", Faction.Antagonist, RoleCategory.AntagonistKilling, AbilityKind.Attack, attack: 1);
+            var view = new KnowledgeView(new CharacterId(0), evil, Personality.None, -1, 1, new[] {
+                new KnownCharacter(new CharacterId(0), "Self", true, 0),
+                new KnownCharacter(new CharacterId(1), "Other", true, 0),
+            }, Array.Empty<NightReport>(), roleCatalog: new[] { town, evil });
+            int claims = 0;
+            for (uint seed = 1; seed <= 50; seed++)
+            {
+                var command = new BasicNpcStrategy().Speak(view, new SeededRandom(seed));
+                if (!command.ClaimedRole.HasValue) continue;
+                claims++;
+                Assert.That(command.ClaimedRole.Value, Is.EqualTo(town.Id));
+            }
+            Assert.That(claims, Is.GreaterThan(0));
+        }
     }
 }

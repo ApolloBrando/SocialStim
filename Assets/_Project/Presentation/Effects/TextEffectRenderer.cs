@@ -18,31 +18,48 @@ namespace SocialStim.Presentation.Effects
         private EffectFrame _frame;
         private float _time;
         private bool _semanticColors = true;
+        private bool _dirty = true;
+        private bool _hasFear;
         private EffectsSettings _settings = new EffectsSettings();
         public void Initialize(TextMeshProUGUI label)
-        { _label = label; _label.OnPreRenderText += Capture; }
+        {
+            if (label == null) throw new ArgumentNullException(nameof(label));
+            if (_label != null) _label.OnPreRenderText -= Capture;
+            _label = label; _label.OnPreRenderText += Capture;
+        }
         public void SetDocument(SemanticText document, int animatedStart, TextPalette palette)
         {
+            if (document == null) throw new ArgumentNullException(nameof(document));
+            if (_label == null) throw new InvalidOperationException("Initialize the text renderer first.");
             _document = document; _animatedStart = animatedStart; _palette = palette;
+            _hasFear = false;
+            foreach (SemanticSpan span in document.Spans)
+                if (span.Style == SemanticStyle.Fear && span.Start + span.Length > animatedStart) _hasFear = true;
+            _dirty = true;
             _visible = animatedStart; _frame = default;
             _label.text = document.Text; _label.richText = false;
             _label.ForceMeshUpdate();
         }
-        public void SetPalette(TextPalette palette) { _palette = palette; }
-        public void SetSemanticColors(bool enabled) { _semanticColors = enabled; }
+        public void SetPalette(TextPalette palette) { _palette = palette; _dirty = true; }
         /// <summary>Updates accessibility without restarting display or mesh ownership.</summary>
         public void SetSettings(EffectsSettings settings)
-        { _settings = settings ?? throw new ArgumentNullException(nameof(settings)); _semanticColors = settings.Enabled; }
+        { _settings = settings ?? throw new ArgumentNullException(nameof(settings)); _semanticColors = settings.Enabled; _dirty = true; }
         public void Apply(int visibleUtf16, EffectFrame frame, float time)
         {
             if (_label == null || _document == null) return;
-            _visible = visibleUtf16; _frame = frame; _time = time;
+            bool moving = _settings.Enabled && !_settings.ReducedMotion
+                && (frame.Shake > 0 || _hasFear && _settings.Intensity > 0);
+            // Static settled text needs no mesh upload every frame. Policy/palette/layout
+            // changes invalidate this cache; active motion keeps sampling unscaled time.
+            if (!_dirty && _visible == visibleUtf16 && _frame.Shake == frame.Shake && !moving) return;
+            _visible = visibleUtf16; _frame = frame; _time = time; _dirty = false;
             Paint(_label.textInfo);
             _label.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices | TMP_VertexDataUpdateFlags.Colors32);
         }
         private void Capture(TMP_TextInfo info)
         {
             if (_document == null) return;
+            _dirty = true;
             if (_vertices.Length < info.meshInfo.Length) Array.Resize(ref _vertices, info.meshInfo.Length);
             for (int mesh = 0; mesh < info.meshInfo.Length; mesh++)
             {
@@ -67,7 +84,8 @@ namespace SocialStim.Presentation.Effects
                 if (character.index >= _visible) color.a = 0;
                 float continuous = _settings.Enabled && !_settings.ReducedMotion && _styles[i] == SemanticStyle.Fear
                     ? 0.2f * _settings.Intensity : 0;
-                float strength = character.index >= _animatedStart && character.index < _visible
+                float strength = _settings.Enabled && !_settings.ReducedMotion
+                    && character.index >= _animatedStart && character.index < _visible
                     ? Math.Max(_frame.Shake, continuous) : 0;
                 Vector3 offset = new Vector3(Mathf.Sin(_time * 27 + i * 1.7f), Mathf.Cos(_time * 31 + i * 1.3f), 0) * (strength * 3);
                 for (int corner = 0; corner < 4; corner++)

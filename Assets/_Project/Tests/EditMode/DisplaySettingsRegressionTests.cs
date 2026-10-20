@@ -42,5 +42,22 @@ namespace SocialStim.Tests.EditMode
             Assert.That(playback.Frame.Flash, Is.Zero);
             Assert.That(playback.Busy, Is.True);
         }
+        [TestCase(false, false)]
+        [TestCase(true, true)]
+        public void SettledMotionImmediatelyObeysChangedAccessibility(bool enabled, bool reduced)
+        {
+            var playback = new DisplayPlayback(); int acknowledgements = 0;
+            var profile = new EffectProfile(new[] {
+                new EffectStep(EffectChannel.TextShake, 1, 1, continuous: true)
+            });
+            playback.Begin(1, SemanticText.Literal("a"), profile,
+                new EffectsSettings(reducedMotion: false), _ => acknowledgements++);
+            playback.Tick(2);
+            Assert.That(playback.Busy, Is.False);
+            Assert.That(playback.Frame.Shake, Is.GreaterThan(0));
+            playback.Reconfigure(new EffectsSettings(enabled: enabled, reducedMotion: reduced));
+            Assert.That(playback.Frame.Shake, Is.Zero);
+            Assert.That(acknowledgements, Is.EqualTo(1));
+        }
     }
 }

@@ -1,5 +1,7 @@
 # Mission audit — phase 0
 
+> Historical audit. Current findings: Docs/POST_MERGE_AUDIT.md. Free Time is cancelled; older roadmap references below are superseded.
+
 Base: fc8f5cde97f1d2acba26e2e54a218179604ad153. All 424 tracked files were
 fetched in full: 144 C# files, 7 asmdefs, 204 metadata files, authored assets,
 the scene, tests, docs and mission. See [inventory](AUDIT_INVENTORY.md).

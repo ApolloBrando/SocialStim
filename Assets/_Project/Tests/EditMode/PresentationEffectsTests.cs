@@ -214,6 +214,21 @@ namespace SocialStim.Tests.EditMode
             foreach (var line in SocialStim.Data.Dialogue.DialogueDocument.Parse(System.IO.File.ReadAllText(path)))
                 Assert.That(SemanticMarkup.Parse(line.Text).Text, Is.Not.Empty);
         }
+        [Test]
+        public void PeacefulMorningDoesNotTriggerACasualtyEffect()
+        {
+            var run = RunFactory.CreateScenario(new RunOptions(123, discussionRounds: 1, votingMode: VotingMode.Trial),
+                new[] { "inspector", "physician", "interrupter", "assassin", "survivor" }
+                    .Select((role, id) => new CastMemberSpec("Person" + id, new SocialStim.Rules.Roles.RoleId(role))),
+                TestContent.Roles(), TestContent.Lines(), new ScenarioStrategy());
+            foreach (var command in new[] { GameCommand.Speak(SpeechIntent.StaySilent),
+                GameCommand.Nominate(null), GameCommand.Night(null) })
+                Assert.That(run.TrySubmit(command, out string error), Is.True, error);
+            var view = run.GetPlayerView();
+            var report = view.Transcript.Single(observation => observation.Cue == GameCue.DeathReported);
+            Assert.That(report.Target, Is.Null);
+            Assert.That(new VisibleCueResolver().Resolve(report, view), Is.EqualTo(PresentationCue.None));
+        }
 #if NET8_0_OR_GREATER && !UNITY_5_3_OR_NEWER
         [Test]
         public void SteadyPortablePlaybackDoesNotAllocate()

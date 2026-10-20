@@ -379,7 +379,7 @@ is introduced.
 See [the complete source audit](docs/AUDIT.md) and [read inventory](docs/AUDIT_INVENTORY.md). Immediate display preference changes preserve the active reveal instead of skipping queued observations. Continuous fear motion uses an independent presentation clock; finite screen cue envelopes retain their current safety limits. The mission supersedes earlier phase/role planning; new work remains on phase branches.
 ## Mission part two: audit baseline and first repairs
 
-The controlling phase plan is [Docs/AUDIT.md](Docs/AUDIT.md). Future discussion,
+The controlling phase plan is [Docs/PRE_MERGE_AUDIT.md](Docs/PRE_MERGE_AUDIT.md). Future discussion,
 role, settings, inference, dialogue and effect systems described there are planned,
 not implemented. Work uses phase branches/PRs and never writes directly to main.
 

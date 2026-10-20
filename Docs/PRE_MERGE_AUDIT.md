@@ -1,5 +1,7 @@
 # Mission part two: source audit
 
+> Historical audit. Current findings: Docs/POST_MERGE_AUDIT.md. Free Time is cancelled; older roadmap references below are superseded.
+
 Baseline: `main` at `fc8f5cde97f1d2acba26e2e54a218179604ad153`.
 File/line references below describe that baseline, before the fixes in PR #13.
 This file uses the repository's existing `Docs` directory; introducing a second

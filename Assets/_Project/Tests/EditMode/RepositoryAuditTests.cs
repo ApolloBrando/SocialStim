@@ -139,6 +139,14 @@ namespace SocialStim.Tests.EditMode
             Assert.That(text.Contains("PLACEHOLDER"), Is.False);
         }
 
+        [TestCase("{target")]
+        [TestCase("target}")]
+        [TestCase("{{target}}")]
+        public void BrokenPlaceholderBracesFailAtImport(string malformed)
+        {
+            Assert.Throws<ArgumentException>(() => DialogueDocument.Parse(ReadDialogue().Replace("{target}", malformed)));
+        }
+
         private static string ReadDialogue()
         {
 #if UNITY_EDITOR

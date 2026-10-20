@@ -20,13 +20,23 @@ namespace SocialStim.Rules.Dialogue
         /// <summary>Validates content and generic fallback coverage for every registered intent.</summary>
         public DialogueSelector(IEnumerable<DialogueLine> lines, IRandomSource random)
         {
-            _lines = lines.OrderBy(l => l.Id, StringComparer.Ordinal).ToList().AsReadOnly();
+            if (lines == null) throw new ArgumentNullException(nameof(lines));
+            var source = lines.ToList();
+            if (source.Any(line => line == null)) throw new ArgumentException("Null dialogue line.", nameof(lines));
+            _lines = source.OrderBy(l => l.Id, StringComparer.Ordinal).ToList().AsReadOnly();
             _random = random ?? throw new ArgumentNullException(nameof(random));
             if (_lines.Select(l => l.Id).Distinct(StringComparer.Ordinal).Count() != _lines.Count)
                 throw new ArgumentException("Duplicate dialogue ID.");
             foreach (DialogueLine line in _lines)
+            {
                 foreach (Match match in Variables.Matches(line.Text))
                     if (!AllowedVariables.Contains(match.Groups[1].Value)) throw new ArgumentException($"{line.Id}: unknown variable {match.Value}.");
+                // A valid-token regex alone misses unmatched and nested braces, which
+                // otherwise survive substitution and appear verbatim in the game.
+                string literal = Variables.Replace(line.Text, "");
+                if (literal.IndexOf('{') >= 0 || literal.IndexOf('}') >= 0)
+                    throw new ArgumentException($"{line.Id}: malformed placeholder.");
+            }
             foreach (SpeechIntent intent in Enum.GetValues(typeof(SpeechIntent)))
                 if (!_lines.Any(l => l.Intent == intent && l.RequiredTrait == Personality.None && !l.SpeakerRole.HasValue && l.Conditions.Count == 0))
                     throw new ArgumentException($"Missing unrestricted dialogue fallback for {intent}.");

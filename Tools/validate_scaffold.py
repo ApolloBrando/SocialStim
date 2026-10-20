@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import subprocess
 from pathlib import Path
 
 
@@ -20,7 +21,7 @@ EXPECTED_DEPENDENCIES = {
         "SocialStim.Rules", "SocialStim.Application", "SocialStim.Data",
     },
     "SocialStim.Editor": {
-        "SocialStim.Rules", "SocialStim.Application", "SocialStim.Data",
+        "SocialStim.Rules", "SocialStim.Application", "SocialStim.Data", "SocialStim.Presentation",
     },
     "SocialStim.Tests.EditMode": {
         "SocialStim.Rules", "SocialStim.Application", "SocialStim.Data",
@@ -50,10 +51,22 @@ def validate() -> list[str]:
         if not condition:
             errors.append(message)
 
-    files = [
-        path for path in ROOT.rglob("*")
-        if path.is_file() and ".git" not in path.relative_to(ROOT).parts
-    ]
+    # Inspect versioned inputs, not ignored Unity/.NET output from an earlier check.
+    # Include new source files so local validation also works before git add.
+    result = subprocess.run(
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
+        cwd=ROOT, check=True, capture_output=True,
+    )
+    # Deduplicate names before making Path objects: WindowsPath equality folds
+    # case and would otherwise conceal exactly the collisions being checked.
+    names = sorted(set(result.stdout.decode("utf-8").split("\0")))
+    files = [ROOT / name for name in names if name and (ROOT / name).is_file()]
+    folded: dict[str, str] = {}
+    for path in files:
+        relative = path.relative_to(ROOT).as_posix()
+        key = relative.casefold()
+        require(key not in folded, f"Case-colliding paths: {folded.get(key)} and {relative}")
+        folded[key] = relative
     imported = [
         path for path in ASSETS.rglob("*")
         if not any(part.startswith(".") for part in path.relative_to(ASSETS).parts)
@@ -81,6 +94,16 @@ def validate() -> list[str]:
             require("AssemblyDefinitionImporter:" in source, f"Wrong importer: {meta}")
     for path in imported:
         require(Path(str(path) + ".meta").is_file(), f"Missing metadata: {path.relative_to(ROOT)}")
+
+    # Unity's built-in references use reserved zero-prefixed GUIDs. Every other
+    # serialized project-owned reference must resolve to committed metadata.
+    # Vendor assets imported outside _Project can refer to package-owned scripts.
+    for path in files:
+        if not path.is_relative_to(PROJECT) or path.suffix not in {".asset", ".unity", ".prefab"}:
+            continue
+        for guid in re.findall(r"\bguid: ([0-9a-f]{32})\b", path.read_text(encoding="utf-8")):
+            require(guid in guids or guid.startswith("0000000000000000"),
+                    f"Unresolved asset GUID {guid}: {path.relative_to(ROOT)}")
 
     parsed: dict[Path, dict] = {}
     for path in files:
@@ -177,8 +200,9 @@ def validate() -> list[str]:
         "library", "temp", "logs", "usersettings", "obj", "build", "builds",
         "testresults", "artifacts", "memorycaptures", "recordings", "coverage",
     }
-    for child in ROOT.iterdir():
-        require(child.name.lower() not in prohibited_roots, f"Generated project state: {child.name}")
+    for path in files:
+        require(path.relative_to(ROOT).parts[0].lower() not in prohibited_roots,
+                f"Versioned generated project state: {path.relative_to(ROOT)}")
     for path in files:
         relative = path.relative_to(ROOT)
         require(not any(part in {".idea", ".vs", ".vscode"} for part in relative.parts), f"IDE state present: {relative}")
@@ -195,6 +219,8 @@ def validate() -> list[str]:
                 errors.append(f"Expected UTF-8 text: {relative}")
                 continue
             require(all(line == line.rstrip() for line in lines), f"Trailing whitespace: {relative}")
+            require(not any(re.match(r"^(<{7,}|={7,}|>{7,})(?: |$)", line) for line in lines),
+                    f"Unresolved merge conflict: {relative}")
         if path.suffix == ".cs":
             parent = path.parent
             while parent != ASSETS and not list(parent.glob("*.asmdef")):
@@ -210,7 +236,7 @@ def main() -> int:
     """Print failures and return a process exit code suitable for local checks."""
     try:
         failures = validate()
-    except (OSError, TypeError, AttributeError) as error:
+    except (OSError, TypeError, AttributeError, subprocess.CalledProcessError) as error:
         print(f"FAIL: Unable to validate scaffold: {error}", file=sys.stderr)
         return 1
     if failures:

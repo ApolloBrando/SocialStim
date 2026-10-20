@@ -45,10 +45,12 @@ namespace SocialStim.Tests.PlayMode
                 Vector3 baseline = label.textInfo.meshInfo[character.materialReferenceIndex].vertices[character.vertexIndex];
                 renderer.Apply(0, default, 0);
                 Assert.That(label.textInfo.meshInfo[character.materialReferenceIndex].colors32[character.vertexIndex].a, Is.Zero);
+                renderer.SetSettings(new EffectsSettings(reducedMotion: false));
                 renderer.Apply(2, new EffectFrame(1, 0, 0, 0), 0.2f);
                 Assert.That(label.textInfo.meshInfo[character.materialReferenceIndex].vertices[character.vertexIndex], Is.Not.EqualTo(baseline));
                 renderer.SetSettings(new EffectsSettings(enabled: false));
-                renderer.Apply(2, default, 0);
+                // Stale playback frames must never bypass the renderer's accessibility gate.
+                renderer.Apply(2, new EffectFrame(1, 0, 0, 0), 0);
                 Assert.That(label.textInfo.meshInfo[character.materialReferenceIndex].vertices[character.vertexIndex], Is.EqualTo(baseline));
                 Assert.That(label.textInfo.meshInfo[character.materialReferenceIndex].colors32[character.vertexIndex].a, Is.EqualTo(255));
             }
