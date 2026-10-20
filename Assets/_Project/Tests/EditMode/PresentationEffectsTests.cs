@@ -209,9 +209,7 @@ namespace SocialStim.Tests.EditMode
         [Test]
         public void ActualAuthoredLinesHaveValidPresentationMarkup()
         {
-            string path = System.IO.File.Exists("Assets/_Project/Data/Dialogue/StarterDialogue.json")
-                ? "Assets/_Project/Data/Dialogue/StarterDialogue.json" : System.IO.Path.Combine(AppContext.BaseDirectory, "StarterDialogue.json");
-            foreach (var line in SocialStim.Data.Dialogue.DialogueDocument.Parse(System.IO.File.ReadAllText(path)))
+            foreach (var line in TestContent.AuthoredLines())
                 Assert.That(SemanticMarkup.Parse(line.Text).Text, Is.Not.Empty);
         }
         [Test]

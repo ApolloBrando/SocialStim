@@ -9,7 +9,8 @@ Paths below are relative to the repository root.
 
 | Edit | Location |
 | --- | --- |
-| Spoken dialogue and conditional variants | Assets/_Project/Data/Dialogue/StarterDialogue.json |
+| Neutral player dialogue | Assets/_Project/Data/Dialogue/StarterDialogue.json |
+| NPC dialogue by trait | Assets/_Project/Data/Dialogue/*Dialogue.json (seven trait files) |
 | Character names and active content references | Assets/_Project/ScriptableObjects/Catalogs/StarterCatalog.asset |
 | Role names, factions, abilities and resources | Assets/_Project/ScriptableObjects/Roles/*.asset |
 | Exact role slots and scalable faction shares | Assets/_Project/ScriptableObjects/Setups/StarterRoleList.asset |
@@ -33,26 +34,28 @@ Paths below are relative to the repository root.
 The JSON contains conversation variants. Specific ability reports are assembled
 from templates in the scripts listed above so they retain the actual target,
 result and night. Menu copy is currently C# text, not a localization database.
-The catalog references one dialogue JSON file; adding a second file does not
-automatically load it. Replace the reference or extend the importer explicitly.
+The catalog loads the player Dialogue TextAsset and all seven NPC Dialogue TextAssets
+together. Add any extra same-schema files to its NPC Dialogue array in Unity.
+See [DIALOGUE_AUTHORING.md](DIALOGUE_AUTHORING.md) for the complete authoring contract.
 
 ## Add or change dialogue
 
-1. Open StarterDialogue.json in a text editor.
+1. Open StarterDialogue.json for player wording, or the appropriate trait file for NPC wording.
 2. Edit a line's text, or copy an object into the lines array.
 3. Give a new line a unique id. Keep existing IDs when revising wording.
 4. Choose a registered intent and a positive integer weight (1–1000).
-5. Keep at least one unrestricted line for each intent. The starter set provides
-   four distinct unrestricted variants per intent.
+5. Set requiredTrait to the exact NPC trait; omit it only for player lines. Keep
+   at least one line without role/context gates for every intent in each voice.
 6. Run Tools → SocialStim → Validate Starter Content in Unity, then start a run.
 
 Example object to add to the existing lines array:
 
 ~~~json
 {
-  "id": "accuse.cautious.005",
+  "id": "npc.grim.accuse.extra",
+  "requiredTrait": "Grim",
   "intent": "Accuse",
-  "text": "I could be wrong, but I'd like to hear more from {target}.",
+  "text": "We have little time left. I accuse {target}.",
   "weight": 2,
   "conditions": [
     { "kind": "speakerTrait", "value": "Grim" },
@@ -82,8 +85,8 @@ with a matching closing tag. Use `<<` for a literal less-than sign. Do not use
 TMP/HTML tags. A line's meaning must remain clear with effects disabled.
 
 Conditions combine with AND. speakerRole tests the speaker's real known role;
-it does not test a public claim or a target's secret role. An unrestricted line
-has no conditions, speakerRole or requiredTrait. Generic accusations should
+it does not test a public claim or a target's secret role. An unrestricted fallback
+has no conditions or speakerRole; its requiredTrait still fixes its voice. Accusations should
 not invent evidence such as a contradictory vote that never happened.
 See [DIALOGUE_AUTHORING.md](DIALOGUE_AUTHORING.md) for all condition names.
 
@@ -92,8 +95,9 @@ See [DIALOGUE_AUTHORING.md](DIALOGUE_AUTHORING.md) for all condition names.
 Select StarterCatalog in Unity. Expand Names and edit or add entries. Every
 name must be nonempty and distinct, and the pool must have at least as many
 entries as participants. Names are shuffled separately from roles; they do not
-define permanent characters or personalities. Personality flags are currently
-assigned from the seed in RunFactory.Create.
+define permanent characters or personalities. Each NPC receives one trait from a separately seeded shuffled bag in
+RunFactory.CreateScenario, using all seven before repeating; the player has None.
+Keep at least 40 distinct names of at most 16 letters/spaces.
 
 ## Change participant count and role composition
 
@@ -143,7 +147,7 @@ entries into one row. Action menus remain grouped and paged.
 6. Ensure a setup slot can accept it. Scaled setups use faction/category
    constraints; exact lists may require a new slot or an updated filter.
 7. Optionally add dialogue with a speakerRole condition matching the ID.
-   Generic fallbacks already let the role speak and be claimed.
+   Same-voice fallbacks already let the role speak and be claimed.
 8. Validate content and test the role in a new run, including death and victory.
 
 Example: duplicate Physician, set ID herbalist, name Herbalist, keep Town /
