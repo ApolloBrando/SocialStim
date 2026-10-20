@@ -840,6 +840,62 @@
       "text": "Starting with the night... not the vote. {result}",
       "weight": 1,
       "requiredTrait": "Slow"
+    },
+    {
+      "id": "npc.slow.counterclaim.01",
+      "intent": "CounterClaim",
+      "text": "Wait... that is what I am. The {role}.",
+      "weight": 1,
+      "requiredTrait": "Slow"
+    },
+    {
+      "id": "npc.slow.counterclaim.02",
+      "intent": "CounterClaim",
+      "text": "Two... no. There should be one {role}. That would be me.",
+      "weight": 1,
+      "requiredTrait": "Slow"
+    },
+    {
+      "id": "npc.slow.counterclaim.03",
+      "intent": "CounterClaim",
+      "text": "Let me say this slowly. I am the {role}. Your claim is wrong.",
+      "weight": 1,
+      "requiredTrait": "Slow"
+    },
+    {
+      "id": "npc.slow.counterclaim.04",
+      "intent": "CounterClaim",
+      "text": "I just caught up. You said {role}... but that is my job.",
+      "weight": 1,
+      "requiredTrait": "Slow"
+    },
+    {
+      "id": "npc.slow.counterclaim.05",
+      "intent": "CounterClaim",
+      "text": "Oh. We have a problem then... I am the real {role}.",
+      "weight": 1,
+      "requiredTrait": "Slow"
+    },
+    {
+      "id": "npc.slow.counterclaim.06",
+      "intent": "CounterClaim",
+      "text": "Could you repeat that... actually, no. I heard it. I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Slow"
+    },
+    {
+      "id": "npc.slow.counterclaim.07",
+      "intent": "CounterClaim",
+      "text": "I was about to say... I am the {role}. Somebody got there first.",
+      "weight": 1,
+      "requiredTrait": "Slow"
+    },
+    {
+      "id": "npc.slow.counterclaim.08",
+      "intent": "CounterClaim",
+      "text": "One moment. I need to correct something. The {role} is me, not you.",
+      "weight": 1,
+      "requiredTrait": "Slow"
     }
   ]
 }

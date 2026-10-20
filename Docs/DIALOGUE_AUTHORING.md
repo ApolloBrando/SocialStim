@@ -10,15 +10,15 @@ All files are in `Assets/_Project/Data/Dialogue`:
 
 | File | Audience | Lines |
 | --- | --- | ---: |
-| `StarterDialogue.json` | Player only; no trait | 68 |
-| `AnxiousDialogue.json` | Anxious NPCs | 120 |
-| `BraveDialogue.json` | Brave NPCs | 122 |
-| `SlowDialogue.json` | Slow NPCs | 120 |
-| `ChatterboxDialogue.json` | Chatterbox NPCs | 120 |
-| `SmugDialogue.json` | Smug NPCs | 120 |
-| `GrimDialogue.json` | Grim NPCs | 120 |
-| `JokesterDialogue.json` | Jokester NPCs | 120 |
-| **Total** | **842 NPC + 68 player** | **910** |
+| `StarterDialogue.json` | Player only; no trait | 72 |
+| `AnxiousDialogue.json` | Anxious NPCs | 128 |
+| `BraveDialogue.json` | Brave NPCs | 130 |
+| `SlowDialogue.json` | Slow NPCs | 128 |
+| `ChatterboxDialogue.json` | Chatterbox NPCs | 128 |
+| `SmugDialogue.json` | Smug NPCs | 128 |
+| `GrimDialogue.json` | Grim NPCs | 128 |
+| `JokesterDialogue.json` | Jokester NPCs | 128 |
+| **Total** | **898 NPC + 72 player** | **970** |
 
 The catalogue retains its original `_dialogue` reference for player content and adds
 seven `_npcDialogue` TextAsset references. Existing references and metadata GUIDs are
@@ -29,7 +29,7 @@ content validator and build gate use the same GameCatalog loading path.
 All 70 original IDs remain: 68 now identify neutral player lines; the two former
 personality-gated lines live in BraveDialogue with their conditions/metadata preserved
 and their old trait predicates mapped to Brave. The word `aggressive` in one old ID
-is a stable historical identifier, not an eighth trait. No IDs or names were deleted.
+is a stable historical identifier, not an eighth trait. No dialogue IDs were deleted. The later discussion revision shortens multiword names; see DISCUSSION_CLAIMS_UPDATE.md.
 
 ## Single trait and assignment
 
@@ -48,8 +48,8 @@ The trait is not added to the UI or public roster snapshot.
 
 ## Reused behavior parameters
 
-Only the existing personality checks were remapped. No utility formula, decision,
-role ability, target policy, settings value or parameter was added or retuned.
+The trait addition reused the existing personality weights. The later discussion revision
+restricts deception by faction: personality never grants a Town character permission to bluff.
 
 | Trait | Existing branches reused |
 | --- | --- |
@@ -57,9 +57,9 @@ role ability, target policy, settings value or parameter was added or retuned.
 | Brave | Aggressive accusation bonus; loyal support/reluctance to condemn trusted people |
 | Slow | Gullible assertion bonus |
 | Chatterbox | Existing baseline behavior; verbosity is expressed in dialogue |
-| Smug | Aggressive accusation bonus; existing deceptive-personality branch |
+| Smug | Aggressive accusation bonus; bluffing still requires a non-Town role |
 | Grim | Existing cautious evidence/vote threshold |
-| Jokester | Existing deceptive-personality branch |
+| Jokester | Humorous voice; bluffing still requires a non-Town role |
 
 Legacy parameter names such as GullibleBonus remain technical names for existing
 weights, not a second trait set. There is no talkativeness parameter or per-trait
@@ -192,3 +192,22 @@ no substitution residue, name constraints, fair seeded assignment, role independ
 repetition and preserved old IDs/gates. The full-catalogue smoke suite loads every
 file. Tools/SocialStim/Validate Starter Content and native build validation load the
 same catalogue references. Unity execution remains a separate verification gate.
+
+## Counterclaims and repetition (current discussion revision)
+
+CounterClaim is a separate registered intent, with eight lines in each NPC trait
+file and four neutral player templates in StarterDialogue.json. It is used only
+in the immediate response window to a just-published role claim. Keep normal
+ClaimRole introductions and CounterClaim challenges separate. All original IDs,
+conditions, weights and asset GUIDs remain intact.
+
+StaySilent records remain authored for compatibility and coverage, but passing
+does not select or publish a line. Silence is genuinely silent in gameplay.
+
+Selection now remembers used lines per speaker and intent across the run. It
+prefers unused eligible lines before repeating, moves to broader eligible tiers
+inside the same trait when a specific tier has been used, and favors lines with
+the fewest run-wide uses. It never discards role/evidence conditions. After all
+currently eligible lines have been used it begins another cycle, with a recent
+history of twelve lines. A pool of eight still repeats after eight uses; 970
+records are divided across voices and actions, not available to every speaker.

@@ -202,9 +202,7 @@ namespace SocialStim.Tests.EditMode
             var first = view.Transcript.First(o => o.Speaker == view.PlayerId);
             Assert.That(first.ClaimedRole.Value.Value, Is.EqualTo("inspector"));
             Assert.That(resolver.Resolve(first, view), Is.EqualTo(PresentationCue.Speech));
-            Assert.That(run.TrySubmit(GameCommand.Speak(SpeechIntent.ClaimRole, role: new SocialStim.Rules.Roles.RoleId("survivor")), out _), Is.True);
-            view = run.GetPlayerView();
-            Assert.That(resolver.Resolve(view.Transcript.Last(o => o.Speaker == view.PlayerId), view), Is.EqualTo(PresentationCue.ContradictedClaim));
+            Assert.That(run.TrySubmit(GameCommand.Speak(SpeechIntent.ClaimRole, role: new SocialStim.Rules.Roles.RoleId("survivor")), out _), Is.False, "Only Town special roles may be impersonated.");
         }
         [Test]
         public void ActualAuthoredLinesHaveValidPresentationMarkup()

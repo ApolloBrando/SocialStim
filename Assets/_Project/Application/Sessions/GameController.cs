@@ -13,11 +13,12 @@ namespace SocialStim.Application.Sessions
     public sealed class GameController
     {
         private readonly RunSession _session;
+        private readonly InteractionLabels _copy;
         private readonly IReadOnlyList<RoleSpec> _catalog;
 
         /// <summary>Wires an isolated session to the public role catalog used for claims.</summary>
-        public GameController(RunSession session, IEnumerable<RoleSpec> catalog)
-        { _session = session ?? throw new ArgumentNullException(nameof(session)); _catalog = catalog.ToList().AsReadOnly(); }
+        public GameController(RunSession session, IEnumerable<RoleSpec> catalog, InteractionLabels copy = null)
+        { _copy = copy ?? InteractionLabels.Default; _session = session ?? throw new ArgumentNullException(nameof(session)); _catalog = catalog.ToList().AsReadOnly(); }
 
         /// <summary>Builds choices without consulting hidden assignments or NPC scores.</summary>
         public PlayerInputRequest Request()
@@ -29,41 +30,39 @@ namespace SocialStim.Application.Sessions
             if (view.Phase == GamePhase.Ended) return new PlayerInputRequest(view, options.AsReadOnly());
             if (!view.Alive)
             { add("Watch", "Continue the run.", GameCommand.Continue()); return new PlayerInputRequest(view, options.AsReadOnly()); }
+            if (view.CounterClaimRole.HasValue)
+            {
+                RoleSpec disputed = _catalog.First(r => r.Id == view.CounterClaimRole.Value);
+                add(_copy.CounterClaim + " " + disputed.Name, "", GameCommand.Speak(SpeechIntent.CounterClaim, role: disputed.Id));
+                add(_copy.Wait, "", GameCommand.Speak(SpeechIntent.StaySilent));
+                return new PlayerInputRequest(view, options.AsReadOnly());
+            }
             switch (view.Phase)
             {
                 case GamePhase.Discussion:
+                    add(_copy.Wait, "", GameCommand.Speak(SpeechIntent.StaySilent));
                     if (view.RespondTo.HasValue)
                     {
-                        add("Defend yourself", "Answer the accusation.", GameCommand.Speak(SpeechIntent.Defend));
-                        add("Counter-accuse", "Challenge your accuser.", GameCommand.Speak(SpeechIntent.Accuse, view.RespondTo));
-                        AddClaims(add, view);
-                        add("Stay silent", "Decline to answer.", GameCommand.Speak(SpeechIntent.StaySilent));
-                        break;
+                        add(_copy.DefendSelf, "", GameCommand.Speak(SpeechIntent.Defend));
+                        add(_copy.Refute, "", GameCommand.Speak(SpeechIntent.Deflect, view.RespondTo));
                     }
-                    if (view.Opening) add("Let someone else open", "Listen first. Keeps your turn.", GameCommand.Continue());
-                    if (view.CanReportAction) add("Report last night's action", "Share your action and results.", GameCommand.ReportLastAction());
-                    add("Defend yourself", "Push back on suspicion.", GameCommand.Speak(SpeechIntent.Defend));
-                    add("Express fear", "Share your unease.", GameCommand.Speak(SpeechIntent.ExpressFear));
-                    add("Stay silent", "Listen this turn.", GameCommand.Speak(SpeechIntent.StaySilent));
-                    AddClaims(add, view);
-                    foreach (var target in view.Characters.Where(c => c.Alive && c.Id != view.PlayerId))
+                    else
+                        foreach (var target in view.Characters.Where(c => c.Alive && c.Id != view.PlayerId))
+                        {
+                            add(target.Name, "", GameCommand.Speak(SpeechIntent.Accuse, target.Id));
+                            add(target.Name, "", GameCommand.Speak(SpeechIntent.Vouch, target.Id));
+                        }
+                    if (view.FollowUpTo.HasValue && view.FollowUpTo != view.PlayerId)
                     {
-                        add($"Accuse {target.Name}", "Raise suspicion.", GameCommand.Speak(SpeechIntent.Accuse, target.Id));
-                        add($"Vouch for {target.Name}", "Offer your support.", GameCommand.Speak(SpeechIntent.Vouch, target.Id));
-                        add($"Put {target.Name} on trial", "Ask for a trial.", GameCommand.Speak(SpeechIntent.CallForTrial, target.Id));
-                        add($"Agree with {target.Name}", "Support their view.", GameCommand.Speak(SpeechIntent.Agree, target.Id));
-                        add($"Disagree with {target.Name}", "Challenge their view.", GameCommand.Speak(SpeechIntent.Disagree, target.Id));
-                        add($"Deflect toward {target.Name}", "Shift attention away from you.", GameCommand.Speak(SpeechIntent.Deflect, target.Id));
-                        if (view.Day > 1)
-                            foreach (Faction faction in Enum.GetValues(typeof(Faction)))
-                                add($"Report {target.Name} as {faction}", "State a finding. You may bluff.",
-                                    GameCommand.Speak(SpeechIntent.ReportInvestigation, target.Id, faction: faction));
+                        add(_copy.Agree, "", GameCommand.Speak(SpeechIntent.Agree, view.FollowUpTo));
+                        add(_copy.Disagree, "", GameCommand.Speak(SpeechIntent.Disagree, view.FollowUpTo));
                     }
+                    AddClaims(add, view);
                     break;
                 case GamePhase.Voting:
                     if (view.AllowAbstain) add("Abstain", "Cast no target vote.", GameCommand.Vote(null));
                     foreach (var target in view.Characters.Where(c => view.VoteTargets.Contains(c.Id)))
-                        add("Vote " + target.Name, "The largest vote total determines elimination.", GameCommand.Vote(target.Id));
+                        add("Vote " + target.Name, "The largest vote total selects the defendant.", GameCommand.Vote(target.Id));
                     break;
                 case GamePhase.VoteReveal:
                     add("Continue", "Acknowledge the public tally.", GameCommand.Continue());
@@ -75,7 +74,7 @@ namespace SocialStim.Application.Sessions
                     break;
                 case GamePhase.Defense:
                     if (view.Defendant == view.PlayerId)
-                    { add("Defend yourself", "Make your case.", GameCommand.Speak(SpeechIntent.Defend)); AddClaims(add, view); }
+                    { add(_copy.DefendSelf, "Make your case.", GameCommand.Speak(SpeechIntent.Defend)); AddClaims(add, view); }
                     else add("Vote", "Hear the verdict.", GameCommand.Continue());
                     break;
                 case GamePhase.Judgement:
@@ -107,10 +106,13 @@ namespace SocialStim.Application.Sessions
 
         private void AddClaims(Action<string, string, GameCommand> add, PlayerView view)
         {
-            foreach (RoleSpec role in _catalog.OrderBy(r => r.Name, StringComparer.Ordinal))
-                add($"Claim {role.Name}", role.Id == view.OwnRole.Id
-                    ? "Tell the truth."
-                    : "Bluff. Contradictions may expose you.", GameCommand.Speak(SpeechIntent.ClaimRole, role: role.Id));
+            if (view.CounterClaimRole.HasValue) return;
+            foreach (RoleSpec role in _catalog.Where(r => view.OwnRole.CanClaim(r)
+                && !view.Characters.Any(c => c.Alive && c.ClaimedRole == r.Id)).OrderBy(r => r.Name, StringComparer.Ordinal))
+                if (!view.Characters.First(c => c.Id == view.PlayerId).ClaimedRole.HasValue)
+                    add(role.Name, "", GameCommand.Speak(SpeechIntent.ClaimRole, role: role.Id));
+            if (view.Phase == GamePhase.Discussion && !view.RespondTo.HasValue && view.CanReportAction && view.OwnRole.CanClaimTruthfully)
+                add(_copy.Report, "", GameCommand.ReportLastAction());
         }
     }
 }

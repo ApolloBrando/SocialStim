@@ -840,6 +840,62 @@
       "text": "Allow me to unpack the actual account before the imaginary suitcase bites. {result}",
       "weight": 1,
       "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.counterclaim.01",
+      "intent": "CounterClaim",
+      "text": "Identity theft? In this economy? I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.counterclaim.02",
+      "intent": "CounterClaim",
+      "text": "That is my job. Find your own hat. I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.counterclaim.03",
+      "intent": "CounterClaim",
+      "text": "We ordered one {role}, and it was me. Send the spare back.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.counterclaim.04",
+      "intent": "CounterClaim",
+      "text": "Nice costume. The actual {role} is underneath this less impressive face.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.counterclaim.05",
+      "intent": "CounterClaim",
+      "text": "Someone photocopied my job description. I am the original {role}.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.counterclaim.06",
+      "intent": "CounterClaim",
+      "text": "Your audition for my role is rejected. The {role} position is filled by me.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.counterclaim.07",
+      "intent": "CounterClaim",
+      "text": "I am the {role}. Whoever hired the lookalike owes us a refund.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
+    },
+    {
+      "id": "npc.jokester.counterclaim.08",
+      "intent": "CounterClaim",
+      "text": "A counterfeit {role}? Finally, a crime with paperwork. The real one is me.",
+      "weight": 1,
+      "requiredTrait": "Jokester"
     }
   ]
 }

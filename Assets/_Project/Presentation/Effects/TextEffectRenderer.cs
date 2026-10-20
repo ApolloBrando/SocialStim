@@ -17,9 +17,11 @@ namespace SocialStim.Presentation.Effects
         private int _animatedStart;
         private EffectFrame _frame;
         private float _time;
+        private float _motionStarted;
         private bool _semanticColors = true;
         private bool _dirty = true;
         private bool _hasFear;
+        private bool _wasMoving;
         private EffectsSettings _settings = new EffectsSettings();
         public void Initialize(TextMeshProUGUI label)
         {
@@ -31,6 +33,7 @@ namespace SocialStim.Presentation.Effects
         {
             if (document == null) throw new ArgumentNullException(nameof(document));
             if (_label == null) throw new InvalidOperationException("Initialize the text renderer first.");
+            _motionStarted = Time.unscaledTime;
             _document = document; _animatedStart = animatedStart; _palette = palette;
             _hasFear = false;
             foreach (SemanticSpan span in document.Spans)
@@ -47,11 +50,13 @@ namespace SocialStim.Presentation.Effects
         public void Apply(int visibleUtf16, EffectFrame frame, float time)
         {
             if (_label == null || _document == null) return;
+            if (Time.unscaledTime - _motionStarted >= 1.5f) frame = default;
             bool moving = _settings.Enabled && !_settings.ReducedMotion
-                && (frame.Shake > 0 || _hasFear && _settings.Intensity > 0);
+                && ((frame.Shake > 0 || _hasFear && _settings.Intensity > 0) && Time.unscaledTime - _motionStarted < 1.5f);
             // Static settled text needs no mesh upload every frame. Policy/palette/layout
             // changes invalidate this cache; active motion keeps sampling unscaled time.
-            if (!_dirty && _visible == visibleUtf16 && _frame.Shake == frame.Shake && !moving) return;
+            if (!_dirty && _visible == visibleUtf16 && _frame.Shake == frame.Shake && !moving && !_wasMoving) return;
+            _wasMoving = moving;
             _visible = visibleUtf16; _frame = frame; _time = time; _dirty = false;
             Paint(_label.textInfo);
             _label.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices | TMP_VertexDataUpdateFlags.Colors32);
@@ -82,7 +87,7 @@ namespace SocialStim.Presentation.Effects
                 if (baseline == null || vertex + 3 >= baseline.Length) continue;
                 Color32 color = _palette.Accent(_semanticColors ? _styles[i] : SemanticStyle.Default);
                 if (character.index >= _visible) color.a = 0;
-                float continuous = _settings.Enabled && !_settings.ReducedMotion && _styles[i] == SemanticStyle.Fear
+                float continuous = _settings.Enabled && !_settings.ReducedMotion && _styles[i] == SemanticStyle.Fear && Time.unscaledTime - _motionStarted < 1.5f
                     ? 0.2f * _settings.Intensity : 0;
                 float strength = _settings.Enabled && !_settings.ReducedMotion
                     && character.index >= _animatedStart && character.index < _visible

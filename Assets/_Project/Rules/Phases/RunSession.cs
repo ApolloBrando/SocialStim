@@ -41,6 +41,9 @@ namespace SocialStim.Rules.Phases
         private TeamNightPlan _lastTeamPlan;
         private bool _opening = true;
         private bool _submitting;
+        private RoleId? _counterClaimRole, _activeClaimRole;
+        private CharacterId? _claimSpeaker, _followUpTo;
+        private bool _resolvingClaim;
         private readonly Dictionary<CharacterId, NightOrder> _lastActions = new Dictionary<CharacterId, NightOrder>();
         private readonly HashSet<CharacterId> _executionObjectives = new HashSet<CharacterId>();
 
@@ -82,7 +85,8 @@ namespace SocialStim.Rules.Phases
                 knowledge.Characters, legal.AsReadOnly(), _transcript.ToList().AsReadOnly(), _opening, _lastActions.ContainsKey(Player.Id), _options.DiscussionRounds,
                 _options.VotingMode, _schedule?.Round ?? _discussionRounds + 1, _schedule?.Window ?? 1,
                 _options.PlayerWindowsPerRound, _discussion?.RespondTo,
-                _voteCandidates.Where(id => id != Player.Id).ToList().AsReadOnly(), _options.AllowAbstain, _revoting);
+                _voteCandidates.Where(id => id != Player.Id).ToList().AsReadOnly(), _options.AllowAbstain, _revoting,
+                _counterClaimRole, _followUpTo);
         }
 
         /// <summary>Applies one legal player command; invalid input leaves state and RNG untouched.</summary>
@@ -98,6 +102,16 @@ namespace SocialStim.Rules.Phases
 
         private void ApplyCommand(GameCommand command)
         {
+            if (_counterClaimRole.HasValue)
+            {
+                _counterClaimRole = null;
+                if (command.Intent == SpeechIntent.CounterClaim) Say(Player, command);
+                _activeClaimRole = null;
+                if (_phases.Phase == GamePhase.Defense) Move(GamePhase.Judgement);
+                else if (_discussion != null) ContinueExchange();
+                _revision++; return;
+            }
+            _followUpTo = null;
             switch (_phases.Phase)
             {
                 case GamePhase.Discussion:
@@ -128,8 +142,8 @@ namespace SocialStim.Rules.Phases
                 case GamePhase.VoteReveal: CompleteVoteReveal(); break;
                 case GamePhase.Nomination: Nominate(command); break;
                 case GamePhase.Defense:
-                    if (_defendant == Player.Id) Say(Player, command);
-                    Move(GamePhase.Judgement); break;
+                    if (_defendant == Player.Id) { Say(Player, command); FollowUps(Player, command); }
+                    if (!_counterClaimRole.HasValue) Move(GamePhase.Judgement); break;
                 case GamePhase.Judgement: Judge(command); break;
                 case GamePhase.LastWords:
                     if (_defendant == Player.Id) Say(Player, command);
@@ -150,11 +164,16 @@ namespace SocialStim.Rules.Phases
         {
             if (command == null || _phases.Phase == GamePhase.Ended) return "No active input request.";
             if (!Player.Alive) return command.Kind == CommandKind.Continue ? null : "Dead participants may only spectate.";
+            if (_counterClaimRole.HasValue)
+                return command.Kind == CommandKind.Speak && (command.Intent == SpeechIntent.StaySilent
+                    || command.Intent == SpeechIntent.CounterClaim && SpeechLegal(Player, command))
+                    ? null : "Counterclaim the role just claimed or wait.";
             switch (_phases.Phase)
             {
                 case GamePhase.Discussion:
                     if (_discussion?.RespondTo != null)
                         return SpeechLegal(Player, command) && (command.Intent == SpeechIntent.Defend || command.Intent == SpeechIntent.Accuse
+                            || command.Intent == SpeechIntent.Deflect || command.Intent == SpeechIntent.Agree || command.Intent == SpeechIntent.Disagree
                             || command.Intent == SpeechIntent.ClaimRole || command.Intent == SpeechIntent.StaySilent)
                             ? null : "Respond to the public accusation first.";
                     if (command.Kind == CommandKind.Continue && _opening) return null;
@@ -189,14 +208,30 @@ namespace SocialStim.Rules.Phases
         private bool SpeechLegal(Participant actor, GameCommand command)
         {
             if (command.Kind != CommandKind.Speak || !Enum.IsDefined(typeof(SpeechIntent), command.Intent)) return false;
-            if (command.ClaimedRole.HasValue != (command.Intent == SpeechIntent.ClaimRole)
+            if (command.ClaimedRole.HasValue != (command.Intent == SpeechIntent.ClaimRole || command.Intent == SpeechIntent.CounterClaim)
                 || command.ReportedFaction.HasValue != (command.Intent == SpeechIntent.ReportInvestigation)) return false;
             bool needsTarget = SpeechContract.RequiresTarget(command.Intent);
             if (needsTarget != command.Target.HasValue) return false;
             if (needsTarget && (!command.Target.HasValue || !Living().Any(c => c.Id == command.Target && c.Id != actor.Id))) return false;
-            if (command.Intent == SpeechIntent.ClaimRole && (!command.ClaimedRole.HasValue || !_catalog.Any(r => r.Id == command.ClaimedRole.Value))) return false;
+            if (command.Intent == SpeechIntent.ClaimRole || command.Intent == SpeechIntent.CounterClaim)
+            {
+                RoleSpec role = _catalog.FirstOrDefault(r => r.Id == command.ClaimedRole);
+                if (!actor.Role.CanClaim(role)) return false;
+                if (command.Intent == SpeechIntent.CounterClaim)
+                { if (_activeClaimRole != role.Id || _claimSpeaker == actor.Id) return false; }
+                else if (_beliefs[actor.Id].Claim(actor.Id).HasValue
+                    || Living().Any(c => c.Id != actor.Id && _beliefs[actor.Id].Claim(c.Id) == role.Id)) return false;
+            }
             if (command.Intent == SpeechIntent.ReportInvestigation && (_phases.Day <= 1 || !command.ReportedFaction.HasValue
                 || !Enum.IsDefined(typeof(Faction), command.ReportedFaction.Value))) return false;
+            if (command.Intent == SpeechIntent.ReportInvestigation && (actor.Role.Faction == Faction.Town
+                ? !_results[actor.Id].Any(r => r.Kind == ReportKind.Investigation && r.Target == command.Target
+                    && r.Alignment == command.ReportedFaction && r.Night == _phases.Day - 1)
+                : !_catalog.Any(r => r.Id == _beliefs[actor.Id].Claim(actor.Id) && r.Ability == AbilityKind.Investigate))) return false;
+            if (command.Intent == SpeechIntent.Agree || command.Intent == SpeechIntent.Disagree)
+                if (!_beliefs[actor.Id].Evidence.Any(e => e.Actor == command.Target
+                    && (e.Intent == SpeechIntent.Accuse || e.Intent == SpeechIntent.Deflect
+                        || e.Intent == SpeechIntent.Defend || e.Intent == SpeechIntent.Vouch))) return false;
             if (command.Intent == SpeechIntent.ReactToDeath && !_beliefs[actor.Id].Evidence.Any(e => e.Kind == EvidenceKind.Death)) return false;
             if (command.Intent == SpeechIntent.ReactToRoleReveal && !_beliefs[actor.Id].Evidence.Any(e => e.Kind == EvidenceKind.RoleReveal)) return false;
             return command.Intent != SpeechIntent.LastWords && command.Intent != SpeechIntent.ReportAction;
@@ -207,11 +242,13 @@ namespace SocialStim.Rules.Phases
             GameCommand speech = _strategy.Speak(Knowledge(actor), _decisions);
             if (speech == null || !SpeechLegal(actor, speech)) speech = GameCommand.Speak(SpeechIntent.StaySilent);
             Say(actor, speech);
+            FollowUps(actor, speech);
             return speech;
         }
 
         private void Say(Participant actor, GameCommand speech, string actionReport = null)
         {
+            if (speech.Intent == SpeechIntent.StaySilent) return;
             string claimed = speech.ClaimedRole.HasValue ? _catalog.First(r => r.Id == speech.ClaimedRole.Value).Name : "";
             var context = new DialogueContext(actor.Id, actor.Name, speech.Target.HasValue ? Actor(speech.Target.Value).Name : "",
                 claimed, speech.ReportedFaction?.ToString() ?? actionReport ?? "", _phases.Day, actor.Role.Id, actor.Personality,
@@ -219,6 +256,50 @@ namespace SocialStim.Rules.Phases
             DialogueSelection line = _dialogue.Select(speech.Intent, context);
             foreach (Participant observer in _cast) _beliefs[observer.Id].Observe(actor.Id, speech, _phases.Day);
             Emit(GameCue.SpeechDelivered, $"{actor.Name}: {line.Text}", actor.Id, line.Metadata, speech.Target, speech.Intent, speech.ClaimedRole);
+            if (speech.Intent == SpeechIntent.ClaimRole) CounterClaims(actor, speech.ClaimedRole.Value);
+        }
+
+        private void CounterClaims(Participant speaker, RoleId roleId)
+        {
+            if (_resolvingClaim) return;
+            _resolvingClaim = true; _activeClaimRole = roleId; _claimSpeaker = speaker.Id;
+            RoleSpec role = _catalog.First(r => r.Id == roleId);
+            bool bluffUsed = false;
+            // Each respondent decides from their own role and public claims. No target's secret role is read.
+            foreach (Participant actor in Living().Where(c => c.Id != speaker.Id && c.Id != Player.Id))
+            {
+                KnowledgeView knowledge = Knowledge(actor);
+                bool truthful = actor.Role.Id == roleId && actor.Role.CanClaimTruthfully;
+                bool teammateClaim = knowledge.Characters.Any(c => c.IsTeammate && c.ClaimedRole == roleId);
+                bool bluff = actor.Role.CanBluff && !bluffUsed && !teammateClaim
+                    && !knowledge.Characters.First(c => c.Id == actor.Id).ClaimedRole.HasValue && _decisions.Next(100) < 25;
+                if (!actor.Role.CanClaim(role) || !truthful && !bluff) continue;
+                Say(actor, GameCommand.Speak(SpeechIntent.CounterClaim, role: roleId));
+                if (!truthful) bluffUsed = true;
+            }
+            if (speaker.Id != Player.Id && Player.Alive && Player.Role.CanClaim(role)
+                && (_phases.Phase == GamePhase.Defense || _phases.Phase == GamePhase.Discussion && _discussion != null)
+                && (!Player.Role.CanBluff || !Knowledge(Player).Characters.Any(c => c.IsTeammate && c.ClaimedRole == roleId)))
+                _counterClaimRole = roleId;
+            if (!_counterClaimRole.HasValue) _activeClaimRole = null;
+            _resolvingClaim = false;
+        }
+
+        private void FollowUps(Participant speaker, GameCommand speech)
+        {
+            bool accusation = speech.Intent == SpeechIntent.Accuse || speech.Intent == SpeechIntent.Deflect;
+            if (!accusation && speech.Intent != SpeechIntent.Defend && speech.Intent != SpeechIntent.Vouch) return;
+            CharacterId subject = speech.Target ?? speaker.Id;
+            _followUpTo = speaker.Id == Player.Id ? (CharacterId?)null : speaker.Id;
+            // A bounded, seeded group joins before the addressed participant receives the floor.
+            int limit = _decisions.Next(3), spoken = 0;
+            foreach (Participant listener in Living().Where(c => c.Id != Player.Id).OrderBy(c => c.Id.Value))
+            {
+                if (spoken >= limit) break;
+                GameCommand reaction = SocialNpcStrategy.Reaction(Knowledge(listener), speaker.Id, subject, accusation, _decisions);
+                if (reaction == null) continue;
+                Say(listener, reaction); spoken++;
+            }
         }
 
         private void SayActionReport(Participant actor)
@@ -276,7 +357,7 @@ namespace SocialStim.Rules.Phases
         {
             if (_discussion.RespondTo.HasValue)
             {
-                Say(Player, command); _discussion.Answer(); ContinueExchange(); return;
+                Say(Player, command); FollowUps(Player, command); _discussion.Answer(); ContinueExchange(); return;
             }
             if (_opening && command.Kind == CommandKind.Continue && Player.Alive)
             {
@@ -284,8 +365,14 @@ namespace SocialStim.Rules.Phases
                 var speakers = Living().Where(c => c.Id != Player.Id).ToList();
                 if (speakers.Count > 0)
                 {
-                    Participant speaker = speakers[_decisions.Next(speakers.Count)];
-                    _discussion.ObserveOpening(speaker.Id, SayNpc(speaker));
+                    int count = 1 + _decisions.Next(Math.Min(3, speakers.Count));
+                    for (int i = 0; i < count; i++)
+                    {
+                        int index = _decisions.Next(speakers.Count);
+                        Participant speaker = speakers[index]; speakers.RemoveAt(index);
+                        _discussion.ObserveOpening(speaker.Id, SayNpc(speaker));
+                        if (_discussion.RespondTo.HasValue || _counterClaimRole.HasValue) break;
+                    }
                 }
                 return;
             }
@@ -293,19 +380,35 @@ namespace SocialStim.Rules.Phases
             if (Player.Alive)
             {
                 if (command.Kind == CommandKind.ReportLastAction) SayActionReport(Player);
-                else Say(Player, command);
+                else { Say(Player, command); FollowUps(Player, command); }
             }
-            _discussion.Begin(Living().Where(c => c.Id != Player.Id).Select(c => c.Id), command,
-                id => Say(Actor(id), GameCommand.Speak(SpeechIntent.Defend)));
+            var queued = Living().Where(c => c.Id != Player.Id).OrderBy(c => c.Id.Value).ToList();
+            // Shuffle a bounded subset; not every NPC speaks in every window.
+            for (int i = queued.Count - 1; i > 0; i--)
+            { int j = _decisions.Next(i + 1); Participant swap = queued[i]; queued[i] = queued[j]; queued[j] = swap; }
+            int queuedCount = queued.Count == 0 ? 0 : 1 + _decisions.Next(queued.Count);
+            _discussion.Begin(queued.Take(queuedCount).Select(c => c.Id), command,
+                DefendNpc);
             ContinueExchange();
         }
 
         private void ContinueExchange()
         {
-            _discussion.Resume(id => SayNpc(Actor(id)), id => Say(Actor(id), GameCommand.Speak(SpeechIntent.Defend)), Player.Alive);
+            if (_counterClaimRole.HasValue) return;
+            _discussion.Resume(id => SayNpc(Actor(id)), DefendNpc, Player.Alive, () => _counterClaimRole.HasValue);
+            if (_counterClaimRole.HasValue) return;
             if (!_schedule.Complete) return;
             _voteCandidates.Clear(); _voteCandidates.AddRange(Living().Select(c => c.Id));
             Move(GamePhase.Voting);
+        }
+
+        private void DefendNpc(CharacterId id)
+        {
+            Participant actor = Actor(id);
+            GameCommand choice = _strategy.Speak(Knowledge(actor), _decisions);
+            var speech = choice != null && choice.Intent == SpeechIntent.ClaimRole && SpeechLegal(actor, choice)
+                ? choice : GameCommand.Speak(SpeechIntent.Defend);
+            Say(actor, speech); FollowUps(actor, speech);
         }
 
         private void CastDailyVote(GameCommand command)
@@ -357,9 +460,9 @@ namespace SocialStim.Rules.Phases
                 else StartNight();
                 return;
             }
-            if (!_options.LastWords) { Execute(); return; }
-            Move(GamePhase.LastWords);
-            if (_defendant != Player.Id) Say(Actor(_defendant.Value), GameCommand.Speak(SpeechIntent.LastWords));
+            _trials++;
+            Move(GamePhase.Defense);
+            if (_defendant != Player.Id) DefendNpc(_defendant.Value);
         }
 
         private void Nominate(GameCommand command)
@@ -404,6 +507,7 @@ namespace SocialStim.Rules.Phases
             if (VoteResolver.IsGuilty(ballots.Select(b => b.Value)))
             {
                 Emit(GameCue.VerdictGuilty, $"{Actor(_defendant.Value).Name} is found guilty.");
+                if (!_options.LastWords) { Execute(); return; }
                 Move(GamePhase.LastWords);
                 if (_defendant != Player.Id) Say(Actor(_defendant.Value), GameCommand.Speak(SpeechIntent.LastWords));
             }
@@ -411,7 +515,7 @@ namespace SocialStim.Rules.Phases
             {
                 Emit(GameCue.VerdictInnocent, $"{Actor(_defendant.Value).Name} is acquitted.");
                 _defendant = null;
-                if (_trials < _options.TrialsPerDay) Move(GamePhase.Nomination); else StartNight();
+                if (_options.VotingMode == VotingMode.Trial && _trials < _options.TrialsPerDay) Move(GamePhase.Nomination); else StartNight();
             }
         }
 
@@ -507,12 +611,14 @@ namespace SocialStim.Rules.Phases
             Move(GamePhase.Ended);
             GameCue cue = _outcome == OutcomeKind.Draw ? GameCue.RunDrawn : PlayerWon() ? GameCue.VictoryAchieved : GameCue.DefeatSuffered;
             string result = _outcome == OutcomeKind.TownVictory ? "Town wins." : _outcome == OutcomeKind.AntagonistVictory
-                ? "Antagonists win." : _outcome == OutcomeKind.LoneKillerVictory ? "The Lone Killer wins." : "Draw.";
+                ? "Antagonists win." : _outcome == OutcomeKind.LoneKillerVictory ? "Anarchy wins."
+                : _outcome == OutcomeKind.InfinitumVictory ? "Infinitum steals the win." : "Draw.";
             Emit(cue, $"Run ended: {result} Objective {(PlayerWon() ? "achieved" : "missed")}.");
             return true;
         }
 
-        private bool PlayerWon() => _outcome != OutcomeKind.Ongoing && (Player.Role.Category == RoleCategory.NeutralEvil
+        private bool PlayerWon() => _outcome != OutcomeKind.Ongoing && (Player.Role.StealsParityWin
+            ? Player.Alive && _outcome == OutcomeKind.InfinitumVictory : Player.Role.Category == RoleCategory.NeutralEvil
             ? _executionObjectives.Contains(Player.Id) : Player.Role.Category == RoleCategory.NeutralKilling
             ? Player.Alive && _outcome == OutcomeKind.LoneKillerVictory : Player.Role.Faction == Faction.Neutral ? Player.Alive
             : Player.Role.Faction == Faction.Town ? _outcome == OutcomeKind.TownVictory : _outcome == OutcomeKind.AntagonistVictory);

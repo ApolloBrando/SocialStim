@@ -16,6 +16,8 @@ namespace SocialStim.Rules.Dialogue
         private readonly Dictionary<(SpeechIntent, Personality), IReadOnlyList<DialogueLine>> _pools
             = new Dictionary<(SpeechIntent, Personality), IReadOnlyList<DialogueLine>>();
         private readonly Dictionary<CharacterId, Queue<string>> _recent = new Dictionary<CharacterId, Queue<string>>();
+        private readonly Dictionary<(CharacterId, SpeechIntent), HashSet<string>> _used = new Dictionary<(CharacterId, SpeechIntent), HashSet<string>>();
+        private readonly Dictionary<string, int> _uses = new Dictionary<string, int>();
         private static readonly Regex Variables = new Regex(@"\{([^{}]*)\}");
         private static readonly HashSet<string> AllowedVariables = new HashSet<string> { "speaker", "target", "role", "result", "day" };
 
@@ -66,19 +68,26 @@ namespace SocialStim.Rules.Dialogue
             if (matching.Count == 0) throw new InvalidOperationException($"No eligible {context.Traits} line for {intent}.");
             // Prefer the most context-specific matching tier, then broader matching
             // tiers, ending in this same trait's unrestricted action pool.
-            int specificity = matching.Max(line => line.Conditions.Count + (line.SpeakerRole.HasValue ? 1 : 0));
-            var eligible = matching.Where(line => line.Conditions.Count + (line.SpeakerRole.HasValue ? 1 : 0) == specificity).ToList();
+            var key = (context.SpeakerId, intent);
+            if (!_used.TryGetValue(key, out var used)) { used = new HashSet<string>(); _used.Add(key, used); }
+            var fresh = matching.Where(line => !used.Contains(line.Id)).ToList();
+            if (fresh.Count == 0) { used.Clear(); fresh = matching; }
+            int specificity = fresh.Max(line => line.Conditions.Count + (line.SpeakerRole.HasValue ? 1 : 0));
+            var eligible = fresh.Where(line => line.Conditions.Count + (line.SpeakerRole.HasValue ? 1 : 0) == specificity).ToList();
             if (!_recent.TryGetValue(context.SpeakerId, out Queue<string> history))
             { history = new Queue<string>(); _recent.Add(context.SpeakerId, history); }
             var candidates = eligible.Where(l => !history.Contains(l.Id)).ToList();
             while (candidates.Count == 0)
             { history.Dequeue(); candidates = eligible.Where(l => !history.Contains(l.Id)).ToList(); }
+            int leastUsed = candidates.Min(line => _uses.TryGetValue(line.Id, out int count) ? count : 0);
+            candidates = candidates.Where(line => (_uses.TryGetValue(line.Id, out int count) ? count : 0) == leastUsed).ToList();
             int ticket = _random.Next(candidates.Sum(l => l.Weight));
             DialogueLine chosen = candidates[0];
             foreach (DialogueLine candidate in candidates)
             { ticket -= candidate.Weight; if (ticket < 0) { chosen = candidate; break; } }
             history.Enqueue(chosen.Id);
-            while (history.Count > 3) history.Dequeue();
+            used.Add(chosen.Id); _uses[chosen.Id] = leastUsed + 1;
+            while (history.Count > 12) history.Dequeue();
             string text = Variables.Replace(chosen.Text, match =>
             {
                 switch (match.Groups[1].Value)

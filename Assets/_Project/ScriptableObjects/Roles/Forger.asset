@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Forger
   m_EditorClassIdentifier:
   _id: forger
-  _displayName: Forger
+  _displayName: Aperture
   _faction: 1
   _category: 7
   _ability: 6
@@ -22,4 +22,6 @@ MonoBehaviour:
   _protection: 0
   _charges: -1
   _appearance: 1
-  _unique: 0
+  _unique: 1
+  _canClaimTruthfully: 0
+  _canBluff: 1

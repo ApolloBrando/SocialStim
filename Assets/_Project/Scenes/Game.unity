@@ -52,7 +52,7 @@ MonoBehaviour:
   _trialsPerDay: 2
   _discussionRounds: 3
   _revealOnDeath: 1
-  _participantCount: 9
+  _participantCount: 7
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

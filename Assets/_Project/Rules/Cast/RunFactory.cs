@@ -26,7 +26,8 @@ namespace SocialStim.Rules.Cast
             var random = new SeededRandom(options.Seed);
             var roleList = setup ?? new RoleList(new[] {
                 new RoleSlot(category: RoleCategory.TownInvestigative), new RoleSlot(category: RoleCategory.TownProtective),
-                new RoleSlot(category: RoleCategory.TownSupport), new RoleSlot(category: RoleCategory.AntagonistKilling),
+                new RoleSlot(category: catalog.Any(r => r.Category == RoleCategory.TownSupport) ? RoleCategory.TownSupport : RoleCategory.TownKilling),
+                new RoleSlot(category: RoleCategory.AntagonistKilling),
                 new RoleSlot(category: RoleCategory.NeutralBenign), new RoleSlot(faction: Faction.Town), new RoleSlot(faction: Faction.Town)
             });
             var assigned = roleList.Resolve(catalog, options.PlayerRole, random).ToList();
@@ -83,7 +84,7 @@ namespace SocialStim.Rules.Cast
             if (winCondition == null && catalog.Any(r => r.Ability == AbilityKind.Attack && r.Faction != Faction.Antagonist
                 && r.Category != RoleCategory.TownKilling && r.Category != RoleCategory.NeutralKilling))
                 throw new ArgumentException("Independent attacks require an explicit killing category or custom win condition.");
-            if (winCondition == null && catalog.Any(r => (int)r.Category > (int)RoleCategory.NeutralBenign))
+            if (winCondition == null && catalog.Any(r => r.StealsParityWin || (int)r.Category > (int)RoleCategory.NeutralBenign))
                 winCondition = new CapabilityWinCondition();
             var settings = reasoning ?? new ReasoningSettings();
             return new RunSession(options, cast, catalog, dialogue, strategy ?? new SocialNpcStrategy(settings), winCondition ?? new StarterWinCondition(), settings);

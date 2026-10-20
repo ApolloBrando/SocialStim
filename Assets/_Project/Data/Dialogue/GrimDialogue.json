@@ -840,6 +840,62 @@
       "text": "Details, since we still need them. {result}",
       "weight": 1,
       "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.counterclaim.01",
+      "intent": "CounterClaim",
+      "text": "Someone stole my job. I am the {role}. Figures.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.counterclaim.02",
+      "intent": "CounterClaim",
+      "text": "That claim is false. I am the {role}. Now we have another problem.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.counterclaim.03",
+      "intent": "CounterClaim",
+      "text": "I hoped to keep this quiet. I am the {role}. So much for hope.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.counterclaim.04",
+      "intent": "CounterClaim",
+      "text": "Two people claiming one role. Same old misery. I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.counterclaim.05",
+      "intent": "CounterClaim",
+      "text": "There goes my cover. The real {role} is me.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.counterclaim.06",
+      "intent": "CounterClaim",
+      "text": "I am the {role}. Apparently even my work has an impostor.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.counterclaim.07",
+      "intent": "CounterClaim",
+      "text": "We were short on trouble, apparently. I am the actual {role}.",
+      "weight": 1,
+      "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.counterclaim.08",
+      "intent": "CounterClaim",
+      "text": "No. You took the wrong title. I am the {role}. This will end badly.",
+      "weight": 1,
+      "requiredTrait": "Grim"
     }
   ]
 }

@@ -17,7 +17,8 @@ Paths below are relative to the repository root.
 | Participant count, seed, discussion/trial limits, death reveals | Assets/_Project/Scenes/Game.unity → SocialStim → GameBootstrap |
 | First-person night-action phrases | Assets/_Project/Rules/Dialogue/NightActionText.cs |
 | Report-result sentences, announcements and outcome text | Assets/_Project/Rules/Phases/RunSession.cs → DescribeReport, DeliverReport, Move, FinishIfTerminal |
-| Choice titles and short explanations | Assets/_Project/Application/Sessions/GameController.cs |
+| Interaction labels (Wait, Accuse, Defend, claims, Refute, Agree/Disagree, Back) | StarterCatalog.asset → Interaction Labels |
+| Other phase choices and explanations | Assets/_Project/Application/Sessions/GameController.cs |
 | Readable phase/action names | Assets/_Project/Application/Input/ActionLabels.cs |
 | Setup, status, menu and accessibility text; layout | Assets/_Project/Presentation/Text/TextGameView.cs |
 | Participant card labels | Assets/_Project/Presentation/Text/ParticipantCard.cs |
@@ -78,7 +79,7 @@ or just {result}.
 
 Registered intents: Accuse, Defend, ClaimRole, ReportInvestigation, Vouch,
 CallForTrial, Agree, Disagree, Deflect, StaySilent, ExpressFear, ReactToDeath,
-ReactToRoleReveal, LastWords, VoteJustification, ReportAction.
+ReactToRoleReveal, LastWords, VoteJustification, ReportAction, CounterClaim.
 
 Supported styles are `<emphasis>`, `<fear>`, `<calm>`, `<evidence>` and `<danger>`, each
 with a matching closing tag. Use `<<` for a literal less-than sign. Do not use
@@ -97,7 +98,7 @@ name must be nonempty and distinct, and the pool must have at least as many
 entries as participants. Names are shuffled separately from roles; they do not
 define permanent characters or personalities. Each NPC receives one trait from a separately seeded shuffled bag in
 RunFactory.CreateScenario, using all seven before repeating; the player has None.
-Keep at least 40 distinct names of at most 16 letters/spaces.
+Keep at least 40 distinct single-word names of at most 16 ASCII letters. The current pool has 60.
 
 ## Change participant count and role composition
 
@@ -198,3 +199,20 @@ dotnet test Tools/HeadlessTests/SocialStim.HeadlessTests.csproj --configuration 
 
 Headless checks do not compile Unity adapters or replace Play Mode testing.
 There is no ongoing-run save system; New run always starts fresh.
+
+## Current discussion and setup defaults
+
+GameBootstrap's serialized Participant Count is **7** in Game.unity. It remains
+an Inspector setting; RoleList.ForPopulation scales the setup rather than using
+seven fixed character slots. A seven-person setup includes two antagonists so
+Archon plus a selected Singer/Aperture can fit. Special roles are unique across
+both the player and NPCs; Solarian may repeat.
+
+The twelve Interaction Labels in StarterCatalog are ordered: Wait, Accuse,
+Defend, Claim Role, Counter claim, Refute, Agree, Disagree, Back, Report last
+night, Defend yourself, PLAYERS. Edit their displayed wording without changing
+navigation or commands. Role display names are still edited in role assets;
+legacy asset filenames and stable IDs are preserved.
+
+See DISCUSSION_CLAIMS_UPDATE.md for the revised vote/verdict flow and native
+Unity verification checklist.

@@ -20,6 +20,10 @@ namespace SocialStim.Data.Definitions
         [SerializeField] private string[] _names;
         [SerializeField] private ReasoningDefinition _reasoning;
         [SerializeField] private RoleListDefinition _setup;
+        [SerializeField] private string[] _interactionLabels = { "Wait", "Accuse", "Defend", "Claim Role", "Counter claim", "Refute",
+            "Agree", "Disagree", "Back", "Report last night", "Defend yourself", "PLAYERS" };
+        /// <summary>Loads editable interaction wording without retaining mutable asset arrays.</summary>
+        public InteractionLabels LoadInteractionLabels() => new InteractionLabels(_interactionLabels);
         public RoleList LoadSetup(int participants = 0) => _setup != null ? _setup.Load(participants)
             : participants > 0 ? RoleList.ForPopulation(participants) : null;
 

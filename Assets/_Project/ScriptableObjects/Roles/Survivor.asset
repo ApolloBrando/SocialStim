@@ -13,13 +13,17 @@ MonoBehaviour:
   m_Name: Survivor
   m_EditorClassIdentifier:
   _id: survivor
-  _displayName: Survivor
+  _displayName: Infinitum
   _faction: 2
   _category: 4
-  _ability: 4
+  _ability: 5
   _attack: 0
   _defense: 0
   _protection: 1
-  _charges: 2
+  _charges: -1
   _appearance: 2
-  _unique: 0
+  _unique: 1
+  _canClaimTruthfully: 0
+  _canBluff: 1
+  _nightImmune: 1
+  _stealsParityWin: 1

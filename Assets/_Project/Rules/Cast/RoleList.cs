@@ -48,7 +48,7 @@ namespace SocialStim.Rules.Cast
             long total = (long)townShare + antagonistShare + neutralShare;
             int neutrals = neutralShare == 0 || participants < 5 ? 0 : Math.Max(1, (int)((long)participants * neutralShare / total));
             neutrals = Math.Min(neutrals, participants - 2);
-            int antagonists = Math.Min(participants - neutrals - 1, Math.Max(1, (int)((long)participants * antagonistShare / total)));
+            int antagonists = Math.Min(participants - neutrals - 1, Math.Max(participants >= 7 ? 2 : 1, (int)((long)participants * antagonistShare / total)));
             int town = participants - antagonists - neutrals;
             var slots = new List<RoleSlot>();
             // Keep one team killer and a specialist core when there is room for flexible Town slots.
@@ -58,7 +58,7 @@ namespace SocialStim.Rules.Cast
             {
                 slots.Add(new RoleSlot(faction: Faction.Town, category: RoleCategory.TownInvestigative));
                 slots.Add(new RoleSlot(faction: Faction.Town, category: RoleCategory.TownProtective));
-                slots.Add(new RoleSlot(faction: Faction.Town, category: RoleCategory.TownSupport));
+                slots.Add(new RoleSlot(faction: Faction.Town, category: RoleCategory.TownKilling));
                 town -= 3;
             }
             for (int i = 0; i < town; i++) slots.Add(new RoleSlot(faction: Faction.Town));

@@ -40,17 +40,20 @@ namespace SocialStim.Rules.Phases
             RespondTo = null;
         }
         /// <summary>Runs queued NPC statements until a player response is needed or the ordinary window completes.</summary>
-        public void Resume(Func<CharacterId, GameCommand> speak, Action<CharacterId> defend, bool playerAlive)
+        public void Resume(Func<CharacterId, GameCommand> speak, Action<CharacterId> defend, bool playerAlive, Func<bool> paused = null)
         {
             if (RespondTo.HasValue) throw new InvalidOperationException("Answer the pending accusation first.");
             while (_speakers.Count > 0)
             {
+                if (paused != null && paused()) return;
                 CharacterId speaker = _speakers.Dequeue();
                 GameCommand speech = speak(speaker);
+                if (paused != null && paused()) return;
                 if (!IsPressure(speech) || !speech.Target.HasValue) continue;
                 if (speech.Target == _player && playerAlive) { RespondTo = speaker; return; }
                 if (speech.Target != _player && _answered.Add(speech.Target.Value)) defend(speech.Target.Value);
             }
+            if (paused != null && paused()) return;
             if (!_windowInProgress) return;
             _windowInProgress = false; _schedule.Advance();
         }

@@ -840,6 +840,62 @@
       "text": "The relevant part begins now, so please ignore the unnecessarily long runway. {result}",
       "weight": 1,
       "requiredTrait": "Chatterbox"
+    },
+    {
+      "id": "npc.chatterbox.counterclaim.01",
+      "intent": "CounterClaim",
+      "text": "That is awkward, because I am the {role}, and I was saving that announcement for a much less awkward moment.",
+      "weight": 1,
+      "requiredTrait": "Chatterbox"
+    },
+    {
+      "id": "npc.chatterbox.counterclaim.02",
+      "intent": "CounterClaim",
+      "text": "Hang on, we cannot both be the {role}, unless someone changed the roster, which they did not, so I am challenging that.",
+      "weight": 1,
+      "requiredTrait": "Chatterbox"
+    },
+    {
+      "id": "npc.chatterbox.counterclaim.03",
+      "intent": "CounterClaim",
+      "text": "I had a whole explanation ready, but you have forced the short version: I am the actual {role}.",
+      "weight": 1,
+      "requiredTrait": "Chatterbox"
+    },
+    {
+      "id": "npc.chatterbox.counterclaim.04",
+      "intent": "CounterClaim",
+      "text": "Normally I would let you finish, honestly I would, but claiming my job is a fairly major interruption. I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Chatterbox"
+    },
+    {
+      "id": "npc.chatterbox.counterclaim.05",
+      "intent": "CounterClaim",
+      "text": "You know when someone tells your story as if it happened to them? This is that. I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Chatterbox"
+    },
+    {
+      "id": "npc.chatterbox.counterclaim.06",
+      "intent": "CounterClaim",
+      "text": "Before this gets repeated and everyone starts remembering it wrong, let me put the correction on record: I am the {role}.",
+      "weight": 1,
+      "requiredTrait": "Chatterbox"
+    },
+    {
+      "id": "npc.chatterbox.counterclaim.07",
+      "intent": "CounterClaim",
+      "text": "Well, there goes my quiet plan, not that it was especially quiet. I am the {role}, so that claim cannot stand.",
+      "weight": 1,
+      "requiredTrait": "Chatterbox"
+    },
+    {
+      "id": "npc.chatterbox.counterclaim.08",
+      "intent": "CounterClaim",
+      "text": "I was waiting for a sensible opening, and apparently the opening is someone else taking my job. The {role} is me.",
+      "weight": 1,
+      "requiredTrait": "Chatterbox"
     }
   ]
 }

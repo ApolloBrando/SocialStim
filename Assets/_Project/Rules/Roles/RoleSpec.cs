@@ -8,7 +8,8 @@ namespace SocialStim.Rules.Roles
         /// <summary>Creates a role. A charge count of -1 means unlimited uses.</summary>
         public RoleSpec(RoleId id, string name, Faction faction, RoleCategory category,
             AbilityKind ability, int attack, int defense, int protection, int charges,
-            Faction appearance, bool unique = false)
+            Faction appearance, bool unique = false, bool? canClaimTruthfully = null, bool? canBluff = null,
+            bool nightImmune = false, bool stealsParityWin = false)
         {
             if (string.IsNullOrWhiteSpace(id.Value) || string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Role identity and name are required.");
@@ -25,6 +26,9 @@ namespace SocialStim.Rules.Roles
             Id = id; Name = name; Faction = faction; Category = category; Ability = ability;
             Attack = attack; Defense = defense; Protection = protection; Charges = charges;
             Appearance = appearance; Unique = unique;
+            CanClaimTruthfully = canClaimTruthfully ?? (faction == Faction.Town && ability != AbilityKind.None);
+            CanBluff = canBluff ?? faction != Faction.Town;
+            NightImmune = nightImmune; StealsParityWin = stealsParityWin;
         }
 
         /// <summary>Stable role key.</summary>
@@ -49,5 +53,16 @@ namespace SocialStim.Rules.Roles
         public Faction Appearance { get; }
         /// <summary>Whether a setup may contain only one copy.</summary>
         public bool Unique { get; }
+        /// <summary>Whether this role may disclose its own Town special role.</summary>
+        public bool CanClaimTruthfully { get; }
+        /// <summary>Whether this role may impersonate a Town special role.</summary>
+        public bool CanBluff { get; }
+        /// <summary>Passive immunity to every night attack, independent of strength.</summary>
+        public bool NightImmune { get; }
+        /// <summary>Whether this surviving role replaces an antagonist parity victory.</summary>
+        public bool StealsParityWin { get; }
+        /// <summary>Shared player/NPC claim permission; ordinary citizens are never claimable.</summary>
+        public bool CanClaim(RoleSpec asserted) => asserted != null && asserted.Faction == Faction.Town
+            && asserted.Ability != AbilityKind.None && (asserted.Id == Id ? CanClaimTruthfully : CanBluff && Faction != Faction.Town);
     }
 }
