@@ -374,6 +374,9 @@ Participant and claim strips have horizontal ScrollRects. The editor preview
 uses the same day-light/night-dark direction as gameplay. No save/resume system
 is introduced.
 
+## Mission phase 0
+
+See [the complete source audit](docs/AUDIT.md) and [read inventory](docs/AUDIT_INVENTORY.md). Immediate display preference changes preserve the active reveal instead of skipping queued observations. Continuous fear motion uses an independent presentation clock; finite screen cue envelopes retain their current safety limits. The mission supersedes earlier phase/role planning; new work remains on phase branches.
 ## Mission part two: audit baseline and first repairs
 
 The controlling phase plan is [Docs/AUDIT.md](Docs/AUDIT.md). Future discussion,

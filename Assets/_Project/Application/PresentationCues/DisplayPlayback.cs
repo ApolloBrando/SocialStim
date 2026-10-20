@@ -12,6 +12,9 @@ namespace SocialStim.Application.PresentationCues
         private float _elapsed;
         private float _duration;
         private float _speed;
+        private float _revealOffset;
+        private float _pauseAfter;
+        private float _speedMultiplier;
         private double _clock;
         private double _nextFlash;
         private bool _permitFlash;
@@ -35,6 +38,7 @@ namespace SocialStim.Application.PresentationCues
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
             _sequence = sequence; _acknowledge = acknowledge; _elapsed = 0; Frame = default; VisibleUtf16 = 0; Busy = true; _active = true;
             _permitFlash = _clock >= _nextFlash; _flashStarted = false;
+            _speedMultiplier = speedMultiplier; _pauseAfter = pauseAfter; _revealOffset = 0;
             _speed = settings.ElementsPerSecond * speedMultiplier;
             _duration = !settings.Enabled ? 0 : Math.Max(settings.InstantText ? 0 : text.ElementCount / _speed, profile.Duration)
                 + (settings.InstantText ? 0 : pauseAfter);
@@ -54,12 +58,33 @@ namespace SocialStim.Application.PresentationCues
                 return;
             }
             VisibleUtf16 = !_settings.Enabled || _settings.InstantText ? Text.Text.Length
-                : Text.EndOfElements((int)(_elapsed * _speed));
+                : Text.EndOfElements((int)(_elapsed * _speed + _revealOffset));
             Frame = _profile.Sample(_elapsed, _settings);
             if (!_permitFlash) Frame = new EffectFrame(Frame.Shake, Frame.Border, Frame.Vignette, 0);
             else if (Frame.Flash > 0 && !_flashStarted) { _nextFlash = _clock + 2; _flashStarted = true; }
             if (_elapsed >= _duration) Finish(DisplayCompletion.Completed);
         }
+        /// <summary>Applies display preferences without skipping this line or acknowledging queued lines.</summary>
+        public void Reconfigure(EffectsSettings settings)
+        {
+            if (settings == null) throw new ArgumentNullException(nameof(settings));
+            float revealed = Text == null ? 0 : !_settings.Enabled || _settings.InstantText ? Text.ElementCount
+                : Math.Min(Text.ElementCount, _elapsed * _speed + _revealOffset);
+            _settings = settings;
+            if (!Busy) return;
+            _speed = settings.ElementsPerSecond * _speedMultiplier;
+            _revealOffset = revealed - _elapsed * _speed;
+            if (!settings.Enabled || settings.InstantText)
+            {
+                VisibleUtf16 = Text.Text.Length;
+                _duration = settings.Enabled ? Math.Max(_elapsed, _profile.Duration) : _elapsed;
+            }
+            else if (revealed < Text.ElementCount)
+                _duration = Math.Max(_profile.Duration, _elapsed + (Text.ElementCount - revealed) / _speed) + _pauseAfter;
+            Frame = _profile.Sample(_elapsed, settings);
+            if (!_permitFlash) Frame = new EffectFrame(Frame.Shake, Frame.Border, Frame.Vignette, 0);
+        }
+
         public void Skip() { if (Busy) Finish(DisplayCompletion.Skipped); }
         public void Cancel()
         {

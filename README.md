@@ -1,6 +1,5 @@
 # SocialStim
 
-A single-player, text-based social deduction game built with Unity and C#.
-Inspired by Town of Salem, Gnosia and Slaughter Horse 2.
+A single-player Unity/C# social deduction prototype.
 
-At least, in theory.
+The new mission is being implemented on feature branches. Start with [the audit](docs/AUDIT.md), [file inventory](docs/AUDIT_INVENTORY.md) and [content guide](Docs/CONTENT_GUIDE.md). Unity checks remain manual. Runs are self-contained, without gameplay saves.

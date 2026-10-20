@@ -18,6 +18,7 @@ namespace SocialStim.Presentation.Effects
         private EffectFrame _frame;
         private float _time;
         private bool _semanticColors = true;
+        private EffectsSettings _settings = new EffectsSettings();
         public void Initialize(TextMeshProUGUI label)
         { _label = label; _label.OnPreRenderText += Capture; }
         public void SetDocument(SemanticText document, int animatedStart, TextPalette palette)
@@ -29,6 +30,9 @@ namespace SocialStim.Presentation.Effects
         }
         public void SetPalette(TextPalette palette) { _palette = palette; }
         public void SetSemanticColors(bool enabled) { _semanticColors = enabled; }
+        /// <summary>Updates accessibility without restarting display or mesh ownership.</summary>
+        public void SetSettings(EffectsSettings settings)
+        { _settings = settings ?? throw new ArgumentNullException(nameof(settings)); _semanticColors = settings.Enabled; }
         public void Apply(int visibleUtf16, EffectFrame frame, float time)
         {
             if (_label == null || _document == null) return;
@@ -61,7 +65,10 @@ namespace SocialStim.Presentation.Effects
                 if (baseline == null || vertex + 3 >= baseline.Length) continue;
                 Color32 color = _palette.Accent(_semanticColors ? _styles[i] : SemanticStyle.Default);
                 if (character.index >= _visible) color.a = 0;
-                float strength = character.index >= _animatedStart ? _frame.Shake : 0;
+                float continuous = _settings.Enabled && !_settings.ReducedMotion && _styles[i] == SemanticStyle.Fear
+                    ? 0.2f * _settings.Intensity : 0;
+                float strength = character.index >= _animatedStart && character.index < _visible
+                    ? Math.Max(_frame.Shake, continuous) : 0;
                 Vector3 offset = new Vector3(Mathf.Sin(_time * 27 + i * 1.7f), Mathf.Cos(_time * 31 + i * 1.3f), 0) * (strength * 3);
                 for (int corner = 0; corner < 4; corner++)
                 {
