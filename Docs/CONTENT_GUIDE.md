@@ -55,7 +55,7 @@ Example object to add to the existing lines array:
   "text": "I could be wrong, but I'd like to hear more from {target}.",
   "weight": 2,
   "conditions": [
-    { "kind": "speakerTrait", "value": "Cautious" },
+    { "kind": "speakerTrait", "value": "Grim" },
     { "kind": "phase", "value": "Discussion" }
   ]
 }

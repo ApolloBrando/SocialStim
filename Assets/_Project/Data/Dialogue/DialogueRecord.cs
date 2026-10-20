@@ -25,7 +25,7 @@ namespace SocialStim.Data.Dialogue
                 throw new ArgumentException($"{_id}: unknown intent {_intent}.");
             Personality trait = Personality.None;
             if (!string.IsNullOrEmpty(_requiredTrait) && (!Enum.TryParse(_requiredTrait, true, out trait)
-                || (trait & ~(Personality.Aggressive | Personality.Cautious | Personality.Gullible | Personality.Loyal | Personality.Deceptive)) != 0))
+                || !Enum.IsDefined(typeof(Personality), trait)))
                 throw new ArgumentException($"{_id}: unknown speaker trait.");
             try
             {

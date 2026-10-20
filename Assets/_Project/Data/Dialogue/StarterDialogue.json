@@ -4,282 +4,282 @@
     {
       "id": "starter.Accuse.001",
       "intent": "Accuse",
-      "text": "<danger>{target}, I don't trust you yet.</danger>",
+      "text": "I suspect {target}.",
       "weight": 1
     },
     {
       "id": "starter.Accuse.002",
       "intent": "Accuse",
-      "text": "Something about {target} worries me.",
+      "text": "My concern is with {target}.",
       "weight": 1
     },
     {
       "id": "starter.Accuse.003",
       "intent": "Accuse",
-      "text": "Can we hear more from {target}?",
+      "text": "I question the account from {target}.",
       "weight": 1
     },
     {
       "id": "starter.Defend.001",
       "intent": "Defend",
-      "text": "<calm>Give me a moment to explain.</calm>",
+      "text": "I dispute the accusation against me.",
       "weight": 1
     },
     {
       "id": "starter.Defend.002",
       "intent": "Defend",
-      "text": "You're making a mistake about me.",
+      "text": "The case against me is unproven.",
       "weight": 1
     },
     {
       "id": "starter.Defend.003",
       "intent": "Defend",
-      "text": "I know you're worried. So am I.",
+      "text": "I ask you to review my account.",
       "weight": 1
     },
     {
       "id": "starter.ClaimRole.001",
       "intent": "ClaimRole",
-      "text": "<evidence>I'm the {role}.</evidence>",
+      "text": "My role is {role}.",
       "weight": 1
     },
     {
       "id": "starter.ClaimRole.002",
       "intent": "ClaimRole",
-      "text": "I should tell you: I'm the {role}.",
+      "text": "I am claiming the role of {role}.",
       "weight": 1
     },
     {
       "id": "starter.ClaimRole.003",
       "intent": "ClaimRole",
-      "text": "For the record, my role is {role}.",
+      "text": "I identify myself as the {role}.",
       "weight": 1
     },
     {
       "id": "starter.ReportInvestigation.001",
       "intent": "ReportInvestigation",
-      "text": "<evidence>I checked {target} last night. The result was {result}.</evidence>",
+      "text": "I investigated {target}. The result was {result}.",
       "weight": 1
     },
     {
       "id": "starter.ReportInvestigation.002",
       "intent": "ReportInvestigation",
-      "text": "My check on {target} came back {result}.",
+      "text": "My check on {target} returned {result}.",
       "weight": 1
     },
     {
       "id": "starter.ReportInvestigation.003",
       "intent": "ReportInvestigation",
-      "text": "I got {result} for {target}. That's what I have.",
+      "text": "The readout for {target} was {result}.",
       "weight": 1
     },
     {
       "id": "starter.Vouch.001",
       "intent": "Vouch",
-      "text": "I trust {target} for now.",
+      "text": "I support {target} for now.",
       "weight": 1
     },
     {
       "id": "starter.Vouch.002",
       "intent": "Vouch",
-      "text": "I'd give {target} another chance.",
+      "text": "I do not support eliminating {target}.",
       "weight": 1
     },
     {
       "id": "starter.Vouch.003",
       "intent": "Vouch",
-      "text": "Let's not rush to condemn {target}.",
+      "text": "I consider {target} worth hearing.",
       "weight": 1
     },
     {
       "id": "starter.CallForTrial.001",
       "intent": "CallForTrial",
-      "text": "I want {target} on trial.",
+      "text": "I want to put {target} on trial.",
       "weight": 1
     },
     {
       "id": "starter.CallForTrial.002",
       "intent": "CallForTrial",
-      "text": "{target}, we need some answers.",
+      "text": "I request a formal defense from {target}.",
       "weight": 1
     },
     {
       "id": "starter.CallForTrial.003",
       "intent": "CallForTrial",
-      "text": "Let's put {target} on trial and hear them out.",
+      "text": "I propose that we question {target}.",
       "weight": 1
     },
     {
       "id": "starter.Agree.001",
       "intent": "Agree",
-      "text": "I'm with {target} on this.",
+      "text": "I agree with {target}.",
       "weight": 1
     },
     {
       "id": "starter.Agree.002",
       "intent": "Agree",
-      "text": "{target} has a point.",
+      "text": "I support the position of {target}.",
       "weight": 1
     },
     {
       "id": "starter.Agree.003",
       "intent": "Agree",
-      "text": "That makes sense to me, {target}.",
+      "text": "I accept the point made by {target}.",
       "weight": 1
     },
     {
       "id": "starter.Disagree.001",
       "intent": "Disagree",
-      "text": "I'm not convinced, {target}.",
+      "text": "I disagree with {target}.",
       "weight": 1
     },
     {
       "id": "starter.Disagree.002",
       "intent": "Disagree",
-      "text": "I see it differently, {target}.",
+      "text": "I dispute the position of {target}.",
       "weight": 1
     },
     {
       "id": "starter.Disagree.003",
       "intent": "Disagree",
-      "text": "I can't go along with {target} on this.",
+      "text": "I do not accept the point from {target}.",
       "weight": 1
     },
     {
       "id": "starter.Deflect.001",
       "intent": "Deflect",
-      "text": "Why aren't we asking {target}?",
+      "text": "I want to question {target} as well.",
       "weight": 1
     },
     {
       "id": "starter.Deflect.002",
       "intent": "Deflect",
-      "text": "Ask {target} those questions too.",
+      "text": "I ask that you examine {target} too.",
       "weight": 1
     },
     {
       "id": "starter.Deflect.003",
       "intent": "Deflect",
-      "text": "{target} has some explaining to do as well.",
+      "text": "I would direct these questions to {target}.",
       "weight": 1
     },
     {
       "id": "starter.StaySilent.001",
       "intent": "StaySilent",
-      "text": "(listens)",
+      "text": "I will listen for now.",
       "weight": 1
     },
     {
       "id": "starter.StaySilent.002",
       "intent": "StaySilent",
-      "text": "(stays quiet)",
+      "text": "I have nothing to add.",
       "weight": 1
     },
     {
       "id": "starter.StaySilent.003",
       "intent": "StaySilent",
-      "text": "(says nothing)",
+      "text": "I will withhold a statement.",
       "weight": 1
     },
     {
       "id": "starter.ExpressFear.001",
       "intent": "ExpressFear",
-      "text": "<fear>I don't know who to trust.</fear>",
+      "text": "Our safety has not been established.",
       "weight": 1
     },
     {
       "id": "starter.ExpressFear.002",
       "intent": "ExpressFear",
-      "text": "I'm dreading tonight.",
+      "text": "I cannot rule out further attacks.",
       "weight": 1
     },
     {
       "id": "starter.ExpressFear.003",
       "intent": "ExpressFear",
-      "text": "What if we get this wrong?",
+      "text": "We have not identified every threat.",
       "weight": 1
     },
     {
       "id": "starter.ReactToDeath.001",
       "intent": "ReactToDeath",
-      "text": "I was hoping we'd all make it.",
+      "text": "We need to account for this death.",
       "weight": 1
     },
     {
       "id": "starter.ReactToDeath.002",
       "intent": "ReactToDeath",
-      "text": "We can't let this keep happening.",
+      "text": "A death requires us to reassess.",
       "weight": 1
     },
     {
       "id": "starter.ReactToDeath.003",
       "intent": "ReactToDeath",
-      "text": "It's hard to talk with someone missing.",
+      "text": "We should examine what led to this.",
       "weight": 1
     },
     {
       "id": "starter.ReactToRoleReveal.001",
       "intent": "ReactToRoleReveal",
-      "text": "That changes things.",
+      "text": "The revealed role changes our information.",
       "weight": 1
     },
     {
       "id": "starter.ReactToRoleReveal.002",
       "intent": "ReactToRoleReveal",
-      "text": "We should go back over what they told us.",
+      "text": "We should review the revealed account.",
       "weight": 1
     },
     {
       "id": "starter.ReactToRoleReveal.003",
       "intent": "ReactToRoleReveal",
-      "text": "Think about who believed their claim.",
+      "text": "We need to reconsider the earlier claims.",
       "weight": 1
     },
     {
       "id": "starter.LastWords.001",
       "intent": "LastWords",
-      "text": "<emphasis>Remember who pushed for this.</emphasis>",
+      "text": "Review my statements after the elimination.",
       "weight": 1
     },
     {
       "id": "starter.LastWords.002",
       "intent": "LastWords",
-      "text": "I've said all I can.",
+      "text": "I have no further information to provide.",
       "weight": 1
     },
     {
       "id": "starter.LastWords.003",
       "intent": "LastWords",
-      "text": "Be careful with your next choice.",
+      "text": "Consider the remaining evidence before voting again.",
       "weight": 1
     },
     {
       "id": "starter.VoteJustification.001",
       "intent": "VoteJustification",
-      "text": "I voted for what seemed right.",
+      "text": "My vote followed my assessment.",
       "weight": 1
     },
     {
       "id": "starter.VoteJustification.002",
       "intent": "VoteJustification",
-      "text": "It was the best call I could make.",
+      "text": "I voted on the available information.",
       "weight": 1
     },
     {
       "id": "starter.VoteJustification.003",
       "intent": "VoteJustification",
-      "text": "I know my vote matters.",
+      "text": "I chose according to my current conclusion.",
       "weight": 1
     },
     {
       "id": "starter.social.accuse.aggressive",
       "intent": "Accuse",
-      "text": "{target}, people are asking questions. Answer them.",
+      "text": "{target}, answer the accusation directly. I will stand behind my challenge.",
       "weight": 3,
       "conditions": [
         {
           "kind": "speakerTrait",
-          "value": "Aggressive"
+          "value": "Brave"
         },
         {
           "kind": "phase",
@@ -291,12 +291,13 @@
       ],
       "metadata": {
         "emotionKey": "tense"
-      }
+      },
+      "requiredTrait": "Brave"
     },
     {
       "id": "starter.social.defend.pressure",
       "intent": "Defend",
-      "text": "I can feel everyone turning on me. Please, let me explain.",
+      "text": "I dispute the case being made against me.",
       "weight": 3,
       "conditions": [
         {
@@ -311,7 +312,7 @@
     {
       "id": "starter.social.claim.trial",
       "intent": "ClaimRole",
-      "text": "Before you decide, you should know I'm the {role}.",
+      "text": "Before the verdict, my role is {role}.",
       "weight": 3,
       "conditions": [
         {
@@ -330,7 +331,7 @@
     {
       "id": "starter.social.death.observed",
       "intent": "ReactToDeath",
-      "text": "There's an empty place here today. We need to get this right.",
+      "text": "An observed death requires another review.",
       "weight": 3,
       "conditions": [
         {
@@ -348,7 +349,7 @@
     {
       "id": "starter.social.report.dawn",
       "intent": "ReportInvestigation",
-      "text": "I checked {target} last night. They appeared {result}.",
+      "text": "Last night I checked {target}. They appeared {result}.",
       "weight": 3,
       "conditions": [
         {
@@ -371,12 +372,12 @@
     {
       "id": "starter.social.vouch.claim",
       "intent": "Vouch",
-      "text": "Let's give {target} a chance to back that up.",
+      "text": "Let {target} back that claim up. I will make sure they get a hearing.",
       "weight": 3,
       "conditions": [
         {
           "kind": "speakerTrait",
-          "value": "Loyal"
+          "value": "Brave"
         },
         {
           "kind": "targetHasClaim"
@@ -384,7 +385,8 @@
       ],
       "metadata": {
         "emotionKey": "tense"
-      }
+      },
+      "requiredTrait": "Brave"
     },
     {
       "id": "report-action.1",
@@ -395,109 +397,109 @@
     {
       "id": "report-action.2",
       "intent": "ReportAction",
-      "text": "About last night: {result}",
+      "text": "Recorded action and results: {result}",
       "weight": 1
     },
     {
       "id": "report-action.3",
       "intent": "ReportAction",
-      "text": "Here's what happened: {result}",
+      "text": "My account of last night: {result}",
       "weight": 1
     },
     {
       "id": "starter.Accuse.004",
       "intent": "Accuse",
-      "text": "I think we should take a closer look at {target}.",
+      "text": "I want to examine {target} further.",
       "weight": 1
     },
     {
       "id": "starter.Defend.004",
       "intent": "Defend",
-      "text": "Please hear me out before you decide.",
+      "text": "I have not been shown to be guilty.",
       "weight": 1
     },
     {
       "id": "starter.ClaimRole.004",
       "intent": "ClaimRole",
-      "text": "I've kept this quiet, but I'm the {role}.",
+      "text": "You should know that I am the {role}.",
       "weight": 1
     },
     {
       "id": "starter.ReportInvestigation.004",
       "intent": "ReportInvestigation",
-      "text": "I looked into {target}. They appeared {result}.",
+      "text": "I examined {target} and received {result}.",
       "weight": 1
     },
     {
       "id": "starter.Vouch.004",
       "intent": "Vouch",
-      "text": "I'm willing to back {target}.",
+      "text": "I ask you to reconsider {target}.",
       "weight": 1
     },
     {
       "id": "starter.CallForTrial.004",
       "intent": "CallForTrial",
-      "text": "I think it's time to question {target} properly.",
+      "text": "I want a trial to examine {target}.",
       "weight": 1
     },
     {
       "id": "starter.Agree.004",
       "intent": "Agree",
-      "text": "I think {target} is right.",
+      "text": "I share the conclusion reached by {target}.",
       "weight": 1
     },
     {
       "id": "starter.Disagree.004",
       "intent": "Disagree",
-      "text": "Hold on, {target}. I'm not sure about that.",
+      "text": "I reach a different conclusion from {target}.",
       "weight": 1
     },
     {
       "id": "starter.Deflect.004",
       "intent": "Deflect",
-      "text": "We've barely heard from {target}.",
+      "text": "I suggest we also consider {target}.",
       "weight": 1
     },
     {
       "id": "starter.StaySilent.004",
       "intent": "StaySilent",
-      "text": "(waits)",
+      "text": "I will let the discussion continue.",
       "weight": 1
     },
     {
       "id": "starter.ExpressFear.004",
       "intent": "ExpressFear",
-      "text": "I wish I felt safer here.",
+      "text": "I consider our position uncertain.",
       "weight": 1
     },
     {
       "id": "starter.ReactToDeath.004",
       "intent": "ReactToDeath",
-      "text": "I keep expecting them to speak.",
+      "text": "This death affects the remaining discussion.",
       "weight": 1
     },
     {
       "id": "starter.ReactToRoleReveal.004",
       "intent": "ReactToRoleReveal",
-      "text": "Now we know a little more.",
+      "text": "This role reveal narrows the possibilities.",
       "weight": 1
     },
     {
       "id": "starter.LastWords.004",
       "intent": "LastWords",
-      "text": "I hope this helps you see things clearly.",
+      "text": "My account is now complete.",
       "weight": 1
     },
     {
       "id": "starter.VoteJustification.004",
       "intent": "VoteJustification",
-      "text": "I wasn't certain. I had to choose.",
+      "text": "My vote reflected an uncertain decision.",
       "weight": 1
     },
     {
       "id": "starter.ReportAction.004",
       "intent": "ReportAction",
-      "text": "My report: {result}",
+      "text": "My night report follows: {result}",
       "weight": 1
     }
   ]
