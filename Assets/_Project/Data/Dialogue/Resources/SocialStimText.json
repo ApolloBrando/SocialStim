@@ -178,10 +178,6 @@
       "text": "Share your unease."
     },
     {
-      "id": "choice.honestReport",
-      "text": "Report {name} as {result}"
-    },
-    {
       "id": "choice.judge",
       "text": "Vote"
     },

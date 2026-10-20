@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace SocialStim.Rules.Dialogue
@@ -28,6 +29,12 @@ namespace SocialStim.Rules.Dialogue
         }
         /// <summary>All loaded content IDs, for validation and authoring tools.</summary>
         public IEnumerable<string> Keys => _entries.Keys;
+        /// <summary>Named variables used by one template, for import-time contract validation.</summary>
+        public IEnumerable<string> Variables(string id)
+        {
+            if (!_entries.TryGetValue(id, out string text)) throw new ArgumentException("Missing text ID: " + id);
+            return Tokens.Matches(text).Cast<Match>().Select(m => m.Groups[1].Value).Distinct(StringComparer.Ordinal).ToArray();
+        }
         /// <summary>Formats one authored template with speaker-authorized values, independently of any game RNG.</summary>
         public string Render(string id, params (string Key, object Value)[] values)
         {

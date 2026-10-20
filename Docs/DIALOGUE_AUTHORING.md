@@ -1,5 +1,9 @@
 # Dialogue authoring specification
 
+Browse every current entry in [DIALOGUE_CATALOGUE.md](DIALOGUE_CATALOGUE.md).
+The [editing guide](DIALOGUE_GUIDE.md) also covers narration, result templates and
+interface copy, now stored separately in editable SocialStimText.json.
+
 The current starter document has 70 natural, editable prototype lines.
 Version 2 supports the conditions below; version 1 still loads without conditions.
 A runtime loader, schema validator and editor menu validate content. No runtime
@@ -60,8 +64,8 @@ fallback for every intent; copy the starter document before adding variants:
 Supported variables are `{speaker}`, `{target}`, `{role}`, `{result}`, and `{day}`;
 `{role}` means the role being asserted in this speech context, not necessarily a
 true secret role. Other contexts expose explicit values only when allowed.
-The current text view has rich text disabled. Future markup views must escape
-substitutions before interpreting styles. No reflected
+The current view parses semantic markup and leaves TMP rich text disabled.
+Substitutions must preserve markup validity; they never grant hidden information. No reflected
 property access or arbitrary string-to-code evaluation is permitted.
 
 ## Version 2 conditions
@@ -147,8 +151,8 @@ once by RunSession; omit a name prefix from each line. Selection does not parse 
 ## Presentation boundary
 
 Presentation supports the exact semantic syntax below. Rules keep text opaque;
-style never changes an intent, evidence or eligibility. Planning names such as
-shout and whisper are not supported tags.
+style never changes an intent, evidence or eligibility. Additional semantic styles, including shout and whisper, are supported by the
+expanded effects system; see [EXPANDED_EFFECTS.md](EXPANDED_EFFECTS.md).
 
 All key information must remain readable with effects, motion, flashes, and
 color distinctions disabled. Effect profiles must never change a line's factual

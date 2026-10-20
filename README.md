@@ -23,3 +23,8 @@ The [interaction/UI overhaul](Docs/INTERACTION_UI.md) replaces menu hierarchies
 with action → roster target → authored phrasing, a single current line, two-press
 reveal/advance and an information drawer. Shared legality checks enforce role
 claim permissions and actual honest investigation results. Unity QA remains pending.
+
+All current dialogue and game copy is editable in JSON. Use the
+[complete dialogue catalogue](Docs/DIALOGUE_CATALOGUE.md) to browse every entry
+and the [editing guide](Docs/DIALOGUE_GUIDE.md) to change it. Narration, result
+wording, choices and interface copy have no hardcoded prose fallback.

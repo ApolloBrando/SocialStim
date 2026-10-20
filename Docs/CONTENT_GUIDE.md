@@ -1,5 +1,8 @@
 # Editing SocialStim
 
+Use [DIALOGUE_CATALOGUE.md](DIALOGUE_CATALOGUE.md) to browse all dialogue and copy,
+and [DIALOGUE_GUIDE.md](DIALOGUE_GUIDE.md) for the current JSON editing workflow.
+
 Edits apply when you start a new run. Keep Unity assets and their existing
 .meta files together; create and duplicate assets inside Unity.
 
@@ -13,13 +16,13 @@ Paths below are relative to the repository root.
 | Character names and active content references | Assets/_Project/ScriptableObjects/Catalogs/StarterCatalog.asset |
 | Role names, factions, abilities and resources | Assets/_Project/ScriptableObjects/Roles/*.asset |
 | Exact role slots and scalable faction shares | Assets/_Project/ScriptableObjects/Setups/StarterRoleList.asset |
-| Participant count, seed, discussion/trial limits, death reveals | Assets/_Project/Scenes/Game.unity → SocialStim → GameBootstrap |
-| First-person night-action phrases | Assets/_Project/Rules/Dialogue/NightActionText.cs |
-| Report-result sentences, announcements and outcome text | Assets/_Project/Rules/Phases/RunSession.cs → DescribeReport, DeliverReport, Move, FinishIfTerminal |
-| Choice titles and short explanations | Assets/_Project/Application/Sessions/GameController.cs |
-| Readable phase/action names | Assets/_Project/Application/Input/ActionLabels.cs |
-| Setup, status, menu and accessibility text; layout | Assets/_Project/Presentation/Text/TextGameView.cs |
-| Participant card labels | Assets/_Project/Presentation/Text/ParticipantCard.cs |
+| Participant count, seed, discussion/trial limits, death reveals | In-game Settings → Game (next run) |
+| First-person night-action phrases | Assets/_Project/Data/Dialogue/Resources/SocialStimText.json → night.selection / night.claimed |
+| Report-result sentences, announcements and outcome text | Assets/_Project/Data/Dialogue/Resources/SocialStimText.json → report / vote / death / phase / outcome |
+| Choice titles and short explanations | Assets/_Project/Data/Dialogue/Resources/SocialStimText.json → choice |
+| Readable phase/action names | Assets/_Project/Data/Dialogue/Resources/SocialStimText.json → label |
+| Setup, status, menus, help and settings wording | Assets/_Project/Data/Dialogue/Resources/SocialStimText.json |
+| Participant card labels | Assets/_Project/Data/Dialogue/Resources/SocialStimText.json → roster / mark |
 | Fonts and button/panel construction | Assets/_Project/Presentation/Text/TextUiFactory.cs |
 | Day/night surfaces and semantic text colors | Assets/_Project/Presentation/Effects/TextPalette.cs |
 | Text reveal speed defaults | Assets/_Project/Application/PresentationCues/EffectsSettings.cs |
@@ -31,8 +34,8 @@ Paths below are relative to the repository root.
 | Faction and personal win rules | Assets/_Project/Rules/Victory/CapabilityWinCondition.cs and Rules/Phases/RunSession.cs → PlayerWon |
 
 The JSON contains conversation variants. Specific ability reports are assembled
-from templates in the scripts listed above so they retain the actual target,
-result and night. Menu copy is currently C# text, not a localization database.
+from editable SocialStimText.json templates using the authorized target, result
+and night. Scripts choose semantic keys; their text is not embedded in code.
 The catalog references one dialogue JSON file; adding a second file does not
 automatically load it. Replace the reference or extend the importer explicitly.
 
@@ -77,8 +80,9 @@ Registered intents: Accuse, Defend, ClaimRole, ReportInvestigation, Vouch,
 CallForTrial, Agree, Disagree, Deflect, StaySilent, ExpressFear, ReactToDeath,
 ReactToRoleReveal, LastWords, VoteJustification, ReportAction.
 
-Supported styles are `<emphasis>`, `<fear>`, `<calm>`, `<evidence>` and `<danger>`, each
-with a matching closing tag. Use `<<` for a literal less-than sign. Do not use
+Semantic styles include `<emphasis>`, `<fear>`, `<calm>`, `<evidence>`, `<danger>`,
+`<rage>`, `<whisper>`, `<shout>`, `<lie-tell>`, `<dread>` and `<glitch>`, each with a
+matching closing tag. See [EXPANDED_EFFECTS.md](EXPANDED_EFFECTS.md). Use `<<` for a literal less-than sign. Do not use
 TMP/HTML tags. A line's meaning must remain clear with effects disabled.
 
 Conditions combine with AND. speakerRole tests the speaker's real known role;
@@ -97,8 +101,9 @@ assigned from the seed in RunFactory.Create.
 
 ## Change participant count and role composition
 
-Open Game.unity, select SocialStim and change Participant Count on GameBootstrap.
-This includes the player and defaults to 9.
+Open in-game Settings → Game and change Participants for the next run.
+This includes the player and defaults to 9. Existing asset-level setup details
+below describe RoleList APIs; the current settings UI supports 5–20 participants.
 
 - Positive count: use scalable faction shares from StarterRoleList. At least
   three participants are required. There is no fixed upper player or role-catalog
@@ -126,8 +131,8 @@ for example, a three-person setup cannot replace its only required killer
 with a non-killing Forger. Larger populations need balance/playtesting; a
 configurable count is not a promise that every size is fun or fast.
 
-Participant and claim strips scroll horizontally rather than squeezing all
-entries into one row. Action menus remain grouped and paged.
+The roster scrolls horizontally. Interaction follows action → target → phrasing,
+with public claim history in the information drawer.
 
 ## Add a role using an existing ability
 

@@ -23,6 +23,8 @@ jobs:
           dotnet-version: '8.0.x'
       - name: Validate project structure
         run: python3 Tools/validate_scaffold.py
+      - name: Check complete dialogue catalogue
+        run: python3 Tools/dialogue_catalogue.py --check
       - name: Compile against the older NUnit assertion API
         if: matrix.nunit == '3.5.0'
         run: dotnet build Tools/HeadlessTests/SocialStim.HeadlessTests.csproj --configuration Release -p:NUnitVersion=3.5.0

@@ -427,3 +427,17 @@ The [interaction/UI overhaul](Docs/INTERACTION_UI.md) replaces menu hierarchies
 with action → roster target → authored phrasing, a single current line, two-press
 reveal/advance and an information drawer. Shared legality checks enforce role
 claim permissions and actual honest investigation results. Unity QA remains pending.
+
+## Editable dialogue and copy
+
+Spoken choices remain in StarterDialogue.json. SocialStimText.json is a separate
+Resources text asset for narration, result templates, command labels and interface
+wording. GameText is the Unity loading adapter; TextDocument is a strict portable
+reader; TextTemplates is an immutable Rules-layer lookup with named substitution.
+RunFactory requires the catalog explicitly. No mutable global catalog or hardcoded
+prose fallback exists. TextCatalogContract verifies required IDs before a run is
+created. IDs and enum values remain code-level semantics; wording is editable.
+GameObservation keeps raw SpokenText separately from attributed transcript text,
+so authors can rewrite attribution without duplicating speaker labels.
+Tools/dialogue_catalogue.py generates the complete reference and checks freshness
+and missing bindings in CI. Existing asset GUIDs and scene references are retained.

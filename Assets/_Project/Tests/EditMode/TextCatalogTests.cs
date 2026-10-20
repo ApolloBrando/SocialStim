@@ -52,6 +52,9 @@ namespace SocialStim.Tests.EditMode
             Assert.Throws<ArgumentException>(() => TextCatalogContract.Validate(new TextTemplates(new[] { new KeyValuePair<string, string>("one", "Only one.") })));
             Assert.Throws<ArgumentException>(() => TestContent.Text.Render("missing"));
             Assert.Throws<ArgumentException>(() => TestContent.Text.Render("run.identity"));
+            var unavailable = new TextTemplates(TestContent.Text.Keys.Select(k => new KeyValuePair<string, string>(k,
+                k == "run.identity" ? "Unknown {unavailable}." : RenderOriginal(k))));
+            Assert.Throws<ArgumentException>(() => TextCatalogContract.Validate(unavailable));
         }
         [TestCase("{\"schemaVersion\":2,\"entries\":[]}")]
         [TestCase("{\"schemaVersion\":1,\"entries\":[],\"extra\":0}")]
