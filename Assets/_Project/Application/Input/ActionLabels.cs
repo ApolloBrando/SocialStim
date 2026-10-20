@@ -30,6 +30,8 @@ namespace SocialStim.Application.Input
             {
                 case GamePhase.Discussion: return "Discussion";
                 case GamePhase.Nomination: return "Nominations";
+                case GamePhase.Voting: return "Vote";
+                case GamePhase.VoteReveal: return "Vote reveal";
                 case GamePhase.Defense: return "Defense";
                 case GamePhase.Judgement: return "Judgement";
                 case GamePhase.LastWords: return "Last words";

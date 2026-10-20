@@ -26,6 +26,12 @@ namespace SocialStim.Presentation.Text
         [SerializeField] private int _fixedSeed = 147;
         [SerializeField, Range(1, 10)] private int _trialsPerDay = 2;
         [SerializeField, Range(1, 10)] private int _discussionRounds = 3;
+        [SerializeField] private VotingMode _votingMode = VotingMode.Gnosia;
+        [SerializeField, Range(3, 7)] private int _groupDiscussionRounds = 5;
+        [SerializeField, Range(1, 2)] private int _playerWindowsPerRound = 1;
+        [SerializeField] private bool _allowAbstain = true;
+        [SerializeField] private bool _revoteTies = true;
+        [SerializeField] private bool _lastWords = true;
         [SerializeField] private bool _revealOnDeath = true;
         [Tooltip("Total participants, including you. Zero uses the exact authored role slots.")]
         [SerializeField, Min(0)] private int _participantCount = 9;
@@ -136,7 +142,10 @@ namespace SocialStim.Presentation.Text
             {
                 uint seed = _randomSeed ? BitConverter.ToUInt32(Guid.NewGuid().ToByteArray(), 0) : unchecked((uint)_fixedSeed);
                 var roles = _catalog.LoadRoles();
-                var options = new RunOptions(seed, chosenRole, _trialsPerDay, _discussionRounds, _revealOnDeath);
+                var options = new RunOptions(seed, chosenRole, _trialsPerDay,
+                    _votingMode == VotingMode.Trial ? _discussionRounds : _groupDiscussionRounds, _revealOnDeath,
+                    votingMode: _votingMode, playerWindowsPerRound: _playerWindowsPerRound,
+                    allowAbstain: _allowAbstain, revoteTies: _revoteTies, lastWords: _lastWords);
                 var session = RunFactory.Create(options, roles, _catalog.LoadNames(), _catalog.LoadDialogue(), reasoning: _catalog.LoadReasoning(), setup: _catalog.LoadSetup(_participantCount));
                 _presenter = new GamePresenter(new GameController(session, roles), _view, _view);
             }

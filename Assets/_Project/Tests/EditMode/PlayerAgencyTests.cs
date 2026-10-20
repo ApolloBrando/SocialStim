@@ -14,7 +14,7 @@ namespace SocialStim.Tests.EditMode
     public sealed class PlayerAgencyTests
     {
         private static RunSession Scenario(ScenarioStrategy strategy, bool reveal = true) => RunFactory.CreateScenario(
-            new RunOptions(123, discussionRounds: 1, revealOnDeath: reveal), new[]
+            new RunOptions(123, discussionRounds: 1, revealOnDeath: reveal, votingMode: VotingMode.Trial), new[]
             {
                 new CastMemberSpec("Player", new RoleId("interrupter")),
                 new CastMemberSpec("Investigator", new RoleId("inspector")),
@@ -89,7 +89,7 @@ namespace SocialStim.Tests.EditMode
             {
                 OnSpeech = knowledge => observed[knowledge.Self] = knowledge.Characters.Single(c => c.Id.Value == 0).Suspicion,
             };
-            var run = RunFactory.CreateScenario(new RunOptions(123, discussionRounds: 3), new[]
+            var run = RunFactory.CreateScenario(new RunOptions(123, discussionRounds: 3, votingMode: VotingMode.Trial), new[]
             {
                 new CastMemberSpec("Player", new RoleId("interrupter")),
                 new CastMemberSpec("Listener1", new RoleId("inspector")),

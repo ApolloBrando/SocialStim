@@ -41,6 +41,19 @@ namespace SocialStim.Rules.Reasoning
             if (definition != null) AssertAlignment(speaker, definition.Faction, credibility);
         }
 
+        internal Faction? KnownFaction(CharacterId target)
+        {
+            if (_known.TryGetValue(target, out Faction known)) return known;
+            Faction? onlyRemaining = null;
+            for (int i = 0; i < 3; i++)
+            {
+                if (_setup.For((Faction)i) <= _known.Values.Count(f => (int)f == i)) continue;
+                if (onlyRemaining.HasValue) return null;
+                onlyRemaining = (Faction)i;
+            }
+            return onlyRemaining;
+        }
+
         internal FactionEstimate Factions(CharacterId target)
         {
             if (_known.TryGetValue(target, out Faction known))

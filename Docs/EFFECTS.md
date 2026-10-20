@@ -16,8 +16,8 @@ The callback fires exactly once as Completed, Skipped, or Cancelled. It is clear
 before invocation, including under reentrant skip/cancel. Rules already completed
 the command; effects never call rules, consume RNG, or determine outcomes.
 `IGameView.IsDisplaying` blocks the next player command in the presenter as well
-as disabling choice buttons. Skip reveals the whole queued batch and restores
-all owned output. New run cancels the active line and discards unstarted lines;
+as disabling choice buttons. Skip reveals the whole queued batch, clears screen pulses and retains explicitly
+continuous motion on the final current line until replacement/cancellation. New run cancels the active line and discards unstarted lines;
 unstarted lines never acquired a display acknowledgement. Disable resets display.
 
 The renderer builds strings, parses markup and caches mesh buffers at line/layout
@@ -34,9 +34,9 @@ toward soft red. Hidden selections do not drive the palette. Rounded surfaces,
 subtle frames and shadows remain when effects are off. Focus uses both a sage
 tint and the textual > marker.
 
-The footer normally shows Skip, Speed and Display options. The options toggle
-reveals effects, motion, flashes, instant text and intensity controls. Defaults
-are reduced motion, flashes off, 50% intensity and 28 text elements/second.
+The footer shows Skip and Display options. The separate options panel contains
+effects, motion, flashes, instant text, intensity, speed and Reset display defaults.
+Defaults are reduced motion, flashes off, 50% intensity and 84 text elements/second.
 Presentation preferences persist with PlayerPrefs; no run state is written.
 Changing a display policy finishes the pending batch first.
 
@@ -68,8 +68,8 @@ style wins. One source line allows 32768 UTF-16 units. Unknown tags, attributes,
 unmatched tags, raw TMP tags and sprite/material injection are rejected. Rules
 still select opaque text; only presentation parses it. Runtime displays malformed
 text literally with TMP rich text disabled. Tools > SocialStim > Validate Starter
-Content rejects invalid authored markup. Five existing PLACEHOLDER lines demonstrate
-the supported syntax; the owner remains responsible for final dialogue.
+Content rejects invalid authored markup. The starter lines demonstrate the supported syntax. The Mission part two assigns
+future authored dialogue expansion to implementation; the current pool has 70 lines.
 
 | Speech intent | Recommended emphasis |
 | --- | --- |
@@ -127,7 +127,8 @@ the portable builder offers Parallel followed by Then for explicit composition.
 Replacement tracks choose the highest priority; equal priority chooses the later
 authored track. All additive tracks then sum over the winning replacement, with
 the final channel clamped to [0,1]. Different observations play sequentially.
-Skip/cancel clears every channel and restores the current text's baseline vertices.
+Cancel clears every channel and restores baseline vertices. Skip clears screen
+pulses but preserves explicitly continuous TextShake on the current line.
 Semantic text color is a cached style channel, not a source of facts. All screen
 geometry ignores raycasts and uses the existing UI material.
 
@@ -151,8 +152,8 @@ light text. Daytime warmth progresses from pale yellow toward soft red as
 public spoken lines and trial stages accumulate; it uses no real gameplay
 clock or secret tension. Fixed frames remain visible with effects disabled.
 
-Default reveal speed is 28 graphemes/second, with a stable per-speaker tempo and
-0.65–1.65 second per-line reading holds. These derive from public observation
+Default reveal speed is 84 text elements/second, with a stable per-speaker tempo and
+0.20–0.54 second per-line reading holds. These derive from public observation
 IDs and do not use rules RNG. Skip bypasses the holds. Instant text bypasses
 typing/reading holds while enabled cue effects retain their own duration.
 Role claims receive a ROLE CLAIM label, Evidence styling and an unverified
@@ -162,3 +163,15 @@ status/cast updates wait for display completion.
 The cozy UI uses rounded native surfaces, soft frames/shadows, warm daylight,
 a slate night palette and a sage focus tint. Text speed and accessibility
 preferences persist independently of runs; there is no game save/load UI.
+
+## Continuous motion repair (mission phase 0)
+
+EffectStep supports explicit continuous text motion. Other channels reject this
+mode, so screen/flash pulses cannot become unbounded. Text-motion intensity still
+obeys enabled/reduced-motion/intensity settings. EffectSequence preserves the flag;
+EffectTrackDefinition exposes it as a private serialized inspector option.
+The default tense cue retains shake. Other authored pulses remain finite unless
+explicitly changed. The clock continues after acknowledgement without blocking
+input or sending another callback; replacement/Cancel clears the retained state.
+This repairs cue motion lifetime. Independent span stacks and the extended effect
+catalog remain planned work, with their validation listed in AUDIT.md.

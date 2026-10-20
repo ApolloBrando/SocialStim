@@ -32,6 +32,8 @@ namespace SocialStim.Rules.Commands
         public static GameCommand ReportLastAction() => new GameCommand(CommandKind.ReportLastAction);
         /// <summary>Nominates a participant, or abstains.</summary>
         public static GameCommand Nominate(CharacterId? target) => new GameCommand(CommandKind.Nominate, target);
+        /// <summary>Casts a daily plurality ballot; null is an abstention when enabled.</summary>
+        public static GameCommand Vote(CharacterId? target) => new GameCommand(CommandKind.Vote, target);
         /// <summary>Submits a judgement stance.</summary>
         public static GameCommand Judge(Verdict verdict) => new GameCommand(CommandKind.Judge, verdict: verdict);
         /// <summary>Chooses a night target, or passes.</summary>

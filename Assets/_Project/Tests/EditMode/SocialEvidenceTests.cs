@@ -111,6 +111,9 @@ namespace SocialStim.Tests.EditMode
                 Assert.That(model.Roles(id).Sum(r => r.BasisPoints), Is.EqualTo(10000));
             }
             Assert.That(model.Factions(new CharacterId(1)).Antagonist, Is.Zero);
+            Assert.That(model.KnownFaction(new CharacterId(1)), Is.Null);
+            model.Reveal(new CharacterId(4), TestContent.Roles()[4], 2);
+            Assert.That(model.KnownFaction(new CharacterId(1)), Is.EqualTo(Faction.Town));
         }
 
         /// <summary>Gullibility increases uncertain-assertion influence compared with caution.</summary>
