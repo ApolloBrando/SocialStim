@@ -15,7 +15,7 @@ namespace SocialStim.Tests.EditMode
     public sealed class DialogueConditionTests
     {
         private static DialogueContext Context(GamePhase phase = GamePhase.Discussion, int day = 2, EvidenceRecord[] evidence = null)
-            => new DialogueContext(new CharacterId(0), "Ada", "Bram", "", "", day, new RoleId("inspector"), Personality.Aggressive,
+            => new DialogueContext(new CharacterId(0), "Ada", "Bram", "", "", day, new RoleId("inspector"), Personality.Brave,
                 phase, new CharacterId(1), evidence);
 
         /// <summary>Conditions are AND-combined and context changes select the generic fallback safely.</summary>

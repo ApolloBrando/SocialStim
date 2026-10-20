@@ -1,8 +1,5 @@
-using System;
-
 namespace SocialStim.Rules.Cast
 {
-    /// <summary>Independent behavior tendencies; flags may coexist.</summary>
-    [Flags]
-    public enum Personality { None = 0, Aggressive = 1, Cautious = 2, Gullible = 4, Loyal = 8, Deceptive = 16 }
+    /// <summary>One NPC voice/behavior trait. None belongs only to the player or an unassigned scenario slot.</summary>
+    public enum Personality { None = 0, Anxious = 1, Brave = 2, Slow = 4, Chatterbox = 8, Smug = 16, Grim = 32, Jokester = 64 }
 }

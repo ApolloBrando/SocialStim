@@ -1,9 +1,7 @@
 using System;
-using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using SocialStim.Application.Sessions;
-using SocialStim.Data.Dialogue;
 using SocialStim.Rules.Cast;
 using SocialStim.Rules.Phases;
 using SocialStim.Rules.Randomness;
@@ -18,12 +16,7 @@ namespace SocialStim.Tests.EditMode
         [TestCase(VotingMode.Trial)]
         public void EveryPlayerRoleHasLegalTerminatingSeededRuns(VotingMode mode)
         {
-#if UNITY_EDITOR
-            string path = Path.Combine(UnityEngine.Application.dataPath, "_Project/Data/Dialogue/StarterDialogue.json");
-#else
-            string path = Path.Combine(TestContext.CurrentContext.TestDirectory, "StarterDialogue.json");
-#endif
-            var dialogue = DialogueDocument.Parse(File.ReadAllText(path));
+            var dialogue = TestContent.AuthoredLines();
             var roles = AdvancedRoleTests.Roles();
             int completed = 0;
             foreach (RoleSpec role in roles)

@@ -19,7 +19,7 @@ namespace SocialStim.Tests.EditMode
         [Test]
         public void RecentLinesDoNotRepeatUntilPoolIsExhausted()
         {
-            var lines = TestContent.Lines().Concat(new[] { new DialogueLine("restricted", SpeechIntent.Accuse, "secret", 1000, Personality.Aggressive) });
+            var lines = TestContent.Lines().Concat(new[] { new DialogueLine("restricted", SpeechIntent.Accuse, "secret", 1000, Personality.Brave) });
             var selector = new DialogueSelector(lines, new SeededRandom(55));
             string[] choices = Enumerable.Range(0, 4).Select(_ => selector.Select(SpeechIntent.Accuse, Context()).Id).ToArray();
             Assert.That(choices.Distinct().Count(), Is.EqualTo(4));
@@ -39,7 +39,7 @@ namespace SocialStim.Tests.EditMode
         [Test]
         public void MarkupRemainsOpaque()
         {
-            var lines = TestContent.Lines().Where(l => l.Intent != SpeechIntent.Accuse).Concat(new[] { new DialogueLine("opaque", SpeechIntent.Accuse, "<fear>{target}</fear> claims {role}") });
+            var lines = TestContent.Lines().Where(l => l.Intent != SpeechIntent.Accuse || l.RequiredTrait != Personality.None).Concat(new[] { new DialogueLine("opaque", SpeechIntent.Accuse, "<fear>{target}</fear> claims {role}") });
             string text = new DialogueSelector(lines, new SeededRandom(1)).Select(SpeechIntent.Accuse, Context()).Text;
             Assert.That(text, Is.EqualTo("<fear>Bram</fear> claims Physician"));
         }

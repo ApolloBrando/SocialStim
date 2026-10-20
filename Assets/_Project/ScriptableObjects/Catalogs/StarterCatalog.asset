@@ -25,6 +25,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f89f6dd8a81f2649119c5e0af191d689, type: 2}
   - {fileID: 11400000, guid: b9e8fe6ef3e23b1a8878783ef4137236, type: 2}
   _dialogue: {fileID: 4900000, guid: 6fd77ad880715fdab8117758bb098e9a, type: 3}
+  _npcDialogue:
+  - {fileID: 4900000, guid: 6207358fc0034734b190c46e703ebe85, type: 3}
+  - {fileID: 4900000, guid: ad67cc640ca54e8a9678320eb048944b, type: 3}
+  - {fileID: 4900000, guid: b6beb38ee6684da4a02f036eaf498b50, type: 3}
+  - {fileID: 4900000, guid: 68ffd6a50acf4709b38c441975e3cae9, type: 3}
+  - {fileID: 4900000, guid: fc5bc7eb741649078d2d1f0a448d53e8, type: 3}
+  - {fileID: 4900000, guid: 394a2241c8934f10a141f760c10724f7, type: 3}
+  - {fileID: 4900000, guid: 3c12b683558b466ebb7c9fd402f94d8b, type: 3}
   _names:
   - Ada
   - Bram
@@ -46,5 +54,45 @@ MonoBehaviour:
   - Radu
   - Sabina
   - Tomas
+  - Aster Venn
+  - Bex Marrow
+  - Cyr Olan
+  - Dax Meridian
+  - Edda Rook
+  - Fen Vesper
+  - Galen Vox
+  - Hessa Tarn
+  - Ivo Kestrel
+  - Juno Vale
+  - Kes Ardent
+  - Luma Sorn
+  - Miro Thane
+  - Nessa Vey
+  - Olin Strake
+  - Perrin Lux
+  - Rhea Solace
+  - Sable Tern
+  - Ulan Crest
+  - Zev Orison
+  - Admiral Waffle
+  - Bean Counter
+  - Commodore Socks
+  - Duke Noodle
+  - Eggbert
+  - Fizz Bucket
+  - Gravy Jones
+  - Hat Inspector
+  - Ink Biscuit
+  - Jelly Admiral
+  - Kettle Pop
+  - Lunchbox
+  - Mop Regent
+  - Nugget Supreme
+  - Oat Baron
+  - Plum Socket
+  - Queen Turnip
+  - Rivet Muffin
+  - Sir Breadcrumb
+  - Toast Marshal
   _reasoning: {fileID: 11400000, guid: ec26a8253ef0549098b5aaabe6d59b29, type: 2}
   _setup: {fileID: 11400000, guid: 3ec9ce8bb57b81392638f82b39b7c4cf, type: 2}

@@ -21,7 +21,7 @@ namespace SocialStim.Tests.PlayMode
             var town = new RoleSpec(new RoleId("inspector"), "Inspector", Faction.Town, RoleCategory.TownInvestigative, AbilityKind.Investigate, 0, 0, 0, -1, Faction.Town);
             var killer = new RoleSpec(new RoleId("assassin"), "Assassin", Faction.Antagonist, RoleCategory.AntagonistKilling, AbilityKind.Attack, 1, 0, 0, -1, Faction.Antagonist);
             var roles = new[] { town, killer };
-            var lines = Enum.GetValues(typeof(SpeechIntent)).Cast<SpeechIntent>().Select(intent => new DialogueLine(intent.ToString(), intent, "PLACEHOLDER: line")).ToList();
+            var lines = Enum.GetValues(typeof(Personality)).Cast<Personality>().SelectMany(trait => Enum.GetValues(typeof(SpeechIntent)).Cast<SpeechIntent>().Select(intent => new DialogueLine(trait + "." + intent, intent, "PLACEHOLDER: line", requiredTrait: trait))).ToList();
             var run = RunFactory.CreateScenario(new RunOptions(123, votingMode: VotingMode.Trial), new[] {
                 new CastMemberSpec("Player", town.Id), new CastMemberSpec("Town", town.Id), new CastMemberSpec("Killer", killer.Id),
             }, roles, lines);

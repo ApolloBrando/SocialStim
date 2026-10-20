@@ -128,7 +128,7 @@ namespace SocialStim.Tests.EditMode
             var run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1, votingMode: VotingMode.Trial),
                 new[] { "physician", "inspector", "assassin", "citizen", "survivor" }
                     .Select((id, i) => new CastMemberSpec("Person" + i, new RoleId(id))),
-                AdvancedRoleTests.Roles(), DialogueDocument.Parse(ReadDialogue()), new ScenarioStrategy());
+                AdvancedRoleTests.Roles(), TestContent.AuthoredLines(), new ScenarioStrategy());
             foreach (var command in new[] { GameCommand.Speak(SpeechIntent.StaySilent), GameCommand.Nominate(null),
                 GameCommand.Night(new CharacterId(1)), GameCommand.Continue(), GameCommand.ReportLastAction() })
                 Assert.That(run.TrySubmit(command, out string error), Is.True, error);

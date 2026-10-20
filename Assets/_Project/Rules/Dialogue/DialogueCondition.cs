@@ -26,7 +26,7 @@ namespace SocialStim.Rules.Dialogue
             if (kind == DialogueConditionKind.Phase && (!Enum.TryParse(value, true, out _phase) || !Enum.IsDefined(typeof(GamePhase), _phase)))
                 throw new ArgumentException("Unknown phase condition.");
             if (kind == DialogueConditionKind.SpeakerTrait && (!Enum.TryParse(value, true, out _trait)
-                || (_trait & ~(Personality.Aggressive | Personality.Cautious | Personality.Gullible | Personality.Loyal | Personality.Deceptive)) != 0))
+                || !Enum.IsDefined(typeof(Personality), _trait)))
                 throw new ArgumentException("Unknown trait condition.");
             if (numberKind && (number < 0 || kind != DialogueConditionKind.SpeakerUnderPressure && number < 1
                 || kind == DialogueConditionKind.SpeakerUnderPressure && number > 100)) throw new ArgumentException("Invalid condition range.");
@@ -51,7 +51,7 @@ namespace SocialStim.Rules.Dialogue
                 case DialogueConditionKind.MaximumDay: return context.Day <= Number.Value;
                 case DialogueConditionKind.HasTarget: return context.HasTarget == Flag.Value;
                 case DialogueConditionKind.HasAssertion: return context.HasAssertion == Flag.Value;
-                case DialogueConditionKind.SpeakerTrait: return (context.Traits & _trait) == _trait;
+                case DialogueConditionKind.SpeakerTrait: return context.Traits == _trait;
                 case DialogueConditionKind.SpeakerRole: return context.OwnRole == new RoleId(Value);
                 case DialogueConditionKind.SpeakerUnderPressure: return context.SelfExposure >= Number.Value;
                 case DialogueConditionKind.ObservedDeath: return context.Evidence.Any(e => e.Kind == EvidenceKind.Death);

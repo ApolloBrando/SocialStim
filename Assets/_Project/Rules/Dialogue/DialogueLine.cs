@@ -18,8 +18,8 @@ namespace SocialStim.Rules.Dialogue
             if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(text) || weight < 1 || weight > 1000)
                 throw new ArgumentException("Dialogue requires an ID, text, and weight in [1, 1000].");
             if (!Enum.IsDefined(typeof(SpeechIntent), intent)
-                || (requiredTrait & ~(Personality.Aggressive | Personality.Cautious | Personality.Gullible | Personality.Loyal | Personality.Deceptive)) != 0)
-                throw new ArgumentException($"{id}: unknown intent or personality flags.");
+                || !Enum.IsDefined(typeof(Personality), requiredTrait))
+                throw new ArgumentException($"{id}: unknown intent or trait.");
             Id = id; Intent = intent; Text = text; Weight = weight;
             RequiredTrait = requiredTrait; SpeakerRole = speakerRole; Metadata = metadata ?? new DialogueMetadata();
             Conditions = (conditions ?? Enumerable.Empty<DialogueCondition>()).ToList().AsReadOnly();
@@ -36,6 +36,9 @@ namespace SocialStim.Rules.Dialogue
             foreach (DialogueConditionKind presence in new[] { DialogueConditionKind.HasTarget, DialogueConditionKind.HasAssertion })
                 if (Conditions.Where(c => c.Kind == presence).Select(c => c.Flag).Distinct().Count() > 1)
                     throw new ArgumentException($"{id}: contradictory presence conditions.");
+            if (Conditions.Any(condition => condition.Kind == DialogueConditionKind.SpeakerTrait
+                && !string.Equals(condition.Value, requiredTrait.ToString(), StringComparison.OrdinalIgnoreCase)))
+                throw new ArgumentException($"{id}: trait condition must match the single voice pool.");
             var ownRoles = Conditions.Where(c => c.Kind == DialogueConditionKind.SpeakerRole).Select(c => c.Value).ToList();
             if (speakerRole.HasValue) ownRoles.Add(speakerRole.Value.Value);
             if (ownRoles.Distinct(StringComparer.Ordinal).Count() > 1) throw new ArgumentException($"{id}: contradictory own-role conditions.");
@@ -48,7 +51,7 @@ namespace SocialStim.Rules.Dialogue
         public string Text { get; }
         /// <summary>Positive integer selection weight.</summary>
         public int Weight { get; }
-        /// <summary>All required speaker traits.</summary>
+        /// <summary>Exact NPC trait, or None for player-only dialogue.</summary>
         public Personality RequiredTrait { get; }
         /// <summary>Optional condition on the speaker's own known role.</summary>
         public RoleId? SpeakerRole { get; }
