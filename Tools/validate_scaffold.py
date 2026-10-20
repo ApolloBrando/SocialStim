@@ -21,7 +21,7 @@ EXPECTED_DEPENDENCIES = {
         "SocialStim.Rules", "SocialStim.Application", "SocialStim.Data",
     },
     "SocialStim.Editor": {
-        "SocialStim.Rules", "SocialStim.Application", "SocialStim.Data",
+        "SocialStim.Rules", "SocialStim.Application", "SocialStim.Data", "SocialStim.Presentation",
     },
     "SocialStim.Tests.EditMode": {
         "SocialStim.Rules", "SocialStim.Application", "SocialStim.Data",
@@ -59,7 +59,7 @@ def validate() -> list[str]:
     )
     files = sorted({ROOT / name for name in result.stdout.decode("utf-8").split("\0")
                     if name and (ROOT / name).is_file()})
-    folded: dict[str, Path] = {}
+    folded: dict[str, str] = {}
     for path in files:
         relative = path.relative_to(ROOT).as_posix()
         key = relative.casefold()
@@ -92,6 +92,15 @@ def validate() -> list[str]:
             require("AssemblyDefinitionImporter:" in source, f"Wrong importer: {meta}")
     for path in imported:
         require(Path(str(path) + ".meta").is_file(), f"Missing metadata: {path.relative_to(ROOT)}")
+
+    # Unity's built-in references use reserved zero-prefixed GUIDs. Every other
+    # serialized project reference must resolve to committed metadata.
+    for path in files:
+        if path.suffix not in {".asset", ".unity", ".prefab"}:
+            continue
+        for guid in re.findall(r"\bguid: ([0-9a-f]{32})\b", path.read_text(encoding="utf-8")):
+            require(guid in guids or guid.startswith("0000000000000000"),
+                    f"Unresolved asset GUID {guid}: {path.relative_to(ROOT)}")
 
     parsed: dict[Path, dict] = {}
     for path in files:
@@ -188,8 +197,9 @@ def validate() -> list[str]:
         "library", "temp", "logs", "usersettings", "obj", "build", "builds",
         "testresults", "artifacts", "memorycaptures", "recordings", "coverage",
     }
-    for child in ROOT.iterdir():
-        require(child.name.lower() not in prohibited_roots, f"Generated project state: {child.name}")
+    for path in files:
+        require(path.relative_to(ROOT).parts[0].lower() not in prohibited_roots,
+                f"Versioned generated project state: {path.relative_to(ROOT)}")
     for path in files:
         relative = path.relative_to(ROOT)
         require(not any(part in {".idea", ".vs", ".vscode"} for part in relative.parts), f"IDE state present: {relative}")
@@ -206,7 +216,7 @@ def validate() -> list[str]:
                 errors.append(f"Expected UTF-8 text: {relative}")
                 continue
             require(all(line == line.rstrip() for line in lines), f"Trailing whitespace: {relative}")
-            require(not any(re.match(r"^(<{7}|={7}|>{7})(?: |$)", line) for line in lines),
+            require(not any(re.match(r"^(<{7,}|={7,}|>{7,})(?: |$)", line) for line in lines),
                     f"Unresolved merge conflict: {relative}")
         if path.suffix == ".cs":
             parent = path.parent

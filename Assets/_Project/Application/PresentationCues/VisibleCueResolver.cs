@@ -38,7 +38,8 @@ namespace SocialStim.Application.PresentationCues
                 case GameCue.VerdictGuilty: return PresentationCue.Guilty;
                 case GameCue.VerdictInnocent: return PresentationCue.Innocent;
                 case GameCue.ExecutionCarriedOut: case GameCue.DeathReported:
-                    if (!observation.Target.HasValue) return PresentationCue.Death;
+                    // A no-casualty morning report shares the event family, not a death effect.
+                    if (!observation.Target.HasValue) return PresentationCue.None;
                     _dead.Add(observation.Target.Value);
                     if (observation.Target == view.PlayerId) return PresentationCue.PlayerKilled;
                     if (view.Characters.Any(c => c.Id == observation.Target && c.IsTeammate)) return PresentationCue.TeammateLost;

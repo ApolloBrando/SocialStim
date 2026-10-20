@@ -80,6 +80,18 @@ namespace SocialStim.Tests.PlayMode
             finally { UnityEngine.Object.DestroyImmediate(root); }
         }
 
+        [Test]
+        public void CompositionReusesOneCompatibleEventSystem()
+        {
+            var root = new GameObject("Event system ownership test");
+            try
+            {
+                var first = UiEventSystem.Ensure(root.transform);
+                Assert.That(UiEventSystem.Ensure(root.transform), Is.SameAs(first));
+            }
+            finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
         private static string Label(Button button) => button.GetComponentsInChildren<TextMeshProUGUI>(true)
             .Single(label => label.name == "Label").text.TrimStart('>', ' ');
     }

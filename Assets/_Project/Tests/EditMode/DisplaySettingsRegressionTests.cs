@@ -42,8 +42,8 @@ namespace SocialStim.Tests.EditMode
             Assert.That(playback.Frame.Flash, Is.Zero);
             Assert.That(playback.Busy, Is.True);
         }
-        [TestCase(false, true)]
-        [TestCase(true, false)]
+        [TestCase(false, false)]
+        [TestCase(true, true)]
         public void SettledMotionImmediatelyObeysChangedAccessibility(bool enabled, bool reduced)
         {
             var playback = new DisplayPlayback(); int acknowledgements = 0;
