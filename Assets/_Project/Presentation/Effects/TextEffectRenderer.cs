@@ -5,30 +5,41 @@ using UnityEngine;
 
 namespace SocialStim.Presentation.Effects
 {
-    /// <summary>Cached TMP geometry; no strings, collections or materials created during Apply.</summary>
+    /// <summary>Cached TMP span renderer. Parsing/buffer growth happen at document/layout boundaries, never during Apply.</summary>
     public sealed class TextEffectRenderer : MonoBehaviour
     {
         private TextMeshProUGUI _label;
         private SemanticText _document;
         private TextPalette _palette;
+        private EffectsSettings _settings = new EffectsSettings();
         private Vector3[][] _vertices = Array.Empty<Vector3[]>();
         private SemanticStyle[] _styles = Array.Empty<SemanticStyle>();
-        private int _visible = int.MaxValue;
-        private int _animatedStart;
+        private float[] _revealed = Array.Empty<float>();
+        private int _visible = int.MaxValue, _animatedStart;
         private EffectFrame _frame;
         private float _time;
-        private bool _semanticColors = true;
-        public void Initialize(TextMeshProUGUI label)
-        { _label = label; _label.OnPreRenderText += Capture; }
+        private bool _semanticColors = true, _stopped;
+        /// <summary>Subscribes to TMP rebuilds so cached baselines cannot drift.</summary>
+        public void Initialize(TextMeshProUGUI label) { _label = label; _label.OnPreRenderText += Capture; }
+        /// <summary>Sets a bounded current line and resets all prior span lifetimes.</summary>
         public void SetDocument(SemanticText document, int animatedStart, TextPalette palette)
         {
-            _document = document; _animatedStart = animatedStart; _palette = palette;
-            _visible = animatedStart; _frame = default;
-            _label.text = document.Text; _label.richText = false;
-            _label.ForceMeshUpdate();
+            if (document.Text.Length > 2048) throw new ArgumentException("Current line exceeds the glyph budget.");
+            _document = document; _animatedStart = animatedStart; _palette = palette; _stopped = false;
+            _visible = animatedStart; _frame = default; _time = 0;
+            if (_revealed.Length < document.Text.Length) Array.Resize(ref _revealed, document.Text.Length);
+            for (int i = 0; i < _revealed.Length; i++) _revealed[i] = -1;
+            _label.text = document.Text; _label.richText = false; _label.ForceMeshUpdate();
         }
+        /// <summary>Applies phase colors without replacing the document.</summary>
         public void SetPalette(TextPalette palette) { _palette = palette; }
+        /// <summary>Enables/disables semantic accents independently of text facts.</summary>
         public void SetSemanticColors(bool enabled) { _semanticColors = enabled; }
+        /// <summary>Updates accessibility policy without restarting span ages.</summary>
+        public void SetPolicy(EffectsSettings settings) { _settings = settings; }
+        /// <summary>Restores geometry on cancellation/dismissal, including post-reveal motion.</summary>
+        public void StopEffects() { _stopped = true; if (_document != null) Apply(int.MaxValue, default, _time); }
+        /// <summary>Samples cached ranges and uploads existing geometry/colors; creates no strings or collections.</summary>
         public void Apply(int visibleUtf16, EffectFrame frame, float time)
         {
             if (_label == null || _document == null) return;
@@ -56,16 +67,32 @@ namespace SocialStim.Presentation.Effects
             {
                 TMP_CharacterInfo character = info.characterInfo[i];
                 if (!character.isVisible || character.materialReferenceIndex >= _vertices.Length) continue;
-                int mesh = character.materialReferenceIndex, vertex = character.vertexIndex;
+                int mesh = character.materialReferenceIndex, vertex = character.vertexIndex, index = character.index;
                 Vector3[] baseline = _vertices[mesh];
                 if (baseline == null || vertex + 3 >= baseline.Length) continue;
-                Color32 color = _palette.Accent(_semanticColors ? _styles[i] : SemanticStyle.Default);
-                if (character.index >= _visible) color.a = 0;
-                float strength = character.index >= _animatedStart ? _frame.Shake : 0;
-                Vector3 offset = new Vector3(Mathf.Sin(_time * 27 + i * 1.7f), Mathf.Cos(_time * 31 + i * 1.3f), 0) * (strength * 3);
+                Color color = _palette.Accent(_semanticColors ? _styles[i] : SemanticStyle.Default);
+                bool visible = index < _visible;
+                if (visible && _revealed[index] < 0) _revealed[index] = _time;
+                float x = 0, y = 0, sx = 1, sy = 1, angle = 0, alpha = visible ? 1 : 0;
+                if (!_stopped && visible && index >= _animatedStart)
+                {
+                    float strength = _settings.ReducedMotion || !_settings.Enabled ? 0 : _frame.Shake;
+                    x = Mathf.Sin(_time * 27 + i * 1.7f) * strength * 3; y = Mathf.Cos(_time * 31 + i * 1.3f) * strength * 3;
+                    for (int n = 0; n < _document.Effects.Count; n++)
+                    {
+                        GlyphEffectSpan span = _document.Effects[n];
+                        if (index < span.Start || index >= span.Start + span.Length) continue;
+                        GlyphTransform sample = GlyphEffectSampler.Sample(span.Effect, Math.Max(0, _time - _revealed[index]), i, _settings, _time);
+                        x += sample.X; y += sample.Y; sx *= sample.ScaleX; sy *= sample.ScaleY; angle += sample.Angle; alpha *= sample.Alpha;
+                        if (_semanticColors) color = Color.Lerp(color, _palette.Accent(SemanticStyle.Evidence), sample.Color);
+                    }
+                }
+                color.a = alpha; Vector3 center = (baseline[vertex] + baseline[vertex + 2]) * 0.5f;
+                float cosine = Mathf.Cos(angle), sine = Mathf.Sin(angle);
                 for (int corner = 0; corner < 4; corner++)
                 {
-                    info.meshInfo[mesh].vertices[vertex + corner] = baseline[vertex + corner] + offset;
+                    Vector3 point = baseline[vertex + corner] - center; float px = point.x * sx, py = point.y * sy;
+                    info.meshInfo[mesh].vertices[vertex + corner] = center + new Vector3(px * cosine - py * sine + x, px * sine + py * cosine + y, point.z);
                     info.meshInfo[mesh].colors32[vertex + corner] = color;
                 }
             }

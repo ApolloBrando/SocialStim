@@ -9,6 +9,9 @@ namespace SocialStim.Editor.EffectsPlayground
     public sealed class EffectsPlaygroundWindow : EditorWindow
     {
         private readonly DisplayPlayback _playback = new DisplayPlayback();
+        private GlyphEffectKind _glyphEffect = GlyphEffectKind.Wave;
+        private EffectLifetime _lifetime = EffectLifetime.Continuous;
+        private float _speed = 1, _amplitude = 3, _duration = 1;
         private PresentationCue _cue = PresentationCue.Accusation;
         private string _source = "<emphasis>I heard you.</emphasis> <fear>Something is wrong.</fear>";
         private bool _night, _reduced = true, _flash, _instant;
@@ -26,6 +29,11 @@ namespace SocialStim.Editor.EffectsPlayground
         }
         private void OnGUI()
         {
+            _glyphEffect = (GlyphEffectKind)EditorGUILayout.EnumPopup("Glyph effect (32)", _glyphEffect);
+            _lifetime = (EffectLifetime)EditorGUILayout.EnumPopup("Span lifetime", _lifetime);
+            _speed = EditorGUILayout.Slider("Glyph speed", _speed, 0.1f, 20);
+            _amplitude = EditorGUILayout.Slider("Glyph amplitude", _amplitude, 0, 20);
+            _duration = EditorGUILayout.Slider("Span duration", _duration, 0.05f, 10);
             _cue = (PresentationCue)EditorGUILayout.EnumPopup("Visible cue", _cue);
             _source = EditorGUILayout.TextArea(_source, GUILayout.Height(72));
             _night = EditorGUILayout.Toggle("Night palette", _night);
@@ -56,8 +64,23 @@ namespace SocialStim.Editor.EffectsPlayground
             }
             string text = _playback.Text == null ? "Preview" : _playback.Text.Text.Substring(0, _playback.VisibleUtf16);
             _style.normal.textColor = ink;
-            float shake = Mathf.Sin(_playback.Elapsed * 27) * frame.Shake * 3;
-            GUI.Label(new Rect(rect.x + 16 + shake, rect.y + 16, rect.width - 32, rect.height - 32), text, _style);
+            float x = rect.x + 16, y = rect.y + 16;
+            var policy = new EffectsSettings(reducedMotion: _reduced, flashes: _flash, intensity: _intensity);
+            var effect = new GlyphEffect(_glyphEffect, speed: _speed, amplitude: _amplitude, duration: _duration, lifetime: _lifetime);
+            Matrix4x4 original = GUI.matrix; Color oldColor = GUI.color;
+            for (int i = 0; i < text.Length; i++)
+            {
+                string glyph = text[i].ToString(); float width = Mathf.Max(4, _style.CalcSize(new GUIContent(glyph)).x);
+                if (x + width > rect.xMax - 16 || glyph == "\n") { x = rect.x + 16; y += 26; }
+                if (glyph == "\n") continue;
+                GlyphTransform sample = GlyphEffectSampler.Sample(effect, _playback.Elapsed, i, policy, _playback.Elapsed);
+                Vector3 center = new Vector3(x + width / 2, y + 13, 0);
+                GUI.matrix = original * Matrix4x4.TRS(center + new Vector3(sample.X, sample.Y, 0),
+                    Quaternion.Euler(0, 0, sample.Angle * Mathf.Rad2Deg), new Vector3(sample.ScaleX, sample.ScaleY, 1))
+                    * Matrix4x4.Translate(-center);
+                GUI.color = new Color(1, 1, 1, sample.Alpha); GUI.Label(new Rect(x, y, width + 4, 28), glyph, _style); x += width;
+            }
+            GUI.matrix = original; GUI.color = oldColor;
             Color flash = ink; flash.a = frame.Flash; EditorGUI.DrawRect(rect, flash);
             EditorGUILayout.LabelField(_result);
             EditorGUILayout.HelpBox("Default profiles. Check scene overrides and TMP rendering in Play Mode.", MessageType.Info);

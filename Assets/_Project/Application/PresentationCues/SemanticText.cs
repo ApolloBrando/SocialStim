@@ -7,8 +7,10 @@ namespace SocialStim.Application.PresentationCues
     public sealed class SemanticText
     {
         private readonly int[] _elements;
-        public SemanticText(string text, IEnumerable<SemanticSpan> spans)
-        { Text = text; Spans = new List<SemanticSpan>(spans).AsReadOnly(); _elements = StringInfo.ParseCombiningCharacters(text); }
+        public SemanticText(string text, IEnumerable<SemanticSpan> spans, IEnumerable<GlyphEffectSpan> effects = null)
+        { Effects = new List<GlyphEffectSpan>(effects ?? System.Array.Empty<GlyphEffectSpan>()).AsReadOnly(); Text = text; Spans = new List<SemanticSpan>(spans).AsReadOnly(); _elements = StringInfo.ParseCombiningCharacters(text); }
+        /// <summary>Independent nested glyph effect ranges, in authored order.</summary>
+        public IReadOnlyList<GlyphEffectSpan> Effects { get; }
         public string Text { get; }
         public IReadOnlyList<SemanticSpan> Spans { get; }
         public int ElementCount => _elements.Length;

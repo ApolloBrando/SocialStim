@@ -19,6 +19,7 @@ namespace SocialStim.Presentation.Text
         [SerializeField] private GameCatalog _catalog;
         [SerializeField] private TMP_FontAsset _font;
         [SerializeField] private CueProfileDefinition _effects;
+        [SerializeField] private TextStyleDefinition _textStyles;
         private GamePreferences _preferences;
         private TextGameView _view;
         private GamePresenter _presenter;
@@ -39,7 +40,7 @@ namespace SocialStim.Presentation.Text
                 events.transform.SetParent(transform, false);
                 _view = gameObject.AddComponent<TextGameView>();
                 _preferences = UiPreferences.Load();
-                _view.Initialize(font, _effects != null ? _effects.Load() : null, _preferences.Effects);
+                _view.Initialize(font, _effects != null ? _effects.Load() : null, _preferences.Effects, _textStyles != null ? _textStyles.Load() : null);
                 _view.ApplyPreferences(_preferences);
                 _view.RestartRequested += ShowSetup;
                 _view.PreferencesChanged += SavePreferences;

@@ -37,6 +37,7 @@ namespace SocialStim.Presentation.Text
         private readonly StringBuilder _shown = new StringBuilder();
         private readonly List<SemanticSpan> _spans = new List<SemanticSpan>();
         private readonly DisplayPlayback _playback = new DisplayPlayback();
+        private GlyphStyleCatalog _styles = GlyphStyleCatalog.Default;
         private VisibleCueResolver _cues = new VisibleCueResolver();
         private IReadOnlyDictionary<PresentationCue, EffectProfile> _profiles;
         private GamePreferences _preferences = new GamePreferences();
@@ -72,8 +73,9 @@ namespace SocialStim.Presentation.Text
         public event Action<GamePreferences> PreferencesChanged;
         public bool IsDisplaying => _playback.Busy || _request != null && _next < _request.View.Transcript.Count;
 
-        public void Initialize(TMP_FontAsset font, IReadOnlyDictionary<PresentationCue, EffectProfile> profiles = null, EffectsSettings initialSettings = null)
+        public void Initialize(TMP_FontAsset font, IReadOnlyDictionary<PresentationCue, EffectProfile> profiles = null, EffectsSettings initialSettings = null, GlyphStyleCatalog styles = null)
         {
+            _styles = styles ?? GlyphStyleCatalog.Default;
             _settings = initialSettings ?? new EffectsSettings();
             _font = font; _profiles = profiles ?? DefaultCueProfiles.Create();
             _onAcknowledged = acknowledgement =>
@@ -275,16 +277,19 @@ namespace SocialStim.Presentation.Text
                     ApplyPalette(false, 0.85f);
                 if (observation.Cue == GameCue.ExecutionCarriedOut) ApplyPalette(false, 1f);
                 SemanticText line;
-                try { line = SemanticMarkup.Parse(observation.Text); }
+                try { line = SemanticMarkup.Parse(observation.Text, _styles); }
                 catch (ArgumentException) { line = SemanticText.Literal(observation.Text); }
                 bool roleClaim = observation.Intent == SpeechIntent.ClaimRole;
                 if (roleClaim) line = new SemanticText("[CLAIM] " + line.Text,
-                    new[] { new SemanticSpan(0, 8 + line.Text.Length, SemanticStyle.Evidence) });
+                    new[] { new SemanticSpan(0, 8 + line.Text.Length, SemanticStyle.Evidence) },
+                    line.Effects.Select(e => new GlyphEffectSpan(e.Start + 8, e.Length, e.Effect)));
                 if (_shown.Length > 0) _shown.Append("\n\n");
                 _currentStart = _shown.Length;
                 _shown.Append(line.Text);
                 foreach (SemanticSpan span in line.Spans) _spans.Add(new SemanticSpan(span.Start + _currentStart, span.Length, span.Style));
-                _textEffects.SetDocument(new SemanticText(_shown.ToString(), _spans), _currentStart, _palette);
+                _currentStart = 0;
+                _textEffects.SetDocument(line, 0, _palette);
+                _textEffects.SetPolicy(_settings);
                 EffectProfile profile = _profiles[_cues.Resolve(observation, _request.View)];
                 var pacing = new SpeechPacing(observation);
                 _playback.Begin(observation.Sequence, line, profile, _settings, _onAcknowledged, pacing.Pause, pacing.Speed);
@@ -296,12 +301,12 @@ namespace SocialStim.Presentation.Text
         {
             while (IsDisplaying) { Pump(); _playback.Skip(); }
             _screenEffects.Apply(default, _palette);
-            if (_request != null) _textEffects.Apply(_shown.Length, default, 0);
+            if (_request != null) _textEffects.Apply(int.MaxValue, default, _playback.Elapsed);
             UpdateChoiceState();
         }
         private void ResetDisplay()
         {
-            _playback.Cancel(); _request = null; _next = 0; _currentStart = 0;
+            _playback.Cancel(); if (_textEffects != null) _textEffects.StopEffects(); _request = null; _next = 0; _currentStart = 0;
             _shown.Clear(); _spans.Clear(); _cues = new VisibleCueResolver(); _wasDisplaying = false;
             _visibleClaims.Clear(); _displayDay = 1; _daySpeeches = 0; _pendingStatus = null;
             foreach (ParticipantCard card in _cards.Values) { card.gameObject.SetActive(false); Destroy(card.gameObject); }
@@ -316,7 +321,7 @@ namespace SocialStim.Presentation.Text
         {
             _preferences = preferences; _settings = preferences.Effects;
             _playback.UpdateSettings(_settings);
-            if (_textEffects != null) _textEffects.SetSemanticColors(_settings.Enabled && !preferences.Colorblind);
+            if (_textEffects != null) { _textEffects.SetPolicy(_settings); _textEffects.SetSemanticColors(_settings.Enabled && !preferences.Colorblind); }
             if (_transcript != null) _transcript.fontSize = preferences.TextSize;
             if (_scaler != null) _scaler.referenceResolution = new Vector2(1280, 800) / preferences.UiScale;
             if (_settingsPanel != null) _settingsPanel.SetPreferences(preferences);
