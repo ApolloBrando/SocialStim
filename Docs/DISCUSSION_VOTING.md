@@ -1,7 +1,8 @@
 # Mission Phase 1A: discussion and vote foundation
 
 Branch: `phase/1-ui-interaction`, stacked on `phase/0-audit-fixes` (PR #13).
-This first Phase 1 PR changes the rules/application loop and connects it to the
+Historical foundation contract: see [the subsequent interaction/UI overhaul](INTERACTION_UI.md)
+for the current view, settings and permission behavior. This first Phase 1 PR changes the rules/application loop and connects it to the
 existing Unity view. The complete Chat/Accuse/Defend target-and-phrasing UI and
 single-speaker screen are a subsequent Phase 1 slice, not implemented here.
 
@@ -67,7 +68,11 @@ last-words inspector options. Its old `_discussionRounds` remains the Trial Mode
 setting; the new group-round field defaults to five without rewriting scene YAML
 or changing existing serialized fields/GUIDs.
 
-## Remaining Phase 1 work
+## Remaining work at the time of the foundation PR
+
+The menu/current-line/drawer/Quick/claim-permission work below is now implemented
+in [the interaction slice](INTERACTION_UI.md). Stat gates and reason-matched
+inference are still pending. The rest of this section describes the original PR.
 
 The old menu/category/pagination structure remains. The immediate response menu
 still uses existing claim permissions; data-driven truthful/bluff permissions

@@ -18,3 +18,8 @@ modal with immediate display edits and next-run game configuration. See
 The [expanded span effect system](Docs/EXPANDED_EFFECTS.md) adds 32 implemented
 glyph behaviors, four lifetimes, nested validated authoring and semantic recipe assets.
 Unity adapter rendering/profiling remains pending.
+
+The [interaction/UI overhaul](Docs/INTERACTION_UI.md) replaces menu hierarchies
+with action → roster target → authored phrasing, a single current line, two-press
+reveal/advance and an information drawer. Shared legality checks enforce role
+claim permissions and actual honest investigation results. Unity QA remains pending.

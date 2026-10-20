@@ -15,10 +15,10 @@ configuration; old serialized scene fields are ignored and can be removed by the
 editor on its next save. The committed scene and all GUIDs remain untouched.
 
 Text/display includes speed (1–240 and Instant), font size, UI scale, auto-advance
-hold and Quick phrasing. The latter two are consumed by the subsequent interaction
-UI slice. Accessibility includes intensity, reduced motion, flashes, effects and
-neutral accents. Each control has Reset; Data resets all defaults. Changes persist
-immediately, and Close/Escape closes the panel without a hidden apply/cancel step.
+hold and Quick phrasing. Quick phrasing selects the first legal authored line; auto-advance uses the
+configured hold plus a small line-length allowance. Accessibility includes intensity, reduced motion, flashes, effects and
+neutral accents. Each control has Reset; Data resets all defaults. Changes apply immediately in memory; disk writes are debounced by 350 ms and
+flushed on pause, quit and teardown. Close/Escape closes the panel without a hidden apply/cancel step.
 There are no audio controls because no audio system exists. Role presets, role
 count/slot editing, stats and difficulty remain with the still-unimplemented role
 customization and reasoning phases; no inactive settings are presented for them.

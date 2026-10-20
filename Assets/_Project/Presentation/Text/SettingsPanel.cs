@@ -160,8 +160,12 @@ namespace SocialStim.Presentation.Text
             field.contentType = TMP_InputField.ContentType.IntegerNumber;
             field.SetTextWithoutNotify(_preferences.Game.Seed?.ToString() ?? "");
             var hint = TextUiFactory.Text("Seed hint", row, _font, 14); hint.text = "Seed (blank = random)";
-            TextUiFactory.Fill(hint.rectTransform, new Vector2(0, 0.65f), Vector2.one, Vector2.zero, Vector2.zero);
-            TextUiFactory.Fill(text.rectTransform, Vector2.zero, new Vector2(1, 0.6f), new Vector2(8, 0), new Vector2(-8, 0));
+            TextUiFactory.Fill(hint.rectTransform, new Vector2(0, 0.65f), new Vector2(0.82f, 1), Vector2.zero, Vector2.zero);
+            TextUiFactory.Fill(text.rectTransform, Vector2.zero, new Vector2(0.82f, 0.6f), new Vector2(8, 0), new Vector2(-8, 0));
+            _refresh.Add(() => { field.SetTextWithoutNotify(_preferences.Game.Seed?.ToString() ?? ""); hint.text = "Seed (blank = random)"; });
+            Button reset = TextUiFactory.Button(row, _font, "Reset", 38);
+            TextUiFactory.Fill((RectTransform)reset.transform, new Vector2(0.82f, 0), Vector2.one, new Vector2(8, 8), new Vector2(-8, -8));
+            reset.onClick.AddListener(() => Commit(PreferencesEditor.Seed(_preferences, null)));
             field.onEndEdit.AddListener(value => {
                 if (string.IsNullOrWhiteSpace(value)) Commit(PreferencesEditor.Seed(_preferences, null));
                 else if (uint.TryParse(value, out uint seed)) Commit(PreferencesEditor.Seed(_preferences, seed));

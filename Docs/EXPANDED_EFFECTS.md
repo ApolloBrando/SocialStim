@@ -36,8 +36,9 @@ removes their modulation. Reduced motion removes position/scale/rotation and
 uses restrained accents where appropriate. Defaults remain reduced motion and
 flashes off. Screen pulse safety from the previous slice remains unchanged.
 
-Only the current line is meshed; history is retained separately for the upcoming
-UI drawer. Cached baselines prevent transform drift. Parsing and buffer growth
+Only the current line is meshed; history is retained separately in the information
+drawer. The adapter caps actual span samples at 16,384 per frame, leaving excess
+glyphs static for that frame. Cached baselines prevent transform drift. Parsing and buffer growth
 are document/layout work; Apply/Sample create no managed collections or strings.
 Portable sampling has an allocation regression; real TMP uploads/GC/frame cost
 still require Unity profiling. Effects Playground now offers every catalog entry,

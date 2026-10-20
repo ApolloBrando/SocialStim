@@ -388,7 +388,7 @@ The existing timed pulse contract is unchanged for non-continuous tracks.
 
 TextGameView groups all display settings in a separate panel with reset defaults.
 Default reveal speed is 84 text elements/second; existing saved choices remain
-valid. Policy changes clear any retained animation. Day/night palettes are unchanged.
+valid. Live policy changes preserve the current reveal position and span ages. Day/night palettes are unchanged.
 Both NPC strategies veto hostile Town choices against hard observer-known Town
 alignment, independent of stale suspicion. These repairs do not implement the
 mission's joint-world inference or new role catalog.
@@ -411,8 +411,9 @@ fields use default group rounds of five while preserving old scene fields for
 Trial Mode. No scene YAML or existing metadata GUID is rewritten.
 
 This is the Phase 1A loop foundation, not the complete interaction/UI rewrite.
-Current-menu replacement, reason-tagged phrasing, current-line presentation and
-the drawer remain subsequent work. No main commit/merge is performed.
+The subsequent interaction slice replaces the menus, adds authored phrasing and
+current-line presentation, and puts secondary information in one drawer. Reason
+inference/stat gates remain pending. No main commit/merge is performed.
 
 Settings now use immutable preferences, versioned JSON persistence and a grouped
 modal with immediate display edits and next-run game configuration. See
@@ -421,3 +422,8 @@ modal with immediate display edits and next-run game configuration. See
 The [expanded span effect system](Docs/EXPANDED_EFFECTS.md) adds 32 implemented
 glyph behaviors, four lifetimes, nested validated authoring and semantic recipe assets.
 Unity adapter rendering/profiling remains pending.
+
+The [interaction/UI overhaul](Docs/INTERACTION_UI.md) replaces menu hierarchies
+with action → roster target → authored phrasing, a single current line, two-press
+reveal/advance and an information drawer. Shared legality checks enforce role
+claim permissions and actual honest investigation results. Unity QA remains pending.
