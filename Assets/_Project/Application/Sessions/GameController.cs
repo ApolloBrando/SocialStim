@@ -32,6 +32,14 @@ namespace SocialStim.Application.Sessions
             switch (view.Phase)
             {
                 case GamePhase.Discussion:
+                    if (view.RespondTo.HasValue)
+                    {
+                        add("Defend yourself", "Answer the accusation.", GameCommand.Speak(SpeechIntent.Defend));
+                        add("Counter-accuse", "Challenge your accuser.", GameCommand.Speak(SpeechIntent.Accuse, view.RespondTo));
+                        AddClaims(add, view);
+                        add("Stay silent", "Decline to answer.", GameCommand.Speak(SpeechIntent.StaySilent));
+                        break;
+                    }
                     if (view.Opening) add("Let someone else open", "Listen first. Keeps your turn.", GameCommand.Continue());
                     if (view.CanReportAction) add("Report last night's action", "Share your action and results.", GameCommand.ReportLastAction());
                     add("Defend yourself", "Push back on suspicion.", GameCommand.Speak(SpeechIntent.Defend));
@@ -51,6 +59,14 @@ namespace SocialStim.Application.Sessions
                                 add($"Report {target.Name} as {faction}", "State a finding. You may bluff.",
                                     GameCommand.Speak(SpeechIntent.ReportInvestigation, target.Id, faction: faction));
                     }
+                    break;
+                case GamePhase.Voting:
+                    if (view.AllowAbstain) add("Abstain", "Cast no target vote.", GameCommand.Vote(null));
+                    foreach (var target in view.Characters.Where(c => view.VoteTargets.Contains(c.Id)))
+                        add("Vote " + target.Name, "The largest vote total determines elimination.", GameCommand.Vote(target.Id));
+                    break;
+                case GamePhase.VoteReveal:
+                    add("Continue", "Acknowledge the public tally.", GameCommand.Continue());
                     break;
                 case GamePhase.Nomination:
                     add("Abstain", "A majority starts a trial.", GameCommand.Nominate(null));

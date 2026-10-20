@@ -240,8 +240,14 @@ namespace SocialStim.Presentation.Text
             TextUiFactory.Fill((RectTransform)_transcriptScroll.transform, Vector2.zero, new Vector2(0.64f, 1), new Vector2(32, 82), new Vector2(-10, -230));
             TextUiFactory.Fill((RectTransform)_choiceScroll.transform, new Vector2(0.64f, 0), Vector2.one, new Vector2(10, 82), new Vector2(-32, -230));
             var view = request.View;
+            _choiceHeading.text = view.RespondTo.HasValue ? "RESPOND"
+                : view.Phase == GamePhase.Voting ? (view.Revote ? "REVOTE" : "VOTE") : "YOUR TURN";
             _pendingStatus = $"Day {view.Day} · {ActionLabels.Phase(view.Phase)} · {view.OwnRole.Name} ({view.OwnRole.Faction}) | {(view.Alive ? "Alive" : "Spectator")}"
                 + $" | Uses: {(view.Charges < 0 ? "unlimited" : view.Charges.ToString())}\nSeed {view.Seed} | Trials {view.TrialsUsed}/{view.TrialsAllowed}";
+            if (view.VotingMode == VotingMode.Gnosia)
+                _pendingStatus = $"Day {view.Day} · {ActionLabels.Phase(view.Phase)} · Round {view.DiscussionRound}/{view.DiscussionRoundsAllowed}"
+                    + $" · Window {view.PlayerWindow}/{view.WindowsPerRound} · {view.OwnRole.Name} ({view.OwnRole.Faction})"
+                    + $" · {(view.Alive ? "Alive" : "Spectator")} · Seed {view.Seed}";
             ClearChoices();
             _menuCategory = null; _menuFamily = null; _menuPage = 0;
             _status.text = "Listening…";

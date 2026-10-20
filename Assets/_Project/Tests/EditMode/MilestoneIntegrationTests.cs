@@ -14,7 +14,7 @@ namespace SocialStim.Tests.EditMode
     public sealed class MilestoneIntegrationTests
     {
         private static RunSession Create(ScenarioStrategy strategy) => RunFactory.CreateScenario(
-            new RunOptions(123, discussionRounds: 1, revealOnDeath: false),
+            new RunOptions(123, discussionRounds: 1, revealOnDeath: false, votingMode: VotingMode.Trial),
             new[] { "inspector", "physician", "interrupter", "assassin", "survivor" }
                 .Select((role, index) => new CastMemberSpec("Person" + index, new RoleId(role))),
             TestContent.Roles(), TestContent.Lines(), strategy);

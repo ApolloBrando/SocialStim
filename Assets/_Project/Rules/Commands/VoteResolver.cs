@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using SocialStim.Rules.Cast;
 
@@ -13,6 +15,20 @@ namespace SocialStim.Rules.Commands
             var group = votes.Where(v => v.HasValue).GroupBy(v => v.Value)
                 .OrderByDescending(g => g.Count()).ThenBy(g => g.Key.Value).FirstOrDefault();
             return group != null && group.Count() > livingCount / 2 ? group.Key : (CharacterId?)null;
+        }
+
+        /// <summary>Tallies a plurality without requiring a majority or breaking ties by identity.</summary>
+        public static PluralityResult Plurality(IEnumerable<CharacterId?> votes)
+        {
+            if (votes == null) throw new ArgumentNullException(nameof(votes));
+            var ballots = votes.ToList();
+            var counts = ballots.Where(v => v.HasValue).GroupBy(v => v.Value).OrderBy(g => g.Key.Value)
+                .ToDictionary(g => g.Key, g => g.Count());
+            int maximum = counts.Values.DefaultIfEmpty(0).Max();
+            var leaders = counts.Where(p => p.Value == maximum).Select(p => p.Key).ToList().AsReadOnly();
+            return new PluralityResult(leaders.Count == 1 ? leaders[0] : (CharacterId?)null,
+                leaders.Count > 1 ? leaders : new List<CharacterId>().AsReadOnly(),
+                new ReadOnlyDictionary<CharacterId, int>(counts), ballots.Count(v => !v.HasValue));
         }
 
         /// <summary>Guilty must exceed innocent; ties and all-abstain acquit.</summary>

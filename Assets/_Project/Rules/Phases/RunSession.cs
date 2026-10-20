@@ -28,6 +28,11 @@ namespace SocialStim.Rules.Phases
         private readonly Dictionary<CharacterId, List<NightReport>> _results = new Dictionary<CharacterId, List<NightReport>>();
         private readonly Dictionary<CharacterId, RoleSpec> _revealed = new Dictionary<CharacterId, RoleSpec>();
         private readonly List<GameObservation> _transcript = new List<GameObservation>();
+        private readonly DiscussionSchedule _schedule;
+        private readonly DiscussionExchange _discussion;
+        private readonly List<CharacterId> _voteCandidates = new List<CharacterId>();
+        private PluralityResult _ballot;
+        private bool _revoting;
         private int _discussionRounds;
         private int _trials;
         private int _revision;
@@ -42,6 +47,9 @@ namespace SocialStim.Rules.Phases
         internal RunSession(RunOptions options, List<Participant> cast, IReadOnlyList<RoleSpec> catalog,
             IEnumerable<DialogueLine> dialogue, INpcStrategy strategy, IWinCondition winCondition, ReasoningSettings reasoning)
         {
+            _schedule = options.VotingMode == VotingMode.Gnosia
+                ? new DiscussionSchedule(options.DiscussionRounds, options.PlayerWindowsPerRound) : null;
+            _discussion = _schedule == null ? null : new DiscussionExchange(_schedule, new CharacterId(0));
             _options = options; _cast = cast; _catalog = catalog; _strategy = strategy; _winCondition = winCondition;
             _decisions = new SeededRandom(options.Seed ^ 0xA341316Cu);
             _dialogue = new DialogueSelector(dialogue, new SeededRandom(options.Seed ^ 0xC8013EA4u));
@@ -71,7 +79,10 @@ namespace SocialStim.Rules.Phases
                 new NightOrder(Player.Id, a.Id), actors)).Select(a => a.Id).ToList() : new List<CharacterId>();
             return new PlayerView(_revision, _options.Seed, _phases.Day, _phases.Phase, _trials, _options.TrialsPerDay,
                 Player.Alive, Player.Role, Player.Charges, _defendant, _outcome, PlayerWon(),
-                knowledge.Characters, legal.AsReadOnly(), _transcript.ToList().AsReadOnly(), _opening, _lastActions.ContainsKey(Player.Id), _options.DiscussionRounds);
+                knowledge.Characters, legal.AsReadOnly(), _transcript.ToList().AsReadOnly(), _opening, _lastActions.ContainsKey(Player.Id), _options.DiscussionRounds,
+                _options.VotingMode, _schedule?.Round ?? _discussionRounds + 1, _schedule?.Window ?? 1,
+                _options.PlayerWindowsPerRound, _discussion?.RespondTo,
+                _voteCandidates.Where(id => id != Player.Id).ToList().AsReadOnly(), _options.AllowAbstain, _revoting);
         }
 
         /// <summary>Applies one legal player command; invalid input leaves state and RNG untouched.</summary>
@@ -90,6 +101,7 @@ namespace SocialStim.Rules.Phases
             switch (_phases.Phase)
             {
                 case GamePhase.Discussion:
+                    if (_options.VotingMode == VotingMode.Gnosia) { Discuss(command); break; }
                     if (_opening && command.Kind == CommandKind.Continue)
                     {
                         _opening = false;
@@ -112,6 +124,8 @@ namespace SocialStim.Rules.Phases
                     foreach (Participant actor in Living().Where(c => c.Id != Player.Id).ToList()) SayNpc(actor);
                     if (++_discussionRounds >= _options.DiscussionRounds) Move(GamePhase.Nomination);
                     break;
+                case GamePhase.Voting: CastDailyVote(command); break;
+                case GamePhase.VoteReveal: CompleteVoteReveal(); break;
                 case GamePhase.Nomination: Nominate(command); break;
                 case GamePhase.Defense:
                     if (_defendant == Player.Id) Say(Player, command);
@@ -122,7 +136,8 @@ namespace SocialStim.Rules.Phases
                     Execute(); break;
                 case GamePhase.NightSelection: ResolveNight(command); break;
                 case GamePhase.Dawn:
-                    _trials = 0; _discussionRounds = 0; _opening = true; Move(GamePhase.Discussion); MorningReports(); break;
+                    _trials = 0; _discussionRounds = 0; _opening = true; _discussion?.Reset(); _revoting = false;
+                    _voteCandidates.Clear(); Move(GamePhase.Discussion); MorningReports(); break;
             }
             _revision++;
         }
@@ -138,9 +153,19 @@ namespace SocialStim.Rules.Phases
             switch (_phases.Phase)
             {
                 case GamePhase.Discussion:
+                    if (_discussion?.RespondTo != null)
+                        return SpeechLegal(Player, command) && (command.Intent == SpeechIntent.Defend || command.Intent == SpeechIntent.Accuse
+                            || command.Intent == SpeechIntent.ClaimRole || command.Intent == SpeechIntent.StaySilent)
+                            ? null : "Respond to the public accusation first.";
                     if (command.Kind == CommandKind.Continue && _opening) return null;
                     if (command.Kind == CommandKind.ReportLastAction) return _lastActions.ContainsKey(Player.Id) ? null : "There is no previous night action.";
                     return SpeechLegal(Player, command) ? null : "Invalid discussion statement.";
+                case GamePhase.Voting:
+                    return command.Kind == CommandKind.Vote && ((!command.Target.HasValue && _options.AllowAbstain)
+                        || command.Target.HasValue && command.Target.Value != Player.Id && _voteCandidates.Contains(command.Target.Value))
+                        ? null : "Choose a valid ballot target.";
+                case GamePhase.VoteReveal:
+                    return command.Kind == CommandKind.Continue ? null : "Acknowledge the public ballot result.";
                 case GamePhase.Nomination:
                     return command.Kind == CommandKind.Nominate && (!command.Target.HasValue || Living().Any(c => c.Id == command.Target && c.Id != Player.Id)) ? null : "Invalid nominee.";
                 case GamePhase.Defense:
@@ -177,10 +202,12 @@ namespace SocialStim.Rules.Phases
             return command.Intent != SpeechIntent.LastWords && command.Intent != SpeechIntent.ReportAction;
         }
 
-        private void SayNpc(Participant actor)
+        private GameCommand SayNpc(Participant actor)
         {
             GameCommand speech = _strategy.Speak(Knowledge(actor), _decisions);
-            Say(actor, speech != null && SpeechLegal(actor, speech) ? speech : GameCommand.Speak(SpeechIntent.StaySilent));
+            if (speech == null || !SpeechLegal(actor, speech)) speech = GameCommand.Speak(SpeechIntent.StaySilent);
+            Say(actor, speech);
+            return speech;
         }
 
         private void Say(Participant actor, GameCommand speech, string actionReport = null)
@@ -243,6 +270,96 @@ namespace SocialStim.Rules.Phases
                             NightActionText.Claimed(asserted.Ability));
                 }
             }
+        }
+
+        private void Discuss(GameCommand command)
+        {
+            if (_discussion.RespondTo.HasValue)
+            {
+                Say(Player, command); _discussion.Answer(); ContinueExchange(); return;
+            }
+            if (_opening && command.Kind == CommandKind.Continue && Player.Alive)
+            {
+                _opening = false;
+                var speakers = Living().Where(c => c.Id != Player.Id).ToList();
+                if (speakers.Count > 0)
+                {
+                    Participant speaker = speakers[_decisions.Next(speakers.Count)];
+                    _discussion.ObserveOpening(speaker.Id, SayNpc(speaker));
+                }
+                return;
+            }
+            _opening = false;
+            if (Player.Alive)
+            {
+                if (command.Kind == CommandKind.ReportLastAction) SayActionReport(Player);
+                else Say(Player, command);
+            }
+            _discussion.Begin(Living().Where(c => c.Id != Player.Id).Select(c => c.Id), command,
+                id => Say(Actor(id), GameCommand.Speak(SpeechIntent.Defend)));
+            ContinueExchange();
+        }
+
+        private void ContinueExchange()
+        {
+            _discussion.Resume(id => SayNpc(Actor(id)), id => Say(Actor(id), GameCommand.Speak(SpeechIntent.Defend)), Player.Alive);
+            if (!_schedule.Complete) return;
+            _voteCandidates.Clear(); _voteCandidates.AddRange(Living().Select(c => c.Id));
+            Move(GamePhase.Voting);
+        }
+
+        private void CastDailyVote(GameCommand command)
+        {
+            var ballots = new List<KeyValuePair<CharacterId, CharacterId?>>();
+            foreach (Participant actor in Living())
+            {
+                CharacterId? vote = actor.Id == Player.Id ? command.Target : _strategy.Nominate(Knowledge(actor), _decisions);
+                var targets = _voteCandidates.Where(id => id != actor.Id).ToList();
+                if (!vote.HasValue || !targets.Contains(vote.Value))
+                {
+                    vote = null;
+                    if (!_options.AllowAbstain)
+                    {
+                        KnowledgeView knowledge = Knowledge(actor);
+                        var ranked = knowledge.Characters.Where(c => targets.Contains(c.Id))
+                            .OrderBy(c => c.IsTeammate || actor.Role.Faction == Faction.Town && c.KnownFaction == Faction.Town)
+                            .ThenByDescending(c => c.Suspicion).ThenBy(c => c.Id.Value).FirstOrDefault();
+                        vote = ranked?.Id;
+                    }
+                }
+                ballots.Add(new KeyValuePair<CharacterId, CharacterId?>(actor.Id, vote));
+            }
+            // All ballots are chosen before any are published; there is no later-voter information advantage.
+            foreach (var ballot in ballots)
+            {
+                foreach (Participant observer in _cast) _beliefs[observer.Id].ObserveNomination(ballot.Key, ballot.Value, _phases.Day);
+                Emit(GameCue.BallotRevealed, Actor(ballot.Key).Name + " votes "
+                    + (ballot.Value.HasValue ? Actor(ballot.Value.Value).Name : "to abstain") + ".", ballot.Key, target: ballot.Value);
+            }
+            _ballot = VoteResolver.Plurality(ballots.Select(b => b.Value));
+            string tally = string.Join(" · ", _ballot.Counts.Select(pair => Actor(pair.Key).Name + ": " + pair.Value));
+            Emit(GameCue.VoteTallied, (tally.Length > 0 ? tally : "No votes cast") + " · Abstentions: " + _ballot.Abstentions + ".");
+            _defendant = _ballot.Winner;
+            if (!_defendant.HasValue) Emit(GameCue.VoteTied, _ballot.Tied.Count > 0 ? "The vote is tied." : "Everyone abstained.");
+            Move(GamePhase.VoteReveal);
+        }
+
+        private void CompleteVoteReveal()
+        {
+            if (!_defendant.HasValue)
+            {
+                if (!_revoting && _options.RevoteTies && _ballot.Tied.Count > 1)
+                {
+                    _revoting = true; _voteCandidates.Clear(); _voteCandidates.AddRange(_ballot.Tied);
+                    Emit(GameCue.RevoteStarted, "Revote between " + string.Join(", ", _voteCandidates.Select(id => Actor(id).Name)) + ".");
+                    Move(GamePhase.Voting);
+                }
+                else StartNight();
+                return;
+            }
+            if (!_options.LastWords) { Execute(); return; }
+            Move(GamePhase.LastWords);
+            if (_defendant != Player.Id) Say(Actor(_defendant.Value), GameCommand.Speak(SpeechIntent.LastWords));
         }
 
         private void Nominate(GameCommand command)
@@ -425,6 +542,8 @@ namespace SocialStim.Rules.Phases
                 case GamePhase.Defense: text = $"Trial {_trials}/{_options.TrialsPerDay}: {Actor(_defendant.Value).Name}."; break;
                 case GamePhase.Discussion: text = "Discussion begins."; break;
                 case GamePhase.Nomination: text = "Nominations open."; break;
+                case GamePhase.Voting: text = _revoting ? "Revote." : "Vote."; break;
+                case GamePhase.VoteReveal: return;
                 case GamePhase.Judgement: text = "Time to vote."; break;
                 case GamePhase.LastWords: text = "Last words."; break;
                 case GamePhase.NightSelection: text = $"Night {_phases.Day}."; break;
