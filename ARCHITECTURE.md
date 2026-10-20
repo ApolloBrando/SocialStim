@@ -385,3 +385,42 @@ RoleSpec carries explicit claim flags, capability flags and a personal objective
 ## Mission phase 2
 
 The modern CouncilSession is decomposed into scoped world, day, speech, vote and night services. Public/recipient events are re-indexed after filtering to prevent private-count side channels. CouncilController owns engine-free three-step navigation and stale IDs; Unity adapters build a focused line/roster/action view. Original sessions remain an optional Trial Mode. Phrase preview uses a separate seeded stream and does not mutate revision or history. See docs/COUNCIL_UI.md.
+## Mission part two: audit baseline and first repairs
+
+The controlling phase plan is [Docs/AUDIT.md](Docs/AUDIT.md). Future discussion,
+role, settings, inference, dialogue and effect systems described there are planned,
+not implemented. Work uses phase branches/PRs and never writes directly to main.
+
+DisplayPlayback now separates acknowledgement completion from retained text-motion
+lifetime. Explicit continuous TextShake tracks keep ticking after reveal/skip;
+Cancel or replacement removes them. Screen channels remain bounded, and continuous
+flash is rejected. EffectSequence and inspector conversion preserve this policy.
+The existing timed pulse contract is unchanged for non-continuous tracks.
+
+TextGameView groups all display settings in a separate panel with reset defaults.
+Default reveal speed is 84 text elements/second; existing saved choices remain
+valid. Policy changes clear any retained animation. Day/night palettes are unchanged.
+Both NPC strategies veto hostile Town choices against hard observer-known Town
+alignment, independent of stale suspicion. These repairs do not implement the
+mission's joint-world inference or new role catalog.
+
+## Mission Phase 1A: discussion and plurality vote
+
+See [Docs/DISCUSSION_VOTING.md](Docs/DISCUSSION_VOTING.md) for the implemented
+contract, explicit UI limitations and manual checklist. Gnosia mode is the new
+run default. Trial Mode remains an explicit alternative; legacy regression
+fixtures select Trial instead of silently changing their behavioral contract.
+
+DiscussionSchedule counts ordinary windows. DiscussionExchange owns the public
+speaking queue and priority responses, independent of authoritative role state.
+RunSession supplies scoped strategy decisions and emits existing speech evidence.
+PluralityResult is a detached public tally; no ballot is published until all
+voters decide. Appended Voting/VoteReveal phases guard the single-revote and
+elimination boundary. PlayerView exposes public round/window/response/candidate
+state, and GameController creates valid revision-scoped choices. New bootstrap
+fields use default group rounds of five while preserving old scene fields for
+Trial Mode. No scene YAML or existing metadata GUID is rewritten.
+
+This is the Phase 1A loop foundation, not the complete interaction/UI rewrite.
+Current-menu replacement, reason-tagged phrasing, current-line presentation and
+the drawer remain subsequent work. No main commit/merge is performed.

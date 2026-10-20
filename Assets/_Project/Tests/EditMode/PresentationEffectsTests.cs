@@ -148,10 +148,49 @@ namespace SocialStim.Tests.EditMode
             Assert.Throws<ArgumentOutOfRangeException>(() => playback.Tick(float.NaN));
             Assert.Throws<ArgumentOutOfRangeException>(() => playback.Tick(-1));
         }
+        [TestCase(false)]
+        [TestCase(true)]
+        public void ContinuousMotionOutlivesRevealWithoutHoldingInputOrRepeatingAcknowledgements(bool skip)
+        {
+            var playback = new DisplayPlayback(); int calls = 0;
+            var profile = new EffectSequence().Parallel(new EffectStep(EffectChannel.TextShake, 0.45f, 0.4f, continuous: true)).Build();
+            playback.Begin(1, SemanticText.Literal("A"), profile, Full, _ => calls++);
+            if (skip) playback.Skip(); else playback.Tick(1);
+            float elapsed = playback.Elapsed;
+            playback.Tick(5);
+            Assert.That(playback.Busy, Is.False);
+            Assert.That(playback.VisibleUtf16, Is.EqualTo(1));
+            Assert.That(playback.Frame.Shake, Is.EqualTo(0.4f).Within(0.0001));
+            Assert.That(playback.Elapsed, Is.GreaterThan(elapsed));
+            Assert.That(calls, Is.EqualTo(1));
+            playback.Cancel(); playback.Tick(5);
+            Assert.That(playback.Frame.Shake, Is.Zero);
+            Assert.That(calls, Is.EqualTo(1));
+            playback.Begin(2, SemanticText.Literal("B"), EffectProfile.None, Full, _ => calls++);
+            playback.Tick(1);
+            Assert.That(playback.Frame.Shake, Is.Zero);
+            Assert.That(calls, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void ContinuousMotionStillRespectsReducedMotionAndFlashSafety()
+        {
+            var profile = new EffectProfile(new[] { new EffectStep(EffectChannel.TextShake, 0.45f, 1, continuous: true) });
+            Assert.That(profile.Sample(10, new EffectsSettings()).Shake, Is.Zero);
+            Assert.That(profile.Sample(10, new EffectsSettings(enabled: false)).Shake, Is.Zero);
+            Assert.Throws<ArgumentException>(() => new EffectStep(EffectChannel.Flash, 1, 1, continuous: true));
+        }
+
+        [Test]
+        public void DefaultRevealSpeedIsThreeTimesThePreviousDefault()
+        {
+            Assert.That(new EffectsSettings().ElementsPerSecond, Is.EqualTo(84));
+        }
+
         [Test]
         public void PublicSpeechCuesUseTheAssertedRoleAndIntent()
         {
-            var run = RunFactory.CreateScenario(new RunOptions(123, discussionRounds: 3), new[] {
+            var run = RunFactory.CreateScenario(new RunOptions(123, discussionRounds: 3, votingMode: VotingMode.Trial), new[] {
                 new CastMemberSpec("Player", new SocialStim.Rules.Roles.RoleId("assassin")),
                 new CastMemberSpec("Town1", new SocialStim.Rules.Roles.RoleId("inspector")),
                 new CastMemberSpec("Town2", new SocialStim.Rules.Roles.RoleId("physician")),
