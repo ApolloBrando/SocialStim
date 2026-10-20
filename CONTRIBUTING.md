@@ -6,7 +6,7 @@ The Mission part two supersedes historical main-publication permissions below.
 Never commit to main. Use one phase branch and PR per phase (split large phases).
 Do not merge automatically or rewrite history. Remove confirmed dead/duplicate
 code when appropriate and enumerate every deletion in the PR; uncertain code stays.
-See [Docs/AUDIT.md](Docs/AUDIT.md) for the current work plan.
+See [Docs/PRE_MERGE_AUDIT.md](Docs/PRE_MERGE_AUDIT.md) for the current work plan.
 
 ## Historical foundation workflow
 

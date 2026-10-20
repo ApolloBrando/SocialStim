@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import subprocess
 from pathlib import Path
 
 
@@ -50,10 +51,20 @@ def validate() -> list[str]:
         if not condition:
             errors.append(message)
 
-    files = [
-        path for path in ROOT.rglob("*")
-        if path.is_file() and ".git" not in path.relative_to(ROOT).parts
-    ]
+    # Inspect versioned inputs, not ignored Unity/.NET output from an earlier check.
+    # Include new source files so local validation also works before git add.
+    result = subprocess.run(
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
+        cwd=ROOT, check=True, capture_output=True,
+    )
+    files = sorted({ROOT / name for name in result.stdout.decode("utf-8").split("\0")
+                    if name and (ROOT / name).is_file()})
+    folded: dict[str, Path] = {}
+    for path in files:
+        relative = path.relative_to(ROOT).as_posix()
+        key = relative.casefold()
+        require(key not in folded, f"Case-colliding paths: {folded.get(key)} and {relative}")
+        folded[key] = relative
     imported = [
         path for path in ASSETS.rglob("*")
         if not any(part.startswith(".") for part in path.relative_to(ASSETS).parts)
@@ -195,6 +206,8 @@ def validate() -> list[str]:
                 errors.append(f"Expected UTF-8 text: {relative}")
                 continue
             require(all(line == line.rstrip() for line in lines), f"Trailing whitespace: {relative}")
+            require(not any(re.match(r"^(<{7}|={7}|>{7})(?: |$)", line) for line in lines),
+                    f"Unresolved merge conflict: {relative}")
         if path.suffix == ".cs":
             parent = path.parent
             while parent != ASSETS and not list(parent.glob("*.asmdef")):
@@ -210,7 +223,7 @@ def main() -> int:
     """Print failures and return a process exit code suitable for local checks."""
     try:
         failures = validate()
-    except (OSError, TypeError, AttributeError) as error:
+    except (OSError, TypeError, AttributeError, subprocess.CalledProcessError) as error:
         print(f"FAIL: Unable to validate scaffold: {error}", file=sys.stderr)
         return 1
     if failures:
