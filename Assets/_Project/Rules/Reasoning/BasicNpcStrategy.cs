@@ -22,10 +22,10 @@ namespace SocialStim.Rules.Reasoning
                 return GameCommand.Speak(SpeechIntent.ReportInvestigation, result.Target, faction: result.Alignment);
             if (knowledge.OwnRole.CanBluff && decoy != null && random.Next(100) < 25)
                 return GameCommand.Speak(SpeechIntent.ClaimRole, role: claim);
-            KnownCharacter suspect = Suspect(knowledge);
-            if (knowledge.OwnRole.Faction == Faction.Antagonist && knowledge.Day > 1 && suspect != null && random.Next(100) < 25)
-                return GameCommand.Speak(SpeechIntent.ReportInvestigation, suspect.Id, faction: Faction.Antagonist);
-            if (suspect != null && (suspect.Suspicion >= 30 || (knowledge.Personality == Personality.Brave || knowledge.Personality == Personality.Smug)))
+            KnownCharacter suspect = SocialAssessment.Suspect(knowledge, random);
+            GameCommand fabrication = ClaimPolicy.FabricatedInvestigation(knowledge, random);
+            if (fabrication != null && random.Next(100) < 25) return fabrication;
+            if (suspect != null && (SocialAssessment.Threat(knowledge, suspect) >= 45))
                 return GameCommand.Speak(SpeechIntent.Accuse, suspect.Id);
             int choice = random.Next(4);
             if (choice == 0 && decoy != null && (knowledge.OwnRole.CanBluff || knowledge.SelfExposure >= 40))
@@ -37,9 +37,10 @@ namespace SocialStim.Rules.Reasoning
         /// <inheritdoc />
         public CharacterId? Nominate(KnowledgeView knowledge, IRandomSource random)
         {
-            KnownCharacter suspect = Suspect(knowledge);
+            KnownCharacter suspect = SocialAssessment.Suspect(knowledge, random, nomination: true);
             int threshold = (knowledge.Personality == Personality.Anxious || knowledge.Personality == Personality.Grim) ? 34 : 24;
-            return suspect != null && suspect.Suspicion >= threshold ? suspect.Id : (CharacterId?)null;
+            return suspect != null && (knowledge.OwnRole.Faction == Faction.Antagonist
+                || SocialAssessment.Threat(knowledge, suspect) >= threshold) ? suspect.Id : (CharacterId?)null;
         }
 
         /// <inheritdoc />
@@ -47,10 +48,7 @@ namespace SocialStim.Rules.Reasoning
         {
             KnownCharacter target = knowledge.Characters.First(c => c.Id == defendant);
             if (target.IsTeammate || knowledge.OwnRole.Faction == Faction.Town && ConfirmedTown(target)) return Verdict.Innocent;
-            int threshold = (knowledge.Personality == Personality.Anxious || knowledge.Personality == Personality.Grim) ? 42 : 30;
-            if ((knowledge.Personality == Personality.Brave)) threshold += 6;
-            if (knowledge.OwnRole.Faction == Faction.Antagonist) threshold -= 12;
-            return target.Suspicion >= threshold ? Verdict.Guilty : Verdict.Innocent;
+            return SocialAssessment.Judge(knowledge, target, 50);
         }
 
         /// <inheritdoc />
@@ -69,21 +67,18 @@ namespace SocialStim.Rules.Reasoning
             }
             if (targets.Count == 0) return null;
             if (knowledge.OwnRole.Ability == AbilityKind.Protect)
-                return targets.OrderBy(c => c.Suspicion).ThenBy(c => c.Id.Value).First().Id;
+                return targets.OrderBy(c => c.Suspicion).ThenBy(c => random.Next(1000)).First().Id;
             if (knowledge.OwnRole.Ability == AbilityKind.Attack && knowledge.OwnRole.Faction == Faction.Town)
             {
-                KnownCharacter suspect = targets.OrderByDescending(c => c.Suspicion).ThenBy(c => c.Id.Value).First();
-                return suspect.Suspicion >= 60 ? suspect.Id : (CharacterId?)null;
+                KnownCharacter suspect = targets.OrderByDescending(c => SocialAssessment.CaseStrength(knowledge, c))
+                    .ThenByDescending(c => c.Suspicion).ThenBy(c => random.Next(1000)).First();
+                return SocialAssessment.Threat(knowledge, suspect) >= 60 && SocialAssessment.CaseStrength(knowledge, suspect) >= 22 ? suspect.Id : (CharacterId?)null;
             }
             if (knowledge.OwnRole.Ability == AbilityKind.Attack)
-                return targets.OrderBy(c => c.Suspicion).ThenBy(c => c.Id.Value).First().Id;
-            return targets.OrderByDescending(c => c.Suspicion).ThenBy(c => c.Id.Value).First().Id;
+                return targets.OrderBy(c => c.Suspicion).ThenBy(c => random.Next(1000)).First().Id;
+            return targets.OrderByDescending(c => c.Suspicion).ThenBy(c => random.Next(1000)).First().Id;
         }
 
         private static bool ConfirmedTown(KnownCharacter character) => character.KnownFaction == Faction.Town;
-        private static KnownCharacter Suspect(KnowledgeView knowledge) => knowledge.Characters
-            .Where(c => c.Alive && c.Id != knowledge.Self && !c.IsTeammate
-                && (knowledge.OwnRole.Faction != Faction.Town || !ConfirmedTown(c)))
-            .OrderByDescending(c => c.Suspicion).ThenBy(c => c.Id.Value).FirstOrDefault();
     }
 }

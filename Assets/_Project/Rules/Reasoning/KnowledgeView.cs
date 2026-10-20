@@ -12,7 +12,8 @@ namespace SocialStim.Rules.Reasoning
         /// <summary>Copies allowed knowledge; true roles of other characters are absent.</summary>
         public KnowledgeView(CharacterId self, RoleSpec ownRole, Personality personality, int charges,
             int day, IEnumerable<KnownCharacter> characters, IEnumerable<NightReport> privateResults,
-            IEnumerable<EvidenceRecord> evidence = null, int selfExposure = 0, IEnumerable<RoleSpec> roleCatalog = null, TeamNightPlan teamPlan = null)
+            IEnumerable<EvidenceRecord> evidence = null, int selfExposure = 0, IEnumerable<RoleSpec> roleCatalog = null, TeamNightPlan teamPlan = null,
+            IEnumerable<CharacterId> nominationCandidates = null)
         {
             Self = self; OwnRole = ownRole; Personality = personality; Charges = charges; Day = day;
             Characters = characters.OrderBy(c => c.Id.Value).ToList().AsReadOnly();
@@ -21,6 +22,7 @@ namespace SocialStim.Rules.Reasoning
             SelfExposure = selfExposure;
             RoleCatalog = (roleCatalog ?? new[] { ownRole }).OrderBy(r => r.Id.Value, System.StringComparer.Ordinal).ToList().AsReadOnly();
             TeamPlan = ownRole.Faction == Faction.Antagonist ? teamPlan : null;
+            NominationCandidates = nominationCandidates?.Distinct().ToList().AsReadOnly();
         }
         /// <summary>Observer identity.</summary>
         public CharacterId Self { get; }
@@ -44,5 +46,7 @@ namespace SocialStim.Rules.Reasoning
         public IReadOnlyList<RoleSpec> RoleCatalog { get; }
         /// <summary>Previous authorized faction plan; always null for other factions.</summary>
         public TeamNightPlan TeamPlan { get; }
+        /// <summary>Public legal targets in a restricted revote; null means all living opponents.</summary>
+        public IReadOnlyList<CharacterId> NominationCandidates { get; }
     }
 }

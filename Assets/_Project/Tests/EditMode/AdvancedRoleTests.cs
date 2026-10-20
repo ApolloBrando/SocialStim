@@ -139,7 +139,8 @@ namespace SocialStim.Tests.EditMode
             Assert.That(condition.Evaluate(new[] { Actor(0, "assassin"), Actor(1, "citizen"), Actor(2, "lone-killer") }, 1, 30), Is.EqualTo(OutcomeKind.Ongoing));
             Assert.That(condition.Evaluate(new[] { Actor(0, "assassin"), Actor(1, "physician") }, 30, 30), Is.EqualTo(OutcomeKind.Draw));
             Assert.That(condition.Evaluate(new[] { Actor(0, "assassin"), Actor(1, "citizen") }, 1, 30), Is.EqualTo(OutcomeKind.AntagonistVictory));
-            Assert.That(condition.Evaluate(new[] { Actor(0, "lone-killer"), Actor(1, "survivor") }, 1, 30), Is.EqualTo(OutcomeKind.LoneKillerVictory));
+            Assert.That(condition.Evaluate(new[] { Actor(0, "lone-killer"), Actor(1, "survivor") }, 1, 30), Is.EqualTo(OutcomeKind.Ongoing));
+            Assert.That(condition.Evaluate(new[] { Actor(0, "lone-killer") }, 1, 30), Is.EqualTo(OutcomeKind.LoneKillerVictory));
             Assert.That(condition.Evaluate(new NightActor[0], 1, 30), Is.EqualTo(OutcomeKind.Draw));
         }
 

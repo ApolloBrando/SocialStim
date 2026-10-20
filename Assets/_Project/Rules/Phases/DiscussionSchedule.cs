@@ -2,7 +2,7 @@ using System;
 
 namespace SocialStim.Rules.Phases
 {
-    /// <summary>Counts ordinary player windows separately from priority responses.</summary>
+    /// <summary>Bounded round counter with legacy window accounting retained for compatibility.</summary>
     public sealed class DiscussionSchedule
     {
         private readonly int _rounds;
@@ -27,6 +27,12 @@ namespace SocialStim.Rules.Phases
         {
             if (Complete) throw new InvalidOperationException("Discussion is complete.");
             _completed++;
+        }
+        /// <summary>Every accepted player action consumes the round, including response/counterclaim actions.</summary>
+        public void AdvanceRound()
+        {
+            if (Complete) throw new InvalidOperationException("Discussion is complete.");
+            _completed = Math.Min(_rounds * _windows, (_completed / _windows + 1) * _windows);
         }
         /// <summary>Starts a fresh day's schedule.</summary>
         public void Reset() => _completed = 0;

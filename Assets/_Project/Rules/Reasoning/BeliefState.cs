@@ -13,8 +13,8 @@ namespace SocialStim.Rules.Reasoning
     /// <summary>Observer-local attributed evidence, credibility, estimates, and visible self-exposure.</summary>
     internal sealed class BeliefState
     {
-        private readonly Dictionary<CharacterId, int> _suspicion = new Dictionary<CharacterId, int>();
-        private readonly Dictionary<CharacterId, int> _trust = new Dictionary<CharacterId, int>();
+        private readonly Dictionary<CharacterId, float> _suspicion = new Dictionary<CharacterId, float>();
+        private readonly Dictionary<CharacterId, float> _trust = new Dictionary<CharacterId, float>();
         private readonly Dictionary<CharacterId, RoleId> _claims = new Dictionary<CharacterId, RoleId>();
         private readonly List<ReportAssertion> _reports = new List<ReportAssertion>();
         private readonly List<NightReport> _privateReports = new List<NightReport>();
@@ -24,22 +24,33 @@ namespace SocialStim.Rules.Reasoning
         private readonly CharacterId _self;
         private readonly ReasoningSettings _settings;
         private readonly bool _deceptionPossible;
+        private readonly RoleSpec _ownRole;
+        private readonly HashSet<(int, CharacterId, CharacterId, bool)> _heard = new HashSet<(int, CharacterId, CharacterId, bool)>();
+        private readonly Dictionary<(int, CharacterId, bool), float> _socialBudget = new Dictionary<(int, CharacterId, bool), float>();
+        private readonly HashSet<(int, CharacterId, CharacterId, bool)> _stances = new HashSet<(int, CharacterId, CharacterId, bool)>();
+        private readonly HashSet<CharacterId> _revealed = new HashSet<CharacterId>();
 
         internal BeliefState(IEnumerable<CharacterId> characters, Personality personality, IRandomSource random,
             CharacterId self, RoleSpec ownRole, SetupKnowledge setup, IReadOnlyList<RoleSpec> catalog,
             IEnumerable<CharacterId> teammates, ReasoningSettings settings)
         {
-            _self = self; _personality = personality; _settings = settings;
+            _self = self; _ownRole = ownRole; _personality = personality; _settings = settings;
             _deceptionPossible = catalog.Any(r => r.Ability == AbilityKind.Forge);
             var ids = characters.ToList();
-            foreach (CharacterId id in ids) { _suspicion.Add(id, 12 + random.Next(13)); _trust.Add(id, 45 + random.Next(11)); }
+            foreach (CharacterId id in ids)
+            {
+                _suspicion.Add(id, id == self ? 0 : random.Next(10001) / 1000f);
+                _trust.Add(id, id == self ? 10 : random.Next(10001) / 1000f);
+            }
             _distribution = new BeliefDistribution(ids, setup, catalog, self, ownRole, teammates);
         }
 
         internal int Exposure { get; private set; }
         internal IReadOnlyList<EvidenceRecord> Evidence => _evidence.ToList().AsReadOnly();
-        internal int Suspicion(CharacterId target) => _suspicion[target];
-        internal int Trust(CharacterId target) => _trust[target];
+        internal int Suspicion(CharacterId target) => (int)Math.Round(_suspicion[target] * 10);
+        internal float SuspicionValue(CharacterId target) => _suspicion[target];
+        internal int Trust(CharacterId target) => (int)Math.Round(_trust[target] * 10);
+        internal float TrustValue(CharacterId target) => _trust[target];
         internal Faction? KnownFaction(CharacterId target) => _distribution.KnownFaction(target);
         internal FactionEstimate Factions(CharacterId target) => _distribution.Factions(target);
         internal IReadOnlyList<RoleEstimate> Roles(CharacterId target) => _distribution.Roles(target);
@@ -47,7 +58,7 @@ namespace SocialStim.Rules.Reasoning
 
         internal void Observe(CharacterId speaker, GameCommand speech, int day)
         {
-            int influence = Math.Max(0, _settings.AssertionWeight * (_trust[speaker] + 25) / 75);
+            int influence = Math.Max(0, (int)Math.Round(_settings.AssertionWeight * (_trust[speaker] * 10 + 25) / 75));
             if ((_personality == Personality.Anxious || _personality == Personality.Slow)) influence += _settings.GullibleBonus;
             if ((_personality == Personality.Anxious || _personality == Personality.Grim)) influence = Math.Max(0, influence - 2);
             EvidenceKind kind = speech.Intent == SpeechIntent.ClaimRole || speech.Intent == SpeechIntent.CounterClaim ? EvidenceKind.RoleClaim
@@ -57,24 +68,21 @@ namespace SocialStim.Rules.Reasoning
             {
                 if (speech.Target.HasValue)
                 {
-                    Change(speech.Target.Value, influence);
-                    _distribution.AssertAlignment(speech.Target.Value, Faction.Antagonist, influence * 2);
-                    if (speech.Target.Value == _self && speaker != _self) Expose(influence);
+                    Social(speaker, speaker, speech.Target.Value, day, true, influence, false);
                 }
                 if (speech.Intent == SpeechIntent.Deflect) Change(speaker, 4);
             }
             if (speech.Intent == SpeechIntent.Vouch && speech.Target.HasValue)
             {
-                Change(speech.Target.Value, -influence);
-                _distribution.AssertAlignment(speech.Target.Value, Faction.Town, influence);
-                if (speech.Target.Value == _self && speaker != _self) Expose(-influence / 2);
+                Social(speaker, speaker, speech.Target.Value, day, false, influence, false);
             }
             if (speech.Intent == SpeechIntent.Defend)
-            { Change(speaker, -3); if (speaker == _self) Expose(-3); }
-            if (speech.Intent == SpeechIntent.Agree && speech.Target.HasValue) TrustChange(speech.Target.Value, 3);
-            if (speech.Intent == SpeechIntent.Disagree && speech.Target.HasValue) TrustChange(speech.Target.Value, -3);
+            { Social(speaker, speaker, speaker, day, false, influence, false); if (speaker == _self) Expose(-3); }
             if ((speech.Intent == SpeechIntent.Agree || speech.Intent == SpeechIntent.Disagree) && speech.Target.HasValue)
             {
+                bool agrees = speech.Intent == SpeechIntent.Agree;
+                if (speaker != _self && _stances.Add((day, speaker, speech.Target.Value, agrees)))
+                    TrustChange(speech.Target.Value, agrees ? 1 : -1);
                 EvidenceRecord statement = _evidence.LastOrDefault(e => e.Actor == speech.Target.Value
                     && (e.Intent == SpeechIntent.Accuse || e.Intent == SpeechIntent.Deflect
                         || e.Intent == SpeechIntent.Vouch || e.Intent == SpeechIntent.Defend));
@@ -82,10 +90,8 @@ namespace SocialStim.Rules.Reasoning
                 {
                     CharacterId subject = statement.Target ?? statement.Actor;
                     bool accusation = statement.Intent == SpeechIntent.Accuse || statement.Intent == SpeechIntent.Deflect;
-                    int change = (speech.Intent == SpeechIntent.Agree) == accusation ? influence : -influence;
-                    Change(subject, change);
-                    _distribution.AssertAlignment(subject, change > 0 ? Faction.Antagonist : Faction.Town, Math.Abs(change));
-                    if (subject == _self) Expose(change);
+                    bool pressure = (speech.Intent == SpeechIntent.Agree) == accusation;
+                    Social(speaker, statement.Actor, subject, day, pressure, influence, true);
                 }
             }
             if (speech.ClaimedRole.HasValue)
@@ -94,6 +100,9 @@ namespace SocialStim.Rules.Reasoning
                 if (priorExists && prior != speech.ClaimedRole.Value) Penalize(speaker, _settings.ContradictionPenalty, day, true);
                 if (!priorExists || prior != speech.ClaimedRole.Value) _distribution.Claim(speaker, speech.ClaimedRole.Value, influence);
                 _claims[speaker] = speech.ClaimedRole.Value;
+                if (speaker != _self && _ownRole.Unique && speech.ClaimedRole == _ownRole.Id
+                    && !_evidence.Any(e => e.Kind == EvidenceKind.Contradiction && e.Actor == speaker))
+                    Penalize(speaker, _settings.ContradictionPenalty, day, false);
             }
             if (speech.Intent == SpeechIntent.ReportInvestigation && speech.Target.HasValue && speech.ReportedFaction.HasValue)
                 ObserveReport(speaker, speech.Target.Value, speech.ReportedFaction.Value, day, influence);
@@ -105,20 +114,30 @@ namespace SocialStim.Rules.Reasoning
             if (_reports.Any(r => r.Speaker == speaker && r.Target == target && r.Night == night && r.Alignment == alignment)) return;
             if (_reports.Any(r => r.Speaker == speaker && r.Target == target && r.Night == night && r.Alignment != alignment))
                 Penalize(speaker, _settings.ContradictionPenalty, day, true);
+            if (_reports.Any(r => r.Speaker == speaker && r.Target != target && r.Night == night))
+                Penalize(speaker, _settings.ContradictionPenalty, day, true);
             foreach (CharacterId other in _reports.Where(r => r.Speaker != speaker && r.Target == target && r.Night == night && r.Alignment != alignment).Select(r => r.Speaker).Distinct())
             { Penalize(speaker, 5, day, true); Penalize(other, 5, day, true); }
-            if (_privateReports.Any(r => r.Target == target && r.Night == night && r.Alignment != alignment))
+            if (_privateReports.Any(r => r.Kind == ReportKind.Investigation && r.Target == target && r.Night == night && r.Alignment != alignment))
+                Penalize(speaker, _settings.ContradictionPenalty, day, false);
+            if (_privateReports.Any(r => r.Kind == ReportKind.VisitorSeen && r.Night == night
+                && r.Target == speaker && r.Subject.HasValue && r.Subject != target))
                 Penalize(speaker, _settings.ContradictionPenalty, day, false);
             _reports.Add(new ReportAssertion(speaker, target, night, alignment));
-            Change(target, alignment == Faction.Antagonist ? influence + 6 : -influence);
-            _distribution.AssertAlignment(target, alignment, influence * 3);
+            if (speaker != _self)
+            {
+                Change(target, alignment == Faction.Antagonist ? influence + 6 : -influence);
+                _distribution.AssertAlignment(target, alignment, influence * 3);
+            }
         }
 
         internal void Receive(NightReport report)
         {
             if (report.Recipient != _self) throw new ArgumentException("A belief model cannot read another observer's private report.");
-            if (report.Kind != ReportKind.Investigation || !report.Target.HasValue || !report.Alignment.HasValue) return;
+            if (_privateReports.Any(r => r.Kind == report.Kind && r.Night == report.Night && r.Target == report.Target
+                && r.Alignment == report.Alignment && r.Subject == report.Subject)) return;
             _privateReports.Add(report);
+            if (report.Kind != ReportKind.Investigation || !report.Target.HasValue || !report.Alignment.HasValue) return;
             Record(report.Night + 1, EvidenceKind.PrivateInvestigation, _self, report.Target, alignment: report.Alignment, night: report.Night);
             Change(report.Target.Value, report.Alignment == Faction.Antagonist ? 65 : -45);
             _distribution.AssertAlignment(report.Target.Value, report.Alignment.Value, 600);
@@ -126,13 +145,15 @@ namespace SocialStim.Rules.Reasoning
 
         internal void Reveal(CharacterId target, RoleSpec role, int day)
         {
+            if (!_revealed.Add(target)) return;
             _distribution.Know(target, role.Faction, role.Id);
             Record(day, EvidenceKind.RoleReveal, target, target, role: role.Id, alignment: role.Faction);
             if (_claims.TryGetValue(target, out RoleId claim) && claim != role.Id) Penalize(target, _settings.ContradictionPenalty, day, true);
             foreach (CharacterId reporter in _reports.Where(r => !_deceptionPossible && r.Target == target && r.Alignment != role.Appearance).Select(r => r.Speaker).Distinct())
                 Penalize(reporter, _settings.ContradictionPenalty, day, true);
             foreach (EvidenceRecord accusation in _evidence.Where(e => e.Kind == EvidenceKind.Statement && e.Target == target
-                && (e.Intent == SpeechIntent.Accuse || e.Intent == SpeechIntent.CallForTrial)).ToList())
+                && (e.Intent == SpeechIntent.Accuse || e.Intent == SpeechIntent.CallForTrial || e.Intent == SpeechIntent.Deflect))
+                .GroupBy(e => e.Actor).Select(g => g.First()).ToList())
             {
                 Change(accusation.Actor, role.Faction == Faction.Antagonist ? -8 : 4);
                 TrustChange(accusation.Actor, role.Faction == Faction.Antagonist ? 8 : -4);
@@ -157,8 +178,8 @@ namespace SocialStim.Rules.Reasoning
         internal void ObserveVote(CharacterId voter, CharacterId defendant, Verdict verdict, int day)
         {
             Record(day, EvidenceKind.Judgement, voter, defendant, verdict: verdict);
-            if (_suspicion[defendant] >= 60 && verdict == Verdict.Innocent) Change(voter, 6);
-            if (_suspicion[defendant] < 20 && verdict == Verdict.Guilty) Change(voter, 4);
+            if (Suspicion(defendant) >= 60 && verdict == Verdict.Innocent) Change(voter, 6);
+            if (Suspicion(defendant) < 20 && verdict == Verdict.Guilty) Change(voter, 4);
             if (defendant == _self && voter != _self) Expose(verdict == Verdict.Guilty ? 8 : verdict == Verdict.Innocent ? -4 : 0);
         }
 
@@ -174,8 +195,27 @@ namespace SocialStim.Rules.Reasoning
         private void Record(int day, EvidenceKind kind, CharacterId actor, CharacterId? target = null,
             SpeechIntent? intent = null, RoleId? role = null, Faction? alignment = null, Verdict? verdict = null, int night = 0)
             => _evidence.Add(new EvidenceRecord(_evidence.Count, day, kind, actor, target, intent, role, alignment, verdict, night));
-        private void Change(CharacterId target, int amount) => _suspicion[target] = Clamp(_suspicion[target] + amount);
-        private void TrustChange(CharacterId target, int amount) => _trust[target] = Clamp(_trust[target] + amount);
+        private void Social(CharacterId listenerSpeaker, CharacterId origin, CharacterId target, int day, bool pressure, int influence, bool echo)
+        {
+            // The same source cannot manufacture corroboration by repeating itself or attracting echoes.
+            if (listenerSpeaker == _self || !_heard.Add((day, listenerSpeaker, target, pressure))) return;
+            var key = (day, target, pressure);
+            _socialBudget.TryGetValue(key, out float spent);
+            float credibility = Math.Max(0.1f, _trust[listenerSpeaker] / 10f);
+            float amount = influence * credibility * (echo ? 0.12f : 0.3f);
+            if (echo && _evidence.Count(e => e.Day == day && e.Actor != listenerSpeaker
+                && e.Target == origin && e.Intent == SpeechIntent.Agree) > 1) amount *= 0.4f;
+            amount = Math.Min(amount, Math.Max(0, 12 - spent));
+            _socialBudget[key] = spent + amount;
+            Change(target, pressure ? amount : -amount);
+            _distribution.AssertAlignment(target, pressure ? Faction.Antagonist : Faction.Town, (int)Math.Round(amount));
+            if (target == _self) Expose((int)Math.Ceiling(pressure ? amount : -amount));
+            if (target == _self) TrustChange(listenerSpeaker, pressure ? -amount / 2 : amount / 2);
+        }
+
+        private void Change(CharacterId target, float amount) => _suspicion[target] = ClampValue(_suspicion[target] + amount / 10f);
+        private void TrustChange(CharacterId target, float amount) => _trust[target] = ClampValue(_trust[target] + amount / 10f);
+        private static float ClampValue(float value) => Math.Max(0, Math.Min(10, value));
         private void Expose(int amount) => Exposure = Clamp(Exposure + amount);
         private static int Clamp(int value) => Math.Max(0, Math.Min(100, value));
     }

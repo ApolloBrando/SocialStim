@@ -20,6 +20,12 @@ namespace SocialStim.Rules.Phases
         { _schedule = schedule ?? throw new ArgumentNullException(nameof(schedule)); _player = player; }
         /// <summary>The public accuser whose statement currently awaits a player response.</summary>
         public CharacterId? RespondTo { get; private set; }
+        /// <summary>Ends the previous exchange and advances after any accepted player discussion action.</summary>
+        public void PlayerActed()
+        {
+            _speakers.Clear(); _answered.Clear(); RespondTo = null; _windowInProgress = false;
+            _schedule.AdvanceRound();
+        }
         /// <summary>Begins an ordinary window and answers a player's direct accusation at most once.</summary>
         public void Begin(IEnumerable<CharacterId> speakers, GameCommand playerSpeech, Action<CharacterId> defend)
         {
@@ -55,7 +61,7 @@ namespace SocialStim.Rules.Phases
             }
             if (paused != null && paused()) return;
             if (!_windowInProgress) return;
-            _windowInProgress = false; _schedule.Advance();
+            _windowInProgress = false;
         }
         /// <summary>Clears the old day's queue, responses and ordinary-window counters.</summary>
         public void Reset()

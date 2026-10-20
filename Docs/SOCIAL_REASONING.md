@@ -1,5 +1,9 @@
 # Milestone 02: social reasoning
 
+Current behavior supersedes parts of this historical milestone report. See
+`AI_REFINEMENT.md` for fractional relationships, joint faction conditioning,
+bounded social influence, revised voting thresholds and the research sources.
+
 ## Status
 
 Implemented on `milestone/02-social-reasoning`, based on merged milestone 01.
@@ -77,7 +81,8 @@ variation breaks predictable ties. It can accuse, call for trial, defend, claim,
 report, vouch, agree/disagree, deflect, react to deaths/reveals, express fear, or
 stay silent. Repeating the same intent/subject is discouraged.
 
-Antagonists and deceptive personalities can bluff. They keep an existing role
+Only Antagonist and Neutral roles with bluff permission can bluff; personality
+never authorizes a Town lie. They keep an existing role
 claim instead of choosing a different cover every turn. Fabricated reports avoid
 contradicting their own already-reported target/night. Exposure makes defense or
 deflection attractive. Authorized teammates are excluded from hostile selections.
