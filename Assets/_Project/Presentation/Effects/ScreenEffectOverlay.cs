@@ -5,6 +5,7 @@ using UnityEngine.UI;
 namespace SocialStim.Presentation.Effects
 {
     /// <summary>Situation tint, peripheral glow, dark vignette and limited flash. Never intercepts input.</summary>
+    [RequireComponent(typeof(CanvasRenderer))]
     public sealed class ScreenEffectOverlay : MaskableGraphic
     {
         private EffectFrame _frame;

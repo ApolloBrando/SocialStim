@@ -6,6 +6,7 @@ using UnityEngine.UI;
 namespace SocialStim.Presentation.Effects
 {
     /// <summary>Native underline geometry for action labels, retaining literal text and semantic indices.</summary>
+    [RequireComponent(typeof(CanvasRenderer))]
     public sealed class ActionUnderlineGraphic : MaskableGraphic
     {
         private TextMeshProUGUI _source;
