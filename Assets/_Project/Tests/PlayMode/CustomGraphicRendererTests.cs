@@ -51,7 +51,6 @@ namespace SocialStim.Tests.PlayMode
         [TestCase(typeof(ActionUnderlineGraphic))]
         [TestCase(typeof(DaylightBackdrop))]
         [TestCase(typeof(ScreenEffectOverlay))]
-        [TestCase(typeof(RelationArrowGraphic))]
         public void AddingCustomGraphicCreatesItsRendererBeforeClipping(Type graphicType)
         {
             var root = new GameObject("Custom graphic clipping", typeof(RectTransform), typeof(Canvas), typeof(RectMask2D));

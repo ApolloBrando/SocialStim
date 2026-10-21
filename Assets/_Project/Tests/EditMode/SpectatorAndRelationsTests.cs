@@ -42,28 +42,5 @@ namespace SocialStim.Tests.EditMode
             Assert.That(run.PlayerKnowledgeForDiagnostics().Characters.All(c => !c.RevealedRole.HasValue), Is.True);
         }
 
-        [Test]
-        public void RelationSnapshotsContainDirectedNpcOpinionsWithoutChangingGameplay()
-        {
-            var run = TestContent.Scenario("inspector", "physician", "assassin", "survivor");
-            var before = run.GetPlayerView(); var knowledge = run.PlayerKnowledgeForDiagnostics();
-            var edges = run.GetSocialDiagnostics();
-            Assert.That(edges.Count, Is.EqualTo(9));
-            Assert.That(edges.All(e => e.Observer != Id(0) && e.Observer != e.Subject), Is.True);
-            Assert.That(edges.Any(e => e.Subject == Id(0)), Is.True);
-            Assert.That(edges.All(e => e.Suspicion >= 0 && e.Suspicion <= 100 && e.Trust >= 0 && e.Trust <= 100), Is.True);
-            Assert.That(edges.All(e => e.SuspicionValue >= 0 && e.SuspicionValue <= 10 && e.TrustValue >= 0 && e.TrustValue <= 10), Is.True);
-            Assert.That(edges.Any(e => Math.Abs(e.SuspicionValue - e.Suspicion / 10f) > 0.0001f), Is.True,
-                "The chart must receive original fractional opinions, not reconstructed rounded scores.");
-            Assert.That(edges.All(e => e.Estimate.Town + e.Estimate.Antagonist + e.Estimate.Neutral == 10000), Is.True);
-            Assert.That(((ICollection<SocialDebugRecord>)edges).IsReadOnly, Is.True);
-            Assert.That(run.GetPlayerView().Revision, Is.EqualTo(before.Revision));
-            Assert.That(run.GetPlayerView().Transcript, Is.EqualTo(before.Transcript));
-            Assert.That(run.PlayerKnowledgeForDiagnostics().Evidence, Is.EqualTo(knowledge.Evidence));
-            int suspicion = edges[0].Suspicion;
-            Submit(run, GameCommand.Speak(SpeechIntent.Accuse, Id(2)));
-            Assert.That(edges[0].Suspicion, Is.EqualTo(suspicion), "Snapshots cannot mutate when the game advances.");
-            Assert.That(before.SpectatorRoles, Is.Empty);
-        }
     }
 }

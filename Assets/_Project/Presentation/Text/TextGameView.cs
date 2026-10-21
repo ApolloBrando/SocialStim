@@ -52,7 +52,6 @@ namespace SocialStim.Presentation.Text
         private GameText _words = GameText.Default;
         private InformationPanel _information;
         private Func<IReadOnlyList<NightDebugRecord>> _diagnostics;
-        private Func<IReadOnlyList<SocialDebugRecord>> _socialDiagnostics;
         private DaylightBackdrop _backdrop;
         private TextMeshProUGUI _timeLabel;
         private Image _timeFill;
@@ -84,9 +83,9 @@ namespace SocialStim.Presentation.Text
         public bool IsDisplaying => _playback.Busy || _request != null && _next < _request.View.Transcript.Count;
 
         public void Initialize(TMP_FontAsset font, IReadOnlyDictionary<PresentationCue, EffectProfile> profiles = null, EffectsSettings initialSettings = null, InteractionLabels copy = null,
-            GameText words = null, Func<IReadOnlyList<NightDebugRecord>> diagnostics = null, Func<IReadOnlyList<SocialDebugRecord>> socialDiagnostics = null)
+            GameText words = null, Func<IReadOnlyList<NightDebugRecord>> diagnostics = null)
         {
-            _words = words ?? GameText.Default; _diagnostics = diagnostics; _socialDiagnostics = socialDiagnostics;
+            _words = words ?? GameText.Default; _diagnostics = diagnostics;
             _copy = copy ?? InteractionLabels.Default;
             _settings = initialSettings ?? new EffectsSettings();
             _font = font; _profiles = profiles ?? DefaultCueProfiles.Create();
@@ -201,7 +200,6 @@ namespace SocialStim.Presentation.Text
             Control(footer, _words.Format("ui.rolesShortcut"), ShowRoleReference);
             Control(footer, _words.Format("ui.latest"), FollowLatest);
             if (_diagnostics != null) Control(footer, _words.Format("ui.debug"), ShowNightDebug);
-            if (_socialDiagnostics != null) Control(footer, _words.Format("ui.relations"), ShowRelations);
             Control(_displayOptionsPanel, "Reset display defaults", ResetSettings);
             _displayOptionsPanel.gameObject.SetActive(false);
             RefreshSettingLabels();
@@ -654,17 +652,6 @@ namespace SocialStim.Presentation.Text
             if (rows.Count == 0) rows.Add(Tuple.Create("", _words.Format("ui.debugEmpty"), _palette.Muted));
             _information.Open(_words.Format("ui.debugTitle"), rows, _palette);
         }
-        private void ShowRelations()
-        {
-            if (_socialDiagnostics == null) return;
-            var records = _socialDiagnostics();
-            if (records.Count == 0)
-            { _information.Open(_words.Format("ui.relationsTitle"), new[] { Tuple.Create("", _words.Format("ui.relationsEmpty"), _palette.Muted) }, _palette); return; }
-            var content = _information.OpenContent(_words.Format("ui.relationsTitle"), _palette, 720);
-            var chart = content.gameObject.AddComponent<RelationChartPanel>();
-            chart.Initialize(_font, _words, _palette, records);
-        }
-
         private static string Plain(string text)
         {
             try { return SemanticMarkup.Parse(text).Text; } catch (ArgumentException) { return text; }

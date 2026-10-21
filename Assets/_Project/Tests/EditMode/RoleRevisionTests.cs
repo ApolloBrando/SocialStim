@@ -197,6 +197,41 @@ namespace SocialStim.Tests.EditMode
             Assert.That(run.GetPlayerView().Characters.Single(c => c.Id == Id(0)).Alive, Is.False);
         }
 
+        [Test]
+        public void Seed4026433134DayTwoNpcJesterResolvesCurseBeforeNight()
+        {
+            var strategy = new ScenarioStrategy { Verdict = Verdict.Guilty };
+            var run = RunFactory.CreateScenario(new RunOptions(4026433134, discussionRounds: 1, votingMode: VotingMode.Trial),
+                new[] { "citizen", "provocateur", "assassin", "citizen", "physician" }
+                    .Select((r, i) => new CastMemberSpec("Person" + i, new RoleId(r))),
+                DiscussionRevisionTests.AuthoredRoles(), TestContent.AuthoredLines(), strategy);
+            Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(null));
+            Submit(run, GameCommand.Night(null)); Submit(run, GameCommand.Continue());
+            Assert.That(run.GetPlayerView().Day, Is.EqualTo(2));
+            strategy.Nominee = Id(1);
+            Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(Id(1)));
+            Submit(run, GameCommand.Continue()); Submit(run, GameCommand.Judge(Verdict.Innocent)); Submit(run, GameCommand.Continue());
+            var view = run.GetPlayerView();
+            var curse = view.Transcript.Single(o => o.Text.Contains("taken by the executed Jester"));
+            Assert.That(new[] { Id(0), Id(3), Id(4) }, Does.Contain(curse.Target.Value));
+            Assert.That(view.Transcript.Single(o => o.Cue == GameCue.NightFalls && o.Day == 2).Sequence, Is.GreaterThan(curse.Sequence));
+            Assert.That(view.Transcript.Single(o => o.Text.Contains("taken by the executed Jester")).Day, Is.EqualTo(2));
+            Assert.That(view.Phase, Is.Not.EqualTo(GamePhase.JesterRevenge));
+        }
+
+        [Test]
+        public void NpcJesterWithoutLivingTownDoesNotCurseMafiaOrNeutralOrStall()
+        {
+            var run = Run(new ScenarioStrategy { Nominee = Id(1), Verdict = Verdict.Guilty },
+                "survivor", "provocateur", "assassin", "forger", "interrupter");
+            Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(Id(1)));
+            Submit(run, GameCommand.Continue()); Submit(run, GameCommand.Judge(Verdict.Guilty)); Submit(run, GameCommand.Continue());
+            var view = run.GetPlayerView();
+            Assert.That(view.Characters.Where(c => c.Id != Id(1)).All(c => c.Alive), Is.True);
+            Assert.That(view.Transcript.Any(o => o.Text.Contains("taken by the executed Jester")), Is.False);
+            Assert.That(view.Phase, Is.Not.EqualTo(GamePhase.JesterRevenge));
+        }
+
         [TestCase(false, false, true)] [TestCase(true, false, true)] [TestCase(true, true, false)]
         public void NightClaimantDeathIsWeightedEvidenceWithoutHiddenRoleKnowledge(bool reveal, bool deadLiar, bool suspicious)
         {

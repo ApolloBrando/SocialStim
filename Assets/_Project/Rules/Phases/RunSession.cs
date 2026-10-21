@@ -93,14 +93,6 @@ namespace SocialStim.Rules.Phases
         /// <summary>Privileged read-only diagnostics for developer tools; intentionally reveals secret night actions.</summary>
         public IReadOnlyList<NightDebugRecord> GetNightDiagnostics() => _nightDiagnostics;
 
-        /// <summary>Privileged detached NPC opinions for developer tools; never routed through player or NPC knowledge.</summary>
-        public IReadOnlyList<SocialDebugRecord> GetSocialDiagnostics() => _cast.Where(c => c.Id != Player.Id)
-            .SelectMany(observer => _cast.Where(c => c.Id != observer.Id).Select(subject =>
-                new SocialDebugRecord(observer.Id, observer.Name, observer.Alive, subject.Id, subject.Name, subject.Alive,
-                    _beliefs[observer.Id].Suspicion(subject.Id), _beliefs[observer.Id].Trust(subject.Id), _beliefs[observer.Id].Factions(subject.Id),
-                    _beliefs[observer.Id].SuspicionValue(subject.Id), _beliefs[observer.Id].TrustValue(subject.Id))))
-            .ToList().AsReadOnly();
-
         /// <summary>Returns a detached read-only player snapshot; no arbitrary-observer query exists.</summary>
         public PlayerView GetPlayerView()
         {

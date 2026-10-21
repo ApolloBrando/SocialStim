@@ -88,6 +88,44 @@ namespace SocialStim.Tests.EditMode
             Assert.That(listener.SuspicionValue(Id(3)), Is.GreaterThan(other));
         }
 
+        [TestCase(1, Faction.Town, true)]
+        [TestCase(2, Faction.Town, false)]
+        [TestCase(1, Faction.Antagonist, false)]
+        public void OnlyMatchingPrivateEvidenceEarnsReportCredibilityOnce(int reportedNight, Faction alignment, bool corroborated)
+        {
+            var model = Model();
+            model.Receive(new NightReport(Id(0), ReportKind.Investigation, Id(3), Faction.Town, 1));
+            float before = model.TrustValue(Id(1));
+            var report = GameCommand.PublishReport(new NightActionClaim(reportedNight, new RoleId("inspector"), AbilityKind.Investigate, Id(3),
+                new[] { new ReportedNightResult(ReportKind.Investigation, Id(3), alignment) }));
+            model.Observe(Id(1), report, 3);
+            float after = model.TrustValue(Id(1));
+            if (corroborated) Assert.That(after, Is.EqualTo(Math.Min(10, before + 0.8f)).Within(0.0001f));
+            else Assert.That(after, Is.LessThanOrEqualTo(before));
+            model.Observe(Id(1), report, 3);
+            Assert.That(model.TrustValue(Id(1)), Is.EqualTo(after));
+            Assert.That(model.KnownFaction(Id(1)), Is.Null, "A matching reading does not prove the reporter's role.");
+        }
+
+        [Test]
+        public void AContestedClaimantsDeathRaisesOwnExposureWithoutChangingSelfBelief()
+        {
+            var roles = DiscussionRevisionTests.AuthoredRoles();
+            var model = new BeliefState(Enumerable.Range(0, 5).Select(Id), Personality.None, new SeededRandom(42),
+                Id(0), roles.Single(r => r.Id.Value == "citizen"), new SetupKnowledge(3, 1, 1), roles,
+                Array.Empty<CharacterId>(), new ReasoningSettings());
+            model.Observe(Id(0), GameCommand.Speak(SpeechIntent.ClaimRole, role: new RoleId("inspector")), 1);
+            model.Observe(Id(1), GameCommand.Speak(SpeechIntent.CounterClaim, role: new RoleId("inspector")), 1);
+            model.ObserveDeath(Id(1), 1, true);
+            int before = model.Exposure;
+            model.ConsiderNightClaimDeaths(1);
+            Assert.That(model.Exposure, Is.EqualTo(before + 12));
+            Assert.That(model.SuspicionValue(Id(0)), Is.Zero);
+            Assert.That(model.TrustValue(Id(0)), Is.EqualTo(10));
+            model.ConsiderNightClaimDeaths(1);
+            Assert.That(model.Exposure, Is.EqualTo(before + 12), "The same casualty cannot add exposure twice.");
+        }
+
         [Test]
         public void RumorAndEchoSpamCannotManufactureUnlimitedSuspicionOrTrust()
         {
