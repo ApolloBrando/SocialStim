@@ -7,6 +7,8 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using SocialStim.Rules.Dialogue;
 using SocialStim.Rules.Randomness;
+using SocialStim.Rules.Cast;
+using SocialStim.Rules.Roles;
 
 namespace SocialStim.Data.Dialogue
 {
@@ -45,5 +47,61 @@ namespace SocialStim.Data.Dialogue
             _ = new DialogueSelector(lines, new SeededRandom(1));
             return lines;
         }
+    }
+
+    [DataContract]
+    internal sealed class DialogueRecord
+    {
+        [DataMember(Name = "id", IsRequired = true)] private string _id = default;
+        [DataMember(Name = "intent", IsRequired = true)] private string _intent = default;
+        [DataMember(Name = "text", IsRequired = true)] private string _text = default;
+        [DataMember(Name = "weight", IsRequired = true)] private int _weight = default;
+        [DataMember(Name = "requiredTrait")] private string _requiredTrait = default;
+        [DataMember(Name = "speakerRole")] private string _speakerRole = default;
+        [DataMember(Name = "metadata")] private DialogueMetadataRecord _metadata = default;
+        [DataMember(Name = "conditions")] private DialogueConditionRecord[] _conditions = default;
+
+        internal DialogueLine ToLine()
+        {
+            if (!Enum.TryParse(_intent, true, out SpeechIntent intent) || !Enum.IsDefined(typeof(SpeechIntent), intent))
+                throw new ArgumentException($"{_id}: unknown intent {_intent}.");
+            Personality trait = Personality.None;
+            if (!string.IsNullOrEmpty(_requiredTrait) && (!Enum.TryParse(_requiredTrait, true, out trait)
+                || !Enum.IsDefined(typeof(Personality), trait)))
+                throw new ArgumentException($"{_id}: unknown speaker trait.");
+            try
+            {
+                return new DialogueLine(_id, intent, _text, _weight, trait,
+                    string.IsNullOrWhiteSpace(_speakerRole) ? (RoleId?)null : new RoleId(_speakerRole), _metadata?.ToMetadata(),
+                    _conditions?.Select(c => c?.ToCondition() ?? throw new ArgumentException("Null condition.")));
+            }
+            catch (ArgumentException exception) { throw new ArgumentException($"{_id}: {exception.Message}", exception); }
+        }
+    }
+
+    [DataContract]
+    internal sealed class DialogueConditionRecord
+    {
+        [DataMember(Name = "kind", IsRequired = true)] private string _kind = default;
+        [DataMember(Name = "value")] private string _value = default;
+        [DataMember(Name = "number")] private int? _number = default;
+        [DataMember(Name = "flag")] private bool? _flag = default;
+
+        internal DialogueCondition ToCondition()
+        {
+            if (!Enum.TryParse(_kind, true, out DialogueConditionKind kind) || !Enum.IsDefined(typeof(DialogueConditionKind), kind))
+                throw new ArgumentException($"Unknown dialogue condition: {_kind}.");
+            return new DialogueCondition(kind, _value, _number, _flag);
+        }
+    }
+
+    [DataContract]
+    internal sealed class DialogueMetadataRecord
+    {
+        [DataMember(Name = "emotionKey")] private string _emotion = default;
+        [DataMember(Name = "portraitKey")] private string _portrait = default;
+        [DataMember(Name = "audioKey")] private string _audio = default;
+
+        internal DialogueMetadata ToMetadata() => new DialogueMetadata(_emotion, _portrait, _audio);
     }
 }

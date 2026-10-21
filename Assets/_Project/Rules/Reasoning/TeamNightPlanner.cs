@@ -25,4 +25,27 @@ namespace SocialStim.Rules.Reasoning
             return new TeamNightPlan(members[0].Actor, target == null ? (CharacterId?)null : target.Key);
         }
     }
+
+    /// <summary>Private shared faction plan, never a public cast observation.</summary>
+    public sealed class TeamNightPlan
+    {
+        internal TeamNightPlan(CharacterId killer, CharacterId? target) { Killer = killer; Target = target; }
+        /// <summary>Designated acting teammate.</summary>
+        public CharacterId Killer { get; }
+        /// <summary>Agreed target, or no kill.</summary>
+        public CharacterId? Target { get; }
+    }
+
+    /// <summary>A faction-authorized kill proposal using an actor's own allowed knowledge.</summary>
+    public sealed class TeamProposal
+    {
+        /// <summary>Creates one locked team preference.</summary>
+        public TeamProposal(CharacterId actor, CharacterId? target, int priority = 0) { Actor = actor; Target = target; Priority = priority; }
+        /// <summary>Team member able to carry out a kill.</summary>
+        public CharacterId Actor { get; }
+        /// <summary>Preferred target, or pass.</summary>
+        public CharacterId? Target { get; }
+        /// <summary>Bounded utility computed from permitted knowledge.</summary>
+        public int Priority { get; }
+    }
 }

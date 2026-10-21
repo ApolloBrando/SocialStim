@@ -57,4 +57,53 @@ namespace SocialStim.Application.PresentationCues
             return Math.Min(1, Math.Max(0, replacement + addition));
         }
     }
+
+    public enum EffectBlend { Replace, Add }
+
+    public enum EffectChannel { TextShake, Border, Vignette, Flash, ColorWash, EdgeGlow }
+
+    public enum EffectEnvelope { Sine, Triangle, Smooth }
+
+    /// <summary>Public situation mood; Unity palettes supply the actual day/night colours.</summary>
+    public enum EffectTone { Neutral, Pressure, Reassurance, Evidence, Challenge, Judgement, Loss, Triumph, Night, Morning, Uncertainty }
+
+    /// <summary>Bounded scalar outputs; the Unity adapter owns colours and geometry.</summary>
+    public readonly struct EffectFrame
+    {
+        public EffectFrame(float shake, float border, float vignette, float flash, float colorWash = 0, float edgeGlow = 0)
+        { Shake = shake; Border = border; Vignette = vignette; Flash = flash; ColorWash = colorWash; EdgeGlow = edgeGlow; }
+        public float Shake { get; }
+        public float Border { get; }
+        public float Vignette { get; }
+        public float Flash { get; }
+        /// <summary>Low-opacity situation tint, independent of optional flashes.</summary>
+        public float ColorWash { get; }
+        /// <summary>Soft peripheral accent, suppressed by reduced motion.</summary>
+        public float EdgeGlow { get; }
+    }
+
+    /// <summary>A bounded pulse, or continuous text motion retained until its display is dismissed.</summary>
+    public readonly struct EffectStep
+    {
+        public EffectStep(EffectChannel channel, float duration, float amount, int priority = 0, EffectBlend blend = EffectBlend.Replace, float delay = 0, EffectEnvelope envelope = EffectEnvelope.Sine, bool continuous = false)
+        {
+            if (!Enum.IsDefined(typeof(EffectChannel), channel) || !Enum.IsDefined(typeof(EffectBlend), blend) || !Enum.IsDefined(typeof(EffectEnvelope), envelope)
+                || !Finite(duration) || duration <= 0 || duration > 10 || !Finite(delay) || delay < 0 || delay > 60
+                || !Finite(amount) || amount < 0 || amount > 1) throw new ArgumentException("Invalid effect step.");
+            if (continuous && channel != EffectChannel.TextShake) throw new ArgumentException("Only text motion can be continuous; screen pulses must remain bounded.");
+            Continuous = continuous;
+            Channel = channel; Duration = duration; Amount = amount; Priority = priority; Blend = blend; Delay = delay;
+            Envelope = envelope;
+        }
+        /// <summary>Retains text motion after reveal completion until replacement or cancellation.</summary>
+        public bool Continuous { get; }
+        public EffectChannel Channel { get; }
+        public float Duration { get; }
+        public float Amount { get; }
+        public int Priority { get; }
+        public EffectBlend Blend { get; }
+        public float Delay { get; }
+        public EffectEnvelope Envelope { get; }
+        internal static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
+    }
 }
