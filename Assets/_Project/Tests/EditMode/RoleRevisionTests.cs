@@ -35,6 +35,32 @@ namespace SocialStim.Tests.EditMode
             public CharacterId? NightTarget(KnowledgeView view, IRandomSource random) => null;
         }
 
+        [TestCase("assassin")]
+        [TestCase("survivor")]
+        [TestCase("provocateur")]
+        public void FirstClaimLocksBluffingPlayerOutOfLaterCounterclaimWindows(string ownRole)
+        {
+            var roles = DiscussionRevisionTests.AuthoredRoles();
+            var run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 5),
+                new[] { ownRole, "physician", "inspector", "coordinator", "citizen" }
+                    .Select((r, i) => new CastMemberSpec("Person" + i, new RoleId(r))), roles, TestContent.AuthoredLines(), new ClaimingStrategy());
+            Submit(run, GameCommand.Speak(SpeechIntent.ClaimRole, role: new RoleId("inspector")));
+            for (int step = 0; step < 30 && run.GetPlayerView().Phase == GamePhase.Discussion; step++)
+            {
+                Assert.That(run.GetPlayerView().CounterClaimRole, Is.Null);
+                Assert.That(new GameController(run, roles).Request().Options.Any(o => o.Intent == SpeechIntent.CounterClaim), Is.False);
+                int revision = run.GetPlayerView().Revision;
+                Assert.That(run.TrySubmit(GameCommand.Speak(SpeechIntent.CounterClaim, role: new RoleId("physician")), out _), Is.False);
+                Assert.That(run.GetPlayerView().Revision, Is.EqualTo(revision));
+                Submit(run, GameCommand.Speak(SpeechIntent.StaySilent));
+            }
+            var claims = run.GetPlayerView().Transcript.Where(o => o.Intent == SpeechIntent.ClaimRole || o.Intent == SpeechIntent.CounterClaim).ToList();
+            Assert.That(claims.Where(o => o.Intent == SpeechIntent.ClaimRole).Select(o => o.ClaimedRole).Distinct().Count(), Is.GreaterThan(1));
+            Assert.That(claims.GroupBy(o => o.Speaker).All(g => g.Count() == 1), Is.True,
+                "Every player and NPC must remain committed to their first public role claim.");
+            Assert.That(run.GetPlayerView().Characters.Single(c => c.Id == Id(0)).ClaimedRole, Is.EqualTo(new RoleId("inspector")));
+        }
+
         [Test]
         public void PlayerCanCounterclaimOnlyOnceAcrossDifferentClaimWindows()
         {

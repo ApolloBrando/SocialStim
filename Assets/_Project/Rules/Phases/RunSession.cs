@@ -265,11 +265,10 @@ namespace SocialStim.Rules.Phases
             if (command.Intent == SpeechIntent.ClaimRole || command.Intent == SpeechIntent.CounterClaim)
             {
                 RoleSpec role = _catalog.FirstOrDefault(r => r.Id == command.ClaimedRole);
-                if (!actor.Role.CanClaim(role)) return false;
+                if (_beliefs[actor.Id].Claim(actor.Id).HasValue || !actor.Role.CanClaim(role)) return false;
                 if (command.Intent == SpeechIntent.CounterClaim)
                 { if (_counterClaimed.Contains(actor.Id) || _activeClaimRole != role.Id || _claimSpeaker == actor.Id) return false; }
-                else if (_beliefs[actor.Id].Claim(actor.Id).HasValue
-                    || Living().Any(c => c.Id != actor.Id && _beliefs[actor.Id].Claim(c.Id) == role.Id)) return false;
+                else if (Living().Any(c => c.Id != actor.Id && _beliefs[actor.Id].Claim(c.Id) == role.Id)) return false;
             }
             if (command.Intent == SpeechIntent.ReportInvestigation && (_phases.Day <= 1 || !command.ReportedFaction.HasValue
                 || !Enum.IsDefined(typeof(Faction), command.ReportedFaction.Value))) return false;
@@ -300,6 +299,8 @@ namespace SocialStim.Rules.Phases
         private void Say(Participant actor, GameCommand speech, string actionReport = null)
         {
             if (speech.Intent == SpeechIntent.StaySilent) return;
+            if ((speech.Intent == SpeechIntent.ClaimRole || speech.Intent == SpeechIntent.CounterClaim)
+                && _beliefs[actor.Id].Claim(actor.Id).HasValue) return;
             if (speech.Intent == SpeechIntent.CounterClaim) _counterClaimed.Add(actor.Id);
             string claimed = speech.ClaimedRole.HasValue ? _catalog.First(r => r.Id == speech.ClaimedRole.Value).Name : "";
             var context = new DialogueContext(actor.Id, actor.Name, speech.Target.HasValue ? Actor(speech.Target.Value).Name : "",
@@ -318,7 +319,8 @@ namespace SocialStim.Rules.Phases
             RoleSpec role = _catalog.First(r => r.Id == roleId);
             bool bluffUsed = false;
             // Each respondent decides from their own role and public claims. No target's secret role is read.
-            foreach (Participant actor in Living().Where(c => c.Id != speaker.Id && c.Id != Player.Id && !_counterClaimed.Contains(c.Id)))
+            foreach (Participant actor in Living().Where(c => c.Id != speaker.Id && c.Id != Player.Id && !_counterClaimed.Contains(c.Id)
+                && !_beliefs[c.Id].Claim(c.Id).HasValue))
             {
                 KnowledgeView knowledge = Knowledge(actor);
                 bool truthful = actor.Role.Id == roleId && actor.Role.CanClaimTruthfully;
@@ -329,7 +331,8 @@ namespace SocialStim.Rules.Phases
                 Say(actor, GameCommand.Speak(SpeechIntent.CounterClaim, role: roleId));
                 if (!truthful) bluffUsed = true;
             }
-            if (speaker.Id != Player.Id && Player.Alive && !_counterClaimed.Contains(Player.Id) && Player.Role.CanClaim(role)
+            if (speaker.Id != Player.Id && Player.Alive && !_counterClaimed.Contains(Player.Id)
+                && !_beliefs[Player.Id].Claim(Player.Id).HasValue && Player.Role.CanClaim(role)
                 && (_phases.Phase == GamePhase.Defense || _phases.Phase == GamePhase.Discussion && _discussion != null && !_schedule.Complete)
                 && (!Player.Role.CanBluff || !Knowledge(Player).Characters.Any(c => c.IsTeammate && c.ClaimedRole == roleId)))
                 _counterClaimRole = roleId;

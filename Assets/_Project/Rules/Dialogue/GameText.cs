@@ -106,7 +106,7 @@ namespace SocialStim.Rules.Dialogue
             ["ui.alive"] = "ALIVE",
             ["ui.teammate"] = "TEAMMATE",
             ["ui.legend"] = "COLOUR KEY",
-            ["ui.legendBody"] = "Speaker names and living player-list names share a character colour. Names mentioned inside sentences use blue. Character colours do not indicate factions. Underlined action labels identify each statement; reply descriptions name the point being supported or challenged. Role badges: Town green, Antagonist red, Neutral orange. A claim is not proof. Dead players are grey.",
+            ["ui.legendBody"] = "Speaker names and living player-list names share a character colour. Names mentioned inside sentences use blue. Character colours do not indicate factions. Underlined action labels identify each statement; reply descriptions name the point being supported or challenged. Role badges: Town green, Antagonist red, Neutral orange. A claim is not proof. Your first claim or counterclaim locks your claimed role for this run. Dead players are grey.",
             ["intent.Accuse"] = "ACCUSE",
             ["intent.Defend"] = "DEFEND",
             ["intent.Vouch"] = "DEFEND",
