@@ -5,6 +5,7 @@ using UnityEngine.UI;
 namespace SocialStim.Presentation.Effects
 {
     /// <summary>Static directed edges rebuilt only when the selected viewpoint or layout changes.</summary>
+    [RequireComponent(typeof(CanvasRenderer))]
     public sealed class RelationArrowGraphic : MaskableGraphic
     {
         private IReadOnlyList<Vector2> _targets;

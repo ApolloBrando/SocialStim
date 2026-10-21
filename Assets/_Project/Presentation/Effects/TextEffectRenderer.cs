@@ -31,7 +31,7 @@ namespace SocialStim.Presentation.Effects
             _label = label; _label.OnPreRenderText += Capture;
             if (_underlines == null)
             {
-                var root = new GameObject("Action underlines", typeof(RectTransform)); root.transform.SetParent(label.transform, false);
+                var root = new GameObject("Action underlines", typeof(RectTransform), typeof(CanvasRenderer)); root.transform.SetParent(label.transform, false);
                 var rect = (RectTransform)root.transform; rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
                 rect.offsetMin = Vector2.zero; rect.offsetMax = Vector2.zero;
                 _underlines = root.AddComponent<ActionUnderlineGraphic>(); _underlines.raycastTarget = false;

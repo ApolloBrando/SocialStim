@@ -4,6 +4,7 @@ using UnityEngine.UI;
 namespace SocialStim.Presentation.Effects
 {
     /// <summary>Native uGUI sky gradient with a short colour crossfade; never advances game time.</summary>
+    [RequireComponent(typeof(CanvasRenderer))]
     public sealed class DaylightBackdrop : MaskableGraphic
     {
         private Color _top, _bottom, _fromTop, _fromBottom, _toTop, _toBottom;
