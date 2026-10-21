@@ -6,10 +6,12 @@ namespace SocialStim.Rules.Reasoning
     public sealed class SocialDebugRecord
     {
         internal SocialDebugRecord(CharacterId observer, string observerName, bool observerAlive,
-            CharacterId subject, string subjectName, bool subjectAlive, int suspicion, int trust, FactionEstimate estimate)
+            CharacterId subject, string subjectName, bool subjectAlive, int suspicion, int trust, FactionEstimate estimate,
+            float? suspicionValue = null, float? trustValue = null)
         { Observer = observer; ObserverName = observerName; ObserverAlive = observerAlive;
             Subject = subject; SubjectName = subjectName; SubjectAlive = subjectAlive;
-            Suspicion = suspicion; Trust = trust; Estimate = estimate; }
+            Suspicion = suspicion; Trust = trust; Estimate = estimate;
+            SuspicionValue = suspicionValue ?? suspicion / 10f; TrustValue = trustValue ?? trust / 10f; }
         /// <summary>NPC whose opinion is shown.</summary>
         public CharacterId Observer { get; }
         /// <summary>Public observer name.</summary>
@@ -26,6 +28,10 @@ namespace SocialStim.Rules.Reasoning
         public int Suspicion { get; }
         /// <summary>Observer-local credibility from zero to one hundred.</summary>
         public int Trust { get; }
+        /// <summary>Unrounded observer-local suspicion from zero to ten.</summary>
+        public float SuspicionValue { get; }
+        /// <summary>Unrounded observer-local trust from zero to ten.</summary>
+        public float TrustValue { get; }
         /// <summary>Normalized heuristic alignment estimates, never true role assignments.</summary>
         public FactionEstimate Estimate { get; }
     }

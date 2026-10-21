@@ -1,15 +1,53 @@
 using System;
+using System.Collections;
 using NUnit.Framework;
+using SocialStim.Application.PresentationCues;
 using SocialStim.Presentation.Effects;
+using SocialStim.Rules.Dialogue;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.TestTools;
 
 namespace SocialStim.Tests.PlayMode
 {
     /// <summary>Native clipping needs a renderer before a custom graphic joins the mask registry.</summary>
     public sealed class CustomGraphicRendererTests
     {
+        [UnityTest]
+        public IEnumerator TmpCanvasRebuildDefersUnderlineDirtyingAndStillRefreshesReflowedGeometry()
+        {
+            Assert.That(TMP_Settings.defaultFontAsset, Is.Not.Null, "Import TMP Essential Resources.");
+            var root = new GameObject("TMP graphic rebuild regression", typeof(RectTransform), typeof(Canvas));
+            try
+            {
+                root.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
+                var viewport = new GameObject("Viewport", typeof(RectTransform), typeof(RectMask2D)); viewport.transform.SetParent(root.transform, false);
+                ((RectTransform)viewport.transform).sizeDelta = new Vector2(400, 200);
+                var textRoot = new GameObject("Dialogue", typeof(RectTransform)); textRoot.transform.SetParent(viewport.transform, false);
+                var label = textRoot.AddComponent<TextMeshProUGUI>(); label.font = TMP_Settings.defaultFontAsset;
+                label.rectTransform.sizeDelta = new Vector2(350, 180); label.fontSize = 18;
+                var renderer = textRoot.AddComponent<TextEffectRenderer>(); renderer.Initialize(label);
+                var document = ActionAppearance.Label(SemanticText.Literal("Ada: I suspect Bram."), SpeechIntent.Accuse, GameText.Default);
+                renderer.SetDocument(document, 0, new TextPalette(false)); renderer.Apply(int.MaxValue, default, 0);
+                var underlines = textRoot.GetComponentInChildren<ActionUnderlineGraphic>();
+                bool dirtiedDuringRebuild = false, capturedDuringRebuild = false;
+                underlines.RegisterDirtyVerticesCallback(() => dirtiedDuringRebuild |= CanvasUpdateRegistry.IsRebuildingGraphics());
+                label.OnPreRenderText += _ => capturedDuringRebuild |= CanvasUpdateRegistry.IsRebuildingGraphics();
+                label.fontSize = 20; label.rectTransform.sizeDelta = new Vector2(160, 180); label.SetVerticesDirty();
+                Canvas.ForceUpdateCanvases();
+                Assert.That(capturedDuringRebuild, Is.True, "Exercise TMP's registered canvas rebuild, not only ForceMeshUpdate.");
+                yield return null; yield return null;
+                Canvas.ForceUpdateCanvases();
+                Assert.That(dirtiedDuringRebuild, Is.False);
+                var mesh = new Mesh();
+                try { underlines.canvasRenderer.GetMesh(mesh); Assert.That(mesh.vertexCount, Is.GreaterThan(0)); }
+                finally { UnityEngine.Object.DestroyImmediate(mesh); }
+                LogAssert.NoUnexpectedReceived();
+            }
+            finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
         [TestCase(typeof(ActionUnderlineGraphic))]
         [TestCase(typeof(DaylightBackdrop))]
         [TestCase(typeof(ScreenEffectOverlay))]

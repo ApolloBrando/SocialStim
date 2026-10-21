@@ -438,7 +438,7 @@
     },
     {
       "key": "ui.relationsHelp",
-      "text": "Choose an NPC viewpoint. Arrows point from that observer to others. S = suspicion; T = trust, both 0–100. These are opinions, not proof of roles. Open this menu again to refresh."
+      "text": "The centre NPC is the observer. Each arrow shows their opinion of the person it points to. Higher suspicion means more suspected; higher trust means more credible. Both run from 0 to 10 and can be high together. Click an NPC to see their viewpoint. These are opinions, not confirmed roles."
     },
     {
       "key": "ui.relationsObserver",
@@ -446,7 +446,7 @@
     },
     {
       "key": "ui.relationsScores",
-      "text": "S {suspicion} · T {trust}"
+      "text": "Suspicion: {suspicion}/10\nTrust: {trust}/10"
     },
     {
       "key": "ui.relationsEstimates",
@@ -515,6 +515,10 @@
     {
       "key": "role.short.provocateur",
       "text": "JES"
+    },
+    {
+      "key": "ui.relationsCentre",
+      "text": "VIEWPOINT\n{name}"
     }
   ]
 }

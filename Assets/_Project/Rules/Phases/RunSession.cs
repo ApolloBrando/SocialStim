@@ -90,7 +90,8 @@ namespace SocialStim.Rules.Phases
         public IReadOnlyList<SocialDebugRecord> GetSocialDiagnostics() => _cast.Where(c => c.Id != Player.Id)
             .SelectMany(observer => _cast.Where(c => c.Id != observer.Id).Select(subject =>
                 new SocialDebugRecord(observer.Id, observer.Name, observer.Alive, subject.Id, subject.Name, subject.Alive,
-                    _beliefs[observer.Id].Suspicion(subject.Id), _beliefs[observer.Id].Trust(subject.Id), _beliefs[observer.Id].Factions(subject.Id))))
+                    _beliefs[observer.Id].Suspicion(subject.Id), _beliefs[observer.Id].Trust(subject.Id), _beliefs[observer.Id].Factions(subject.Id),
+                    _beliefs[observer.Id].SuspicionValue(subject.Id), _beliefs[observer.Id].TrustValue(subject.Id))))
             .ToList().AsReadOnly();
 
         /// <summary>Returns a detached read-only player snapshot; no arbitrary-observer query exists.</summary>

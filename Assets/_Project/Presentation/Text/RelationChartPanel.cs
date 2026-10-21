@@ -53,9 +53,9 @@ namespace SocialStim.Presentation.Text
                 return new Vector2(Mathf.Cos(angle) * 0.35f, Mathf.Sin(angle) * 0.36f);
             }).ToArray();
             var arrows = graph.gameObject.AddComponent<RelationArrowGraphic>();
-            arrows.Configure(targets, records.Select(r => r.Suspicion >= 60 ? _palette.RoleColor(SocialStim.Rules.Roles.Faction.Antagonist)
-                : r.Trust >= 60 ? _palette.RoleColor(SocialStim.Rules.Roles.Faction.Town) : _palette.Muted).ToArray());
-            var centre = TextUiFactory.Text("Central observer", graph, _font, 16); centre.text = all[0].ObserverName;
+            arrows.Configure(targets, records.Select(r => _palette.Muted).ToArray());
+            var centre = TextUiFactory.Text("Central observer", graph, _font, 16);
+            centre.text = _words.Format("ui.relationsCentre", ("name", all[0].ObserverName));
             centre.alignment = TextAlignmentOptions.Center; centre.color = _palette.Character(all[0].Observer.Value);
             centre.rectTransform.anchorMin = centre.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
             centre.rectTransform.sizeDelta = new Vector2(124, 58); centre.rectTransform.anchoredPosition = Vector2.zero;
@@ -71,9 +71,8 @@ namespace SocialStim.Presentation.Text
                 rect.sizeDelta = new Vector2(136, 78); rect.anchoredPosition = Vector2.zero;
                 var label = node.GetComponentsInChildren<TextMeshProUGUI>().Single();
                 label.fontSize = 12;
-                string details = _words.Format("ui.relationsScores", ("suspicion", edge.Suspicion.ToString()), ("trust", edge.Trust.ToString()));
-                if (edge.Estimate != null) details += "\n" + _words.Format("ui.relationsEstimates", ("town", Percent(edge.Estimate.Town)),
-                    ("mafia", Percent(edge.Estimate.Antagonist)), ("neutral", Percent(edge.Estimate.Neutral)));
+                string details = _words.Format("ui.relationsScores", ("suspicion", edge.SuspicionValue.ToString("0.0", CultureInfo.InvariantCulture)),
+                    ("trust", edge.TrustValue.ToString("0.0", CultureInfo.InvariantCulture)));
                 node.GetComponent<ChoiceFocusIndicator>().SetText(name + "\n" + details);
                 label.color = edge.SubjectAlive ? _palette.Character(edge.Subject.Value) : _palette.Muted;
                 node.GetComponent<ChoiceFocusIndicator>().SetSurfaceColors(_palette.ButtonBackground, _palette.FocusBackground);
@@ -88,7 +87,6 @@ namespace SocialStim.Presentation.Text
             GetComponentInParent<InformationPanel>().ConfineNavigation();
             if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(previous.gameObject);
         }
-        private static string Percent(int basisPoints) => (basisPoints / 100f).ToString("0", CultureInfo.InvariantCulture);
         private void SelectObserver(int direction) { _observerIndex = (_observerIndex + direction + _observers.Length) % _observers.Length; _page = 0; Rebuild(); }
         private Button Control(string key, Vector2 minimum, Vector2 maximum, UnityEngine.Events.UnityAction action)
         {
