@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Vigilante
   m_EditorClassIdentifier:
   _id: vigilante
-  _displayName: Nullifier
+  _displayName: Vigilante
   _faction: 0
   _category: 5
   _ability: 3
@@ -25,3 +25,4 @@ MonoBehaviour:
   _unique: 1
   _canClaimTruthfully: 1
   _canBluff: 0
+  _diesAfterTownKill: 1

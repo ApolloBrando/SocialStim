@@ -25,6 +25,8 @@ namespace SocialStim.Rules.Night
         public Dictionary<CharacterId, SocialStim.Rules.Roles.Faction> Appearance { get; } = new Dictionary<CharacterId, SocialStim.Rules.Roles.Faction>();
         /// <summary>Deaths are accumulated before simultaneous cleanup.</summary>
         public HashSet<CharacterId> Deaths { get; } = new HashSet<CharacterId>();
+        /// <summary>Successful Town killers whose role schedules guilt for the following night.</summary>
+        public HashSet<CharacterId> TownKillers { get; } = new HashSet<CharacterId>();
         /// <summary>Actors spending one limited charge.</summary>
         public HashSet<CharacterId> SpentCharges { get; } = new HashSet<CharacterId>();
         /// <summary>Actual visitors; these are not public observations.</summary>

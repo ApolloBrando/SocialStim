@@ -265,7 +265,7 @@ namespace SocialStim.Presentation.Text
 
         public void Render(PlayerInputRequest request)
         {
-            _request = request; _autoAdvance = false;
+            _request = request; _autoAdvance = false; _autoAdvance = false;
             _choiceHeading.text = "YOUR TURN";
             _conversationHeading.text = "CONVERSATION";
             TextUiFactory.Fill((RectTransform)_transcriptScroll.transform, Vector2.zero, new Vector2(0.51f, 1), new Vector2(32, 82), new Vector2(-10, -130));
@@ -318,7 +318,7 @@ namespace SocialStim.Presentation.Text
             if (_autoAdvance && !IsDisplaying && !_information.IsOpen && !_displayOptionsPanel.gameObject.activeSelf && _scrollFollower.Following && Time.unscaledTime >= _spectateAt)
             {
                 _autoAdvance = false;
-                if (_request != null && !_request.View.Alive && _request.Options.Count == 1)
+                if (_request != null && !_request.View.Alive && _request.View.Phase != GamePhase.JesterRevenge && _request.Options.Count == 1)
                     OptionChosen?.Invoke(_request.Options[0].Id);
             }
         }
@@ -490,7 +490,7 @@ namespace SocialStim.Presentation.Text
                 _status.text = _pendingStatus;
                 _castScroll.gameObject.SetActive(true);
                 RenderRoster();
-                if (!_request.View.Alive && _request.View.Phase != GamePhase.Ended)
+                if (!_request.View.Alive && _request.View.Phase != GamePhase.Ended && _request.View.Phase != GamePhase.JesterRevenge)
                 {
                     ClearChoices(); _choiceScroll.gameObject.SetActive(false);
                     _spectateAt = Time.unscaledTime + 0.8f; _autoAdvance = true;
@@ -509,7 +509,8 @@ namespace SocialStim.Presentation.Text
                 => entries.Add(Tuple.Create(label, detail, selected));
             if (_menuCategory == null)
             {
-                _choiceHeading.text = _request.View.RespondTo.HasValue ? _copy.DefendSelf : _words.Format("ui.actionFirst");
+                _choiceHeading.text = _request.View.Phase == GamePhase.JesterRevenge ? _words.Format("ui.revengePrompt")
+                    : _request.View.RespondTo.HasValue ? _copy.DefendSelf : _words.Format("ui.actionFirst");
                 foreach (PlayerOption option in options.Where(o => !o.HasSubmenu && (!o.Target.HasValue || o.Kind == SocialStim.Rules.Commands.CommandKind.Speak)))
                 {
                     string id = option.Id;

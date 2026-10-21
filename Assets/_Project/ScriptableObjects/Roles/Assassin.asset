@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Assassin
   m_EditorClassIdentifier:
   _id: assassin
-  _displayName: Archon
+  _displayName: Mafioso
   _faction: 1
   _category: 3
   _ability: 3

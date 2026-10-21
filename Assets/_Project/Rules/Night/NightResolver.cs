@@ -36,6 +36,7 @@ namespace SocialStim.Rules.Night
                 throw new ArgumentException("The antagonist team has only one kill per night.");
             var context = new NightContext(cast, locked);
             foreach (INightStage stage in _stages) stage.Resolve(context);
+            foreach (NightActor actor in cast.Where(a => a.GuiltDue)) context.Deaths.Add(actor.Id);
             return new NightResolution(context);
         }
     }

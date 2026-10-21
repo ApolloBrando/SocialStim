@@ -9,7 +9,7 @@ namespace SocialStim.Rules.Roles
         public RoleSpec(RoleId id, string name, Faction faction, RoleCategory category,
             AbilityKind ability, int attack, int defense, int protection, int charges,
             Faction appearance, bool unique = false, bool? canClaimTruthfully = null, bool? canBluff = null,
-            bool nightImmune = false, bool stealsParityWin = false)
+            bool nightImmune = false, bool stealsParityWin = false, bool diesAfterTownKill = false, bool executionRevenge = false)
         {
             if (string.IsNullOrWhiteSpace(id.Value) || string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Role identity and name are required.");
@@ -29,6 +29,7 @@ namespace SocialStim.Rules.Roles
             CanClaimTruthfully = canClaimTruthfully ?? (faction == Faction.Town && ability != AbilityKind.None);
             CanBluff = canBluff ?? faction != Faction.Town;
             NightImmune = nightImmune; StealsParityWin = stealsParityWin;
+            DiesAfterTownKill = diesAfterTownKill; ExecutionRevenge = executionRevenge;
         }
 
         /// <summary>Stable role key.</summary>
@@ -61,6 +62,10 @@ namespace SocialStim.Rules.Roles
         public bool NightImmune { get; }
         /// <summary>Whether this surviving role replaces an antagonist parity victory.</summary>
         public bool StealsParityWin { get; }
+        /// <summary>Whether a successful attack on Town schedules unavoidable guilt for the following night.</summary>
+        public bool DiesAfterTownKill { get; }
+        /// <summary>Whether day execution grants revenge against a living Town guilty voter.</summary>
+        public bool ExecutionRevenge { get; }
         /// <summary>Shared player/NPC claim permission; ordinary citizens are never claimable.</summary>
         public bool CanClaim(RoleSpec asserted) => asserted != null && asserted.Faction == Faction.Town
             && asserted.Ability != AbilityKind.None && (asserted.Id == Id ? CanClaimTruthfully : CanBluff && Faction != Faction.Town);

@@ -23,9 +23,12 @@ namespace SocialStim.Data.Definitions
         [SerializeField] private bool _nightImmune;
         [SerializeField] private bool _stealsParityWin;
 
+        [SerializeField] private bool _diesAfterTownKill;
+        [SerializeField] private bool _executionRevenge;
+
         /// <summary>Creates validated runtime data without retaining this Unity object.</summary>
         public RoleSpec ToSpec() => new RoleSpec(new RoleId(_id), _displayName, _faction, _category,
             _ability, _attack, _defense, _protection, _charges, _appearance, _unique, _canClaimTruthfully, _canBluff,
-            _nightImmune, _stealsParityWin);
+            _nightImmune, _stealsParityWin, _diesAfterTownKill, _executionRevenge);
     }
 }

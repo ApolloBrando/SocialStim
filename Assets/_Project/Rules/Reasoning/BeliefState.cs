@@ -24,6 +24,9 @@ namespace SocialStim.Rules.Reasoning
         private readonly CharacterId _self;
         private readonly ReasoningSettings _settings;
         private readonly bool _deceptionPossible;
+        private readonly HashSet<RoleId> _uniqueRoles;
+        private readonly Dictionary<CharacterId, int> _nightDeaths = new Dictionary<CharacterId, int>();
+        private readonly HashSet<CharacterId> _dead = new HashSet<CharacterId>();
         private readonly RoleSpec _ownRole;
         private readonly HashSet<(int, CharacterId, CharacterId, bool)> _heard = new HashSet<(int, CharacterId, CharacterId, bool)>();
         private readonly Dictionary<(int, CharacterId, bool), float> _socialBudget = new Dictionary<(int, CharacterId, bool), float>();
@@ -37,6 +40,7 @@ namespace SocialStim.Rules.Reasoning
             IEnumerable<CharacterId> teammates, ReasoningSettings settings)
         {
             _self = self; _ownRole = ownRole; _personality = personality; _settings = settings;
+            _uniqueRoles = new HashSet<RoleId>(catalog.Where(r => r.Unique).Select(r => r.Id));
             _deceptionPossible = catalog.Any(r => r.Ability == AbilityKind.Forge);
             var ids = characters.ToList();
             foreach (CharacterId id in ids)
@@ -235,7 +239,32 @@ namespace SocialStim.Rules.Reasoning
             if (defendant == _self && voter != _self) Expose(verdict == Verdict.Guilty ? 8 : verdict == Verdict.Innocent ? -4 : 0);
         }
 
-        internal void ObserveDeath(CharacterId target, int day) => Record(day, EvidenceKind.Death, target, target);
+        internal void ObserveDeath(CharacterId target, int day, bool night = false)
+        {
+            if (!_dead.Add(target)) return;
+            Record(day, EvidenceKind.Death, target, target);
+            if (night) _nightDeaths[target] = day;
+        }
+
+        internal void ConsiderNightClaimDeaths(int day)
+        {
+            // Process after all casualties and optional public reveals. A dead liar is not evidence against a truthful rival.
+            foreach (var death in _nightDeaths.Where(d => d.Value == day))
+            {
+                if (!_claims.TryGetValue(death.Key, out RoleId claimed) || !_uniqueRoles.Contains(claimed)) continue;
+                EvidenceRecord reveal = _evidence.LastOrDefault(e => e.Kind == EvidenceKind.RoleReveal && e.Target == death.Key);
+                if (reveal != null && reveal.Role != claimed) continue;
+                foreach (CharacterId rival in _claims.Where(c => c.Key != death.Key && c.Value == claimed && !_dead.Contains(c.Key)).Select(c => c.Key))
+                {
+                    if (rival == _self || KnownFaction(rival) == Faction.Town
+                        || _evidence.Any(e => e.Kind == EvidenceKind.ClaimantLostAtNight && e.Actor == rival && e.Target == death.Key)) continue;
+                    int weight = reveal == null ? 12 : 30;
+                    Change(rival, weight); TrustChange(rival, -weight / 2);
+                    _distribution.AssertAlignment(rival, Faction.Antagonist, weight);
+                    Record(day, EvidenceKind.ClaimantLostAtNight, rival, death.Key, role: claimed);
+                }
+            }
+        }
 
         private void Penalize(CharacterId speaker, int penalty, int day, bool publicContradiction)
         {

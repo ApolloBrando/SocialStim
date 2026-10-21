@@ -16,7 +16,7 @@ namespace SocialStim.Rules.Phases
             IReadOnlyList<GameObservation> transcript, bool opening = false, bool canReportAction = false, int discussionRoundsAllowed = 3, VotingMode votingMode = VotingMode.Trial,
             int discussionRound = 1, int playerWindow = 1, int windowsPerRound = 1, CharacterId? respondTo = null,
             IReadOnlyList<CharacterId> voteTargets = null, bool allowAbstain = true, bool revote = false,
-            RoleId? counterClaimRole = null, CharacterId? followUpTo = null, NightActionClaim lastNightAction = null)
+            RoleId? counterClaimRole = null, CharacterId? followUpTo = null, NightActionClaim lastNightAction = null, IReadOnlyList<CharacterId> revengeTargets = null)
         {
             Revision = revision; Seed = seed; Day = day; Phase = phase; TrialsUsed = trialsUsed; TrialsAllowed = trialsAllowed;
             Alive = alive; OwnRole = ownRole; Charges = charges; Defendant = defendant; Outcome = outcome; Won = won;
@@ -25,9 +25,11 @@ namespace SocialStim.Rules.Phases
             WindowsPerRound = windowsPerRound; RespondTo = respondTo; VoteTargets = voteTargets ?? new CharacterId[0];
             AllowAbstain = allowAbstain; Revote = revote;
             CounterClaimRole = counterClaimRole; FollowUpTo = followUpTo;
-            LastNightAction = lastNightAction;
+            LastNightAction = lastNightAction; RevengeTargets = revengeTargets ?? new CharacterId[0];
             Opening = opening; CanReportAction = canReportAction; DiscussionRoundsAllowed = discussionRoundsAllowed;
         }
+        /// <summary>Granted only to an executed player Jester: living Town guilty voters eligible for revenge.</summary>
+        public IReadOnlyList<CharacterId> RevengeTargets { get; }
         /// <summary>Configured daily elimination policy.</summary>
         public VotingMode VotingMode { get; }
         /// <summary>One-based public discussion round.</summary>

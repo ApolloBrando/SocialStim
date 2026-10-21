@@ -9,10 +9,13 @@ namespace SocialStim.Rules.Night
     {
         internal NightResolution(NightContext context)
         {
+            TownKillers = context.TownKillers.OrderBy(id => id.Value).ToList().AsReadOnly();
             Deaths = context.Deaths.OrderBy(id => id.Value).ToList().AsReadOnly();
             SpentCharges = context.SpentCharges.OrderBy(id => id.Value).ToList().AsReadOnly();
             Visits = context.Visits.AsReadOnly(); Reports = context.Reports.AsReadOnly();
         }
+        /// <summary>Actors to schedule for guilt next night, never the shooting night.</summary>
+        public IReadOnlyList<CharacterId> TownKillers { get; }
         /// <summary>Simultaneous casualties.</summary>
         public IReadOnlyList<CharacterId> Deaths { get; }
         /// <summary>Actors whose limited resource was consumed.</summary>

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Interrupter
   m_EditorClassIdentifier:
   _id: interrupter
-  _displayName: Singer
+  _displayName: Strongarm
   _faction: 1
   _category: 8
   _ability: 2
