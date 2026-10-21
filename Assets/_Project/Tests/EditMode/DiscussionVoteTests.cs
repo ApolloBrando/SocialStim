@@ -21,7 +21,8 @@ namespace SocialStim.Tests.EditMode
             internal Func<KnowledgeView, CharacterId?> Ballot = _ => null;
             public GameCommand Speak(KnowledgeView k, IRandomSource r) => Speech(k);
             public CharacterId? Nominate(KnowledgeView k, IRandomSource r) => Ballot(k);
-            public Verdict Judge(KnowledgeView k, CharacterId d, IRandomSource r) => Verdict.Guilty;
+            internal Verdict Judgement = Verdict.Guilty;
+            public Verdict Judge(KnowledgeView k, CharacterId d, IRandomSource r) => Judgement;
             public CharacterId? NightTarget(KnowledgeView k, IRandomSource r) => null;
         }
 
@@ -154,6 +155,61 @@ namespace SocialStim.Tests.EditMode
             Submit(run, GameCommand.Vote(null)); Submit(run, GameCommand.Continue());
             Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.NightSelection));
             Assert.That(run.GetPlayerView().Characters.All(c => c.Alive), Is.True);
+        }
+
+        [TestCase(VotingMode.Gnosia, 1)] [TestCase(VotingMode.Gnosia, 2)] [TestCase(VotingMode.Gnosia, 3)]
+        [TestCase(VotingMode.Trial, 1)] [TestCase(VotingMode.Trial, 2)] [TestCase(VotingMode.Trial, 3)]
+        public void AcquittalsAllowFreshBallotsUntilTheConfiguredDailyTrialLimit(VotingMode mode, int limit)
+        {
+            var strategy = new ScenarioStrategy { Nominee = new CharacterId(1), Verdict = Verdict.Innocent };
+            var run = RunFactory.CreateScenario(new RunOptions(42, trialsPerDay: limit, discussionRounds: 3, votingMode: mode),
+                new[] { "citizen", "inspector", "physician", "assassin", "citizen" }
+                    .Select((role, id) => new CastMemberSpec("Person" + id, new RoleId(role))),
+                AdvancedRoleTests.Roles(), TestContent.Lines(), strategy);
+            while (run.GetPlayerView().Phase == GamePhase.Discussion) Submit(run, GameCommand.Speak(SpeechIntent.StaySilent));
+            for (int trial = 1; trial <= limit; trial++)
+            {
+                var defendant = new CharacterId(trial % 2 == 1 ? 1 : 2);
+                strategy.Nominee = defendant;
+                Submit(run, mode == VotingMode.Gnosia ? GameCommand.Vote(defendant) : GameCommand.Nominate(defendant));
+                if (mode == VotingMode.Gnosia) Submit(run, GameCommand.Continue());
+                Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.Defense));
+                Assert.That(run.GetPlayerView().TrialsUsed, Is.EqualTo(trial));
+                Assert.That(run.GetPlayerView().Defendant, Is.EqualTo(defendant));
+                Submit(run, GameCommand.Continue()); Submit(run, GameCommand.Judge(Verdict.Innocent));
+                var view = run.GetPlayerView();
+                Assert.That(view.Day, Is.EqualTo(1)); Assert.That(view.Characters.All(c => c.Alive), Is.True);
+                Assert.That(view.Defendant, Is.Null);
+                Assert.That(view.Phase, Is.EqualTo(trial == limit ? GamePhase.NightSelection
+                    : mode == VotingMode.Gnosia ? GamePhase.Voting : GamePhase.Nomination));
+                if (trial < limit && mode == VotingMode.Gnosia)
+                {
+                    Assert.That(view.Revote, Is.False);
+                    Assert.That(view.VoteTargets.Select(id => id.Value), Is.EquivalentTo(new[] { 1, 2, 3, 4 }));
+                }
+            }
+            Submit(run, GameCommand.Night(null)); Submit(run, GameCommand.Continue());
+            Assert.That(run.GetPlayerView().TrialsUsed, Is.Zero, "A new day restores the trial allowance.");
+        }
+
+        [Test]
+        public void AcquittalAfterATieResetsTheCandidatePoolAndGrantsANewTieBreak()
+        {
+            var strategy = new ScriptedConversation { Judgement = Verdict.Innocent,
+                Ballot = k => k.Self.Value == 1 ? new CharacterId(2) : k.Self.Value == 2 ? new CharacterId(1) : (CharacterId?)null };
+            var run = Run(strategy); DiscussToVote(run);
+            Submit(run, GameCommand.Vote(null)); Submit(run, GameCommand.Continue());
+            Assert.That(run.GetPlayerView().Revote, Is.True);
+            Submit(run, GameCommand.Vote(new CharacterId(1))); Submit(run, GameCommand.Continue());
+            Submit(run, GameCommand.Continue()); Submit(run, GameCommand.Judge(Verdict.Innocent));
+            Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.Voting));
+            Assert.That(run.GetPlayerView().Revote, Is.False);
+            Assert.That(run.GetPlayerView().VoteTargets.Select(id => id.Value), Is.EquivalentTo(new[] { 1, 2, 3, 4 }));
+            Submit(run, GameCommand.Vote(null)); Submit(run, GameCommand.Continue());
+            Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.Voting));
+            Assert.That(run.GetPlayerView().Revote, Is.True, "The previous trial's tie break cannot consume the new ballot's allowance.");
+            Submit(run, GameCommand.Vote(null)); Submit(run, GameCommand.Continue());
+            Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.NightSelection), "A second tied ballot still skips the day.");
         }
 
         [Test]

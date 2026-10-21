@@ -42,6 +42,7 @@ namespace SocialStim.Rules.Dialogue
             ["fabricate.selected"] = "Selected visitors: {names}",
             ["fabricate.none"] = "None",
             ["mafia.solo"] = "Private Mafia update: you have no teammates this game.",
+            ["event.anotherTrial"] = "Acquittal leaves another trial available. Vote again for trial {number}/{allowed}.",
             ["event.noNightDeaths"] = "Nobody died during the night.",
             ["mafia.actionFatal"] = "Private Mafia action · {name} (died tonight): {report}",
             ["ui.spectating"] = "Spectator",

@@ -683,6 +683,10 @@
     {
       "key": "ui.spectating",
       "text": "Spectator"
+    },
+    {
+      "key": "event.anotherTrial",
+      "text": "Acquittal leaves another trial available. Vote again for trial {number}/{allowed}."
     }
   ]
 }

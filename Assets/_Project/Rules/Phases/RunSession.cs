@@ -470,6 +470,7 @@ namespace SocialStim.Rules.Phases
 
         private void StartDiscussionVote()
         {
+            _revoting = false; _ballot = null; _defendant = null;
             _followUpTo = null;
             _voteCandidates.Clear(); _voteCandidates.AddRange(Living().Select(c => c.Id));
             Move(GamePhase.Voting);
@@ -588,7 +589,13 @@ namespace SocialStim.Rules.Phases
             {
                 Emit(GameCue.VerdictInnocent, $"{Actor(_defendant.Value).Name} is acquitted.");
                 _defendant = null;
-                if (_options.VotingMode == VotingMode.Trial && _trials < _options.TrialsPerDay) Move(GamePhase.Nomination); else StartNight();
+                if (_trials >= _options.TrialsPerDay) StartNight();
+                else
+                {
+                    Emit(GameCue.PhaseChanged, _text.Format("event.anotherTrial", ("number", (_trials + 1).ToString()), ("allowed", _options.TrialsPerDay.ToString())));
+                    if (_options.VotingMode == VotingMode.Trial) Move(GamePhase.Nomination);
+                    else StartDiscussionVote();
+                }
             }
         }
 

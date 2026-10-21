@@ -104,3 +104,7 @@ are recorded in the PR; local Unity and .NET execution are unavailable.
 - [ ] Repeat the same seed, configuration and inputs; compare all observations.
 - [ ] Record actual rendering/layout/input results. Headless success does not
       verify TMP/uGUI compilation, device navigation, frame cost or a player build.
+
+## Daily trial allowance after acquittal
+
+Both voting modes honor `RunOptions.TrialsPerDay` (two by default). After an innocent judgement, an unused trial returns directly to fresh public voting in Gnosia mode or nomination in Trial mode. The defendant is cleared, the full living candidate pool is restored, and a prior restricted tie-break does not consume the new ballot’s tie-break allowance. A second acquittal at the configured limit starts night; an execution also ends the day. A repeated tied ballot or an all-abstain ballot retains the existing day-skip rule. The trial counter is visible in both modes and resets each morning.
