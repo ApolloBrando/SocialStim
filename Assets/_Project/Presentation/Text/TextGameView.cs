@@ -285,8 +285,7 @@ namespace SocialStim.Presentation.Text
                 ("role", view.OwnRole.Name), ("faction", view.OwnRole.Faction.ToString()),
                 ("state", _words.Format(view.Alive ? "ui.alive" : "ui.spectating")),
                 ("uses", view.Charges < 0 ? _words.Format("ui.unlimited") : view.Charges.ToString()), ("seed", view.Seed.ToString()));
-            if (view.VotingMode == VotingMode.Trial)
-                _pendingStatus += " | " + _words.Format("ui.trialsStatus", ("used", view.TrialsUsed.ToString()), ("allowed", view.TrialsAllowed.ToString()));
+            _pendingStatus += " | " + _words.Format("ui.trialsStatus", ("used", view.TrialsUsed.ToString()), ("allowed", view.TrialsAllowed.ToString()));
             ClearChoices();
             _menuCategory = null; _menuPage = 0;
             foreach (ParticipantCard card in _cards.Values) card.SetSelectable(false);
