@@ -15,9 +15,12 @@ namespace SocialStim.Presentation.Text
         /// <summary>Subscribes input and displays the initial scoped state.</summary>
         public GamePresenter(GameController controller, IGameView view, IPlayerInputProvider input)
         {
-            _controller = controller; _view = view; _input = input;
+            _controller = controller ?? throw new ArgumentNullException(nameof(controller));
+            _view = view ?? throw new ArgumentNullException(nameof(view));
+            _input = input ?? throw new ArgumentNullException(nameof(input));
             _input.OptionChosen += Choose;
-            _view.Render(_controller.Request());
+            try { _view.Render(_controller.Request()); }
+            catch { _input.OptionChosen -= Choose; throw; }
         }
 
         /// <summary>Removes the session's presentation subscription.</summary>

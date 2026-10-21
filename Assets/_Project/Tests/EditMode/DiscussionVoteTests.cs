@@ -213,6 +213,18 @@ namespace SocialStim.Tests.EditMode
         }
 
         [Test]
+        public void PlayerCannotAgreeWithAnUnanchoredStatementFromYesterday()
+        {
+            var run = Run(new ScriptedConversation { Speech = k => k.Day == 1 && k.Self.Value == 1
+                ? GameCommand.Speak(SpeechIntent.Accuse, new CharacterId(2)) : GameCommand.Speak(SpeechIntent.StaySilent) });
+            DiscussToVote(run); Submit(run, GameCommand.Vote(null)); Submit(run, GameCommand.Continue());
+            Submit(run, GameCommand.Night(null)); Submit(run, GameCommand.Continue());
+            int revision = run.GetPlayerView().Revision;
+            Assert.That(run.TrySubmit(GameCommand.Speak(SpeechIntent.Agree, new CharacterId(1)), out _), Is.False);
+            Assert.That(run.GetPlayerView().Revision, Is.EqualTo(revision));
+        }
+
+        [Test]
         public void AllAbstainDoesNotCreateAnUnboundedRevote()
         {
             var run = Run(); DiscussToVote(run); Submit(run, GameCommand.Vote(null)); Submit(run, GameCommand.Continue());

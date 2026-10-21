@@ -61,3 +61,25 @@ cast. No Windows player build or Unity profiler result is claimed.
 Verified code commit: f6f2b7a76e7bb9799281b6dc72edb06510d0a439.
 GitHub Actions run 39295451222 passed the scaffold validator, NUnit 3.5 API
 compilation and all 124 NUnit 3.14 behavioral cases. No Unity checks ran.
+
+
+## Follow-up checkup — 2026-10-21
+
+Baseline: current main `a1f1495` (merged daily-trial fix, source consolidation and stale-chart-test replacement). This pass reviewed phase/input transitions, all night-stage ordering and role resources, claim/report legality, observer-local evidence, NPC strategies, report composition, presenter lifetime, roster projection, TMP/effects source, content loaders and editor/build validators. Repository/package/assembly/GUID hygiene is checked by the scaffold validator. The historical sections above describe their original baselines.
+
+### Fixed issues
+
+- **Impossible or mechanically empty NPC cover reports.** A passive role previously always reported passing; a self-protecting role could reuse itself as a Sheriff/Physician/Lookout/Vigilante target. Automatic NPC covers now preserve a valid real visit when possible, otherwise select a plausible other night participant from the observer's own opinions and public identities. This does not read another actor's hidden orders/results. Honest Town reports still use the original recorded action. Player-authored report choices remain explicit.
+- **Legacy report bypass.** `Speak(ReportInvestigation, ...)` previously bypassed the public-claim requirement and did not consume the once-per-night allowance. It now requires the same claimed investigation role, permits only truthful Town results or authorized bluffing, and publishes through the structured report path. Repeating it or mixing it with Give Report cannot publish twice. The unused old report-prose parameter has been removed from the speech helper.
+- **Unanchored agreements.** Agreement/disagreement could refer to yesterday's statement even though the UI's reply context is limited to today. Session legality, belief updates and NPC selection now agree on the current-day boundary. Historical evidence remains available for deduction; an unsupported reply cannot create new trust or suspicion from an old statement.
+- **Disabled cover roles.** A Town role explicitly marked nonclaimable could still be offered to bluffers, even though fabricated-report validation rejected it later. Shared claim permissions now honor the authored claimability flag for covers too.
+- **Presenter subscription leak.** If the initial view render threw during presenter construction, input stayed subscribed to an otherwise abandoned presenter. Construction now validates its ports and removes the subscription before propagating a render failure.
+- **Inconsistent roster abbreviations.** Claimed roles now use editable `role.short.*` entries, matching the spectator list, with the existing fallback for custom roles.
+
+### Verification and limits
+
+The initial targeted run reproduced 16 failing cases before the fixes; the self-protection/passive-role matrix was then expanded. All **424 shared C# tests** pass, including **20 new regression cases**, 1,100 scoped seeded benchmark games, 176 full-catalogue games in each voting mode, and the existing all-role/knowledge-boundary tests. These simulations check legality, repeatability and progress; their outcome counts are not a balance or human-quality AI claim.
+
+Python scaffold validation and all four validator tests pass. NUnit 3.5/net472 compatibility compilation passes with zero warnings/errors. A temporary Roslyn C# 9 syntax parse covers all 151 source files under both editor and player preprocessor configurations with zero syntax errors. This is not Unity type compilation.
+
+Unity is unavailable: native import, editor/PlayMode execution, actual profiling and player builds were not run. In Unity, verify restart after a render failure, claimed-role abbreviations, same-day reply context and neutral bluff reports alongside the existing nightly-role smoke checks. Existing hardcoded UI/event copy remains incremental mission work; this pass adds no hardcoded player-facing wording. No README edits, new source assets, GUID changes, file removals or package changes.

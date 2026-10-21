@@ -261,14 +261,19 @@ namespace SocialStim.Rules.Phases
                 { if (_counterClaimed.Contains(actor.Id) || _activeClaimRole != role.Id || _claimSpeaker == actor.Id) return false; }
                 else if (Living().Any(c => c.Id != actor.Id && _beliefs[actor.Id].Claim(c.Id) == role.Id)) return false;
             }
-            if (command.Intent == SpeechIntent.ReportInvestigation && (_phases.Day <= 1 || !command.ReportedFaction.HasValue
-                || !Enum.IsDefined(typeof(Faction), command.ReportedFaction.Value))) return false;
-            if (command.Intent == SpeechIntent.ReportInvestigation && (actor.Role.Faction == Faction.Town
-                ? !_results[actor.Id].Any(r => r.Kind == ReportKind.Investigation && r.Target == command.Target
-                    && r.Alignment == command.ReportedFaction && r.Night == _phases.Day - 1)
-                : !_catalog.Any(r => r.Id == _beliefs[actor.Id].Claim(actor.Id) && r.Ability == AbilityKind.Investigate))) return false;
+            if (command.Intent == SpeechIntent.ReportInvestigation)
+            {
+                // Legacy callers share the same claim and per-night allowance as structured publication.
+                RoleSpec asserted = _catalog.FirstOrDefault(r => r.Id == _beliefs[actor.Id].Claim(actor.Id));
+                if (!CanGiveReport(actor) || asserted?.Ability != AbilityKind.Investigate
+                    || !command.ReportedFaction.HasValue || !Enum.IsDefined(typeof(Faction), command.ReportedFaction.Value)) return false;
+                if (actor.Role.Faction == Faction.Town
+                    ? !_results[actor.Id].Any(r => r.Kind == ReportKind.Investigation && r.Target == command.Target
+                        && r.Alignment == command.ReportedFaction && r.Night == _lastNight)
+                    : !actor.Role.CanBluff) return false;
+            }
             if (command.Intent == SpeechIntent.Agree || command.Intent == SpeechIntent.Disagree)
-                if (!_beliefs[actor.Id].Evidence.Any(e => e.Actor == command.Target
+                if (!_beliefs[actor.Id].Evidence.Any(e => e.Day == _phases.Day && e.Actor == command.Target
                     && (e.Intent == SpeechIntent.Accuse || e.Intent == SpeechIntent.Deflect
                         || e.Intent == SpeechIntent.Defend || e.Intent == SpeechIntent.Vouch))) return false;
             if (command.Intent == SpeechIntent.ReactToDeath && !_beliefs[actor.Id].Evidence.Any(e => e.Kind == EvidenceKind.Death)) return false;
@@ -287,15 +292,23 @@ namespace SocialStim.Rules.Phases
             return speech;
         }
 
-        private void Say(Participant actor, GameCommand speech, string actionReport = null)
+        private void Say(Participant actor, GameCommand speech)
         {
             if (speech.Intent == SpeechIntent.StaySilent) return;
+            if (speech.Intent == SpeechIntent.ReportInvestigation)
+            {
+                RoleId reportRole = _beliefs[actor.Id].Claim(actor.Id).Value;
+                NightActionClaim report = actor.Role.Faction == Faction.Town ? OwnLastNight(actor)
+                    : new NightActionClaim(_lastNight, reportRole, AbilityKind.Investigate, speech.Target,
+                        new[] { new ReportedNightResult(ReportKind.Investigation, speech.Target, speech.ReportedFaction) });
+                PublishReport(actor, report); return;
+            }
             if ((speech.Intent == SpeechIntent.ClaimRole || speech.Intent == SpeechIntent.CounterClaim)
                 && _beliefs[actor.Id].Claim(actor.Id).HasValue) return;
             if (speech.Intent == SpeechIntent.CounterClaim) _counterClaimed.Add(actor.Id);
             string claimed = speech.ClaimedRole.HasValue ? _catalog.First(r => r.Id == speech.ClaimedRole.Value).Name : "";
             var context = new DialogueContext(actor.Id, actor.Name, speech.Target.HasValue ? Actor(speech.Target.Value).Name : "",
-                claimed, speech.ReportedFaction?.ToString() ?? actionReport ?? "", _phases.Day, actor.Role.Id, actor.Personality,
+                claimed, speech.ReportedFaction?.ToString() ?? "", _phases.Day, actor.Role.Id, actor.Personality,
                 _phases.Phase, speech.Target, _beliefs[actor.Id].Evidence, _beliefs[actor.Id].Exposure);
             DialogueSelection line = _dialogue.Select(speech.Intent, context);
             foreach (Participant observer in _cast) _beliefs[observer.Id].Observe(actor.Id, speech, _phases.Day);
@@ -366,19 +379,28 @@ namespace SocialStim.Rules.Phases
             NightActionClaim own = OwnLastNight(actor);
             RoleSpec asserted = _catalog.First(r => r.Id == _beliefs[actor.Id].Claim(actor.Id).Value);
             if (asserted.Id == actor.Role.Id) return own;
-            // A cover story can use the liar's own selected target, not another participant's hidden orders/results.
+            // Keep a plausible real visit when possible. Passive/self-protecting NPCs still need a cover action.
+            // Candidate identities and opinions are observer-local; no other hidden orders or roles are consulted.
+            CharacterId? target = own.Target;
+            if (target == actor.Id || actor.Id != Player.Id && !target.HasValue)
+            {
+                KnowledgeView knowledge = Knowledge(actor);
+                target = knowledge.Characters.Where(c => c.Id != actor.Id && _lastActions.ContainsKey(c.Id))
+                    .OrderByDescending(c => asserted.Ability == AbilityKind.Protect ? c.Trust : SocialAssessment.Threat(knowledge, c))
+                    .ThenBy(c => c.Id.Value).Select(c => (CharacterId?)c.Id).FirstOrDefault();
+            }
             var results = new List<ReportedNightResult>();
-            if (own.Blocked) results.Add(new ReportedNightResult(ReportKind.Blocked));
-            else if (own.Target.HasValue)
+            if (own.Blocked && target.HasValue) results.Add(new ReportedNightResult(ReportKind.Blocked));
+            else if (target.HasValue)
             {
                 if (asserted.Ability == AbilityKind.Investigate)
-                    results.Add(new ReportedNightResult(ReportKind.Investigation, own.Target, chosenResult ?? Faction.Town));
+                    results.Add(new ReportedNightResult(ReportKind.Investigation, target, chosenResult ?? Faction.Town));
                 if (asserted.Ability == AbilityKind.Watch)
-                    results.Add(new ReportedNightResult(ReportKind.NoVisitors, own.Target, subject: own.Target));
+                    results.Add(new ReportedNightResult(ReportKind.NoVisitors, target, subject: target));
                 if (asserted.Ability == AbilityKind.Protect)
-                    results.Add(new ReportedNightResult(ReportKind.ProtectionApplied, own.Target));
+                    results.Add(new ReportedNightResult(ReportKind.ProtectionApplied, target));
             }
-            return new NightActionClaim(_lastNight, asserted.Id, asserted.Ability, own.Target, results);
+            return new NightActionClaim(_lastNight, asserted.Id, asserted.Ability, target, results);
         }
 
         private void PublishReport(Participant actor, NightActionClaim report)
