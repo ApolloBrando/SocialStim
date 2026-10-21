@@ -12,3 +12,7 @@ Removed assets and their metadata (no serialized scene, prefab or asset referenc
 Existing serialized fields and remaining asset GUIDs are preserved. Old relationship text keys remain in the editable catalogue for compatibility with existing content; no relationship debug UI consumes them. Historical chart design documents describe the removed implementation.
 
 The AI changes and current opinion model are explained in TRUST_AND_SUSPICION.md.
+
+## Overlay-import compatibility
+
+The former `Assets/_Project/Tests/PlayMode/RelationChartLayoutTests.cs` path now contains only a retirement comment, with its original metadata GUID. Main had deleted this test, but overlay imports can retain a stale copy that calls the removed `GetSocialDiagnostics` API and breaks compilation. The empty replacement overwrites that stale test without restoring any chart or debug mechanics. A Git update that applies deletions would already remove the obsolete test.
