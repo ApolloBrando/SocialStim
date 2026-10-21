@@ -34,6 +34,10 @@ namespace SocialStim.Tests.EditMode
             Assert.That(records.Count, Is.EqualTo(3));
             Assert.That(records.Single(r => r.Actor == Id(1)).Action.Target, Is.EqualTo(Id(4)));
             Assert.That(records.Single(r => r.Actor == Id(2)).Action.Target, Is.EqualTo(Id(3)));
+            var privateChat = run.GetPlayerView().Transcript.Where(o => o.Text.StartsWith("Private Mafia action", System.StringComparison.Ordinal)).ToList();
+            Assert.That(privateChat.Count, Is.EqualTo(3));
+            Assert.That(privateChat.Any(o => o.Text.Contains("N1") && o.Text.Contains("N4") && o.Text.Contains("Forger report")), Is.True);
+            Assert.That(privateChat.Any(o => o.Text.Contains("N2") && o.Text.Contains("N3") && o.Text.Contains("Strongarm report")), Is.True);
             Assert.That(((ICollection<TeamNightRecord>)records).IsReadOnly, Is.True);
             Submit(run, GameCommand.Continue()); Submit(run, GameCommand.Speak(SpeechIntent.StaySilent));
             Assert.That(ally.TeamReports.Count, Is.EqualTo(3));
@@ -71,6 +75,7 @@ namespace SocialStim.Tests.EditMode
             Assert.That(killer.OwnRole.Id, Is.EqualTo(new RoleId("assassin")));
             Assert.That(run.GetPlayerView().Characters.Single(c => c.Id == Id(4)).Alive, Is.False);
             Assert.That(run.GetPlayerView().TeamReports, Is.Empty);
+            Assert.That(run.GetPlayerView().Transcript.Any(o => o.Text.StartsWith("Private Mafia action", System.StringComparison.Ordinal)), Is.False);
         }
         [Test]
         public void SimultaneousCasualtiesAreRemovedBeforeExactlyOneLivingMafiaInheritsTheKill()
