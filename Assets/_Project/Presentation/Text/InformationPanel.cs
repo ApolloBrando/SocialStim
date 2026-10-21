@@ -76,6 +76,24 @@ namespace SocialStim.Presentation.Text
             Canvas.ForceUpdateCanvases(); _scroll.verticalNormalizedPosition = 1;
             if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(_close.gameObject);
         }
+        /// <summary>Opens native custom content inside the same scrolling modal and focus lifecycle.</summary>
+        public RectTransform OpenContent(string title, TextPalette palette, float height)
+        {
+            Open(title, Enumerable.Empty<Tuple<string, string, Color>>(), palette);
+            RectTransform content = TextUiFactory.Rect("Custom information", _content);
+            content.gameObject.AddComponent<LayoutElement>().preferredHeight = height;
+            return content;
+        }
+        /// <summary>Uses native explicit navigation to keep modal keyboard focus inside active controls.</summary>
+        public void ConfineNavigation()
+        {
+            var controls = GetComponentsInChildren<Selectable>().Where(c => c.IsActive() && c.IsInteractable()).ToArray();
+            for (int i = 0; i < controls.Length; i++)
+                controls[i].navigation = new Navigation { mode = Navigation.Mode.Explicit,
+                    selectOnUp = controls[(i + controls.Length - 1) % controls.Length],
+                    selectOnLeft = controls[(i + controls.Length - 1) % controls.Length],
+                    selectOnDown = controls[(i + 1) % controls.Length], selectOnRight = controls[(i + 1) % controls.Length] };
+        }
         public void Close()
         {
             gameObject.SetActive(false);

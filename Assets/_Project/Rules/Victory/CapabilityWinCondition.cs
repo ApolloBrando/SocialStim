@@ -28,7 +28,7 @@ namespace SocialStim.Rules.Victory
                 if (living.Count == 1) return OutcomeKind.LoneKillerVictory;
                 if (infinitum && living.Count == 2) return OutcomeKind.Draw;
             }
-            bool townCanResist = town.Any(a => a.Charges != 0 &&
+            bool townCanResist = town.Any(a => !a.GuiltDue && a.Charges != 0 &&
                 (a.Role.Ability == AbilityKind.Block || a.Role.Ability == AbilityKind.Protect || a.Role.Ability == AbilityKind.SelfProtect
                     || a.Role.Ability == AbilityKind.Attack && a.Role.Attack > 0));
             if (independent.Count == 0 && !townCanResist && antagonists.Any(a => a.Role.Ability == AbilityKind.Attack && a.Charges != 0 && a.Role.Attack > 0)

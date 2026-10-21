@@ -8,6 +8,7 @@ using SocialStim.Rules.Roles;
 using TMPro;
 using UnityEngine;
 using SocialStim.Rules.Night;
+using SocialStim.Rules.Reasoning;
 using System.Collections.Generic;
 
 namespace SocialStim.Presentation.Text
@@ -58,10 +59,12 @@ namespace SocialStim.Presentation.Text
                 UiEventSystem.Ensure(transform);
                 _view = gameObject.AddComponent<TextGameView>();
                 Func<IReadOnlyList<NightDebugRecord>> diagnostics = null;
+                Func<IReadOnlyList<SocialDebugRecord>> socialDiagnostics = null;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 diagnostics = () => _activeSession?.GetNightDiagnostics() ?? Array.Empty<NightDebugRecord>();
+                socialDiagnostics = () => _activeSession?.GetSocialDiagnostics() ?? Array.Empty<SocialDebugRecord>();
 #endif
-                _view.Initialize(font, _effects != null ? _effects.Load() : null, UiPreferences.Load(), _catalog.LoadInteractionLabels(), _catalog.LoadGameText(), diagnostics);
+                _view.Initialize(font, _effects != null ? _effects.Load() : null, UiPreferences.Load(), _catalog.LoadInteractionLabels(), _catalog.LoadGameText(), diagnostics, socialDiagnostics);
                 _view.RestartRequested += ShowSetup;
                 _view.SettingsChanged += SavePreferences;
                 ShowSetup();

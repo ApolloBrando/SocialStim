@@ -43,7 +43,8 @@ namespace SocialStim.Tests.EditMode
                 return new RoleSpec(new RoleId(text("id")), text("displayName"), (Faction)number("faction"),
                     (RoleCategory)number("category"), (AbilityKind)number("ability"), number("attack"), number("defense"),
                     number("protection"), number("charges"), (Faction)number("appearance"), number("unique") == 1,
-                    number("canClaimTruthfully") == 1, number("canBluff") == 1, number("nightImmune") == 1, number("stealsParityWin") == 1);
+                    number("canClaimTruthfully") == 1, number("canBluff") == 1, number("nightImmune") == 1, number("stealsParityWin") == 1,
+                    number("diesAfterTownKill") == 1, number("executionRevenge") == 1);
             }).ToList().AsReadOnly();
         }
 
@@ -201,7 +202,7 @@ namespace SocialStim.Tests.EditMode
             var roles = AuthoredRoles();
             Func<int, string, NightActor> actor = (id, role) => new NightActor(new CharacterId(id), roles.First(r => r.Id.Value == role), -1);
             var cast = new[] { actor(0, "survivor"), actor(1, "assassin"), actor(2, "lone-killer"), actor(3, "citizen") };
-            Assert.That(cast[0].Role.Name, Is.EqualTo("Infinitum"));
+            Assert.That(cast[0].Role.Name, Is.EqualTo("Ego"));
             Assert.That(cast[0].Role.Ability, Is.EqualTo(AbilityKind.None));
             var resolution = new NightResolver().Resolve(cast, new[] {
                 new NightOrder(new CharacterId(1), new CharacterId(0)), new NightOrder(new CharacterId(2), new CharacterId(0)) });

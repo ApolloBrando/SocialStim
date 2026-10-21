@@ -9,6 +9,7 @@ using SocialStim.Rules.Commands;
 using SocialStim.Rules.Dialogue;
 using SocialStim.Rules.Phases;
 using SocialStim.Rules.Randomness;
+using SocialStim.Rules.Reasoning;
 using SocialStim.Rules.Roles;
 
 namespace SocialStim.Tests.EditMode
@@ -100,6 +101,30 @@ namespace SocialStim.Tests.EditMode
                 }
                 Assert.That(voice.All(line => Enum.IsDefined(typeof(Personality), line.RequiredTrait)), Is.True);
             }
+        }
+
+        [Test]
+        public void ExecutionRepliesStayInVoiceAndDoNotAppearInDiscussion()
+        {
+            var lines = TestContent.AuthoredLines(); var byId = lines.ToDictionary(line => line.Id);
+            var selector = new DialogueSelector(lines, new SeededRandom(93));
+            var evidence = new[] { new EvidenceRecord(0, 2, EvidenceKind.Death, new CharacterId(2), new CharacterId(2)),
+                new EvidenceRecord(1, 2, EvidenceKind.RoleReveal, new CharacterId(2), new CharacterId(2), role: new RoleId("citizen")) };
+            foreach (Personality trait in Traits)
+                foreach (SpeechIntent intent in new[] { SpeechIntent.ReactToDeath, SpeechIntent.ReactToRoleReveal })
+                {
+                    var execution = new DialogueContext(new CharacterId((int)trait), "Self", "", "", "", 2,
+                        new RoleId("citizen"), trait, GamePhase.Execution, evidence: evidence);
+                    for (int i = 0; i < 3; i++)
+                    {
+                        var selected = byId[selector.Select(intent, execution).Id];
+                        Assert.That(selected.RequiredTrait, Is.EqualTo(trait));
+                        Assert.That(selected.Conditions.Any(c => c.Kind == DialogueConditionKind.Phase && c.Value == "Execution"), Is.True);
+                    }
+                    var discussion = new DialogueContext(new CharacterId((int)trait), "Self", "", "", "", 2,
+                        new RoleId("citizen"), trait, GamePhase.Discussion, evidence: evidence);
+                    Assert.That(byId[selector.Select(intent, discussion).Id].Conditions.Any(c => c.Kind == DialogueConditionKind.Phase && c.Value == "Execution"), Is.False);
+                }
         }
 
         [Test]

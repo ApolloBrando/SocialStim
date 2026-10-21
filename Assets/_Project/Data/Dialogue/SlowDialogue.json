@@ -4,56 +4,56 @@
     {
       "id": "npc.slow.Accuse.001",
       "intent": "Accuse",
-      "text": "Wait... the person I suspect is {target}.",
+      "text": "I've been thinking about {target}. Something still bothers me.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Accuse.002",
       "intent": "Accuse",
-      "text": "{target}... yes. That's who I don't trust yet.",
+      "text": "Give me a moment with this. The person I suspect is {target}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Accuse.003",
       "intent": "Accuse",
-      "text": "I'm still getting there, but... I suspect {target}.",
+      "text": "I don't have it all sorted out, but I don't trust {target}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Accuse.004",
       "intent": "Accuse",
-      "text": "I suspect {target}. I'd like us to examine that carefully.",
+      "text": "Before we leave that subject, could we question {target}?",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Accuse.005",
       "intent": "Accuse",
-      "text": "I lost my words. Not the suspicion. It's about {target}.",
+      "text": "{target}, I need to hear your answer again.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Accuse.006",
       "intent": "Accuse",
-      "text": "So... my answer is that {target} seems suspicious.",
+      "text": "I keep coming back to the same name. {target}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Accuse.007",
       "intent": "Accuse",
-      "text": "Hold on. Before the next thing... I'm questioning {target}.",
+      "text": "Hang on. I wasn't finished thinking about {target}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Accuse.008",
       "intent": "Accuse",
-      "text": "I know I'm late saying it. {target} still worries me.",
+      "text": "I've got a concern about {target}. Let me say it properly.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -88,56 +88,56 @@
     {
       "id": "npc.slow.Defend.001",
       "intent": "Defend",
-      "text": "Me... right. I deny the accusation against me.",
+      "text": "Can we take that question first? I can't answer everyone at once.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.002",
       "intent": "Defend",
-      "text": "Give me a second. My answer is no: I didn't do what you're accusing me of.",
+      "text": "I heard you. I'm thinking about how to explain, not admitting anything.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.003",
       "intent": "Defend",
-      "text": "Wait... you haven't proved I'm guilty. Don't decide yet.",
+      "text": "Hold on. No, I didn't do it.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.004",
       "intent": "Defend",
-      "text": "I heard my name. I'm defending myself against that accusation.",
+      "text": "I need a little time. Please don't decide for me while I'm answering.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.005",
       "intent": "Defend",
-      "text": "I'm taking time to answer. That isn't an admission of guilt.",
+      "text": "Let me go back to the beginning. You've got the wrong person.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.006",
       "intent": "Defend",
-      "text": "So... my defense is that your suspicion isn't proof against me.",
+      "text": "I understand why you're asking. I don't agree with your answer.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.007",
       "intent": "Defend",
-      "text": "I don't accept the accusation. Can we take it one part at a time?",
+      "text": "One thing at a time. I'm trying to give you a straight answer.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Defend.008",
       "intent": "Defend",
-      "text": "No... I don't agree that I'm guilty. That's my answer.",
+      "text": "I'm not finished, and I'm not agreeing that I'm guilty.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -172,42 +172,42 @@
     {
       "id": "npc.slow.ClaimRole.001",
       "intent": "ClaimRole",
-      "text": "My role... right, I should say it. {role}.",
+      "text": "Before I forget the important bit, I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ClaimRole.002",
       "intent": "ClaimRole",
-      "text": "Wait... the thing I'm meant to tell you is that I'm the {role}.",
+      "text": "Right. My role. It's {role}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ClaimRole.003",
       "intent": "ClaimRole",
-      "text": "I know my role. It's the rest I'm catching up with. I'm the {role}.",
+      "text": "I've thought about when to say this. I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ClaimRole.004",
       "intent": "ClaimRole",
-      "text": "So... put me down as {role}.",
+      "text": "You should probably know I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ClaimRole.005",
       "intent": "ClaimRole",
-      "text": "You asked what I am. The role answer is {role}.",
+      "text": "Let me start with something I'm sure of. My role is {role}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ClaimRole.006",
       "intent": "ClaimRole",
-      "text": "Let me get this part straight... I'm claiming {role}.",
+      "text": "There's something I meant to tell everyone: I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -242,42 +242,42 @@
     {
       "id": "npc.slow.Agree.001",
       "intent": "Agree",
-      "text": "{target}... yes. I think I agree with that.",
+      "text": "Oh, I see what you mean, {target}. Yes.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Agree.002",
       "intent": "Agree",
-      "text": "I caught up to the point {target} made. It makes sense to me.",
+      "text": "Give me a second. Yes, {target}, I think that follows.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Agree.003",
       "intent": "Agree",
-      "text": "Wait, I wanted to agree with {target}'s point. Did we move on already?",
+      "text": "I wanted to come back to {target}'s point. I'm with them.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Agree.004",
       "intent": "Agree",
-      "text": "I've thought about what {target} said. I agree with it.",
+      "text": "I've let that settle, {target}. It makes sense.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Agree.005",
       "intent": "Agree",
-      "text": "I'm a little behind, but I'm on {target}'s side of this.",
+      "text": "I was thinking it through while you talked, {target}. I agree.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Agree.006",
       "intent": "Agree",
-      "text": "That thought from {target}... I understand it now. I agree.",
+      "text": "That's the bit I was looking for, {target}. I'll support it.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -312,42 +312,42 @@
     {
       "id": "npc.slow.Disagree.001",
       "intent": "Disagree",
-      "text": "Wait... I don't think {target} has that right.",
+      "text": "There's a step I'm missing there, {target}. I can't agree yet.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Disagree.002",
       "intent": "Disagree",
-      "text": "I followed most of it, {target}. I don't follow the conclusion.",
+      "text": "I followed you until the conclusion, {target}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Disagree.003",
       "intent": "Disagree",
-      "text": "That point from {target}... no. I end up somewhere else.",
+      "text": "Can we go over that again, {target}? I come out differently.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Disagree.004",
       "intent": "Disagree",
-      "text": "I need to go back a bit. I'm not agreeing with {target}.",
+      "text": "I needed a moment to be sure. No, {target}, I don't think so.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Disagree.005",
       "intent": "Disagree",
-      "text": "{target}, can we stop at that part? It doesn't work for me.",
+      "text": "That doesn't quite fit for me, {target}. Let's stay with it.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Disagree.006",
       "intent": "Disagree",
-      "text": "I was still thinking when everyone moved on. I disagree with {target}.",
+      "text": "I know we've moved on, but I still disagree with {target}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -382,42 +382,42 @@
     {
       "id": "npc.slow.ReactToDeath.001",
       "intent": "ReactToDeath",
-      "text": "Someone's missing... I was still expecting everyone to answer.",
+      "text": "I keep thinking of something I meant to ask them.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ReactToDeath.002",
       "intent": "ReactToDeath",
-      "text": "I understand the word died. It's taking longer to understand the room.",
+      "text": "It's the empty chair. I notice it, then I notice it again.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ReactToDeath.003",
       "intent": "ReactToDeath",
-      "text": "So that chair stays empty now... right.",
+      "text": "I know they're gone. It just hasn't settled yet.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ReactToDeath.004",
       "intent": "ReactToDeath",
-      "text": "Wait... we don't get another conversation with them?",
+      "text": "We were talking a little while ago. I can't get past that.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ReactToDeath.005",
       "intent": "ReactToDeath",
-      "text": "I keep counting people and then having to start again.",
+      "text": "Give me a minute before the next subject, please.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ReactToDeath.006",
       "intent": "ReactToDeath",
-      "text": "I'm a bit behind the death report. Please give me a moment.",
+      "text": "I don't want to get used to counting one less person.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -452,42 +452,42 @@
     {
       "id": "npc.slow.VoteJustification.001",
       "intent": "VoteJustification",
-      "text": "I took a while to choose. The ballot was still mine.",
+      "text": "I thought it through as far as I could. Then I chose.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.VoteJustification.002",
       "intent": "VoteJustification",
-      "text": "Wait... you're asking why I voted. I made the best choice I could understand.",
+      "text": "I wasn't waiting for someone else's vote. I needed the time.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.VoteJustification.003",
       "intent": "VoteJustification",
-      "text": "I went through it slowly and then picked a name.",
+      "text": "That was the name I settled on. I'm still thinking about it.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.VoteJustification.004",
       "intent": "VoteJustification",
-      "text": "My vote came after the thinking. The thinking just took longer.",
+      "text": "I couldn't work out every possibility before the ballot.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.VoteJustification.005",
       "intent": "VoteJustification",
-      "text": "I wasn't copying the last voice. I was finishing my own thought.",
+      "text": "I know my answer came late. It was still my answer.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.VoteJustification.006",
       "intent": "VoteJustification",
-      "text": "So... that was my decision, even if I explained it late.",
+      "text": "Let me explain it from the beginning, if there's time.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -522,28 +522,28 @@
     {
       "id": "npc.slow.Vouch.001",
       "intent": "Vouch",
-      "text": "I... think we should keep hearing {target}. I'm not ready to blame them.",
+      "text": "Wait. I haven't heard enough to give up on {target}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Vouch.002",
       "intent": "Vouch",
-      "text": "I'm getting to my point... I support {target}.",
+      "text": "{target} deserves time to finish. I'm still listening.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Vouch.003",
       "intent": "Vouch",
-      "text": "{target} has my backing. I don't want them condemned yet.",
+      "text": "I think we should keep {target} with us a little longer.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Vouch.004",
       "intent": "Vouch",
-      "text": "I don't support the accusation against {target}. Let's hear their side.",
+      "text": "Don't rush {target}. Some answers take a moment.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -564,28 +564,28 @@
     {
       "id": "npc.slow.ReportInvestigation.001",
       "intent": "ReportInvestigation",
-      "text": "I checked... {target}. The result was {result}.",
+      "text": "I've got it here. {target}: {result}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ReportInvestigation.002",
       "intent": "ReportInvestigation",
-      "text": "Wait, I've got the result here. {target} appeared {result}.",
+      "text": "The result was {result}. Sorry, that was for {target}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ReportInvestigation.003",
       "intent": "ReportInvestigation",
-      "text": "The name was {target}... and the readout said {result}.",
+      "text": "Let me read it carefully. {target} appeared {result}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ReportInvestigation.004",
       "intent": "ReportInvestigation",
-      "text": "One bit at a time. Investigation: {target}. Answer: {result}.",
+      "text": "I checked {target} last night. The answer came back {result}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -599,21 +599,21 @@
     {
       "id": "npc.slow.CallForTrial.001",
       "intent": "CallForTrial",
-      "text": "So... I want a trial for {target}. That's the next step I'm asking for.",
+      "text": "I'd like to hear {target}'s defense, at a proper trial.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.CallForTrial.002",
       "intent": "CallForTrial",
-      "text": "Wait. Could {target} give a formal defense?",
+      "text": "Can we question {target} one at a time in a hearing?",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.CallForTrial.003",
       "intent": "CallForTrial",
-      "text": "I'm calling for... what was the word? A trial. For {target}.",
+      "text": "I think the next step is a trial for {target}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -634,21 +634,21 @@
     {
       "id": "npc.slow.Deflect.001",
       "intent": "Deflect",
-      "text": "Wait... I deny that accusation. I suspect {target} instead.",
+      "text": "I'm still answering for myself, but I want to ask about {target} too.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Deflect.002",
       "intent": "Deflect",
-      "text": "I'm not accepting the blame. The person I want questioned is {target}.",
+      "text": "No, I didn't. The person I'm worried about is {target}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.Deflect.003",
       "intent": "Deflect",
-      "text": "Let me say both parts... I deny it, and I suspect {target}.",
+      "text": "Let me separate those thoughts. I deny it, and I suspect {target}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -669,21 +669,21 @@
     {
       "id": "npc.slow.StaySilent.001",
       "intent": "StaySilent",
-      "text": "I'm still thinking... go ahead without my answer for now.",
+      "text": "I'm not there yet. Let someone else go.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.StaySilent.002",
       "intent": "StaySilent",
-      "text": "Wait... no, I haven't got anything to add yet.",
+      "text": "I need to sit with that for a moment.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.StaySilent.003",
       "intent": "StaySilent",
-      "text": "I'll listen. I need to catch up first.",
+      "text": "Keep talking. I'm still putting it together.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -704,21 +704,21 @@
     {
       "id": "npc.slow.ExpressFear.001",
       "intent": "ExpressFear",
-      "text": "I keep getting to the danger a moment after everyone else.",
+      "text": "I keep thinking about what happens when this room empties.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ExpressFear.002",
       "intent": "ExpressFear",
-      "text": "Wait... tonight is coming again? I don't like that.",
+      "text": "Does anyone else wish we had a little more time?",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ExpressFear.003",
       "intent": "ExpressFear",
-      "text": "I'm trying to understand what could happen. The more I get, the worse it feels.",
+      "text": "The more I understand, the less I like tonight.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -739,21 +739,21 @@
     {
       "id": "npc.slow.ReactToRoleReveal.001",
       "intent": "ReactToRoleReveal",
-      "text": "Oh... that was the role. Let me put that into the right place.",
+      "text": "Wait. Then I need to hear their claim differently.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ReactToRoleReveal.002",
       "intent": "ReactToRoleReveal",
-      "text": "Wait, can we go over the reveal again? I need to rethink.",
+      "text": "Let me put that beside what they said earlier.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ReactToRoleReveal.003",
       "intent": "ReactToRoleReveal",
-      "text": "So we know their role now... the earlier talk will look different.",
+      "text": "I hadn't allowed for that role. Give me a moment.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -774,21 +774,21 @@
     {
       "id": "npc.slow.LastWords.001",
       "intent": "LastWords",
-      "text": "Wait... these are the last words? I haven't found them yet.",
+      "text": "I was still working out what to say to you.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.LastWords.002",
       "intent": "LastWords",
-      "text": "I wanted to leave you a clear thought... take your time with the next choice.",
+      "text": "Take the time to hear the next person. Please.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.LastWords.003",
       "intent": "LastWords",
-      "text": "So I stop here. You keep going. I understand.",
+      "text": "I understand. I just wish understanding gave me longer.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -809,21 +809,21 @@
     {
       "id": "npc.slow.ReportAction.001",
       "intent": "ReportAction",
-      "text": "Last night... let me find the beginning. {result}",
+      "text": "Let me take you through it in order. {result}",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ReportAction.002",
       "intent": "ReportAction",
-      "text": "One part at a time, then. {result}",
+      "text": "I kept the details together this time. {result}",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.ReportAction.003",
       "intent": "ReportAction",
-      "text": "I have the account ready... here. {result}",
+      "text": "Right, last night. Here's where I started. {result}",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -844,28 +844,28 @@
     {
       "id": "npc.slow.counterclaim.01",
       "intent": "CounterClaim",
-      "text": "Wait... I dispute that claim. I am the {role}.",
+      "text": "Hold on. You said {role}, didn't you? That's my role.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.counterclaim.02",
       "intent": "CounterClaim",
-      "text": "Two... no. There should be one {role}. That would be me.",
+      "text": "I've got to stop you there. I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.counterclaim.03",
       "intent": "CounterClaim",
-      "text": "Let me say this slowly. I am the {role}. Your claim is wrong.",
+      "text": "I know this part for certain: I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
     {
       "id": "npc.slow.counterclaim.04",
       "intent": "CounterClaim",
-      "text": "I just caught up. You said {role}... but that is my job.",
+      "text": "I was deciding when to tell you. I'm the {role}, so we need to talk.",
       "weight": 1,
       "requiredTrait": "Slow"
     },
@@ -896,6 +896,102 @@
       "text": "One moment. I need to correct something. The {role} is me, not you.",
       "weight": 1,
       "requiredTrait": "Slow"
+    },
+    {
+      "id": "npc.slow.execution.ReactToDeath.01",
+      "intent": "ReactToDeath",
+      "text": "So that's the end of their turn. I need a minute.",
+      "weight": 1,
+      "requiredTrait": "Slow",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedDeath"
+        }
+      ]
+    },
+    {
+      "id": "npc.slow.execution.ReactToDeath.02",
+      "intent": "ReactToDeath",
+      "text": "I knew what the vote meant. Seeing it happen is different.",
+      "weight": 1,
+      "requiredTrait": "Slow",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedDeath"
+        }
+      ]
+    },
+    {
+      "id": "npc.slow.execution.ReactToDeath.03",
+      "intent": "ReactToDeath",
+      "text": "Can we wait before moving on? There's something I haven't quite taken in.",
+      "weight": 1,
+      "requiredTrait": "Slow",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedDeath"
+        }
+      ]
+    },
+    {
+      "id": "npc.slow.execution.ReactToRoleReveal.01",
+      "intent": "ReactToRoleReveal",
+      "text": "Let me think back to their claim with that role in mind.",
+      "weight": 1,
+      "requiredTrait": "Slow",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedRoleReveal"
+        }
+      ]
+    },
+    {
+      "id": "npc.slow.execution.ReactToRoleReveal.02",
+      "intent": "ReactToRoleReveal",
+      "text": "We get to know that now. They don't get to explain it.",
+      "weight": 1,
+      "requiredTrait": "Slow",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedRoleReveal"
+        }
+      ]
+    },
+    {
+      "id": "npc.slow.execution.ReactToRoleReveal.03",
+      "intent": "ReactToRoleReveal",
+      "text": "Hang on. That role changes how I understood the vote.",
+      "weight": 1,
+      "requiredTrait": "Slow",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedRoleReveal"
+        }
+      ]
     }
   ]
 }

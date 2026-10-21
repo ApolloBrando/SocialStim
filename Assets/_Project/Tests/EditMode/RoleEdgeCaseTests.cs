@@ -124,7 +124,7 @@ namespace SocialStim.Tests.EditMode
             Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(Id(1)));
             Submit(run, GameCommand.Continue()); Submit(run, GameCommand.Judge(Verdict.Guilty));
             Assert.That(run.GetPlayerView().Characters.Single(c => c.Id == Id(1)).Alive, Is.False);
-            var reveal = run.GetPlayerView().Transcript.Single(o => o.Cue == GameCue.RoleRevealed);
+            var reveal = run.GetPlayerView().Transcript.Single(o => o.Cue == GameCue.RoleRevealed && o.Target == Id(1));
             Assert.That(reveal.Target, Is.EqualTo(Id(1)));
             Assert.That(RosterInteractions.PublicRecord(run.GetPlayerView(), Id(1)), Does.Contain(reveal));
         }
@@ -177,6 +177,8 @@ namespace SocialStim.Tests.EditMode
             if (mode == VotingMode.Gnosia) Submit(run, GameCommand.Continue());
             if (execute) { Submit(run, GameCommand.Speak(SpeechIntent.Defend)); Submit(run, GameCommand.Continue()); }
             else Submit(run, GameCommand.Night(null));
+            if (run.GetPlayerView().Phase == GamePhase.JesterRevenge)
+                Submit(run, GameCommand.Revenge(run.GetPlayerView().RevengeTargets[0]));
             Assert.That(run.GetPlayerView().Phase, Is.EqualTo(GamePhase.Ended));
             Assert.That(run.GetPlayerView().Won, Is.EqualTo(execute));
             Assert.That(run.GetPlayerView().Alive, Is.False);

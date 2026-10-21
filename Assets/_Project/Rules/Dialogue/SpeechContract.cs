@@ -20,6 +20,7 @@ namespace SocialStim.Rules.Dialogue
         public static bool AllowsPhase(SpeechIntent intent, GamePhase phase) => phase == GamePhase.Discussion
             ? intent != SpeechIntent.LastWords : phase == GamePhase.Defense
             ? intent == SpeechIntent.Defend || intent == SpeechIntent.ClaimRole
+            : phase == GamePhase.Execution ? intent == SpeechIntent.ReactToDeath || intent == SpeechIntent.ReactToRoleReveal
             : phase == GamePhase.LastWords && intent == SpeechIntent.LastWords;
     }
 }

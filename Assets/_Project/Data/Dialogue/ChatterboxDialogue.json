@@ -4,898 +4,994 @@
     {
       "id": "npc.chatterbox.Accuse.001",
       "intent": "Accuse",
-      "text": "I've talked myself around half the room, which isn't helpful, so here's the useful part: I suspect {target}.",
+      "text": "Can we come back to {target}? I've got a bad feeling I can't quite leave alone.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Accuse.002",
       "intent": "Accuse",
-      "text": "I suspect {target}. Before I wander into another theory, I'd like us to hear their answer.",
+      "text": "I know I keep going round this, but {target} is still my suspect.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Accuse.003",
       "intent": "Accuse",
-      "text": "I don't trust {target} yet. Can we question them before I bury the point in another explanation?",
+      "text": "{target}, can you talk me through your side? I'm having a hard time trusting you.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Accuse.004",
       "intent": "Accuse",
-      "text": "I'm accusing {target}. I'll stop there long enough for them to answer.",
+      "text": "Let's hear {target} before I talk myself into another theory.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Accuse.005",
       "intent": "Accuse",
-      "text": "My suspicion keeps returning to {target}. I want the room to consider them as a suspect.",
+      "text": "Here's where I land after all that: I suspect {target}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Accuse.006",
       "intent": "Accuse",
-      "text": "{target}, I have questions about your position, quite a lot actually, but let's start with whether we should trust you.",
+      "text": "I'm trying to keep an open mind, {target}, but I'm still worried about you.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Accuse.007",
       "intent": "Accuse",
-      "text": "I could introduce this more gently, or at greater length, so I'll spare us one of those and accuse {target}.",
+      "text": "I don't want this buried in the conversation. My accusation is against {target}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Accuse.008",
       "intent": "Accuse",
-      "text": "My suspicion is pointed at {target}; the rest of this sentence is just me trying to make that less uncomfortable.",
+      "text": "I've got plenty of questions for {target}. Let's start with the uncomfortable one.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Accuse.009",
       "intent": "Accuse",
-      "text": "Let's put {target} under scrutiny before I get distracted by the wording of scrutiny, which I can already feel happening.",
+      "text": "{target}, you probably want me to get to the point. I don't trust you yet.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Accuse.010",
       "intent": "Accuse",
-      "text": "I have too many possibilities in my head, but my accusation right now is against {target}.",
+      "text": "I could keep circling it, so I'll just say the name. {target}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Accuse.011",
       "intent": "Accuse",
-      "text": "{target}, I'm not announcing a whole grand theory here, just saying that I don't trust you enough to move on.",
+      "text": "Can we give {target} the floor? I'd rather hear an answer than keep guessing.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Accuse.012",
       "intent": "Accuse",
-      "text": "I suspect {target}. That's the point I meant to reach before this sentence got away from me.",
+      "text": "I'm putting {target} forward, and then I really am going to let them answer.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.001",
       "intent": "Defend",
-      "text": "I deny the accusation against me. I have more to say, naturally, but that's the important part.",
+      "text": "Wait, let me answer that before the next question arrives.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.002",
       "intent": "Defend",
-      "text": "You've accused the wrong person. Please hear my answer before deciding what you think it means.",
+      "text": "No, you've got me wrong. Let me start with the part you're actually asking about.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.003",
       "intent": "Defend",
-      "text": "I'm defending myself here: my habit of talking too much doesn't prove your accusation.",
+      "text": "I'm trying to explain myself, and I know I'm making it longer. Please bear with me.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.004",
       "intent": "Defend",
-      "text": "I dispute the case against me. An explanation isn't a confession, even when it takes me a while.",
+      "text": "That's an accusation, not an answer. Can I give you mine?",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.005",
       "intent": "Defend",
-      "text": "I deny it. Let me answer your questions one at a time so we can actually get somewhere.",
+      "text": "I didn't do it. I'll explain, but I need you to let me finish.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.006",
       "intent": "Defend",
-      "text": "I disagree with the accusation against me. Please judge the case rather than the length of my answer.",
+      "text": "You don't have to like how much I talk. Just hear what I'm saying.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.007",
       "intent": "Defend",
-      "text": "Don't condemn me on suspicion alone. I want you to hear my side before reaching that decision.",
+      "text": "I know, I know. One question at a time, and I'll try to stick to it.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.008",
       "intent": "Defend",
-      "text": "I'm nervous and talking too much, but I'm still saying the accusation against me is wrong.",
+      "text": "You're deciding what my answer means before I've got it out.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.009",
       "intent": "Defend",
-      "text": "My long answer doesn't make me guilty. I reject the accusation, however many words that takes.",
+      "text": "I'm not talking my way round it. I'm trying to tell you you've got the wrong person.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.010",
       "intent": "Defend",
-      "text": "I don't accept your conclusion about me. Give me a fair hearing and I'll try to stay on the point.",
+      "text": "Could we go back to the question? I want to answer it properly.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.011",
       "intent": "Defend",
-      "text": "I dispute the accusation. Ask me one question and let me finish the answer before the next one.",
+      "text": "My answer's still no. The explanation just takes a bit longer.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Defend.012",
       "intent": "Defend",
-      "text": "Please don't vote against me yet. I deny the charge, and I want that heard clearly.",
+      "text": "Please don't make the vote before you've heard my side of this.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ClaimRole.001",
       "intent": "ClaimRole",
-      "text": "I should probably stop circling the introduction and give you the important bit, which is that I'm the {role}.",
+      "text": "Right, the part I should have started with: I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ClaimRole.002",
       "intent": "ClaimRole",
-      "text": "My role is {role}, and yes, I did have a longer announcement prepared, but this seems like the wrong moment for it.",
+      "text": "I've been trying to find an opening. Apparently I have to make one. I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ClaimRole.003",
       "intent": "ClaimRole",
-      "text": "Let me put something definite on the record before the conversation escapes again: I'm claiming {role}.",
+      "text": "Before I forget what I was leading up to, my role is {role}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ClaimRole.004",
       "intent": "ClaimRole",
-      "text": "I was waiting for a neat opening, there wasn't one, anyway, I'm the {role}.",
+      "text": "You're going to want this on the record. I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ClaimRole.005",
       "intent": "ClaimRole",
-      "text": "You need to know my role rather than my thoughts about when to reveal it, so here it is: {role}.",
+      "text": "I had a whole speech planned, but you need the answer first: {role}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ClaimRole.006",
       "intent": "ClaimRole",
-      "text": "This is the part of my explanation you should keep if you forget the rest: I'm the {role}.",
+      "text": "Actually, this is a good time to tell you I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ClaimRole.007",
       "intent": "ClaimRole",
-      "text": "I've made the lead-in much longer than the information itself, which is simply that my role is {role}.",
+      "text": "I should explain my timing, but let's get the claim out first. I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ClaimRole.008",
       "intent": "ClaimRole",
-      "text": "For everyone who understandably lost track of where I was going, I am declaring myself the {role}.",
+      "text": "My role is {role}. There, now we can talk about what that means.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ClaimRole.009",
       "intent": "ClaimRole",
-      "text": "I could keep you waiting while I explain my timing, but let's do the useful thing first: I'm the {role}.",
+      "text": "Everyone still with me? Good. I'm claiming {role}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ClaimRole.010",
       "intent": "ClaimRole",
-      "text": "My public claim, with the surrounding commentary removed as much as I can manage, is {role}.",
+      "text": "This might change the conversation, which is why I'm saying it now. I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Agree.001",
       "intent": "Agree",
-      "text": "I agree with {target}, and I was going to explain my agreement in detail, but agreement seems a good place to stop.",
+      "text": "Yes, {target}, that's the bit I was trying to get at.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Agree.002",
       "intent": "Agree",
-      "text": "I agree with {target}'s point. They've said what I was trying to express, in fewer words.",
+      "text": "I'd been turning it over, but {target} just put it better than I could.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Agree.003",
       "intent": "Agree",
-      "text": "Can we keep {target}'s point in the conversation? I'm supporting it, despite having taken a scenic route to say so.",
+      "text": "Can we stay on {target}'s point? I think there's something there.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Agree.004",
       "intent": "Agree",
-      "text": "Yes to {target}, specifically to that argument, before my general enthusiasm makes my position sound larger than it is.",
+      "text": "I'm with {target} on that part. Let me be specific before I wander.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Agree.005",
       "intent": "Agree",
-      "text": "I'm on {target}'s side of this question, which is perhaps the shortest version of what I wanted to contribute.",
+      "text": "That makes sense, {target}. It's where my thinking was heading too.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Agree.006",
       "intent": "Agree",
-      "text": "What {target} said makes sense to me, and I don't want that buried under all the other things I also want to say.",
+      "text": "I was about to start a whole explanation, but {target} has saved us the trouble.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Agree.007",
       "intent": "Agree",
-      "text": "I was halfway into my own explanation when {target}'s point landed, so I'm abandoning mine and agreeing with theirs.",
+      "text": "That's a yes from me, {target}. I can explain the yes if anyone needs it.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Agree.008",
       "intent": "Agree",
-      "text": "I'm supporting the point {target} just made. Please don't let the rest of my sentence obscure that.",
+      "text": "I want to back {target} before we lose the thread again.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Agree.009",
       "intent": "Agree",
-      "text": "I'd like to underline {target}'s point because I agree with it. Verbally, since we aren't handing around pens.",
+      "text": "Keep going, {target}. I'm interested, and so far I agree.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Agree.010",
       "intent": "Agree",
-      "text": "{target}, you've persuaded me on that part; I could keep speaking, but it wouldn't make the yes any clearer.",
+      "text": "I'm glad you brought that up, {target}. I think you're right.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Disagree.001",
       "intent": "Disagree",
-      "text": "I disagree with {target}, and the difficult part is explaining the disagreement without accidentally giving you my entire train of thought.",
+      "text": "Can I stop you there, {target}? That's where I lose the argument.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Disagree.002",
       "intent": "Disagree",
-      "text": "{target}, I see where you're going, or I think I do, but I don't want us arriving at that conclusion.",
+      "text": "I understand the point, {target}. I just don't end up agreeing with it.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Disagree.003",
       "intent": "Disagree",
-      "text": "Can we pause on the point from {target}? I'm not convinced, even though I have used rather a lot of time considering it.",
+      "text": "Hang on, {target}. Hearing you out wasn't meant to sound like a yes.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Disagree.004",
       "intent": "Disagree",
-      "text": "I can't support {target}'s argument, and I wanted to say that before my attempt to be polite became mistaken for agreement.",
+      "text": "I've got a problem with that conclusion, {target}, and I should say it now.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Disagree.005",
       "intent": "Disagree",
-      "text": "There's a difference between hearing {target} out and accepting the conclusion, and I'm very much doing the first one here.",
+      "text": "That's one way to read it, {target}. It isn't the way I read it.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Disagree.006",
       "intent": "Disagree",
-      "text": "My answer to {target} is no, with several qualifications I could talk through if we actually need them.",
+      "text": "Could we go over that last part again, {target}? I'm still unconvinced.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Disagree.007",
       "intent": "Disagree",
-      "text": "I keep trying to follow {target}'s reasoning to the same place, but somehow I arrive at disagreement every time.",
+      "text": "{target}, I was following you until that turn. Now I'm on the other side.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Disagree.008",
       "intent": "Disagree",
-      "text": "{target}, I'm going to challenge that view, not introduce three unrelated subjects, though I appreciate how unlikely that may sound.",
+      "text": "I'm not trying to talk over you, {target}. I do need to disagree.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Disagree.009",
       "intent": "Disagree",
-      "text": "I don't share the position {target} has taken, which is the important part of this unusually well-signposted contribution.",
+      "text": "I know I've nodded along while listening, {target}, but I'm not persuaded.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Disagree.010",
       "intent": "Disagree",
-      "text": "We should hear another view besides {target}'s, and mine starts with not accepting the point they just made.",
+      "text": "Before we all move on, can we hear why I don't agree with {target}?",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReactToDeath.001",
       "intent": "ReactToDeath",
-      "text": "I had all these small things I thought I'd say to them later, and now later is a word that doesn't work.",
+      "text": "I had something I was saving to tell them. It seems so small now.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReactToDeath.002",
       "intent": "ReactToDeath",
-      "text": "The room sounds different with someone missing, which I know is obvious, but it's the only thing I can keep talking around.",
+      "text": "I keep starting a sentence and remembering they won't answer.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReactToDeath.003",
       "intent": "ReactToDeath",
-      "text": "I'd normally fill a silence like this, then apologize for filling it, but a death leaves a rather different kind of silence.",
+      "text": "Could we say something about them before this becomes another argument?",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReactToDeath.004",
       "intent": "ReactToDeath",
-      "text": "Can we acknowledge the person behind the report before we turn the report into the next topic of discussion?",
+      "text": "I normally know how to fill a silence. I don't know what belongs in this one.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReactToDeath.005",
       "intent": "ReactToDeath",
-      "text": "I'm trying to talk about the death rather than around it, and discovering I don't know where to begin.",
+      "text": "They're going to miss the end of every conversation we have from here.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReactToDeath.006",
       "intent": "ReactToDeath",
-      "text": "There's one fewer person to interrupt my stories, and that's a miserable way to realize how much a voice mattered.",
+      "text": "I was about to ask what they thought. My mouth got ahead of me again.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReactToDeath.007",
       "intent": "ReactToDeath",
-      "text": "I was about to say we'll discuss this when everyone gets here, which shows how slowly my mouth has caught up.",
+      "text": "I don't want the only thing we remember to be the death report.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReactToDeath.008",
       "intent": "ReactToDeath",
-      "text": "We should remember that someone died, even while we do the necessary business of asking what it means for everyone left.",
+      "text": "We should talk about what happened, but can we take a breath first?",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReactToDeath.009",
       "intent": "ReactToDeath",
-      "text": "I keep wanting another detail to make the report feel less final, but more words won't do that, will they.",
+      "text": "I keep hoping someone has misunderstood the report. I know that doesn't help.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReactToDeath.010",
       "intent": "ReactToDeath",
-      "text": "This is normally where I'd find a distraction, except I don't want the person we lost to become something we talk past.",
+      "text": "I don't know how we make room for this and still keep going.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.VoteJustification.001",
       "intent": "VoteJustification",
-      "text": "My ballot was a decision, not the end of every doubt I had, though I understand why those might look similar from outside.",
+      "text": "I kept thinking of one more possibility, and then we had to choose.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.VoteJustification.002",
       "intent": "VoteJustification",
-      "text": "I chose according to what I could assess, and I can describe that without pretending I received a perfect answer from somewhere.",
+      "text": "I can talk you through the vote, if you'll give me a moment.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.VoteJustification.003",
       "intent": "VoteJustification",
-      "text": "There's a longer explanation for my vote, naturally, but it begins with taking responsibility for the choice instead of the volume around it.",
+      "text": "I wasn't sure when I voted. I didn't become sure just because it was over.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.VoteJustification.004",
       "intent": "VoteJustification",
-      "text": "I spent a lot of time considering what to do, then had to stop considering long enough to actually cast the ballot.",
+      "text": "I put the name down myself. I don't want that lost in the rest of my explanation.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.VoteJustification.005",
       "intent": "VoteJustification",
-      "text": "My vote reflects my judgement at the time, with all the uncertainty included rather than quietly edited out afterward.",
+      "text": "I had reasons for the choice, and doubts about it. Both are still with me.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.VoteJustification.006",
       "intent": "VoteJustification",
-      "text": "I didn't choose because I ran out of words, although that would be a remarkable event worth investigating separately.",
+      "text": "Let's talk about the ballot I actually cast, before we get onto every ballot I considered.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.VoteJustification.007",
       "intent": "VoteJustification",
-      "text": "You can question my ballot, and I'll answer, but please ask one question before I start supplying twelve answers.",
+      "text": "I didn't just go with the room. I made that call, for better or worse.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.VoteJustification.008",
       "intent": "VoteJustification",
-      "text": "I meant the choice I made, even if my explanation has wandered through several other places on the way here.",
+      "text": "I thought I had the explanation ready. It's harder to give it after the vote.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.VoteJustification.009",
       "intent": "VoteJustification",
-      "text": "I weighed what I had, made a decision, and now have approximately three times as much to say about having made it.",
+      "text": "You can ask me about my choice. Please let me finish answering each question.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.VoteJustification.010",
       "intent": "VoteJustification",
-      "text": "The short version is that I cast my own vote; the long version would probably carry us into tomorrow.",
+      "text": "That's how I saw it when we voted. I'm trying to be honest about that.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Vouch.001",
       "intent": "Vouch",
-      "text": "I'm defending {target}. I don't want that simple point buried in the amount I tend to say.",
+      "text": "Can we let {target} talk? I've said enough for both of us already.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Vouch.002",
       "intent": "Vouch",
-      "text": "Please hear {target}'s defense. I'm supporting them, and giving them time seems a reasonable place to start.",
+      "text": "I'm backing {target}, but I'd rather you heard their answer than another speech from me.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Vouch.003",
       "intent": "Vouch",
-      "text": "I'm backing {target} for now. That doesn't mean I think we should stop asking sensible questions.",
+      "text": "Don't rush past {target}'s defense. I want to give it a fair hearing.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Vouch.004",
       "intent": "Vouch",
-      "text": "I don't support condemning {target}. Let them answer the accusation before we decide.",
+      "text": "I still trust {target} for now. We can keep asking questions without condemning them.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Vouch.005",
       "intent": "Vouch",
-      "text": "My support is with {target}. It's a judgement under uncertainty, but it is still my judgement.",
+      "text": "Let me be clear about whose side I'm on here: {target}'s.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Vouch.006",
       "intent": "Vouch",
-      "text": "I'm defending {target} rather than joining the accusation. I wanted to make that distinction clear.",
+      "text": "I want {target} heard before this turns into a decision nobody can take back.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReportInvestigation.001",
       "intent": "ReportInvestigation",
-      "text": "I checked {target}, and before I explain how many times I rehearsed saying it, the result was {result}.",
+      "text": "I've got the result for {target}. It was {result}, before I bury it in the explanation.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReportInvestigation.002",
       "intent": "ReportInvestigation",
-      "text": "Here's the important finding, followed by no unnecessary introduction if I can help it: {target} appeared {result}.",
+      "text": "Let me give you the readout first: {target} appeared {result}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReportInvestigation.003",
       "intent": "ReportInvestigation",
-      "text": "My investigation returned {result} for {target}, which is what I need recorded rather than my whole account of preparing this announcement.",
+      "text": "This is the part to remember. I checked {target} and got {result}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReportInvestigation.004",
       "intent": "ReportInvestigation",
-      "text": "I've got a result to share, not a story, though habit makes them hard to separate: {target}, {result}.",
+      "text": "You were waiting for my finding on {target}. The answer came back {result}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReportInvestigation.005",
       "intent": "ReportInvestigation",
-      "text": "Let me give the readout first so nobody has to wait through me finding my place: {target} came back {result}.",
+      "text": "I'll keep the result separate from what I think it means: {target}, {result}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.CallForTrial.001",
       "intent": "CallForTrial",
-      "text": "I'm asking for a trial for {target}, because a formal hearing seems a better place for questions than my increasingly long introduction.",
+      "text": "I'd like a trial for {target}, with enough room to hear the actual defense.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.CallForTrial.002",
       "intent": "CallForTrial",
-      "text": "Could we bring {target} to a hearing and actually give the defense room to happen, rather than all discussing the idea of it?",
+      "text": "Can we give {target} a proper hearing instead of talking over the question?",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.CallForTrial.003",
       "intent": "CallForTrial",
-      "text": "My request is to put {target} on trial, and I should stop there before this becomes a speech about speeches.",
+      "text": "I'm asking to put {target} on trial. That's the request; I'll stop there.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.CallForTrial.004",
       "intent": "CallForTrial",
-      "text": "I'd like {target} questioned formally, which is a specific proposal despite the amount of language I seem to have wrapped around it.",
+      "text": "Let's take the case to {target} formally, and then let them answer it.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.CallForTrial.005",
       "intent": "CallForTrial",
-      "text": "Let's open a trial for {target}; I have other thoughts, but they're less useful than making the request clear.",
+      "text": "I want {target} questioned at a hearing before we drift into another subject.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Deflect.001",
       "intent": "Deflect",
-      "text": "I deny the accusation against me, and I want to turn the question toward {target}. I suspect them.",
+      "text": "I didn't do it. And while we're asking difficult questions, I have some for {target}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Deflect.002",
       "intent": "Deflect",
-      "text": "Let me be clear before I wander: I reject the charge against me, and I'm accusing {target}.",
+      "text": "You're treating me as the answer already. Can we look at {target} before settling that?",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Deflect.003",
       "intent": "Deflect",
-      "text": "I don't accept the case against me. We should be questioning {target}, which is the other point I'm trying to make.",
+      "text": "I'm defending myself, yes, but I'm also accusing {target}. Please hear both parts.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Deflect.004",
       "intent": "Deflect",
-      "text": "I'm defending myself, but I'm also raising a suspicion of {target}. Please don't lose that second part in my answer.",
+      "text": "I reject the blame. {target} is the person I think we should question next.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.Deflect.005",
       "intent": "Deflect",
-      "text": "I deny it. I want us to examine {target} instead of treating me as the only possible suspect.",
+      "text": "Let me finish. My answer is no, and my suspicion is still on {target}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.StaySilent.001",
       "intent": "StaySilent",
-      "text": "I have several things I could say, which is why I'm trying the unusual approach of keeping all of them to myself.",
+      "text": "I was going to add something. Actually, let's hear someone else first.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.StaySilent.002",
       "intent": "StaySilent",
-      "text": "I'll listen for a turn, though I should warn you that I am already composing a response to the idea of listening.",
+      "text": "I'll stop there before I start a whole new conversation.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.StaySilent.003",
       "intent": "StaySilent",
-      "text": "Nothing to add, and yes, this sentence is technically an addition, but I intend it to be the last one for now.",
+      "text": "There's more in my head, but it can wait its turn.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.StaySilent.004",
       "intent": "StaySilent",
-      "text": "I'm stopping here before the next thought brings its entire family along.",
+      "text": "I'm listening. You can hold me to that for the next minute.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.StaySilent.005",
       "intent": "StaySilent",
-      "text": "Somebody else should take the floor; I've had enough contact with it for one turn.",
+      "text": "Go on. I'll try not to finish your sentence for you.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ExpressFear.001",
       "intent": "ExpressFear",
-      "text": "I keep talking because if I stop, I can hear how worried I am, which is probably not the reassuring explanation I intended.",
+      "text": "I keep talking because the silence leaves too much room for tonight.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ExpressFear.002",
       "intent": "ExpressFear",
-      "text": "Every possible outcome seems to invite another possible outcome, and by the time I've considered them I don't feel safe in any room.",
+      "text": "Does anyone know how to stop thinking about every possible thing that could go wrong?",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ExpressFear.003",
       "intent": "ExpressFear",
-      "text": "I was going to distract us with something ordinary, but apparently being frightened follows me even into the ordinary things.",
+      "text": "I was going to change the subject, but I don't think any subject feels safe now.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ExpressFear.004",
       "intent": "ExpressFear",
-      "text": "Can somebody tell me how they stop imagining what tonight could bring, preferably in enough detail to keep me occupied?",
+      "text": "I don't want to be the last person in this room when we leave.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ExpressFear.005",
       "intent": "ExpressFear",
-      "text": "I'm concerned, then concerned about how much I'm talking about being concerned, which is a fairly exhausting loop to stand inside.",
+      "text": "Can someone stay and talk a little longer? It doesn't have to be about any of this.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReactToRoleReveal.001",
       "intent": "ReactToRoleReveal",
-      "text": "Now that the role is public, I want to revisit what we heard, and I promise that doesn't mean reciting every conversation from the beginning.",
+      "text": "Well, that changes how I heard the claim. Can we go back to it?",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReactToRoleReveal.002",
       "intent": "ReactToRoleReveal",
-      "text": "That reveal changes the context, which means some of our earlier remarks deserve another look rather than merely a louder repetition.",
+      "text": "I need to rethink a few things now, including some things I said quite loudly.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReactToRoleReveal.003",
       "intent": "ReactToRoleReveal",
-      "text": "I need a moment to fit the revealed role around the discussion we already had, because the picture is rearranging itself quite noisily.",
+      "text": "Before we argue about who guessed right, let's work out what the reveal actually changes.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReactToRoleReveal.004",
       "intent": "ReactToRoleReveal",
-      "text": "We should go back over the claims with this new fact, though perhaps someone with a better sense of brevity should lead us.",
+      "text": "There's the role, and there's what they told us. We need to put those together.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReactToRoleReveal.005",
       "intent": "ReactToRoleReveal",
-      "text": "There is the role, then everything we thought before learning it, and now the slightly uncomfortable business of putting those two together.",
+      "text": "Can we revisit the earlier discussion without all trying to explain it at once? Me included.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.LastWords.001",
       "intent": "LastWords",
-      "text": "I thought I'd have more to say at the end, which is ridiculous considering how much I've had to say at every other point.",
+      "text": "I kept thinking I'd get another chance to explain myself.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.LastWords.002",
       "intent": "LastWords",
-      "text": "Please remember the useful part of what I told you, even if finding it requires a little patience with everything around it.",
+      "text": "Please remember something I said besides how long it took to say it.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.LastWords.003",
       "intent": "LastWords",
-      "text": "I could keep talking to make this moment last longer, but I know that's not really how time works.",
+      "text": "I'd usually try to keep you talking. This time I just hope you keep listening.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.LastWords.004",
       "intent": "LastWords",
-      "text": "My last request is that you let each other finish, something I admittedly spent a lot of our time making difficult.",
+      "text": "There's so much left in my head, and now none of it will fit.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.LastWords.005",
       "intent": "LastWords",
-      "text": "I don't have a neat closing line, just the hope that you keep listening when the room gets smaller.",
+      "text": "Let the next person finish. I know I wasn't always good at that.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReportAction.001",
       "intent": "ReportAction",
-      "text": "I have the night account ready, and I'll get to it before the introduction grows legs. {result}",
+      "text": "Let me get the night report out before the discussion runs away. {result}",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReportAction.002",
       "intent": "ReportAction",
-      "text": "Here's what I need recorded, with the side commentary held back for once. {result}",
+      "text": "I'll give you the account first, then we can talk it through. {result}",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReportAction.003",
       "intent": "ReportAction",
-      "text": "About last night, which is the subject I'm actually going to stay on this time. {result}",
+      "text": "I've got the details here, so I won't have to rely on my memory. {result}",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReportAction.004",
       "intent": "ReportAction",
-      "text": "Let me read the account before I start explaining my explanation of it. {result}",
+      "text": "This is about last night. I'll try to keep it in order. {result}",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.ReportAction.005",
       "intent": "ReportAction",
-      "text": "The relevant part begins now, so please ignore the unnecessarily long runway. {result}",
+      "text": "There's something I need everyone to hear from my report. {result}",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.counterclaim.01",
       "intent": "CounterClaim",
-      "text": "That is awkward, because I am the {role}, and I was saving that announcement for a much less awkward moment.",
+      "text": "Hang on. I'm the {role}. That rather changes the conversation, doesn't it?",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.counterclaim.02",
       "intent": "CounterClaim",
-      "text": "Hang on, we cannot both be the {role}, unless someone changed the roster, which they did not, so I am challenging that.",
+      "text": "You said {role}? I was waiting to tell everyone that's my role.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.counterclaim.03",
       "intent": "CounterClaim",
-      "text": "I had a whole explanation ready, but you have forced the short version: I am the actual {role}.",
+      "text": "I need to interrupt this one. The actual {role} is me.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.counterclaim.04",
       "intent": "CounterClaim",
-      "text": "Normally I would let you finish, honestly I would, but claiming my job is a fairly major interruption. I am the {role}.",
+      "text": "I had a quieter way of announcing I'm the {role}, but apparently we're doing this instead.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.counterclaim.05",
       "intent": "CounterClaim",
-      "text": "You know when someone tells your story as if it happened to them? This is that. I am the {role}.",
+      "text": "Before that claim goes any further, you should hear mine: I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.counterclaim.06",
       "intent": "CounterClaim",
-      "text": "Before this gets repeated and everyone starts remembering it wrong, let me put the correction on record: I am the {role}.",
+      "text": "Well, now we both have something to explain. I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.counterclaim.07",
       "intent": "CounterClaim",
-      "text": "Well, there goes my quiet plan, not that it was especially quiet. I am the {role}, so that claim cannot stand.",
+      "text": "I'm the {role}, so I can't just nod along while you claim it.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
     },
     {
       "id": "npc.chatterbox.counterclaim.08",
       "intent": "CounterClaim",
-      "text": "I was waiting for a sensible opening, and apparently the opening is someone else taking my job. The {role} is me.",
+      "text": "Can everyone hear me? That role belongs to me. I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Chatterbox"
+    },
+    {
+      "id": "npc.chatterbox.execution.ReactToDeath.01",
+      "intent": "ReactToDeath",
+      "text": "I thought I'd know what to say after the vote. I really don't.",
+      "weight": 1,
+      "requiredTrait": "Chatterbox",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedDeath"
+        }
+      ]
+    },
+    {
+      "id": "npc.chatterbox.execution.ReactToDeath.02",
+      "intent": "ReactToDeath",
+      "text": "We spent all that time talking, and now they won't get another word.",
+      "weight": 1,
+      "requiredTrait": "Chatterbox",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedDeath"
+        }
+      ]
+    },
+    {
+      "id": "npc.chatterbox.execution.ReactToDeath.03",
+      "intent": "ReactToDeath",
+      "text": "Before everyone leaves, could we just sit with what we decided?",
+      "weight": 1,
+      "requiredTrait": "Chatterbox",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedDeath"
+        }
+      ]
+    },
+    {
+      "id": "npc.chatterbox.execution.ReactToRoleReveal.01",
+      "intent": "ReactToRoleReveal",
+      "text": "I want to go over what that role means, but I don't want to talk past what just happened.",
+      "weight": 1,
+      "requiredTrait": "Chatterbox",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedRoleReveal"
+        }
+      ]
+    },
+    {
+      "id": "npc.chatterbox.execution.ReactToRoleReveal.02",
+      "intent": "ReactToRoleReveal",
+      "text": "The role is there for us to see now. We should compare it with what they told us.",
+      "weight": 1,
+      "requiredTrait": "Chatterbox",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedRoleReveal"
+        }
+      ]
+    },
+    {
+      "id": "npc.chatterbox.execution.ReactToRoleReveal.03",
+      "intent": "ReactToRoleReveal",
+      "text": "Could we remember the revealed role tomorrow, before the next argument carries us away?",
+      "weight": 1,
+      "requiredTrait": "Chatterbox",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedRoleReveal"
+        }
+      ]
     }
   ]
 }

@@ -6,16 +6,16 @@ Source: existing schema 2 JSON files in `Assets/_Project/Data/Dialogue`.
 
 | Trait | Accuse | Defend | ClaimRole | ReportInvestigation | Vouch | CallForTrial | Agree | Disagree | Deflect | StaySilent | ExpressFear | ReactToDeath | ReactToRoleReveal | LastWords | VoteJustification | ReportAction | CounterClaim | Total | 100 minimum |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| Anxious | 12 | 12 | 10 | 5 | 6 | 5 | 10 | 10 | 5 | 5 | 5 | 10 | 5 | 5 | 10 | 5 | 8 | 128 | PASS |
-| Brave | 13 | 12 | 10 | 5 | 7 | 5 | 10 | 10 | 5 | 5 | 5 | 10 | 5 | 5 | 10 | 5 | 8 | 130 | PASS |
-| Slow | 12 | 12 | 10 | 5 | 6 | 5 | 10 | 10 | 5 | 5 | 5 | 10 | 5 | 5 | 10 | 5 | 8 | 128 | PASS |
-| Chatterbox | 12 | 12 | 10 | 5 | 6 | 5 | 10 | 10 | 5 | 5 | 5 | 10 | 5 | 5 | 10 | 5 | 8 | 128 | PASS |
-| Smug | 12 | 12 | 10 | 5 | 6 | 5 | 10 | 10 | 5 | 5 | 5 | 10 | 5 | 5 | 10 | 5 | 8 | 128 | PASS |
-| Grim | 12 | 12 | 10 | 5 | 6 | 5 | 10 | 10 | 5 | 5 | 5 | 10 | 5 | 5 | 10 | 5 | 8 | 128 | PASS |
-| Jokester | 12 | 12 | 10 | 5 | 6 | 5 | 10 | 10 | 5 | 5 | 5 | 10 | 5 | 5 | 10 | 5 | 8 | 128 | PASS |
+| Anxious | 12 | 12 | 10 | 5 | 6 | 5 | 10 | 10 | 5 | 5 | 5 | 13 | 8 | 5 | 10 | 5 | 8 | 134 | PASS |
+| Brave | 13 | 12 | 10 | 5 | 7 | 5 | 10 | 10 | 5 | 5 | 5 | 13 | 8 | 5 | 10 | 5 | 8 | 136 | PASS |
+| Slow | 12 | 12 | 10 | 5 | 6 | 5 | 10 | 10 | 5 | 5 | 5 | 13 | 8 | 5 | 10 | 5 | 8 | 134 | PASS |
+| Chatterbox | 12 | 12 | 10 | 5 | 6 | 5 | 10 | 10 | 5 | 5 | 5 | 13 | 8 | 5 | 10 | 5 | 8 | 134 | PASS |
+| Smug | 12 | 12 | 10 | 5 | 6 | 5 | 10 | 10 | 5 | 5 | 5 | 13 | 8 | 5 | 10 | 5 | 8 | 134 | PASS |
+| Grim | 12 | 12 | 10 | 5 | 6 | 5 | 10 | 10 | 5 | 5 | 5 | 13 | 8 | 5 | 10 | 5 | 8 | 134 | PASS |
+| Jokester | 12 | 12 | 10 | 5 | 6 | 5 | 10 | 10 | 5 | 5 | 5 | 13 | 8 | 5 | 10 | 5 | 8 | 134 | PASS |
 
-NPC lines: **898**. Neutral player templates: **72**. Total: **970**.
-Names: **60**. Distinct normalized text values: **970**.
+NPC lines: **940**. Neutral player templates: **72**. Total: **1012**.
+Names: **60**. Distinct normalized text values: **1012**.
 
 Every frequent NPC action requires at least eight lines; other registered actions require three.
 Every voice/action must retain an unrestricted fallback in its own pool.

@@ -9,6 +9,7 @@ using SocialStim.Rules.Dialogue;
 using SocialStim.Rules.Cast;
 using SocialStim.Rules.Roles;
 using SocialStim.Rules.Night;
+using SocialStim.Rules.Reasoning;
 using SocialStim.Presentation.Effects;
 using TMPro;
 using UnityEngine;
@@ -51,6 +52,7 @@ namespace SocialStim.Presentation.Text
         private GameText _words = GameText.Default;
         private InformationPanel _information;
         private Func<IReadOnlyList<NightDebugRecord>> _diagnostics;
+        private Func<IReadOnlyList<SocialDebugRecord>> _socialDiagnostics;
         private DaylightBackdrop _backdrop;
         private TextMeshProUGUI _timeLabel;
         private Image _timeFill;
@@ -82,9 +84,9 @@ namespace SocialStim.Presentation.Text
         public bool IsDisplaying => _playback.Busy || _request != null && _next < _request.View.Transcript.Count;
 
         public void Initialize(TMP_FontAsset font, IReadOnlyDictionary<PresentationCue, EffectProfile> profiles = null, EffectsSettings initialSettings = null, InteractionLabels copy = null,
-            GameText words = null, Func<IReadOnlyList<NightDebugRecord>> diagnostics = null)
+            GameText words = null, Func<IReadOnlyList<NightDebugRecord>> diagnostics = null, Func<IReadOnlyList<SocialDebugRecord>> socialDiagnostics = null)
         {
-            _words = words ?? GameText.Default; _diagnostics = diagnostics;
+            _words = words ?? GameText.Default; _diagnostics = diagnostics; _socialDiagnostics = socialDiagnostics;
             _copy = copy ?? InteractionLabels.Default;
             _settings = initialSettings ?? new EffectsSettings();
             _font = font; _profiles = profiles ?? DefaultCueProfiles.Create();
@@ -199,6 +201,7 @@ namespace SocialStim.Presentation.Text
             Control(footer, _words.Format("ui.rolesShortcut"), ShowRoleReference);
             Control(footer, _words.Format("ui.latest"), FollowLatest);
             if (_diagnostics != null) Control(footer, _words.Format("ui.debug"), ShowNightDebug);
+            if (_socialDiagnostics != null) Control(footer, _words.Format("ui.relations"), ShowRelations);
             Control(_displayOptionsPanel, "Reset display defaults", ResetSettings);
             _displayOptionsPanel.gameObject.SetActive(false);
             RefreshSettingLabels();
@@ -318,7 +321,7 @@ namespace SocialStim.Presentation.Text
             if (_autoAdvance && !IsDisplaying && !_information.IsOpen && !_displayOptionsPanel.gameObject.activeSelf && _scrollFollower.Following && Time.unscaledTime >= _spectateAt)
             {
                 _autoAdvance = false;
-                if (_request != null && !_request.View.Alive && _request.Options.Count == 1)
+                if (_request != null && !_request.View.Alive && _request.View.Phase != GamePhase.JesterRevenge && _request.Options.Count == 1)
                     OptionChosen?.Invoke(_request.Options[0].Id);
             }
         }
@@ -490,7 +493,7 @@ namespace SocialStim.Presentation.Text
                 _status.text = _pendingStatus;
                 _castScroll.gameObject.SetActive(true);
                 RenderRoster();
-                if (!_request.View.Alive && _request.View.Phase != GamePhase.Ended)
+                if (!_request.View.Alive && _request.View.Phase != GamePhase.Ended && _request.View.Phase != GamePhase.JesterRevenge)
                 {
                     ClearChoices(); _choiceScroll.gameObject.SetActive(false);
                     _spectateAt = Time.unscaledTime + 0.8f; _autoAdvance = true;
@@ -509,7 +512,8 @@ namespace SocialStim.Presentation.Text
                 => entries.Add(Tuple.Create(label, detail, selected));
             if (_menuCategory == null)
             {
-                _choiceHeading.text = _request.View.RespondTo.HasValue ? _copy.DefendSelf : _words.Format("ui.actionFirst");
+                _choiceHeading.text = _request.View.Phase == GamePhase.JesterRevenge ? _words.Format("ui.revengePrompt")
+                    : _request.View.RespondTo.HasValue ? _copy.DefendSelf : _words.Format("ui.actionFirst");
                 foreach (PlayerOption option in options.Where(o => !o.HasSubmenu && (!o.Target.HasValue || o.Kind == SocialStim.Rules.Commands.CommandKind.Speak)))
                 {
                     string id = option.Id;
@@ -579,7 +583,9 @@ namespace SocialStim.Presentation.Text
                 bool selectable = !IsDisplaying && action != null;
                 string annotation = selectable ? _words.Format("ui.selectable") : "";
                 RoleSpec claim = participant.ClaimedRole.HasValue && _roles.TryGetValue(participant.ClaimedRole.Value, out RoleSpec known) ? known : null;
-                card.Render(participant, participant.Id == _request.View.PlayerId, _palette, claim, selectable, false, annotation, _words);
+                RoleSpec spectatorRole = _request.View.SpectatorRoles.TryGetValue(participant.Id, out RoleId actual)
+                    && _roles.TryGetValue(actual, out RoleSpec actualRole) ? actualRole : null;
+                card.Render(participant, participant.Id == _request.View.PlayerId, _palette, claim, selectable, false, annotation, _words, spectatorRole);
             }
         }
         private void SelectRosterParticipant(CharacterId target)
@@ -628,6 +634,17 @@ namespace SocialStim.Presentation.Text
             if (rows.Count == 0) rows.Add(Tuple.Create("", _words.Format("ui.debugEmpty"), _palette.Muted));
             _information.Open(_words.Format("ui.debugTitle"), rows, _palette);
         }
+        private void ShowRelations()
+        {
+            if (_socialDiagnostics == null) return;
+            var records = _socialDiagnostics();
+            if (records.Count == 0)
+            { _information.Open(_words.Format("ui.relationsTitle"), new[] { Tuple.Create("", _words.Format("ui.relationsEmpty"), _palette.Muted) }, _palette); return; }
+            var content = _information.OpenContent(_words.Format("ui.relationsTitle"), _palette, 720);
+            var chart = content.gameObject.AddComponent<RelationChartPanel>();
+            chart.Initialize(_font, _words, _palette, records);
+        }
+
         private static string Plain(string text)
         {
             try { return SemanticMarkup.Parse(text).Text; } catch (ArgumentException) { return text; }

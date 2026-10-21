@@ -4,7 +4,7 @@
     {
       "id": "starter.Accuse.001",
       "intent": "Accuse",
-      "text": "I suspect {target}.",
+      "text": "I want us to question {target}.",
       "weight": 1
     },
     {
@@ -22,19 +22,19 @@
     {
       "id": "starter.Defend.001",
       "intent": "Defend",
-      "text": "I dispute the accusation against me.",
+      "text": "That accusation is wrong. Let me answer.",
       "weight": 1
     },
     {
       "id": "starter.Defend.002",
       "intent": "Defend",
-      "text": "The case against me is unproven.",
+      "text": "You haven't proved the case against me.",
       "weight": 1
     },
     {
       "id": "starter.Defend.003",
       "intent": "Defend",
-      "text": "I reject the accusation against me. Please hear my defense.",
+      "text": "Hear my defense before you decide.",
       "weight": 1
     },
     {
@@ -46,13 +46,13 @@
     {
       "id": "starter.ClaimRole.002",
       "intent": "ClaimRole",
-      "text": "I am claiming the role of {role}.",
+      "text": "I'm claiming the {role} role.",
       "weight": 1
     },
     {
       "id": "starter.ClaimRole.003",
       "intent": "ClaimRole",
-      "text": "I identify myself as the {role}.",
+      "text": "You should know I'm the {role}.",
       "weight": 1
     },
     {
@@ -82,13 +82,13 @@
     {
       "id": "starter.Vouch.002",
       "intent": "Vouch",
-      "text": "I do not support eliminating {target}.",
+      "text": "I don't think we should eliminate {target}.",
       "weight": 1
     },
     {
       "id": "starter.Vouch.003",
       "intent": "Vouch",
-      "text": "I'm defending {target}. Let them answer before deciding.",
+      "text": "Let {target} answer. I'm defending them.",
       "weight": 1
     },
     {
@@ -100,13 +100,13 @@
     {
       "id": "starter.CallForTrial.002",
       "intent": "CallForTrial",
-      "text": "I request a formal defense from {target}.",
+      "text": "Let us hear {target}'s formal defense.",
       "weight": 1
     },
     {
       "id": "starter.CallForTrial.003",
       "intent": "CallForTrial",
-      "text": "I propose that we question {target}.",
+      "text": "We should question {target} at a trial.",
       "weight": 1
     },
     {
@@ -124,43 +124,43 @@
     {
       "id": "starter.Agree.003",
       "intent": "Agree",
-      "text": "I accept the point made by {target}.",
+      "text": "{target}'s point makes sense to me.",
       "weight": 1
     },
     {
       "id": "starter.Disagree.001",
       "intent": "Disagree",
-      "text": "I do not share {target}'s conclusion.",
+      "text": "I don't agree with {target}'s conclusion.",
       "weight": 1
     },
     {
       "id": "starter.Disagree.002",
       "intent": "Disagree",
-      "text": "I dispute the position of {target}.",
+      "text": "I'm challenging what {target} just said.",
       "weight": 1
     },
     {
       "id": "starter.Disagree.003",
       "intent": "Disagree",
-      "text": "I do not accept the point from {target}.",
+      "text": "{target} hasn't convinced me on that point.",
       "weight": 1
     },
     {
       "id": "starter.Deflect.001",
       "intent": "Deflect",
-      "text": "I deny the accusation against me. I suspect {target} instead.",
+      "text": "I deny it. We should question {target}.",
       "weight": 1
     },
     {
       "id": "starter.Deflect.002",
       "intent": "Deflect",
-      "text": "I reject the case against me, and I want {target} questioned.",
+      "text": "I reject that accusation. I suspect {target}.",
       "weight": 1
     },
     {
       "id": "starter.Deflect.003",
       "intent": "Deflect",
-      "text": "I dispute the accusation. My own accusation is against {target}.",
+      "text": "I'm defending myself and accusing {target}.",
       "weight": 1
     },
     {
@@ -178,7 +178,7 @@
     {
       "id": "starter.StaySilent.003",
       "intent": "StaySilent",
-      "text": "I will withhold a statement.",
+      "text": "I'll wait before saying anything else.",
       "weight": 1
     },
     {
@@ -202,31 +202,31 @@
     {
       "id": "starter.ReactToDeath.001",
       "intent": "ReactToDeath",
-      "text": "We need to account for this death.",
+      "text": "We should discuss what this death means.",
       "weight": 1
     },
     {
       "id": "starter.ReactToDeath.002",
       "intent": "ReactToDeath",
-      "text": "A death requires us to reassess.",
+      "text": "Someone died. We need to think again.",
       "weight": 1
     },
     {
       "id": "starter.ReactToDeath.003",
       "intent": "ReactToDeath",
-      "text": "We should examine what led to this.",
+      "text": "We should learn what we can from this death.",
       "weight": 1
     },
     {
       "id": "starter.ReactToRoleReveal.001",
       "intent": "ReactToRoleReveal",
-      "text": "The revealed role changes our information.",
+      "text": "That role changes how we read the claims.",
       "weight": 1
     },
     {
       "id": "starter.ReactToRoleReveal.002",
       "intent": "ReactToRoleReveal",
-      "text": "Now that their role is public, we should review what they claimed.",
+      "text": "We should compare their role with their claims.",
       "weight": 1
     },
     {
@@ -238,13 +238,13 @@
     {
       "id": "starter.LastWords.001",
       "intent": "LastWords",
-      "text": "Review my statements after the elimination.",
+      "text": "Remember what I said during the discussion.",
       "weight": 1
     },
     {
       "id": "starter.LastWords.002",
       "intent": "LastWords",
-      "text": "I have no further information to provide.",
+      "text": "That's all I can tell you now.",
       "weight": 1
     },
     {
@@ -256,7 +256,7 @@
     {
       "id": "starter.VoteJustification.001",
       "intent": "VoteJustification",
-      "text": "My vote followed my assessment.",
+      "text": "That was my best judgement when voting.",
       "weight": 1
     },
     {
@@ -268,13 +268,13 @@
     {
       "id": "starter.VoteJustification.003",
       "intent": "VoteJustification",
-      "text": "I chose according to my current conclusion.",
+      "text": "I chose based on what I knew.",
       "weight": 1
     },
     {
       "id": "starter.social.defend.pressure",
       "intent": "Defend",
-      "text": "I dispute the case being made against me.",
+      "text": "I don't accept the case against me.",
       "weight": 3,
       "conditions": [
         {
@@ -308,7 +308,7 @@
     {
       "id": "starter.social.death.observed",
       "intent": "ReactToDeath",
-      "text": "An observed death requires another review.",
+      "text": "We should reconsider after the death report.",
       "weight": 3,
       "conditions": [
         {
@@ -355,7 +355,7 @@
     {
       "id": "report-action.2",
       "intent": "ReportAction",
-      "text": "Recorded action and results: {result}",
+      "text": "Here's my action and its results: {result}",
       "weight": 1
     },
     {
@@ -373,13 +373,13 @@
     {
       "id": "starter.Defend.004",
       "intent": "Defend",
-      "text": "I have not been shown to be guilty.",
+      "text": "You haven't shown that I'm guilty.",
       "weight": 1
     },
     {
       "id": "starter.ClaimRole.004",
       "intent": "ClaimRole",
-      "text": "You should know that I am the {role}.",
+      "text": "My claim is that I'm the {role}.",
       "weight": 1
     },
     {
@@ -403,19 +403,19 @@
     {
       "id": "starter.Agree.004",
       "intent": "Agree",
-      "text": "I share the conclusion reached by {target}.",
+      "text": "I'm with {target} on this point.",
       "weight": 1
     },
     {
       "id": "starter.Disagree.004",
       "intent": "Disagree",
-      "text": "I reach a different conclusion from {target}.",
+      "text": "I see it differently from {target}.",
       "weight": 1
     },
     {
       "id": "starter.Deflect.004",
       "intent": "Deflect",
-      "text": "I don't accept that blame. I think we should examine {target} instead.",
+      "text": "I deny the blame. Look at {target}.",
       "weight": 1
     },
     {
@@ -433,31 +433,31 @@
     {
       "id": "starter.ReactToDeath.004",
       "intent": "ReactToDeath",
-      "text": "This death affects the remaining discussion.",
+      "text": "We have fewer people after this death.",
       "weight": 1
     },
     {
       "id": "starter.ReactToRoleReveal.004",
       "intent": "ReactToRoleReveal",
-      "text": "This role reveal narrows the possibilities.",
+      "text": "We know more now. Revisit the claims.",
       "weight": 1
     },
     {
       "id": "starter.LastWords.004",
       "intent": "LastWords",
-      "text": "My account is now complete.",
+      "text": "I've told you what I can.",
       "weight": 1
     },
     {
       "id": "starter.VoteJustification.004",
       "intent": "VoteJustification",
-      "text": "My vote reflected an uncertain decision.",
+      "text": "I wasn't certain when I cast that vote.",
       "weight": 1
     },
     {
       "id": "starter.ReportAction.004",
       "intent": "ReportAction",
-      "text": "My night report follows: {result}",
+      "text": "Here's the night report I can give: {result}",
       "weight": 1
     },
     {

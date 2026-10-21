@@ -46,13 +46,15 @@ namespace SocialStim.Presentation.Text
         }
 
         public void Render(KnownCharacter participant, bool self, TextPalette palette, RoleSpec claimedRole = null,
-            bool selectable = false, bool selected = false, string annotation = "", SocialStim.Rules.Dialogue.GameText words = null)
+            bool selectable = false, bool selected = false, string annotation = "", SocialStim.Rules.Dialogue.GameText words = null, RoleSpec spectatorRole = null)
         {
             words = words ?? SocialStim.Rules.Dialogue.GameText.Default;
             _self = self;
             _alive = participant.Alive; _claimedRole = claimedRole;
             _selected = selected; _button.interactable = selectable;
-            _label.text = (participant.Id.Value + 1) + ". " + participant.Name + (self ? " " + words.Format("ui.you") : "");
+            _label.text = (participant.Id.Value + 1) + ". " + participant.Name + (self ? " " + words.Format("ui.you") : "")
+                + (spectatorRole == null ? "" : " [" + (words.Entries.TryGetValue("role.short." + spectatorRole.Id.Value, out string shortName)
+                    ? shortName : spectatorRole.Name) + "]");
             _focus.SetText(_label.text);
             _state.text = (words.Format(!participant.Alive ? "ui.dead" : participant.IsTeammate ? "ui.teammate" : "ui.alive"))
                 + (string.IsNullOrEmpty(annotation) ? "" : "\n" + annotation);
