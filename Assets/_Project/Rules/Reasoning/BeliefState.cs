@@ -144,6 +144,13 @@ namespace SocialStim.Rules.Reasoning
             if (_privateReports.Any(r => r.Kind == ReportKind.VisitorSeen && r.Night == night
                 && r.Target == speaker && r.Subject.HasValue && r.Subject != target))
                 Penalize(speaker, _settings.ContradictionPenalty, day, false);
+            // Only independent private evidence earns credibility; echoes do not verify a report.
+            // A matching reading supports the observation, not the reporter's hidden role.
+            if (speaker != _self
+                && _privateReports.Any(r => r.Kind == ReportKind.Investigation && r.Target == target && r.Night == night && r.Alignment == alignment)
+                && !_privateReports.Any(r => r.Kind == ReportKind.Investigation && r.Target == target && r.Night == night && r.Alignment != alignment)
+                && !_reports.Any(r => r.Speaker == speaker && r.Target == target && r.Night == night))
+                TrustChange(speaker, 8);
             _reports.Add(new ReportAssertion(speaker, target, night, alignment));
             if (speaker != _self)
             {
@@ -275,11 +282,15 @@ namespace SocialStim.Rules.Reasoning
                 if (reveal != null && reveal.Role != claimed) continue;
                 foreach (CharacterId rival in _claims.Where(c => c.Key != death.Key && c.Value == claimed && !_dead.Contains(c.Key)).Select(c => c.Key))
                 {
-                    if (rival == _self || KnownFaction(rival) == Faction.Town
+                    if ((rival != _self && KnownFaction(rival) == Faction.Town)
                         || _evidence.Any(e => e.Kind == EvidenceKind.ClaimantLostAtNight && e.Actor == rival && e.Target == death.Key)) continue;
                     int weight = reveal == null ? 12 : 30;
-                    Change(rival, weight); TrustChange(rival, -weight / 2);
-                    _distribution.AssertAlignment(rival, Faction.Antagonist, weight);
+                    if (rival == _self) Expose(weight);
+                    else
+                    {
+                        Change(rival, weight); TrustChange(rival, -weight / 2);
+                        _distribution.AssertAlignment(rival, Faction.Antagonist, weight);
+                    }
                     Record(day, EvidenceKind.ClaimantLostAtNight, rival, death.Key, role: claimed);
                 }
             }

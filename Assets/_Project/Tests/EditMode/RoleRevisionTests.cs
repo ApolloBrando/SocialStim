@@ -35,6 +35,32 @@ namespace SocialStim.Tests.EditMode
             public CharacterId? NightTarget(KnowledgeView view, IRandomSource random) => null;
         }
 
+        [TestCase("assassin")]
+        [TestCase("survivor")]
+        [TestCase("provocateur")]
+        public void FirstClaimLocksBluffingPlayerOutOfLaterCounterclaimWindows(string ownRole)
+        {
+            var roles = DiscussionRevisionTests.AuthoredRoles();
+            var run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 5),
+                new[] { ownRole, "physician", "inspector", "coordinator", "citizen" }
+                    .Select((r, i) => new CastMemberSpec("Person" + i, new RoleId(r))), roles, TestContent.AuthoredLines(), new ClaimingStrategy());
+            Submit(run, GameCommand.Speak(SpeechIntent.ClaimRole, role: new RoleId("inspector")));
+            for (int step = 0; step < 30 && run.GetPlayerView().Phase == GamePhase.Discussion; step++)
+            {
+                Assert.That(run.GetPlayerView().CounterClaimRole, Is.Null);
+                Assert.That(new GameController(run, roles).Request().Options.Any(o => o.Intent == SpeechIntent.CounterClaim), Is.False);
+                int revision = run.GetPlayerView().Revision;
+                Assert.That(run.TrySubmit(GameCommand.Speak(SpeechIntent.CounterClaim, role: new RoleId("physician")), out _), Is.False);
+                Assert.That(run.GetPlayerView().Revision, Is.EqualTo(revision));
+                Submit(run, GameCommand.Speak(SpeechIntent.StaySilent));
+            }
+            var claims = run.GetPlayerView().Transcript.Where(o => o.Intent == SpeechIntent.ClaimRole || o.Intent == SpeechIntent.CounterClaim).ToList();
+            Assert.That(claims.Where(o => o.Intent == SpeechIntent.ClaimRole).Select(o => o.ClaimedRole).Distinct().Count(), Is.GreaterThan(1));
+            Assert.That(claims.GroupBy(o => o.Speaker).All(g => g.Count() == 1), Is.True,
+                "Every player and NPC must remain committed to their first public role claim.");
+            Assert.That(run.GetPlayerView().Characters.Single(c => c.Id == Id(0)).ClaimedRole, Is.EqualTo(new RoleId("inspector")));
+        }
+
         [Test]
         public void PlayerCanCounterclaimOnlyOnceAcrossDifferentClaimWindows()
         {
@@ -123,8 +149,8 @@ namespace SocialStim.Tests.EditMode
             Assert.That(run.GetPlayerView().Alive, Is.False);
         }
 
-        [TestCase(Verdict.Guilty, true)] [TestCase(Verdict.Innocent, false)] [TestCase(Verdict.Abstain, false)]
-        public void NpcJesterCanOnlyKillALivingTownGuiltyVoter(Verdict playerVote, bool playerDies)
+        [TestCase(Verdict.Guilty)] [TestCase(Verdict.Innocent)] [TestCase(Verdict.Abstain)]
+        public void NpcJesterCanKillAnyLivingTownRegardlessOfBallot(Verdict playerVote)
         {
             var strategy = new ScenarioStrategy { Nominee = Id(1), Verdict = Verdict.Guilty };
             var run = Run(strategy, "citizen", "provocateur", "assassin", "citizen", "physician");
@@ -133,8 +159,7 @@ namespace SocialStim.Tests.EditMode
             Submit(run, GameCommand.Continue());
             var view = run.GetPlayerView();
             var revenge = view.Transcript.Single(o => o.Text.Contains("taken by the executed Jester"));
-            if (!playerDies) Assert.That(revenge.Target, Is.Not.EqualTo(Id(0)));
-            Assert.That(playerDies ? new[] { Id(0), Id(3), Id(4) } : new[] { Id(3), Id(4) }, Does.Contain(revenge.Target.Value));
+            Assert.That(new[] { Id(0), Id(3), Id(4) }, Does.Contain(revenge.Target.Value));
             Assert.That(revenge.Target, Is.Not.EqualTo(Id(2)), "Mafia guilty voters are ineligible.");
             Assert.That(view.Transcript.Single(o => o.Cue == GameCue.NightFalls).Sequence, Is.GreaterThan(revenge.Sequence));
         }
@@ -162,14 +187,49 @@ namespace SocialStim.Tests.EditMode
         }
 
         [Test]
-        public void JesterWithNoEligibleTownVoterDoesNotStallOrKillAnInnocentVoter()
+        public void NpcJesterCurseStillResolvesWhenOnlyTownVotedInnocent()
         {
             var run = Run(new ScenarioStrategy { Nominee = Id(1), Verdict = Verdict.Guilty },
                 "citizen", "provocateur", "assassin", "forger", "interrupter");
             Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(Id(1)));
             Submit(run, GameCommand.Continue()); Submit(run, GameCommand.Judge(Verdict.Innocent)); Submit(run, GameCommand.Continue());
             Assert.That(run.GetPlayerView().Phase, Is.Not.EqualTo(GamePhase.JesterRevenge));
-            Assert.That(run.GetPlayerView().Characters.Single(c => c.Id == Id(0)).Alive, Is.True);
+            Assert.That(run.GetPlayerView().Characters.Single(c => c.Id == Id(0)).Alive, Is.False);
+        }
+
+        [Test]
+        public void Seed4026433134DayTwoNpcJesterResolvesCurseBeforeNight()
+        {
+            var strategy = new ScenarioStrategy { Verdict = Verdict.Guilty };
+            var run = RunFactory.CreateScenario(new RunOptions(4026433134, discussionRounds: 1, votingMode: VotingMode.Trial),
+                new[] { "citizen", "provocateur", "assassin", "citizen", "physician" }
+                    .Select((r, i) => new CastMemberSpec("Person" + i, new RoleId(r))),
+                DiscussionRevisionTests.AuthoredRoles(), TestContent.AuthoredLines(), strategy);
+            Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(null));
+            Submit(run, GameCommand.Night(null)); Submit(run, GameCommand.Continue());
+            Assert.That(run.GetPlayerView().Day, Is.EqualTo(2));
+            strategy.Nominee = Id(1);
+            Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(Id(1)));
+            Submit(run, GameCommand.Continue()); Submit(run, GameCommand.Judge(Verdict.Innocent)); Submit(run, GameCommand.Continue());
+            var view = run.GetPlayerView();
+            var curse = view.Transcript.Single(o => o.Text.Contains("taken by the executed Jester"));
+            Assert.That(new[] { Id(0), Id(3), Id(4) }, Does.Contain(curse.Target.Value));
+            Assert.That(view.Transcript.Single(o => o.Cue == GameCue.NightFalls && o.Day == 2).Sequence, Is.GreaterThan(curse.Sequence));
+            Assert.That(view.Transcript.Single(o => o.Text.Contains("taken by the executed Jester")).Day, Is.EqualTo(2));
+            Assert.That(view.Phase, Is.Not.EqualTo(GamePhase.JesterRevenge));
+        }
+
+        [Test]
+        public void NpcJesterWithoutLivingTownDoesNotCurseMafiaOrNeutralOrStall()
+        {
+            var run = Run(new ScenarioStrategy { Nominee = Id(1), Verdict = Verdict.Guilty },
+                "survivor", "provocateur", "assassin", "forger", "interrupter");
+            Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(Id(1)));
+            Submit(run, GameCommand.Continue()); Submit(run, GameCommand.Judge(Verdict.Guilty)); Submit(run, GameCommand.Continue());
+            var view = run.GetPlayerView();
+            Assert.That(view.Characters.Where(c => c.Id != Id(1)).All(c => c.Alive), Is.True);
+            Assert.That(view.Transcript.Any(o => o.Text.Contains("taken by the executed Jester")), Is.False);
+            Assert.That(view.Phase, Is.Not.EqualTo(GamePhase.JesterRevenge));
         }
 
         [TestCase(false, false, true)] [TestCase(true, false, true)] [TestCase(true, true, false)]

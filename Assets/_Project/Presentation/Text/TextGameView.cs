@@ -52,7 +52,6 @@ namespace SocialStim.Presentation.Text
         private GameText _words = GameText.Default;
         private InformationPanel _information;
         private Func<IReadOnlyList<NightDebugRecord>> _diagnostics;
-        private Func<IReadOnlyList<SocialDebugRecord>> _socialDiagnostics;
         private DaylightBackdrop _backdrop;
         private TextMeshProUGUI _timeLabel;
         private Image _timeFill;
@@ -64,7 +63,6 @@ namespace SocialStim.Presentation.Text
         private Button _skip;
         private Button _effectsControl, _motionControl, _flashControl, _instantControl;
         private Button _intensityControl, _optionsControl;
-        private Button _mafiaLog;
         private TextSpeedControl _speedControl;
         private ConversationScrollFollower _scrollFollower;
         private bool _wasDisplaying;
@@ -85,9 +83,9 @@ namespace SocialStim.Presentation.Text
         public bool IsDisplaying => _playback.Busy || _request != null && _next < _request.View.Transcript.Count;
 
         public void Initialize(TMP_FontAsset font, IReadOnlyDictionary<PresentationCue, EffectProfile> profiles = null, EffectsSettings initialSettings = null, InteractionLabels copy = null,
-            GameText words = null, Func<IReadOnlyList<NightDebugRecord>> diagnostics = null, Func<IReadOnlyList<SocialDebugRecord>> socialDiagnostics = null)
+            GameText words = null, Func<IReadOnlyList<NightDebugRecord>> diagnostics = null)
         {
-            _words = words ?? GameText.Default; _diagnostics = diagnostics; _socialDiagnostics = socialDiagnostics;
+            _words = words ?? GameText.Default; _diagnostics = diagnostics;
             _copy = copy ?? InteractionLabels.Default;
             _settings = initialSettings ?? new EffectsSettings();
             _font = font; _profiles = profiles ?? DefaultCueProfiles.Create();
@@ -202,8 +200,6 @@ namespace SocialStim.Presentation.Text
             Control(footer, _words.Format("ui.rolesShortcut"), ShowRoleReference);
             Control(footer, _words.Format("ui.latest"), FollowLatest);
             if (_diagnostics != null) Control(footer, _words.Format("ui.debug"), ShowNightDebug);
-            if (_socialDiagnostics != null) Control(footer, _words.Format("ui.relations"), ShowRelations);
-            _mafiaLog = Control(footer, _words.Format("mafia.log"), ShowMafiaLog); _mafiaLog.gameObject.SetActive(false);
             Control(_displayOptionsPanel, "Reset display defaults", ResetSettings);
             _displayOptionsPanel.gameObject.SetActive(false);
             RefreshSettingLabels();
@@ -276,18 +272,21 @@ namespace SocialStim.Presentation.Text
             TextUiFactory.Fill((RectTransform)_transcriptScroll.transform, Vector2.zero, new Vector2(0.51f, 1), new Vector2(32, 82), new Vector2(-10, -130));
             TextUiFactory.Fill((RectTransform)_choiceScroll.transform, new Vector2(0.51f, 0), new Vector2(0.79f, 1), new Vector2(10, 82), new Vector2(-32, -130));
             var view = request.View;
-            _mafiaLog.gameObject.SetActive(view.OwnRole.Faction == Faction.Antagonist);
             _roleBadge.gameObject.SetActive(true);
             _roleBadge.text = view.OwnRole.Name + "\n" + view.OwnRole.Faction;
             _roleBadge.color = _palette.RoleColor(view.OwnRole.Faction);
             _choiceHeading.text = view.RespondTo.HasValue ? "RESPOND"
                 : view.Phase == GamePhase.Voting ? (view.Revote ? "REVOTE" : "VOTE") : "YOUR TURN";
-            _pendingStatus = $"Day {view.Day} · {ActionLabels.Phase(view.Phase)} · {view.OwnRole.Name} ({view.OwnRole.Faction}) | {(view.Alive ? "Alive" : "Spectator")}"
-                + $" | Uses: {(view.Charges < 0 ? "unlimited" : view.Charges.ToString())}\nSeed {view.Seed} | Trials {view.TrialsUsed}/{view.TrialsAllowed}";
-            if (view.VotingMode == VotingMode.Gnosia)
-                _pendingStatus = $"Day {view.Day} · {ActionLabels.Phase(view.Phase)} · Round {view.DiscussionRound}/{view.DiscussionRoundsAllowed}"
-                    + $" · Window {view.PlayerWindow}/{view.WindowsPerRound} · {view.OwnRole.Name} ({view.OwnRole.Faction})"
-                    + $" · {(view.Alive ? "Alive" : "Spectator")} · Seed {view.Seed}";
+            bool night = Daylight.IsNight(view.Phase);
+            if (view.Phase == GamePhase.Ended)
+                night = view.Transcript.LastOrDefault(o => o.Cue == GameCue.NightFalls || o.Cue == GameCue.DawnBreaks)?.Cue == GameCue.NightFalls;
+            string period = _words.Format(night ? "ui.nightCount" : "ui.dayCount", ("number", view.Day.ToString()));
+            _pendingStatus = _words.Format("ui.runStatus", ("period", period), ("phase", ActionLabels.Phase(view.Phase, _words)),
+                ("role", view.OwnRole.Name), ("faction", view.OwnRole.Faction.ToString()),
+                ("state", _words.Format(view.Alive ? "ui.alive" : "ui.spectating")),
+                ("uses", view.Charges < 0 ? _words.Format("ui.unlimited") : view.Charges.ToString()), ("seed", view.Seed.ToString()));
+            if (view.VotingMode == VotingMode.Trial)
+                _pendingStatus += " | " + _words.Format("ui.trialsStatus", ("used", view.TrialsUsed.ToString()), ("allowed", view.TrialsAllowed.ToString()));
             ClearChoices();
             _menuCategory = null; _menuPage = 0;
             foreach (ParticipantCard card in _cards.Values) card.SetSelectable(false);
@@ -392,7 +391,6 @@ namespace SocialStim.Presentation.Text
             if (_choiceScroll != null) _choiceScroll.viewport.offsetMax = new Vector2(-22, -48);
             _shown.Clear(); _spans.Clear(); _cues = new VisibleCueResolver(); _wasDisplaying = false;
             _autoAdvance = false; _displayDay = 1; _pendingStatus = null;
-            if (_mafiaLog != null) _mafiaLog.gameObject.SetActive(false);
             if (_information != null && _information.IsOpen) _information.Close();
             foreach (ParticipantCard card in _cards.Values) { card.gameObject.SetActive(false); Destroy(card.gameObject); }
             _cards.Clear();
@@ -449,7 +447,8 @@ namespace SocialStim.Presentation.Text
             if (_backdrop != null) _backdrop.Apply(_palette, _request == null);
             if (_timeLabel != null)
             {
-                _timeLabel.text = _words.Format(night ? "ui.night" : progress < 0.25f ? "ui.morning" : progress < 0.65f ? "ui.afternoon" : "ui.evening");
+                _timeLabel.text = _words.Format(night ? "ui.nightCount" : "ui.dayCount", ("number", _displayDay.ToString()))
+                    + (night ? "" : " · " + _words.Format(progress < 0.25f ? "ui.morning" : progress < 0.65f ? "ui.afternoon" : "ui.evening"));
                 _timeLabel.color = _palette.Foreground;
                 _timeFill.color = _palette.Accent(SemanticStyle.Evidence);
                 _timeFill.rectTransform.anchorMax = new Vector2(night ? 1 : Mathf.Max(0.04f, progress), 0);
@@ -653,26 +652,6 @@ namespace SocialStim.Presentation.Text
             if (rows.Count == 0) rows.Add(Tuple.Create("", _words.Format("ui.debugEmpty"), _palette.Muted));
             _information.Open(_words.Format("ui.debugTitle"), rows, _palette);
         }
-        private void ShowRelations()
-        {
-            if (_socialDiagnostics == null) return;
-            var records = _socialDiagnostics();
-            if (records.Count == 0)
-            { _information.Open(_words.Format("ui.relationsTitle"), new[] { Tuple.Create("", _words.Format("ui.relationsEmpty"), _palette.Muted) }, _palette); return; }
-            var content = _information.OpenContent(_words.Format("ui.relationsTitle"), _palette, 720);
-            var chart = content.gameObject.AddComponent<RelationChartPanel>();
-            chart.Initialize(_font, _words, _palette, records);
-        }
-        private void ShowMafiaLog()
-        {
-            if (_request == null || _request.View.OwnRole.Faction != Faction.Antagonist) return;
-            var rows = _request.View.TeamReports.Select(r => Tuple.Create(r.Name,
-                NightReportFormatter.Format(r.Action, _roles[r.Action.Role].Name,
-                    id => _request.View.Characters.First(c => c.Id == id).Name, _words), _palette.Foreground)).ToList();
-            if (rows.Count == 0) rows.Add(Tuple.Create("", _words.Format("mafia.noReports"), _palette.Muted));
-            _information.Open(_words.Format("mafia.log"), rows, _palette, _request.View.Characters.Select(c => c.Name));
-        }
-
         private static string Plain(string text)
         {
             try { return SemanticMarkup.Parse(text).Text; } catch (ArgumentException) { return text; }

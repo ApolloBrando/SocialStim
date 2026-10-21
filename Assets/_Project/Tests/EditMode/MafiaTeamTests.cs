@@ -34,6 +34,10 @@ namespace SocialStim.Tests.EditMode
             Assert.That(records.Count, Is.EqualTo(3));
             Assert.That(records.Single(r => r.Actor == Id(1)).Action.Target, Is.EqualTo(Id(4)));
             Assert.That(records.Single(r => r.Actor == Id(2)).Action.Target, Is.EqualTo(Id(3)));
+            var privateChat = run.GetPlayerView().Transcript.Where(o => o.Text.StartsWith("Private Mafia action", System.StringComparison.Ordinal)).ToList();
+            Assert.That(privateChat.Count, Is.EqualTo(3));
+            Assert.That(privateChat.Any(o => o.Text.Contains("N1") && o.Text.Contains("N4") && o.Text.Contains("Forger report")), Is.True);
+            Assert.That(privateChat.Any(o => o.Text.Contains("N2") && o.Text.Contains("N3") && o.Text.Contains("Strongarm report")), Is.True);
             Assert.That(((ICollection<TeamNightRecord>)records).IsReadOnly, Is.True);
             Submit(run, GameCommand.Continue()); Submit(run, GameCommand.Speak(SpeechIntent.StaySilent));
             Assert.That(ally.TeamReports.Count, Is.EqualTo(3));
@@ -71,6 +75,7 @@ namespace SocialStim.Tests.EditMode
             Assert.That(killer.OwnRole.Id, Is.EqualTo(new RoleId("assassin")));
             Assert.That(run.GetPlayerView().Characters.Single(c => c.Id == Id(4)).Alive, Is.False);
             Assert.That(run.GetPlayerView().TeamReports, Is.Empty);
+            Assert.That(run.GetPlayerView().Transcript.Any(o => o.Text.StartsWith("Private Mafia action", System.StringComparison.Ordinal)), Is.False);
         }
         [Test]
         public void SimultaneousCasualtiesAreRemovedBeforeExactlyOneLivingMafiaInheritsTheKill()
@@ -105,6 +110,23 @@ namespace SocialStim.Tests.EditMode
             Submit(run, GameCommand.Continue()); Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(null)); Submit(run, GameCommand.Night(null));
             Assert.That(run.GetNightDiagnostics().Any(r => r.Action.Role == new RoleId("assassin") || r.Action.Role == new RoleId("forger")), Is.False);
         }
+        [Test]
+        public void FatalMafiaActionAppearsAfterCasualtiesAndNeverClaimsSurvival()
+        {
+            var run = Run(new ScenarioStrategy { Target = k => k.Self == Id(2) ? Id(0) : (CharacterId?)null },
+                "forger", "assassin", "lone-killer", "physician", "inspector", "citizen");
+            Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(null)); Submit(run, GameCommand.Night(Id(5)));
+            var view = run.GetPlayerView();
+            Assert.That(view.Alive, Is.False);
+            var death = view.Transcript.Single(o => o.Cue == GameCue.DeathReported && o.Target == Id(0));
+            var action = view.Transcript.Single(o => o.Text.StartsWith("Private Mafia action") && o.Text.Contains("N0"));
+            Assert.That(action.Sequence, Is.GreaterThan(death.Sequence));
+            Assert.That(action.Text, Does.Contain("died tonight"));
+            Assert.That(action.Text, Does.Contain("N5"));
+            Assert.That(action.Text, Does.Not.Contain("survived"));
+            Assert.That(view.Transcript.Any(o => o.Cue == GameCue.PlayerTargetedAtNight), Is.False);
+        }
+
         [Test]
         public void TeamVisitRecordsLetMafiaNoticeAConflictingLookoutStoryWithoutKnowingTheLiarsRole()
         {

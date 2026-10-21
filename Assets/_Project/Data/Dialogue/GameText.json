@@ -22,7 +22,7 @@
     },
     {
       "key": "ui.legendBody",
-      "text": "Speaker names and living player-list names share a character colour. Names mentioned inside sentences use blue. Character colours do not indicate factions. Underlined action labels identify each statement; reply descriptions name the point being supported or challenged. Role badges: Town green, Antagonist red, Neutral orange. A claim is not proof. Dead players are grey."
+      "text": "Speaker names and living player-list names share a character colour. Names mentioned inside sentences use blue. Character colours do not indicate factions. Underlined action labels identify each statement; reply descriptions name the point being supported or challenged. Role badges: Town green, Antagonist red, Neutral orange. A claim is not proof. Your first claim or counterclaim locks your claimed role for this run. Dead players are grey."
     },
     {
       "key": "intent.Accuse",
@@ -346,7 +346,7 @@
     },
     {
       "key": "report.targeted",
-      "text": "I survived a night attack. I do not know who attacked me."
+      "text": "I was attacked during the night. I do not know who attacked me."
     },
     {
       "key": "report.forgery",
@@ -398,7 +398,7 @@
     },
     {
       "key": "role.provocateur",
-      "text": "NEUTRAL — Jester\nAbility: Get yourself executed by the day vote.\nLimits: A night death does not count. After execution, choose one living Town member who voted guilty to kill before night. No eligible voter means no revenge kill.\nClaims: Bluff a Town role and give fabricated reports.\nGoal: Be executed; revenge does not change your earned win."
+      "text": "NEUTRAL — Jester\nAbility: Get yourself executed by the day vote.\nLimits: A night death does not count. After execution, choose one living Town member to kill before night. No eligible voter means no revenge kill.\nClaims: Bluff a Town role and give fabricated reports.\nGoal: Be executed; revenge does not change your earned win."
     },
     {
       "key": "ui.revengeTarget",
@@ -406,7 +406,7 @@
     },
     {
       "key": "ui.revengePrompt",
-      "text": "Jester revenge — choose a living Town member who voted guilty."
+      "text": "Jester revenge — choose a living Town member."
     },
     {
       "key": "event.revenge",
@@ -647,6 +647,42 @@
     {
       "key": "ui.relationsSuspicion",
       "text": "Suspicion: {value} / 10"
+    },
+    {
+      "key": "event.noNightDeaths",
+      "text": "Nobody died during the night."
+    },
+    {
+      "key": "mafia.actionFatal",
+      "text": "Private Mafia action · {name} (died tonight): {report}"
+    },
+    {
+      "key": "ui.dayCount",
+      "text": "Day {number}"
+    },
+    {
+      "key": "ui.nightCount",
+      "text": "Night {number}"
+    },
+    {
+      "key": "ui.runStatus",
+      "text": "{period} · {phase} · {role} ({faction}) | {state} | Uses: {uses}\nSeed {seed}"
+    },
+    {
+      "key": "ui.trialsStatus",
+      "text": "Trials {used}/{allowed}"
+    },
+    {
+      "key": "ui.unlimited",
+      "text": "Unlimited"
+    },
+    {
+      "key": "ui.finalActPhase",
+      "text": "Jester's final act"
+    },
+    {
+      "key": "ui.spectating",
+      "text": "Spectator"
     }
   ]
 }

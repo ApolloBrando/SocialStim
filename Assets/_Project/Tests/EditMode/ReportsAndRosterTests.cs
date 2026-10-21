@@ -24,6 +24,16 @@ namespace SocialStim.Tests.EditMode
         private static void Submit(RunSession run, GameCommand command) => Assert.That(run.TrySubmit(command, out string error), Is.True, error);
 
         [Test]
+        public void ActionOnlyReportContainsNoUnconfirmedResultFiller()
+        {
+            var report = new NightActionClaim(1, new RoleId("vigilante"), AbilityKind.Attack, Id(1));
+            string formatted = NightReportFormatter.Format(report, "Vigilante", id => "N" + id.Value, GameText.Default);
+            Assert.That(formatted, Does.Contain("N1"));
+            Assert.That(formatted, Does.Not.Contain("no further result"));
+            Assert.That(formatted, Does.Not.Contain("survived"));
+        }
+
+        [Test]
         public void WatcherCanSelectALivingCounterclaimantAndReportTheirActualVisitors()
         {
             var roles = DiscussionRevisionTests.AuthoredRoles(); RunSession run = null;

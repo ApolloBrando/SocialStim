@@ -24,7 +24,7 @@ namespace SocialStim.Application.Input
                 default: return intent.ToString();
             }
         }
-        public static string Phase(GamePhase phase)
+        public static string Phase(GamePhase phase, GameText words = null)
         {
             switch (phase)
             {
@@ -36,6 +36,7 @@ namespace SocialStim.Application.Input
                 case GamePhase.Judgement: return "Judgement";
                 case GamePhase.LastWords: return "Last words";
                 case GamePhase.Execution: return "Execution";
+                case GamePhase.JesterRevenge: return (words ?? GameText.Default).Format("ui.finalActPhase");
                 case GamePhase.NightSelection:
                 case GamePhase.NightResolution: return "Night";
                 case GamePhase.Dawn: return "Morning";

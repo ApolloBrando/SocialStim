@@ -64,7 +64,7 @@ namespace SocialStim.Rules.Roles
         public bool StealsParityWin { get; }
         /// <summary>Whether a successful attack on Town schedules unavoidable guilt for the following night.</summary>
         public bool DiesAfterTownKill { get; }
-        /// <summary>Whether day execution grants revenge against a living Town guilty voter.</summary>
+        /// <summary>Whether day execution grants revenge against a living Town participant.</summary>
         public bool ExecutionRevenge { get; }
         /// <summary>Shared player/NPC claim permission; ordinary citizens are never claimable.</summary>
         public bool CanClaim(RoleSpec asserted) => asserted != null && asserted.Faction == Faction.Town
