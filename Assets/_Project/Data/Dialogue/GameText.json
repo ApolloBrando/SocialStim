@@ -438,7 +438,7 @@
     },
     {
       "key": "ui.relationsHelp",
-      "text": "The centre NPC is the observer. Each arrow shows their opinion of the person it points to. Higher suspicion means more suspected; higher trust means more credible. Both run from 0 to 10 and can be high together. Click an NPC to see their viewpoint. These are opinions, not confirmed roles."
+      "text": "Read from the centre out: the centre NPC is judging each person an arrow points to. Longer Trust bars mean more credible; longer Suspicion bars mean more suspected. Both can be high together. Click an NPC card to switch viewpoint. Page through targets below. These are opinions, not confirmed roles."
     },
     {
       "key": "ui.relationsObserver",
@@ -639,6 +639,14 @@
     {
       "key": "mafia.solo",
       "text": "Private Mafia update: you have no teammates this game."
+    },
+    {
+      "key": "ui.relationsTrust",
+      "text": "Trust: {value} / 10"
+    },
+    {
+      "key": "ui.relationsSuspicion",
+      "text": "Suspicion: {value} / 10"
     }
   ]
 }
