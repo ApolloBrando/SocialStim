@@ -40,9 +40,9 @@ namespace SocialStim.Tests.PlayMode
                 yield return null; yield return null;
                 Canvas.ForceUpdateCanvases();
                 Assert.That(dirtiedDuringRebuild, Is.False);
-                var mesh = new Mesh();
-                try { underlines.canvasRenderer.GetMesh(mesh); Assert.That(mesh.vertexCount, Is.GreaterThan(0)); }
-                finally { UnityEngine.Object.DestroyImmediate(mesh); }
+                Mesh mesh = underlines.canvasRenderer.GetMesh();
+                Assert.That(mesh, Is.Not.Null);
+                Assert.That(mesh.vertexCount, Is.GreaterThan(0));
                 LogAssert.NoUnexpectedReceived();
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
