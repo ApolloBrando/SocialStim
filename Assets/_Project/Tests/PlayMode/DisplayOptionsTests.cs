@@ -27,7 +27,7 @@ namespace SocialStim.Tests.PlayMode
                 var view = root.AddComponent<TextGameView>();
                 view.Initialize(TMP_Settings.defaultFontAsset, initialSettings: new EffectsSettings(elementsPerSecond: 28));
                 var buttons = root.GetComponentsInChildren<Button>(true);
-                Button speed = buttons.Single(b => Label(b).StartsWith("Speed:", System.StringComparison.Ordinal));
+                Slider speed = root.GetComponentsInChildren<Slider>(true).Single();
                 Button toggle = buttons.Single(b => Label(b) == "Display options");
                 Button reset = buttons.Single(b => Label(b) == "Reset display defaults");
                 Assert.That(speed.gameObject.activeInHierarchy, Is.False);
@@ -42,7 +42,9 @@ namespace SocialStim.Tests.PlayMode
                 Assert.That(saved.ElementsPerSecond, Is.EqualTo(84));
                 Assert.That(saved.ReducedMotion, Is.True);
                 Assert.That(saved.Flashes, Is.False);
-                Assert.That(Label(speed), Does.Contain("84"));
+                Assert.That(speed.value, Is.EqualTo(100));
+                Assert.That(speed.minValue, Is.Zero); Assert.That(speed.maxValue, Is.EqualTo(200));
+                Assert.That(speed.wholeNumbers, Is.True);
                 toggle.onClick.Invoke();
                 Assert.That(speed.gameObject.activeInHierarchy, Is.False);
             }
@@ -50,7 +52,7 @@ namespace SocialStim.Tests.PlayMode
         }
 
         [Test]
-        public void ChangingSpeedThroughTheActualButtonDoesNotSkipQueuedSpeech()
+        public void ChangingTheActualSliderDoesNotSkipQueuedSpeech()
         {
             Assert.That(TMP_Settings.defaultFontAsset, Is.Not.Null, "Import TMP Essential Resources.");
             var root = new GameObject("Live settings regression");
@@ -72,9 +74,8 @@ namespace SocialStim.Tests.PlayMode
                 view.Initialize(TMP_Settings.defaultFontAsset);
                 view.Render(new GameController(run, roles).Request());
                 Assert.That(view.IsDisplaying, Is.True);
-                Button speed = root.GetComponentsInChildren<Button>(true)
-                    .Single(button => Label(button).StartsWith("Speed:", StringComparison.Ordinal));
-                speed.onClick.Invoke();
+                Slider speed = root.GetComponentsInChildren<Slider>(true).Single();
+                speed.value = 150;
                 Assert.That(view.IsDisplaying, Is.True, "A display setting cannot consume queued observations.");
                 Assert.That(run.GetPlayerView().Revision, Is.Zero);
             }
@@ -127,11 +128,15 @@ namespace SocialStim.Tests.PlayMode
                 Func<Button[]> active = () => choices.GetComponentsInChildren<Button>().Where(b => b.gameObject.activeInHierarchy).ToArray();
                 Assert.That(active().Select(Label), Is.EquivalentTo(new[] { "Wait", "Accuse", "Defend" }));
                 active().Single(b => Label(b) == "Accuse").onClick.Invoke();
-                Assert.That(active().Select(Label), Is.EquivalentTo(new[] { "Back", "Bram", "Celia" }));
+                Assert.That(active().Select(Label), Is.EquivalentTo(new[] { "Back" }));
+                Assert.That(root.GetComponentsInChildren<ParticipantCard>().Where(c => c.Id.Value != 0)
+                    .All(c => c.GetComponent<Button>().interactable), Is.True);
                 Assert.That(run.GetPlayerView().Revision, Is.Zero, "Opening a target menu must not spend the turn.");
                 active().Single(b => Label(b) == "Back").onClick.Invoke();
                 active().Single(b => Label(b) == "Defend").onClick.Invoke();
-                Assert.That(active().Select(Label), Is.EquivalentTo(new[] { "Back", "Bram", "Celia" }));
+                Assert.That(active().Select(Label), Is.EquivalentTo(new[] { "Back" }));
+                Assert.That(root.GetComponentsInChildren<ParticipantCard>().Where(c => c.Id.Value != 0)
+                    .All(c => c.GetComponent<Button>().interactable), Is.True);
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
         }

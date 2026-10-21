@@ -16,8 +16,10 @@ namespace SocialStim.Rules.Phases
             IReadOnlyList<GameObservation> transcript, bool opening = false, bool canReportAction = false, int discussionRoundsAllowed = 3, VotingMode votingMode = VotingMode.Trial,
             int discussionRound = 1, int playerWindow = 1, int windowsPerRound = 1, CharacterId? respondTo = null,
             IReadOnlyList<CharacterId> voteTargets = null, bool allowAbstain = true, bool revote = false,
-            RoleId? counterClaimRole = null, CharacterId? followUpTo = null, NightActionClaim lastNightAction = null, IReadOnlyList<CharacterId> revengeTargets = null)
+            RoleId? counterClaimRole = null, CharacterId? followUpTo = null, NightActionClaim lastNightAction = null, IReadOnlyList<CharacterId> revengeTargets = null, IDictionary<CharacterId, RoleId> spectatorRoles = null)
         {
+            SpectatorRoles = new System.Collections.ObjectModel.ReadOnlyDictionary<CharacterId, RoleId>(
+                spectatorRoles == null ? new Dictionary<CharacterId, RoleId>() : new Dictionary<CharacterId, RoleId>(spectatorRoles));
             Revision = revision; Seed = seed; Day = day; Phase = phase; TrialsUsed = trialsUsed; TrialsAllowed = trialsAllowed;
             Alive = alive; OwnRole = ownRole; Charges = charges; Defendant = defendant; Outcome = outcome; Won = won;
             Characters = characters; LegalNightTargets = legalNightTargets; Transcript = transcript;
@@ -28,6 +30,8 @@ namespace SocialStim.Rules.Phases
             LastNightAction = lastNightAction; RevengeTargets = revengeTargets ?? new CharacterId[0];
             Opening = opening; CanReportAction = canReportAction; DiscussionRoundsAllowed = discussionRoundsAllowed;
         }
+        /// <summary>True roles available only after player death for the spectator roster; never fed into NPC knowledge.</summary>
+        public IReadOnlyDictionary<CharacterId, RoleId> SpectatorRoles { get; }
         /// <summary>Granted only to an executed player Jester: living Town guilty voters eligible for revenge.</summary>
         public IReadOnlyList<CharacterId> RevengeTargets { get; }
         /// <summary>Configured daily elimination policy.</summary>

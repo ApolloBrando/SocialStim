@@ -423,6 +423,98 @@
     {
       "key": "event.egoWins",
       "text": "Ego steals the win."
+    },
+    {
+      "key": "ui.relations",
+      "text": "Relation debug"
+    },
+    {
+      "key": "ui.relationsTitle",
+      "text": "NPC RELATIONS — privileged opinions, not facts"
+    },
+    {
+      "key": "ui.relationsEmpty",
+      "text": "Start a run to inspect NPC opinions."
+    },
+    {
+      "key": "ui.relationsHelp",
+      "text": "Choose an NPC viewpoint. Arrows point from that observer to others. S = suspicion; T = trust, both 0–100. These are opinions, not proof of roles. Open this menu again to refresh."
+    },
+    {
+      "key": "ui.relationsObserver",
+      "text": "Viewpoint: {name}"
+    },
+    {
+      "key": "ui.relationsScores",
+      "text": "S {suspicion} · T {trust}"
+    },
+    {
+      "key": "ui.relationsEstimates",
+      "text": "Town {town}% · Mafia {mafia}% · Neutral {neutral}%"
+    },
+    {
+      "key": "ui.previousNpc",
+      "text": "Previous NPC"
+    },
+    {
+      "key": "ui.nextNpc",
+      "text": "Next NPC"
+    },
+    {
+      "key": "ui.previousTargets",
+      "text": "Previous targets"
+    },
+    {
+      "key": "ui.nextTargets",
+      "text": "Next targets"
+    },
+    {
+      "key": "ui.relationsPage",
+      "text": "Targets {page}/{pages}"
+    },
+    {
+      "key": "role.short.citizen",
+      "text": "VIL"
+    },
+    {
+      "key": "role.short.inspector",
+      "text": "SHF"
+    },
+    {
+      "key": "role.short.physician",
+      "text": "PHY"
+    },
+    {
+      "key": "role.short.vigilante",
+      "text": "VIG"
+    },
+    {
+      "key": "role.short.coordinator",
+      "text": "LO"
+    },
+    {
+      "key": "role.short.assassin",
+      "text": "MAF"
+    },
+    {
+      "key": "role.short.interrupter",
+      "text": "STR"
+    },
+    {
+      "key": "role.short.forger",
+      "text": "FOR"
+    },
+    {
+      "key": "role.short.lone-killer",
+      "text": "SK"
+    },
+    {
+      "key": "role.short.survivor",
+      "text": "EGO"
+    },
+    {
+      "key": "role.short.provocateur",
+      "text": "JES"
     }
   ]
 }

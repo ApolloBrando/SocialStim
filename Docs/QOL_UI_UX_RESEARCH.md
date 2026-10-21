@@ -44,3 +44,39 @@ The general game-development practice is to keep reversible menu state in presen
 Twelve new shared test cases verify speed conversion/validation, 0% pause/resume/skip/instant/empty lines, speaker versus mention attribution, literal/markup preservation, direct legal target choice and original-statement reply resolution. All 246 shared portable tests pass on this standalone QoL branch. Run the Python scaffold/validator tests and NUnit compatibility compilation before publication.
 
 Unity is unavailable. Syntax parsing is not Unity API compilation. Native acceptance checks: all target flows without a confirmation; root discussion click makes no guessed action; 1–9 and arrow/Enter navigation; modal/back focus; action underlines across wrapped and partially revealed tags; speaker/roster colours with effects off; gray dead entries; slider drag/arrows/Home/End/0% recovery and persistence after restart; no disk-save stutter while dragging; long wrapped role descriptions; scrolling back during live dialogue; spectator pause/resume; narrow window layout and multiple DPI scales.
+
+## Follow-up: spectator roster and relation chart
+
+Branch `feat/qol-relations-and-spectator` is a separate, stacked change based on `fix/role-rules-and-evidence`. Merge the role branch first, then compare this branch against it (or against main after that merge). The twelve improvements documented above are already on main; they are preserved rather than reimplemented.
+
+New changes:
+
+1. **Spectator truth in the roster.** After player death, each name includes a stable, explicit abbreviation: VIL, SHF, PHY, VIG, LO, MAF, STR, FOR, SK, JES or EGO. The side badge continues to represent the public claim; brackets after the name show spectator truth. Character colours and dead-player grey remain. A separate read-only spectator map is created only in the player snapshot. It does not publish reveal events, change an NPC's knowledge or feed hidden roles into the AI. A dead Jester is still choosing an earned action, so full spectator truth begins after revenge completes.
+2. **Relation debug.** In editor/development builds, a separate menu opens a directed chart. The centre is one NPC's viewpoint. Arrows point toward up to eight others; node labels show suspicion and trust on a 0–100 scale and the NPC's heuristic faction estimates. These are opinions, not actual roles. Click an NPC node or use Previous/Next NPC to switch viewpoint. Page targets for larger casts. The player may be a subject, never an NPC viewpoint. Dead people are labelled explicitly. Closing and reopening refreshes the detached snapshot; the graph does not poll or rebuild every frame.
+3. **Readable graph density.** One observer at a time and eight targets per page avoid an unreadable all-pairs hairball. Native uGUI buttons, text, clipping, scrolling and explicit Navigation retain mouse and digital input; a small MaskableGraphic draws only static directional edges. No physics, graph framework, package or layout solver is needed. Numbers and arrow direction retain the information when colours cannot be distinguished.
+4. **Modal focus.** The chart's native explicit Navigation cycles only through active controls in the information modal, including Close. Escape and focus restoration use the existing modal lifecycle. Spectator advancement pauses while the modal is open.
+5. **Native test maintenance.** DisplayOptionsTests now checks the real 0–200 Slider and 100% reset instead of searching for the removed speed button. Its target-selection checks assert direct selectable roster cards and Back, rather than the removed post-action target list. These tests require Unity and were not executed here.
+
+### Additional source research, 21 October 2026
+
+The prior primary-source review above remains relevant. Fresh direct retrieval of Microsoft Learn, Unity's documentation site and NNGroup was blocked by the environment's egress policy; those pages were not rechecked in this pass. The following authoritative source files were retrieved through allowed GitHub hosts and read. These web accessibility criteria inform game design; this is not a WCAG or Xbox certification claim.
+
+| Source | Practical implication | Applied decision / verification limit |
+| --- | --- | --- |
+| [W3C: Use of Color](https://github.com/w3c/wcag/blob/main/understanding/20/use-of-color.html) | Information conveyed with hue must also have another visible representation; simply assigning more colours does not solve identification. | Literal names, bracketed role abbreviations, explicit dead status, numerical S/T values and arrowheads remain. Character identity colour is separate from mention highlighting and faction claims. Native contrast and colourblind checks remain manual. |
+| [W3C: Focus Not Obscured](https://github.com/w3c/wcag/blob/main/understanding/22/focus-not-obscured-minimum.html) | An overlay should take focus, constrain interaction while modal and provide a way to reveal/dismiss obscuring content. | The information modal takes focus; the graph uses explicit in-modal navigation, scroll-to-focused controls, Close and existing Escape handling. Rebuilding a viewpoint restores focus to Previous NPC. Check narrow windows and keyboard navigation in Unity. |
+| [Unity uGUI Slider implementation](https://github.com/Unity-Technologies/uGUI/blob/main/com.unity.ugui/Runtime/UGUI/UI/Core/Slider.cs) | Native Slider already clamps, rounds whole-number values, handles pointer drag and axis movement, and supports SetValueWithoutNotify. | Preserve the native slider instead of implementing drag/range logic. Use SetValueWithoutNotify on settings refresh to avoid feedback; change display speed without advancing gameplay. Mainline source corroborates the API, while the project's pinned uGUI 2.0 remains the compatibility target. |
+
+The broader game-development practices remain: validate commands at the rules boundary; keep debug data out of player/AI knowledge; separate retained preferences from run state; put authorable wording in data; use deterministic simulations for regression, not as proof of balance; avoid per-frame allocations/rebuilds; profile native rendering before claiming performance improvements; and test input/focus/layout in the actual editor rather than equating portable tests with a player build.
+
+### Validation and manual acceptance
+
+370 portable tests pass, including detached relation snapshots and spectator/NPC information isolation. Python scaffold/content checks and four validator tests pass. Native graph, slider, roster, underline, wrapping and keyboard behavior still require Unity 6000.3.26f1. In the editor:
+
+- Check all earlier twelve QoL behaviors, especially action-first underlines and which statement Agree/Disagree references.
+- Die with reveal-on-death off: confirm bracketed true roles appear for spectators while the public transcript still withholds reveals.
+- Open Relation debug; switch NPC viewpoints, click target nodes, page a larger cast, inspect dead labels and verify arrow direction plus scores. Try keyboard-only navigation through Close and Escape; background controls should not receive focus.
+- Open the chart while spectating and reading back: gameplay must pause until the modal closes and the latest dialogue is followed.
+- Confirm ordinary release builds have no diagnostic menu providers. Neither diagnostic read should advance the revision or alter decisions.
+
+No files were deleted and no README, serialized field names or existing GUIDs were changed.
