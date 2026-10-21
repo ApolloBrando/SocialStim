@@ -12,13 +12,15 @@ namespace SocialStim.Rules.Reasoning
         public KnownCharacter(CharacterId id, string name, bool alive, int suspicion,
             bool teammate = false, RoleId? revealedRole = null, Faction? revealedFaction = null, RoleId? claim = null,
             int trust = 50, FactionEstimate factionEstimate = null, IEnumerable<RoleEstimate> roleEstimates = null, Faction? knownFaction = null,
-            float? suspicionValue = null, float? trustValue = null)
+            float? suspicionValue = null, float? trustValue = null, RoleId? teamRole = null)
         { Id = id; Name = name; Alive = alive; Suspicion = suspicion; IsTeammate = teammate;
             RevealedRole = revealedRole; RevealedFaction = revealedFaction; ClaimedRole = claim;
             KnownFaction = knownFaction ?? revealedFaction;
             Trust = trust; FactionEstimate = factionEstimate;
             SuspicionValue = suspicionValue ?? suspicion / 10f; TrustValue = trustValue ?? trust / 10f;
-            RoleEstimates = (roleEstimates ?? Enumerable.Empty<RoleEstimate>()).ToList().AsReadOnly(); }
+            RoleEstimates = (roleEstimates ?? Enumerable.Empty<RoleEstimate>()).ToList().AsReadOnly(); TeamRole = teamRole; }
+        /// <summary>Actual allied role shared only within the Mafia, separate from public reveals.</summary>
+        public RoleId? TeamRole { get; }
         /// <summary>Public identity.</summary>
         public CharacterId Id { get; }
         /// <summary>Public name.</summary>

@@ -13,6 +13,7 @@ namespace SocialStim.Rules.Reasoning
         private readonly IReadOnlyList<RoleSpec> _catalog;
         private readonly Dictionary<CharacterId, Faction> _known = new Dictionary<CharacterId, Faction>();
         private readonly Dictionary<CharacterId, RoleId> _knownRoles = new Dictionary<CharacterId, RoleId>();
+        private readonly HashSet<RoleId> _successionRoles = new HashSet<RoleId>();
         private readonly Dictionary<CharacterId, long[]> _weights = new Dictionary<CharacterId, long[]>();
         private readonly Dictionary<CharacterId, RoleId> _claims = new Dictionary<CharacterId, RoleId>();
         private readonly Dictionary<CharacterId, FactionEstimate> _marginals = new Dictionary<CharacterId, FactionEstimate>();
@@ -29,6 +30,7 @@ namespace SocialStim.Rules.Reasoning
 
         internal void Know(CharacterId id, Faction faction, RoleId? role = null)
         { _known[id] = faction; if (role.HasValue) _knownRoles[id] = role.Value; _dirty = true; }
+        internal void AllowSuccession(RoleId role) { _successionRoles.Add(role); _dirty = true; }
 
         internal void AssertAlignment(CharacterId target, Faction faction, int influence)
         {
@@ -140,7 +142,7 @@ namespace SocialStim.Rules.Reasoning
                 var candidates = _catalog.Where(r => (int)r.Faction == i).ToList();
                 if (candidates.Count == 0)
                 { if (factions.For((Faction)i) != 0) throw new InvalidOperationException("Public setup has no matching catalog role."); continue; }
-                long[] weights = candidates.Select(r => r.Unique && _knownRoles.Values.Contains(r.Id) ? 0L
+                long[] weights = candidates.Select(r => r.Unique && !_successionRoles.Contains(r.Id) && _knownRoles.Values.Contains(r.Id) ? 0L
                     : _claims.TryGetValue(target, out RoleId claim) && r.Id == claim ? 150L : 100L).ToArray();
                 int[] values = Normalize(weights, factions.For((Faction)i));
                 for (int index = 0; index < candidates.Count; index++) output.Add(candidates[index].Id, values[index]);

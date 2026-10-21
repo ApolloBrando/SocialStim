@@ -20,7 +20,7 @@ namespace SocialStim.Application.Input
                 : !shown.Any(o => o.Target == id && (o.Cue == GameCue.DeathReported || o.Cue == GameCue.ExecutionCarriedOut));
             return new Rules.Reasoning.KnownCharacter(participant.Id, participant.Name, alive, participant.Suspicion,
                 participant.IsTeammate, claim: claim?.ClaimedRole, trust: participant.Trust,
-                suspicionValue: participant.SuspicionValue, trustValue: participant.TrustValue);
+                suspicionValue: participant.SuspicionValue, trustValue: participant.TrustValue, teamRole: participant.TeamRole);
         }
         public static IReadOnlyList<PlayerOption> ForTarget(PlayerInputRequest request, CharacterId target, string category = null)
             => request.Options.Where(o => o.Target == target && (category == null || o.Category == category)).ToList().AsReadOnly();

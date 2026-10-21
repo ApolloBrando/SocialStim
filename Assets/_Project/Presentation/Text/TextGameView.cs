@@ -64,6 +64,7 @@ namespace SocialStim.Presentation.Text
         private Button _skip;
         private Button _effectsControl, _motionControl, _flashControl, _instantControl;
         private Button _intensityControl, _optionsControl;
+        private Button _mafiaLog;
         private TextSpeedControl _speedControl;
         private ConversationScrollFollower _scrollFollower;
         private bool _wasDisplaying;
@@ -202,6 +203,7 @@ namespace SocialStim.Presentation.Text
             Control(footer, _words.Format("ui.latest"), FollowLatest);
             if (_diagnostics != null) Control(footer, _words.Format("ui.debug"), ShowNightDebug);
             if (_socialDiagnostics != null) Control(footer, _words.Format("ui.relations"), ShowRelations);
+            _mafiaLog = Control(footer, _words.Format("mafia.log"), ShowMafiaLog); _mafiaLog.gameObject.SetActive(false);
             Control(_displayOptionsPanel, "Reset display defaults", ResetSettings);
             _displayOptionsPanel.gameObject.SetActive(false);
             RefreshSettingLabels();
@@ -274,6 +276,7 @@ namespace SocialStim.Presentation.Text
             TextUiFactory.Fill((RectTransform)_transcriptScroll.transform, Vector2.zero, new Vector2(0.51f, 1), new Vector2(32, 82), new Vector2(-10, -130));
             TextUiFactory.Fill((RectTransform)_choiceScroll.transform, new Vector2(0.51f, 0), new Vector2(0.79f, 1), new Vector2(10, 82), new Vector2(-32, -130));
             var view = request.View;
+            _mafiaLog.gameObject.SetActive(view.OwnRole.Faction == Faction.Antagonist);
             _roleBadge.gameObject.SetActive(true);
             _roleBadge.text = view.OwnRole.Name + "\n" + view.OwnRole.Faction;
             _roleBadge.color = _palette.RoleColor(view.OwnRole.Faction);
@@ -389,6 +392,7 @@ namespace SocialStim.Presentation.Text
             if (_choiceScroll != null) _choiceScroll.viewport.offsetMax = new Vector2(-22, -48);
             _shown.Clear(); _spans.Clear(); _cues = new VisibleCueResolver(); _wasDisplaying = false;
             _autoAdvance = false; _displayDay = 1; _pendingStatus = null;
+            if (_mafiaLog != null) _mafiaLog.gameObject.SetActive(false);
             if (_information != null && _information.IsOpen) _information.Close();
             foreach (ParticipantCard card in _cards.Values) { card.gameObject.SetActive(false); Destroy(card.gameObject); }
             _cards.Clear();
@@ -595,6 +599,8 @@ namespace SocialStim.Presentation.Text
                 var action = RosterInteractions.DirectChoice(_request, participant.Id, _menuCategory);
                 bool selectable = !IsDisplaying && action != null;
                 string annotation = selectable ? _words.Format("ui.selectable") : "";
+                if (participant.IsTeammate && participant.TeamRole.HasValue && _roles.TryGetValue(participant.TeamRole.Value, out RoleSpec teamRole))
+                    annotation = _words.Format("mafia.teamRole", ("role", teamRole.Name)) + (annotation.Length == 0 ? "" : " · " + annotation);
                 RoleSpec claim = participant.ClaimedRole.HasValue && _roles.TryGetValue(participant.ClaimedRole.Value, out RoleSpec known) ? known : null;
                 RoleSpec spectatorRole = spectator && _request.View.SpectatorRoles.TryGetValue(participant.Id, out RoleId actual)
                     && _roles.TryGetValue(actual, out RoleSpec actualRole) ? actualRole : null;
@@ -656,6 +662,15 @@ namespace SocialStim.Presentation.Text
             var content = _information.OpenContent(_words.Format("ui.relationsTitle"), _palette, 720);
             var chart = content.gameObject.AddComponent<RelationChartPanel>();
             chart.Initialize(_font, _words, _palette, records);
+        }
+        private void ShowMafiaLog()
+        {
+            if (_request == null || _request.View.OwnRole.Faction != Faction.Antagonist) return;
+            var rows = _request.View.TeamReports.Select(r => Tuple.Create(r.Name,
+                NightReportFormatter.Format(r.Action, _roles[r.Action.Role].Name,
+                    id => _request.View.Characters.First(c => c.Id == id).Name, _words), _palette.Foreground)).ToList();
+            if (rows.Count == 0) rows.Add(Tuple.Create("", _words.Format("mafia.noReports"), _palette.Muted));
+            _information.Open(_words.Format("mafia.log"), rows, _palette, _request.View.Characters.Select(c => c.Name));
         }
 
         private static string Plain(string text)

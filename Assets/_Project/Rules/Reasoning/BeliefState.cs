@@ -27,7 +27,8 @@ namespace SocialStim.Rules.Reasoning
         private readonly HashSet<RoleId> _uniqueRoles;
         private readonly Dictionary<CharacterId, int> _nightDeaths = new Dictionary<CharacterId, int>();
         private readonly HashSet<CharacterId> _dead = new HashSet<CharacterId>();
-        private readonly RoleSpec _ownRole;
+        private RoleSpec _ownRole;
+        private readonly List<TeamNightRecord> _teamReports = new List<TeamNightRecord>();
         private readonly HashSet<(int, CharacterId, CharacterId, bool)> _heard = new HashSet<(int, CharacterId, CharacterId, bool)>();
         private readonly Dictionary<(int, CharacterId, bool), float> _socialBudget = new Dictionary<(int, CharacterId, bool), float>();
         private readonly HashSet<(int, CharacterId, CharacterId, bool)> _stances = new HashSet<(int, CharacterId, CharacterId, bool)>();
@@ -61,6 +62,19 @@ namespace SocialStim.Rules.Reasoning
         internal FactionEstimate Factions(CharacterId target) => _distribution.Factions(target);
         internal IReadOnlyList<RoleEstimate> Roles(CharacterId target) => _distribution.Roles(target);
         internal RoleId? Claim(CharacterId target) => _claims.TryGetValue(target, out RoleId claim) ? claim : (RoleId?)null;
+        internal void KnowTeamRole(CharacterId member, RoleSpec role)
+        {
+            if (_ownRole.Faction != Faction.Antagonist || role.Faction != Faction.Antagonist)
+                throw new InvalidOperationException("Only Mafia observers receive allied roles.");
+            _distribution.Know(member, role.Faction, role.Id);
+            if (member == _self) _ownRole = role;
+        }
+        internal void AllowMafiaSuccession(RoleId role) => _distribution.AllowSuccession(role);
+        internal void RememberTeamAction(TeamNightRecord report)
+        {
+            if (_ownRole.Faction != Faction.Antagonist) throw new InvalidOperationException("Only Mafia observers receive team actions.");
+            if (!_teamReports.Any(r => r.Actor == report.Actor && r.Action.Night == report.Action.Night)) _teamReports.Add(report);
+        }
 
         internal void Observe(CharacterId speaker, GameCommand speech, int day)
         {
@@ -142,6 +156,11 @@ namespace SocialStim.Rules.Reasoning
         {
             if (_actionReports.Any(r => r.speaker == speaker && r.claim.Signature == claim.Signature)) return;
             Record(day, EvidenceKind.NightActionClaim, speaker, claim.Target, SpeechIntent.ReportAction, claim.Role, night: claim.Night, nightReport: claim);
+            if (speaker != _self && KnownFaction(speaker) != Faction.Antagonist && !claim.Blocked && claim.Ability == AbilityKind.Watch
+                && _teamReports.Any(known => known.Action.Night == claim.Night && (
+                    claim.Results.Any(r => r.Kind == ReportKind.NoVisitors && known.VisitTarget == r.Target)
+                    || claim.Results.Any(r => r.Kind == ReportKind.VisitorSeen && r.Target == known.Actor && known.VisitTarget != r.Subject))))
+                Penalize(speaker, _settings.ContradictionPenalty, day, false);
             if (_actionReports.Any(r => r.speaker == speaker && r.claim.Night == claim.Night)
                 || _claims.TryGetValue(speaker, out RoleId declared) && declared != claim.Role)
                 Penalize(speaker, _settings.ContradictionPenalty, day, true);
