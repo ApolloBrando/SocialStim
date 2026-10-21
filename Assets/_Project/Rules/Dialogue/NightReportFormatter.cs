@@ -32,7 +32,6 @@ namespace SocialStim.Rules.Dialogue
                     case ReportKind.ForgeryApplied: parts.Add(text.Format("report.forgery", ("target", target))); break;
                 }
             }
-            if (claim.Target.HasValue && claim.Results.Count == 0) parts.Add(text.Format("report.noResult"));
             return string.Join(" ", parts);
         }
     }

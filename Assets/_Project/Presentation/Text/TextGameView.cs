@@ -279,12 +279,16 @@ namespace SocialStim.Presentation.Text
             _roleBadge.color = _palette.RoleColor(view.OwnRole.Faction);
             _choiceHeading.text = view.RespondTo.HasValue ? "RESPOND"
                 : view.Phase == GamePhase.Voting ? (view.Revote ? "REVOTE" : "VOTE") : "YOUR TURN";
-            _pendingStatus = $"Day {view.Day} · {ActionLabels.Phase(view.Phase)} · {view.OwnRole.Name} ({view.OwnRole.Faction}) | {(view.Alive ? "Alive" : "Spectator")}"
-                + $" | Uses: {(view.Charges < 0 ? "unlimited" : view.Charges.ToString())}\nSeed {view.Seed} | Trials {view.TrialsUsed}/{view.TrialsAllowed}";
-            if (view.VotingMode == VotingMode.Gnosia)
-                _pendingStatus = $"Day {view.Day} · {ActionLabels.Phase(view.Phase)} · Round {view.DiscussionRound}/{view.DiscussionRoundsAllowed}"
-                    + $" · Window {view.PlayerWindow}/{view.WindowsPerRound} · {view.OwnRole.Name} ({view.OwnRole.Faction})"
-                    + $" · {(view.Alive ? "Alive" : "Spectator")} · Seed {view.Seed}";
+            bool night = Daylight.IsNight(view.Phase);
+            if (view.Phase == GamePhase.Ended)
+                night = view.Transcript.LastOrDefault(o => o.Cue == GameCue.NightFalls || o.Cue == GameCue.DawnBreaks)?.Cue == GameCue.NightFalls;
+            string period = _words.Format(night ? "ui.nightCount" : "ui.dayCount", ("number", view.Day.ToString()));
+            _pendingStatus = _words.Format("ui.runStatus", ("period", period), ("phase", ActionLabels.Phase(view.Phase, _words)),
+                ("role", view.OwnRole.Name), ("faction", view.OwnRole.Faction.ToString()),
+                ("state", _words.Format(view.Alive ? "ui.alive" : "ui.spectating")),
+                ("uses", view.Charges < 0 ? _words.Format("ui.unlimited") : view.Charges.ToString()), ("seed", view.Seed.ToString()));
+            if (view.VotingMode == VotingMode.Trial)
+                _pendingStatus += " | " + _words.Format("ui.trialsStatus", ("used", view.TrialsUsed.ToString()), ("allowed", view.TrialsAllowed.ToString()));
             ClearChoices();
             _menuCategory = null; _menuPage = 0;
             foreach (ParticipantCard card in _cards.Values) card.SetSelectable(false);
@@ -445,7 +449,8 @@ namespace SocialStim.Presentation.Text
             if (_backdrop != null) _backdrop.Apply(_palette, _request == null);
             if (_timeLabel != null)
             {
-                _timeLabel.text = _words.Format(night ? "ui.night" : progress < 0.25f ? "ui.morning" : progress < 0.65f ? "ui.afternoon" : "ui.evening");
+                _timeLabel.text = _words.Format(night ? "ui.nightCount" : "ui.dayCount", ("number", _displayDay.ToString()))
+                    + (night ? "" : " · " + _words.Format(progress < 0.25f ? "ui.morning" : progress < 0.65f ? "ui.afternoon" : "ui.evening"));
                 _timeLabel.color = _palette.Foreground;
                 _timeFill.color = _palette.Accent(SemanticStyle.Evidence);
                 _timeFill.rectTransform.anchorMax = new Vector2(night ? 1 : Mathf.Max(0.04f, progress), 0);

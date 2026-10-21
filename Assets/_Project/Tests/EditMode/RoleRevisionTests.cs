@@ -149,8 +149,8 @@ namespace SocialStim.Tests.EditMode
             Assert.That(run.GetPlayerView().Alive, Is.False);
         }
 
-        [TestCase(Verdict.Guilty, true)] [TestCase(Verdict.Innocent, false)] [TestCase(Verdict.Abstain, false)]
-        public void NpcJesterCanOnlyKillALivingTownGuiltyVoter(Verdict playerVote, bool playerDies)
+        [TestCase(Verdict.Guilty)] [TestCase(Verdict.Innocent)] [TestCase(Verdict.Abstain)]
+        public void NpcJesterCanKillAnyLivingTownRegardlessOfBallot(Verdict playerVote)
         {
             var strategy = new ScenarioStrategy { Nominee = Id(1), Verdict = Verdict.Guilty };
             var run = Run(strategy, "citizen", "provocateur", "assassin", "citizen", "physician");
@@ -159,8 +159,7 @@ namespace SocialStim.Tests.EditMode
             Submit(run, GameCommand.Continue());
             var view = run.GetPlayerView();
             var revenge = view.Transcript.Single(o => o.Text.Contains("taken by the executed Jester"));
-            if (!playerDies) Assert.That(revenge.Target, Is.Not.EqualTo(Id(0)));
-            Assert.That(playerDies ? new[] { Id(0), Id(3), Id(4) } : new[] { Id(3), Id(4) }, Does.Contain(revenge.Target.Value));
+            Assert.That(new[] { Id(0), Id(3), Id(4) }, Does.Contain(revenge.Target.Value));
             Assert.That(revenge.Target, Is.Not.EqualTo(Id(2)), "Mafia guilty voters are ineligible.");
             Assert.That(view.Transcript.Single(o => o.Cue == GameCue.NightFalls).Sequence, Is.GreaterThan(revenge.Sequence));
         }
@@ -188,14 +187,14 @@ namespace SocialStim.Tests.EditMode
         }
 
         [Test]
-        public void JesterWithNoEligibleTownVoterDoesNotStallOrKillAnInnocentVoter()
+        public void NpcJesterCurseStillResolvesWhenOnlyTownVotedInnocent()
         {
             var run = Run(new ScenarioStrategy { Nominee = Id(1), Verdict = Verdict.Guilty },
                 "citizen", "provocateur", "assassin", "forger", "interrupter");
             Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(Id(1)));
             Submit(run, GameCommand.Continue()); Submit(run, GameCommand.Judge(Verdict.Innocent)); Submit(run, GameCommand.Continue());
             Assert.That(run.GetPlayerView().Phase, Is.Not.EqualTo(GamePhase.JesterRevenge));
-            Assert.That(run.GetPlayerView().Characters.Single(c => c.Id == Id(0)).Alive, Is.True);
+            Assert.That(run.GetPlayerView().Characters.Single(c => c.Id == Id(0)).Alive, Is.False);
         }
 
         [TestCase(false, false, true)] [TestCase(true, false, true)] [TestCase(true, true, false)]

@@ -54,7 +54,6 @@ namespace SocialStim.Rules.Phases
         private readonly Dictionary<CharacterId, NightOrder> _lastActions = new Dictionary<CharacterId, NightOrder>();
         private readonly HashSet<CharacterId> _counterClaimed = new HashSet<CharacterId>();
         private readonly Dictionary<CharacterId, int> _guiltDue = new Dictionary<CharacterId, int>();
-        private readonly HashSet<CharacterId> _guiltyVoters = new HashSet<CharacterId>();
         private readonly List<CharacterId> _revengeTargets = new List<CharacterId>();
         private readonly HashSet<CharacterId> _executionObjectives = new HashSet<CharacterId>();
 
@@ -200,7 +199,7 @@ namespace SocialStim.Rules.Phases
             if (command == null || _phases.Phase == GamePhase.Ended) return "No active input request.";
             if (_phases.Phase == GamePhase.JesterRevenge)
                 return command.Kind == CommandKind.Revenge && command.Target.HasValue && _revengeTargets.Contains(command.Target.Value)
-                    ? null : "Choose a living Town participant who voted guilty.";
+                    ? null : "Choose a living Town participant.";
             if (!Player.Alive) return command.Kind == CommandKind.Continue ? null : "Dead participants may only spectate.";
             if (_counterClaimRole.HasValue)
                 return command.Kind == CommandKind.Speak && (command.Intent == SpeechIntent.StaySilent
@@ -410,7 +409,8 @@ namespace SocialStim.Rules.Phases
                 case ReportKind.VisitorSeen: return Actor(report.Target.Value).Name + " visited " + Actor(report.Subject.Value).Name + ".";
                 case ReportKind.NoVisitors: return "I saw no other visitors to " + Actor(report.Target.Value).Name + ".";
                 case ReportKind.ForgeryApplied: return "I made the target look like an Antagonist for the night.";
-                default: return "I survived an attack. I don\'t know who it was.";
+                case ReportKind.Targeted: return _text.Format("report.targeted");
+                default: return _text.Format("report.noResult");
             }
         }
 
@@ -585,8 +585,6 @@ namespace SocialStim.Rules.Phases
                 foreach (Participant observer in _cast) _beliefs[observer.Id].ObserveVote(ballot.Key, _defendant.Value, ballot.Value, _phases.Day);
                 Emit(GameCue.BallotRevealed, $"{Actor(ballot.Key).Name}: {ballot.Value}.", ballot.Key, target: _defendant);
             }
-            _guiltyVoters.Clear();
-            foreach (var ballot in ballots.Where(b => b.Value == Verdict.Guilty)) _guiltyVoters.Add(ballot.Key);
             if (VoteResolver.IsGuilty(ballots.Select(b => b.Value)))
             {
                 Emit(GameCue.VerdictGuilty, $"{Actor(_defendant.Value).Name} is found guilty.");
@@ -614,7 +612,7 @@ namespace SocialStim.Rules.Phases
                     _options.RevealOnDeath ? SpeechIntent.ReactToRoleReveal : SpeechIntent.ReactToDeath));
             _revengeTargets.Clear();
             if (executed.Role.ExecutionRevenge)
-                _revengeTargets.AddRange(Living().Where(c => c.Role.Faction == Faction.Town && _guiltyVoters.Contains(c.Id)).Select(c => c.Id));
+                _revengeTargets.AddRange(Living().Where(c => c.Role.Faction == Faction.Town).Select(c => c.Id));
             if (_revengeTargets.Count > 0)
             {
                 if (executed.Id == Player.Id)
@@ -681,9 +679,6 @@ namespace SocialStim.Rules.Phases
                 var teamRecord = new TeamNightRecord(record.Actor, record.Name, record.Action, record.VisitTarget);
                 _teamReports.Add(teamRecord);
                 foreach (Participant member in _cast.Where(c => c.Role.Faction == Faction.Antagonist)) _beliefs[member.Id].RememberTeamAction(teamRecord);
-                if (Player.Role.Faction == Faction.Antagonist)
-                    Emit(GameCue.PhaseChanged, _text.Format("mafia.action", ("name", record.Name),
-                        ("report", NightReportFormatter.Format(record.Action, _catalog.First(r => r.Id == record.Action.Role).Name, id => Actor(id).Name, _text))));
             }
             foreach (CharacterId id in resolution.SpentCharges) Actor(id).Charges--;
             foreach (CharacterId id in resolution.TownKillers)
@@ -692,9 +687,14 @@ namespace SocialStim.Rules.Phases
                 if (id == Player.Id && !resolution.Deaths.Contains(id))
                     Emit(GameCue.PhaseChanged, _text.Format("event.guiltQueued"));
             }
-            foreach (CharacterId id in resolution.Deaths) Kill(Actor(id), false);
+            foreach (CharacterId id in resolution.Deaths.OrderBy(id => id.Value)) Kill(Actor(id), false);
+            if (resolution.Deaths.Count == 0) Emit(GameCue.DeathReported, _text.Format("event.noNightDeaths"));
             if (resolution.Deaths.Any(id => IsMafiaKiller(Actor(id).Role))) PromoteMafiaSuccessor();
             foreach (Participant survivor in Living()) _beliefs[survivor.Id].ConsiderNightClaimDeaths(_phases.Day);
+            if (Player.Role.Faction == Faction.Antagonist)
+                foreach (var record in _teamReports.Where(r => r.Action.Night == _lastNight).OrderBy(r => r.Actor.Value))
+                    Emit(GameCue.PhaseChanged, _text.Format(resolution.Deaths.Contains(record.Actor) ? "mafia.actionFatal" : "mafia.action", ("name", record.Name),
+                        ("report", NightReportFormatter.Format(record.Action, _catalog.First(r => r.Id == record.Action.Role).Name, id => Actor(id).Name, _text))));
             foreach (NightReport report in resolution.Reports)
             {
                 if (!Actor(report.Recipient).Alive) continue;
@@ -703,7 +703,6 @@ namespace SocialStim.Rules.Phases
                 _beliefs[report.Recipient].Receive(delivered);
                 if (report.Recipient == Player.Id) DeliverReport(delivered);
             }
-            if (resolution.Deaths.Count == 0) Emit(GameCue.DeathReported, "Nobody died during the night.");
             if (!FinishIfTerminal()) Move(GamePhase.Dawn);
         }
 

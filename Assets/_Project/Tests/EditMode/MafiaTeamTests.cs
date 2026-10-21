@@ -111,6 +111,23 @@ namespace SocialStim.Tests.EditMode
             Assert.That(run.GetNightDiagnostics().Any(r => r.Action.Role == new RoleId("assassin") || r.Action.Role == new RoleId("forger")), Is.False);
         }
         [Test]
+        public void FatalMafiaActionAppearsAfterCasualtiesAndNeverClaimsSurvival()
+        {
+            var run = Run(new ScenarioStrategy { Target = k => k.Self == Id(2) ? Id(0) : (CharacterId?)null },
+                "forger", "assassin", "lone-killer", "physician", "inspector", "citizen");
+            Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(null)); Submit(run, GameCommand.Night(Id(5)));
+            var view = run.GetPlayerView();
+            Assert.That(view.Alive, Is.False);
+            var death = view.Transcript.Single(o => o.Cue == GameCue.DeathReported && o.Target == Id(0));
+            var action = view.Transcript.Single(o => o.Text.StartsWith("Private Mafia action") && o.Text.Contains("N0"));
+            Assert.That(action.Sequence, Is.GreaterThan(death.Sequence));
+            Assert.That(action.Text, Does.Contain("died tonight"));
+            Assert.That(action.Text, Does.Contain("N5"));
+            Assert.That(action.Text, Does.Not.Contain("survived"));
+            Assert.That(view.Transcript.Any(o => o.Cue == GameCue.PlayerTargetedAtNight), Is.False);
+        }
+
+        [Test]
         public void TeamVisitRecordsLetMafiaNoticeAConflictingLookoutStoryWithoutKnowingTheLiarsRole()
         {
             var roles = DiscussionRevisionTests.AuthoredRoles(); var own = roles.Single(r => r.Id.Value == "assassin");

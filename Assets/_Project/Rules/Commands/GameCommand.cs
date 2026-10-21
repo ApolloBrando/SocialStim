@@ -46,7 +46,7 @@ namespace SocialStim.Rules.Commands
         public static GameCommand Judge(Verdict verdict) => new GameCommand(CommandKind.Judge, verdict: verdict);
         /// <summary>Chooses a night target, or passes.</summary>
         public static GameCommand Night(CharacterId? target) => new GameCommand(CommandKind.ChooseNightTarget, target);
-        /// <summary>Chooses one living Town guilty voter for an executed Jester's revenge.</summary>
+        /// <summary>Chooses one living Town participant for an executed Jester's revenge.</summary>
         public static GameCommand Revenge(CharacterId target) => new GameCommand(CommandKind.Revenge, target);
         /// <summary>Acknowledges a defense, last words, dawn, or spectator turn.</summary>
         public static GameCommand Continue() => new GameCommand(CommandKind.Continue);

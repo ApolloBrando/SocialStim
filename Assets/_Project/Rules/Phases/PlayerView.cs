@@ -39,7 +39,7 @@ namespace SocialStim.Rules.Phases
         public IReadOnlyList<CharacterId> ReportParticipants { get; }
         /// <summary>Private faction history; empty for Town and Neutral players.</summary>
         public IReadOnlyList<TeamNightRecord> TeamReports { get; }
-        /// <summary>Granted only to an executed player Jester: living Town guilty voters eligible for revenge.</summary>
+        /// <summary>Granted only to an executed player Jester: living Town participants eligible for revenge.</summary>
         public IReadOnlyList<CharacterId> RevengeTargets { get; }
         /// <summary>Configured daily elimination policy.</summary>
         public VotingMode VotingMode { get; }
