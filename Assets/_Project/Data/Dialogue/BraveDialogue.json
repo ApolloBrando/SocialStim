@@ -4,7 +4,7 @@
     {
       "id": "starter.social.accuse.aggressive",
       "intent": "Accuse",
-      "text": "I suspect {target}, and I'm standing behind that accusation. Please answer it directly.",
+      "text": "Let's hear your answer, {target}. I don't trust you.",
       "weight": 3,
       "conditions": [
         {
@@ -27,7 +27,7 @@
     {
       "id": "starter.social.vouch.claim",
       "intent": "Vouch",
-      "text": "I'm defending {target}. Give them a fair chance to explain their role claim.",
+      "text": "Let {target} answer. I'll make sure they get the chance.",
       "weight": 3,
       "conditions": [
         {
@@ -46,21 +46,21 @@
     {
       "id": "npc.brave.Accuse.001",
       "intent": "Accuse",
-      "text": "I'm accusing {target}. I want to hear their answer directly.",
+      "text": "I'm putting {target}'s name forward. Question me about it if you need to.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Accuse.002",
       "intent": "Accuse",
-      "text": "I suspect {target}. I'll say it without hiding behind the room.",
+      "text": "{target}, I think you're a threat. I'm giving you a chance to answer.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Accuse.003",
       "intent": "Accuse",
-      "text": "I suspect {target}. Let's examine that suspicion openly.",
+      "text": "I'll take the heat for this one. I suspect {target}.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -130,28 +130,28 @@
     {
       "id": "npc.brave.Defend.001",
       "intent": "Defend",
-      "text": "I deny the accusation. Ask your questions and let me answer.",
+      "text": "Then ask me directly. I'm not running from your questions.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Defend.002",
       "intent": "Defend",
-      "text": "I reject that case against me. Suspicion isn't proof.",
+      "text": "No. You've got the wrong person, and I'll tell you why.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Defend.003",
       "intent": "Defend",
-      "text": "You're accusing the wrong person. I'm here to defend myself.",
+      "text": "Let me finish before you decide I'm guilty.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Defend.004",
       "intent": "Defend",
-      "text": "I dispute the charge. Hear my defense before you reach a verdict.",
+      "text": "You can question me all day. You still have to hear the answer.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -214,28 +214,28 @@
     {
       "id": "npc.brave.ClaimRole.001",
       "intent": "ClaimRole",
-      "text": "I'm the {role}. I will answer for that claim.",
+      "text": "I'm your {role}. Let's deal with that openly.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.ClaimRole.002",
       "intent": "ClaimRole",
-      "text": "Put my role on the record: {role}.",
+      "text": "I'll say it first: my role is {role}.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.ClaimRole.003",
       "intent": "ClaimRole",
-      "text": "No more waiting. I'm claiming {role} now.",
+      "text": "You need to know what I can do. I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.ClaimRole.004",
       "intent": "ClaimRole",
-      "text": "Hear this clearly. My role is {role}.",
+      "text": "No point hiding this now. I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -284,28 +284,28 @@
     {
       "id": "npc.brave.Agree.001",
       "intent": "Agree",
-      "text": "{target} is right on this point. I'll support it openly.",
+      "text": "I'm with {target}. Let's see that point through.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Agree.002",
       "intent": "Agree",
-      "text": "I agree with {target}. Put my name beside that position.",
+      "text": "Yes, {target}. That's worth standing behind.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Agree.003",
       "intent": "Agree",
-      "text": "I'll back the argument {target} is making.",
+      "text": "You don't have to argue that alone, {target}. I agree.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Agree.004",
       "intent": "Agree",
-      "text": "I support the point {target} just made. You've got my agreement.",
+      "text": "Keep going, {target}. You have my support on this.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -354,28 +354,28 @@
     {
       "id": "npc.brave.Disagree.001",
       "intent": "Disagree",
-      "text": "{target}, I oppose that conclusion. Let's examine it directly.",
+      "text": "Hold on, {target}. I'm not taking that leap with you.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Disagree.002",
       "intent": "Disagree",
-      "text": "I won't support {target}'s position just to keep the room comfortable.",
+      "text": "We can disagree without backing away, {target}. I don't accept that.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Disagree.003",
       "intent": "Disagree",
-      "text": "No, {target}. I think that takes us the wrong way.",
+      "text": "Say it as firmly as you like, {target}. I still need convincing.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Disagree.004",
       "intent": "Disagree",
-      "text": "I'm challenging the point {target} just made.",
+      "text": "I'm asking you to reconsider, {target}. I think that's the wrong call.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -424,28 +424,28 @@
     {
       "id": "npc.brave.ReactToDeath.001",
       "intent": "ReactToDeath",
-      "text": "Someone died. We owe the living a clear response.",
+      "text": "Don't shut anyone out now. We need every voice we have left.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.ReactToDeath.002",
       "intent": "ReactToDeath",
-      "text": "Let the loss sharpen our attention, not scatter it.",
+      "text": "I wish they were here to argue with us.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.ReactToDeath.003",
       "intent": "ReactToDeath",
-      "text": "I won't pretend that death is easy to hear. I'm still listening.",
+      "text": "We can be scared and still look after each other.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.ReactToDeath.004",
       "intent": "ReactToDeath",
-      "text": "An empty chair is enough reason to take this seriously.",
+      "text": "Take a breath. We'll face the next part together.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -494,28 +494,28 @@
     {
       "id": "npc.brave.VoteJustification.001",
       "intent": "VoteJustification",
-      "text": "I cast my ballot deliberately, and I'll answer for it.",
+      "text": "I put the name down myself. I'll answer for that.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.VoteJustification.002",
       "intent": "VoteJustification",
-      "text": "That vote was my decision. I won't hand responsibility to the room.",
+      "text": "I knew I might be wrong. I wasn't going to hide from the choice.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.VoteJustification.003",
       "intent": "VoteJustification",
-      "text": "I chose with the information available, then committed to the choice.",
+      "text": "If you have questions about my vote, ask me.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.VoteJustification.004",
       "intent": "VoteJustification",
-      "text": "Question my ballot if you need to. I stand ready to discuss it.",
+      "text": "That was the decision I could stand behind at the time.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -564,21 +564,21 @@
     {
       "id": "npc.brave.Vouch.001",
       "intent": "Vouch",
-      "text": "I'm defending {target}. Give them a fair hearing.",
+      "text": "I'm standing with {target} on this one.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Vouch.002",
       "intent": "Vouch",
-      "text": "I support {target}. I won't let that be mistaken for silence.",
+      "text": "You want to condemn {target}? Hear them out first.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Vouch.003",
       "intent": "Vouch",
-      "text": "{target} has my backing for now. Hear their answer.",
+      "text": "I'll back {target}, and you can hold me to it.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -606,21 +606,21 @@
     {
       "id": "npc.brave.ReportInvestigation.001",
       "intent": "ReportInvestigation",
-      "text": "My investigation of {target} returned {result}. Hear it clearly.",
+      "text": "Listen up. I checked {target}, and the result was {result}.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.ReportInvestigation.002",
       "intent": "ReportInvestigation",
-      "text": "I have a finding to share. {target} appeared {result}.",
+      "text": "Here's what I can report: {target} appeared {result}.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.ReportInvestigation.003",
       "intent": "ReportInvestigation",
-      "text": "Record this result for {target}: {result}.",
+      "text": "My finding on {target} was {result}. Make sure everyone hears it.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -641,21 +641,21 @@
     {
       "id": "npc.brave.CallForTrial.001",
       "intent": "CallForTrial",
-      "text": "Bring {target} to trial. I want a direct defense.",
+      "text": "Give {target} the floor. I want a proper hearing.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.CallForTrial.002",
       "intent": "CallForTrial",
-      "text": "I'm formally calling for {target} to be questioned.",
+      "text": "I want {target} on trial, with a chance to answer every question.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.CallForTrial.003",
       "intent": "CallForTrial",
-      "text": "{target}, take the floor at a trial and answer the case.",
+      "text": "Let's put the case to {target} directly, at a hearing.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -676,21 +676,21 @@
     {
       "id": "npc.brave.Deflect.001",
       "intent": "Deflect",
-      "text": "I reject the accusation against me. I'm accusing {target} instead.",
+      "text": "I'm not accepting that blame. {target}, you need to answer too.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Deflect.002",
       "intent": "Deflect",
-      "text": "I deny the charge. Put the same scrutiny on {target}; I suspect them.",
+      "text": "You can keep questioning me, but don't leave {target} out of this.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.Deflect.003",
       "intent": "Deflect",
-      "text": "I'm defending myself and challenging {target}. Hear both points clearly.",
+      "text": "I deny it. My accusation is against {target}, and I'll stand by it.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -711,21 +711,21 @@
     {
       "id": "npc.brave.StaySilent.001",
       "intent": "StaySilent",
-      "text": "I'll hold my statement and hear the next speaker.",
+      "text": "I've said my piece. Who's next?",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.StaySilent.002",
       "intent": "StaySilent",
-      "text": "Nothing further from me. Take the floor.",
+      "text": "I'll hear the room before I say more.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.StaySilent.003",
       "intent": "StaySilent",
-      "text": "I can wait my turn without filling the silence.",
+      "text": "Go on. I'm listening, even if I disagree.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -746,21 +746,21 @@
     {
       "id": "npc.brave.ExpressFear.001",
       "intent": "ExpressFear",
-      "text": "I understand the danger. I'm staying to face it.",
+      "text": "Of course I'm afraid. I'm still here with you.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.ExpressFear.002",
       "intent": "ExpressFear",
-      "text": "Being afraid won't stop me from taking the next step.",
+      "text": "I don't know what tonight brings. I do know we're facing it together.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.ExpressFear.003",
       "intent": "ExpressFear",
-      "text": "I don't like what tonight could bring. I won't look away.",
+      "text": "I'd rather admit I'm scared than leave someone else feeling alone.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -781,21 +781,21 @@
     {
       "id": "npc.brave.ReactToRoleReveal.001",
       "intent": "ReactToRoleReveal",
-      "text": "The role is revealed. Recheck the claims with that fact in place.",
+      "text": "All right. That means we have to look at the claims again.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.ReactToRoleReveal.002",
       "intent": "ReactToRoleReveal",
-      "text": "Take that information seriously and revise your conclusions where needed.",
+      "text": "Use what we just learned, even if it proves you wrong.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.ReactToRoleReveal.003",
       "intent": "ReactToRoleReveal",
-      "text": "Now we have a public role to work from. Use it.",
+      "text": "We owe them an honest look at what happened.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -816,21 +816,21 @@
     {
       "id": "npc.brave.LastWords.001",
       "intent": "LastWords",
-      "text": "Keep asking the hard questions when I can't ask them with you.",
+      "text": "Stay together. You don't have to trust everyone to hear them out.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.LastWords.002",
       "intent": "LastWords",
-      "text": "I'm facing the decision. Make your next one with care.",
+      "text": "Make the next choice carefully. That's all I ask.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.LastWords.003",
       "intent": "LastWords",
-      "text": "I'll leave standing, and I'll leave my words on the record.",
+      "text": "I won't get another turn. Make yours count.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -851,21 +851,21 @@
     {
       "id": "npc.brave.ReportAction.001",
       "intent": "ReportAction",
-      "text": "Here is my complete account. {result}",
+      "text": "I'll walk you through my night. {result}",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.ReportAction.002",
       "intent": "ReportAction",
-      "text": "I'll put last night on the record. {result}",
+      "text": "Here's the account I can give you. {result}",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.ReportAction.003",
       "intent": "ReportAction",
-      "text": "Hear the report before you judge it. {result}",
+      "text": "Ask your questions after you've heard this. {result}",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -886,28 +886,28 @@
     {
       "id": "npc.brave.counterclaim.01",
       "intent": "CounterClaim",
-      "text": "That role is mine. I am the {role}.",
+      "text": "Look at me when you say that. I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.counterclaim.02",
       "intent": "CounterClaim",
-      "text": "I will challenge that claim openly. The real {role} is standing here.",
+      "text": "I'm the {role}. If you're challenging that, do it openly.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.counterclaim.03",
       "intent": "CounterClaim",
-      "text": "You picked the wrong role to steal. I am the {role}.",
+      "text": "You don't get to take my role unopposed. I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
     {
       "id": "npc.brave.counterclaim.04",
       "intent": "CounterClaim",
-      "text": "Everyone heard that claim. Now hear mine: I am the {role}.",
+      "text": "Then we have a problem. The {role} is me.",
       "weight": 1,
       "requiredTrait": "Brave"
     },
@@ -938,6 +938,102 @@
       "text": "Hold it. You cannot have my role. I am the {role}.",
       "weight": 1,
       "requiredTrait": "Brave"
+    },
+    {
+      "id": "npc.brave.execution.ReactToDeath.01",
+      "intent": "ReactToDeath",
+      "text": "We cast the votes. We need to face what followed.",
+      "weight": 1,
+      "requiredTrait": "Brave",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedDeath"
+        }
+      ]
+    },
+    {
+      "id": "npc.brave.execution.ReactToDeath.02",
+      "intent": "ReactToDeath",
+      "text": "Don't leave anyone alone with this tonight.",
+      "weight": 1,
+      "requiredTrait": "Brave",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedDeath"
+        }
+      ]
+    },
+    {
+      "id": "npc.brave.execution.ReactToDeath.03",
+      "intent": "ReactToDeath",
+      "text": "We still have people to look after. Remember that before we go.",
+      "weight": 1,
+      "requiredTrait": "Brave",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedDeath"
+        }
+      ]
+    },
+    {
+      "id": "npc.brave.execution.ReactToRoleReveal.01",
+      "intent": "ReactToRoleReveal",
+      "text": "Their role is public now. Keep it in mind when we hear the next claim.",
+      "weight": 1,
+      "requiredTrait": "Brave",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedRoleReveal"
+        }
+      ]
+    },
+    {
+      "id": "npc.brave.execution.ReactToRoleReveal.02",
+      "intent": "ReactToRoleReveal",
+      "text": "We can still learn from the decision. We owe them that much.",
+      "weight": 1,
+      "requiredTrait": "Brave",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedRoleReveal"
+        }
+      ]
+    },
+    {
+      "id": "npc.brave.execution.ReactToRoleReveal.03",
+      "intent": "ReactToRoleReveal",
+      "text": "Put the revealed role beside the claims. We need a clear answer tomorrow.",
+      "weight": 1,
+      "requiredTrait": "Brave",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedRoleReveal"
+        }
+      ]
     }
   ]
 }

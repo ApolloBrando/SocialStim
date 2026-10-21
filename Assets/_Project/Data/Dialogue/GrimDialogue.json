@@ -4,28 +4,28 @@
     {
       "id": "npc.grim.Accuse.001",
       "intent": "Accuse",
-      "text": "{target}. That's where my suspicion rests.",
+      "text": "I'd question {target}. I don't expect to enjoy the answer.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Accuse.002",
       "intent": "Accuse",
-      "text": "I don't trust {target}. Trust is getting expensive.",
+      "text": "There's no kind way to say this, {target}. I suspect you.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Accuse.003",
       "intent": "Accuse",
-      "text": "I suspect {target}. An unpleasant place to start.",
+      "text": "I keep landing on {target}. Wish I didn't.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Accuse.004",
       "intent": "Accuse",
-      "text": "The person I suspect is {target}. There's no better way to say it.",
+      "text": "{target}, you're the person I don't trust. Let's get it said.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -88,28 +88,28 @@
     {
       "id": "npc.grim.Defend.001",
       "intent": "Defend",
-      "text": "I deny it. You've made an accusation, not proved a case.",
+      "text": "No. You've got the wrong person. It happens.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Defend.002",
       "intent": "Defend",
-      "text": "I dispute the blame. Hear me before you decide.",
+      "text": "Hear me out before you make this worse.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Defend.003",
       "intent": "Defend",
-      "text": "I'm defending myself. You haven't shown I'm guilty.",
+      "text": "If you want a confession, you'll be disappointed.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Defend.004",
       "intent": "Defend",
-      "text": "I reject the accusation. A suspicion isn't a conclusion.",
+      "text": "I'm denying it. I haven't much else to give you.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -172,28 +172,28 @@
     {
       "id": "npc.grim.ClaimRole.001",
       "intent": "ClaimRole",
-      "text": "I'm the {role}. There it is.",
+      "text": "Might as well know. I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.ClaimRole.002",
       "intent": "ClaimRole",
-      "text": "My role is {role}. No better day to say it.",
+      "text": "I'm your {role}. Don't expect it to make this easy.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.ClaimRole.003",
       "intent": "ClaimRole",
-      "text": "Put down {role} beside my name.",
+      "text": "Put {role} beside my name and be done with it.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.ClaimRole.004",
       "intent": "ClaimRole",
-      "text": "I suppose you need the role. {role}.",
+      "text": "There's no good moment for this. My role is {role}.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -242,28 +242,28 @@
     {
       "id": "npc.grim.Agree.001",
       "intent": "Agree",
-      "text": "{target} has my agreement. For what that's worth.",
+      "text": "I'm with {target}. That's something, at least.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Agree.002",
       "intent": "Agree",
-      "text": "I support {target}'s point. Something had to make sense.",
+      "text": "Yes, {target}. I came to the same miserable conclusion.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Agree.003",
       "intent": "Agree",
-      "text": "I agree with {target}'s point. We can stop circling it.",
+      "text": "Leave that point where we can see it, {target}. I agree.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Agree.004",
       "intent": "Agree",
-      "text": "I'm with {target} on this. No speech required.",
+      "text": "I think {target}'s right. I won't dress it up.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -312,28 +312,28 @@
     {
       "id": "npc.grim.Disagree.001",
       "intent": "Disagree",
-      "text": "I disagree with {target}'s point. It doesn't convince me.",
+      "text": "No, {target}. I can't get there with you.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Disagree.002",
       "intent": "Disagree",
-      "text": "I don't accept {target}'s conclusion. We can endure the disagreement.",
+      "text": "I'd like that to convince me, {target}. It doesn't.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Disagree.003",
       "intent": "Disagree",
-      "text": "{target} hasn't convinced me. Certainty isn't contagious today.",
+      "text": "Don't mistake my silence for agreement, {target}.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Disagree.004",
       "intent": "Disagree",
-      "text": "I don't accept {target}'s conclusion. Neither answer is comfortable.",
+      "text": "I heard the argument, {target}. I'm still on the other side.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -382,28 +382,28 @@
     {
       "id": "npc.grim.ReactToDeath.001",
       "intent": "ReactToDeath",
-      "text": "Another chair we won't need.",
+      "text": "I keep looking at the chair as if that helps.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.ReactToDeath.002",
       "intent": "ReactToDeath",
-      "text": "They won't be speaking again. The room has noticed.",
+      "text": "One more person we'll only talk about in the past tense.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.ReactToDeath.003",
       "intent": "ReactToDeath",
-      "text": "Death makes a tidy report out of a complicated person.",
+      "text": "They were here. Now we have to get through this without them.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.ReactToDeath.004",
       "intent": "ReactToDeath",
-      "text": "We have less company and the same questions.",
+      "text": "Nothing good to say about an empty place.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -452,28 +452,28 @@
     {
       "id": "npc.grim.VoteJustification.001",
       "intent": "VoteJustification",
-      "text": "I chose. Doubt came with the ballot.",
+      "text": "I picked a name. The doubt stayed with me.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.VoteJustification.002",
       "intent": "VoteJustification",
-      "text": "My vote was a judgement, not a promise.",
+      "text": "That was my vote. There's no comfort in blaming the room.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.VoteJustification.003",
       "intent": "VoteJustification",
-      "text": "I used what I had. It wasn't much comfort.",
+      "text": "I did what I could with what I knew. I wish that were enough.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.VoteJustification.004",
       "intent": "VoteJustification",
-      "text": "The ballot was mine. So is the burden of it.",
+      "text": "The ballot didn't wait until I felt ready.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -522,28 +522,28 @@
     {
       "id": "npc.grim.Vouch.001",
       "intent": "Vouch",
-      "text": "Don't condemn {target} yet. I want to hear them through.",
+      "text": "I'd keep listening to {target}. We can still do that much.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Vouch.002",
       "intent": "Vouch",
-      "text": "I'm backing {target} for now. That's where I stand.",
+      "text": "{target} has my backing. For now is all anyone gets.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Vouch.003",
       "intent": "Vouch",
-      "text": "Don't condemn {target} yet. I support their right to a defense.",
+      "text": "I don't want {target} condemned before they've finished.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Vouch.004",
       "intent": "Vouch",
-      "text": "I oppose the accusation against {target}. We can be careful, at least.",
+      "text": "Give {target} time. We're running short of chances to hear people.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -564,21 +564,21 @@
     {
       "id": "npc.grim.ReportInvestigation.001",
       "intent": "ReportInvestigation",
-      "text": "{target} appeared {result}. That's the readout.",
+      "text": "The check on {target} came back {result}. There you have it.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.ReportInvestigation.002",
       "intent": "ReportInvestigation",
-      "text": "I checked {target}. It came back {result}. Another fact to carry.",
+      "text": "{result}, for {target}. That's what I received.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.ReportInvestigation.003",
       "intent": "ReportInvestigation",
-      "text": "The result for {target} was {result}. Record it.",
+      "text": "I have a finding to put down: {target} appeared {result}.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -599,21 +599,21 @@
     {
       "id": "npc.grim.CallForTrial.001",
       "intent": "CallForTrial",
-      "text": "Bring {target} to trial. We may as well ask properly.",
+      "text": "A trial for {target}. We won't like it better by waiting.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.CallForTrial.002",
       "intent": "CallForTrial",
-      "text": "I want a hearing for {target}. Another hard conversation.",
+      "text": "I'd hear {target}'s formal defense before this gets any uglier.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.CallForTrial.003",
       "intent": "CallForTrial",
-      "text": "Put {target} on trial. The room won't enjoy it.",
+      "text": "Let's question {target} at a hearing and get through it.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -634,21 +634,21 @@
     {
       "id": "npc.grim.Deflect.001",
       "intent": "Deflect",
-      "text": "I deny it. Question {target} instead; I suspect them.",
+      "text": "I didn't do it. I'm still waiting for an answer from {target}.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Deflect.002",
       "intent": "Deflect",
-      "text": "I reject the blame. My accusation is against {target}.",
+      "text": "You're not getting a confession from me. Question {target} too.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.Deflect.003",
       "intent": "Deflect",
-      "text": "Don't call me guilty. I want {target} examined.",
+      "text": "The blame doesn't fit me. I'd start looking at {target}.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -669,21 +669,21 @@
     {
       "id": "npc.grim.StaySilent.001",
       "intent": "StaySilent",
-      "text": "I'll leave the room its silence.",
+      "text": "Let the next person try.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.StaySilent.002",
       "intent": "StaySilent",
-      "text": "Nothing from me. There will be other bad moments to speak.",
+      "text": "I've nothing worth making you hear.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.StaySilent.003",
       "intent": "StaySilent",
-      "text": "I'm listening. That will have to count.",
+      "text": "I'm staying quiet. Don't make too much of it.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -704,21 +704,21 @@
     {
       "id": "npc.grim.ExpressFear.001",
       "intent": "ExpressFear",
-      "text": "I don't expect the night to be kind.",
+      "text": "I don't much like the thought of another night alone.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.ExpressFear.002",
       "intent": "ExpressFear",
-      "text": "The danger is still here. So are we, for now.",
+      "text": "I'm afraid too. Just tired of finding new words for it.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.ExpressFear.003",
       "intent": "ExpressFear",
-      "text": "I'm afraid. It's become a fairly ordinary condition.",
+      "text": "We'll have to leave this room eventually. That's the part I keep thinking about.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -739,21 +739,21 @@
     {
       "id": "npc.grim.ReactToRoleReveal.001",
       "intent": "ReactToRoleReveal",
-      "text": "The role is known now. Too late for an easy conversation.",
+      "text": "There it is. Now put it beside everything they told us.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.ReactToRoleReveal.002",
       "intent": "ReactToRoleReveal",
-      "text": "A reveal. Another reason to distrust our earlier certainty.",
+      "text": "We get the answer after we lose the chance to ask why.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.ReactToRoleReveal.003",
       "intent": "ReactToRoleReveal",
-      "text": "We know more about them now. They don't get to hear what we make of it.",
+      "text": "That role makes the earlier conversation harder to forget.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -774,21 +774,21 @@
     {
       "id": "npc.grim.LastWords.001",
       "intent": "LastWords",
-      "text": "You'll have one less voice to argue with.",
+      "text": "Remember the people. You can argue about the rest.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.LastWords.002",
       "intent": "LastWords",
-      "text": "Remember the words if you forget the person.",
+      "text": "I'd have liked another ordinary morning.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.LastWords.003",
       "intent": "LastWords",
-      "text": "This is where my part stops. Yours won't.",
+      "text": "Take care with the next name you choose.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -809,21 +809,21 @@
     {
       "id": "npc.grim.ReportAction.001",
       "intent": "ReportAction",
-      "text": "Here's the account. Nothing to brighten it. {result}",
+      "text": "Here's what I have left from the night. {result}",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.ReportAction.002",
       "intent": "ReportAction",
-      "text": "The night left this to report. {result}",
+      "text": "The account won't make better reading by waiting. {result}",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.ReportAction.003",
       "intent": "ReportAction",
-      "text": "I'll read what happened and leave it there. {result}",
+      "text": "I'll give you the details and sit down. {result}",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -844,28 +844,28 @@
     {
       "id": "npc.grim.counterclaim.01",
       "intent": "CounterClaim",
-      "text": "Someone stole my job. I am the {role}. Figures.",
+      "text": "Of course someone picked my role. I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.counterclaim.02",
       "intent": "CounterClaim",
-      "text": "That claim is false. I am the {role}. Now we have another problem.",
+      "text": "I'm the {role}. Now neither of us gets a quiet day.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.counterclaim.03",
       "intent": "CounterClaim",
-      "text": "I hoped to keep this quiet. I am the {role}. So much for hope.",
+      "text": "That claim's wrong. I'm the {role}, for all the good saying it will do.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
     {
       "id": "npc.grim.counterclaim.04",
       "intent": "CounterClaim",
-      "text": "Two people claiming one role. Same old misery. I am the {role}.",
+      "text": "I wasn't planning to announce it like this. I'm the {role}.",
       "weight": 1,
       "requiredTrait": "Grim"
     },
@@ -896,6 +896,102 @@
       "text": "No. You took the wrong title. I am the {role}. This will end badly.",
       "weight": 1,
       "requiredTrait": "Grim"
+    },
+    {
+      "id": "npc.grim.execution.ReactToDeath.01",
+      "intent": "ReactToDeath",
+      "text": "No taking that vote back now.",
+      "weight": 1,
+      "requiredTrait": "Grim",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedDeath"
+        }
+      ]
+    },
+    {
+      "id": "npc.grim.execution.ReactToDeath.02",
+      "intent": "ReactToDeath",
+      "text": "They're gone. We still have to leave this room and face the night.",
+      "weight": 1,
+      "requiredTrait": "Grim",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedDeath"
+        }
+      ]
+    },
+    {
+      "id": "npc.grim.execution.ReactToDeath.03",
+      "intent": "ReactToDeath",
+      "text": "Another name we won't hear answering at the next meeting.",
+      "weight": 1,
+      "requiredTrait": "Grim",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedDeath"
+        }
+      ]
+    },
+    {
+      "id": "npc.grim.execution.ReactToRoleReveal.01",
+      "intent": "ReactToRoleReveal",
+      "text": "Write the role down. We won't get a clearer answer from them.",
+      "weight": 1,
+      "requiredTrait": "Grim",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedRoleReveal"
+        }
+      ]
+    },
+    {
+      "id": "npc.grim.execution.ReactToRoleReveal.02",
+      "intent": "ReactToRoleReveal",
+      "text": "The reveal stays with us. So does the vote.",
+      "weight": 1,
+      "requiredTrait": "Grim",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedRoleReveal"
+        }
+      ]
+    },
+    {
+      "id": "npc.grim.execution.ReactToRoleReveal.03",
+      "intent": "ReactToRoleReveal",
+      "text": "We know what they were now. That won't give them another morning.",
+      "weight": 1,
+      "requiredTrait": "Grim",
+      "conditions": [
+        {
+          "kind": "Phase",
+          "value": "Execution"
+        },
+        {
+          "kind": "ObservedRoleReveal"
+        }
+      ]
     }
   ]
 }

@@ -11,14 +11,14 @@ All files are in `Assets/_Project/Data/Dialogue`:
 | File | Audience | Lines |
 | --- | --- | ---: |
 | `StarterDialogue.json` | Player only; no trait | 72 |
-| `AnxiousDialogue.json` | Anxious NPCs | 128 |
-| `BraveDialogue.json` | Brave NPCs | 130 |
-| `SlowDialogue.json` | Slow NPCs | 128 |
-| `ChatterboxDialogue.json` | Chatterbox NPCs | 128 |
-| `SmugDialogue.json` | Smug NPCs | 128 |
-| `GrimDialogue.json` | Grim NPCs | 128 |
-| `JokesterDialogue.json` | Jokester NPCs | 128 |
-| **Total** | **898 NPC + 72 player** | **970** |
+| `AnxiousDialogue.json` | Anxious NPCs | 134 |
+| `BraveDialogue.json` | Brave NPCs | 136 |
+| `SlowDialogue.json` | Slow NPCs | 134 |
+| `ChatterboxDialogue.json` | Chatterbox NPCs | 134 |
+| `SmugDialogue.json` | Smug NPCs | 134 |
+| `GrimDialogue.json` | Grim NPCs | 134 |
+| `JokesterDialogue.json` | Jokester NPCs | 134 |
+| **Total** | **940 NPC + 72 player** | **1012** |
 
 The catalogue retains its original `_dialogue` reference for player content and adds
 seven `_npcDialogue` TextAsset references. Existing references and metadata GUIDs are
@@ -218,3 +218,11 @@ See DIALOGUE_INTENTS.md for the meaning of each action and the 280-line clarity 
 Live previous-night reports use GameText.json and NightReportFormatter, preserving the
 recorded action, named target and actual delivered findings rather than selecting a
 random report line. NPC and player personality dialogue remains in the eight files above.
+
+## Natural dialogue and execution replies
+
+The follow-up voice review is documented in DIALOGUE_POLISH.md. It preserves all pre-existing IDs, trait boundaries, tags, weights, conditions, role restrictions and placeholders. Short neutral player lines remain separate. Prefer direct replies such as agreement with a named speaker, a request to finish a defense, or acknowledgement of a revealed role over announcements that the speaker is formally performing a speech action. Do not add a specific factual allegation unless its eligibility condition is actually enforced.
+
+There are three additional execution-specific death replies and three execution-specific reveal replies per NPC trait. They use the existing `Phase = Execution` plus `ObservedDeath` or `ObservedRoleReveal` conditions. SpeechContract permits these two passive reaction intents in Execution; this does not allow a player input action during that transient phase. The selector prefers matching specific lines and keeps its same-trait unrestricted fallback. A reveal-specific response is not used when reveal-on-death is disabled.
+
+The traits should sound like people rather than repeated verbal tics: Anxious seeks reassurance but still makes decisions; Brave is direct and protective; Slow takes time to reflect without being incapable; Chatterbox follows conversational tangents without commenting on its own sentence construction every turn; Smug uses dry confidence rather than constant formal insults; Grim is restrained rather than mechanically pessimistic; Jokester uses awkward humour to cope instead of adding an unrelated imaginary prop to every line.
