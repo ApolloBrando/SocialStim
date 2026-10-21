@@ -70,4 +70,13 @@ namespace SocialStim.Rules.Roles
         public bool CanClaim(RoleSpec asserted) => asserted != null && asserted.Faction == Faction.Town
             && asserted.Ability != AbilityKind.None && (asserted.Id == Id ? CanClaimTruthfully : CanBluff && Faction != Faction.Town);
     }
+
+    /// <summary>Initial ability implementations, reusable by content-defined roles.</summary>
+    public enum AbilityKind { Investigate, Protect, Block, Attack, SelfProtect, None, Forge, Watch }
+
+    /// <summary>Major alignment; neutral personal goals are evaluated separately.</summary>
+    public enum Faction { Town, Antagonist, Neutral }
+
+    /// <summary>Setup-generation buckets for the initial catalog.</summary>
+    public enum RoleCategory { TownInvestigative, TownProtective, TownSupport, AntagonistKilling, NeutralBenign, TownKilling, TownBenign, AntagonistDeception, AntagonistSupport, NeutralEvil, NeutralKilling }
 }

@@ -110,4 +110,14 @@ namespace SocialStim.Application.PresentationCues
             callback?.Invoke(new DisplayAcknowledgement(_sequence, completion));
         }
     }
+
+    public enum DisplayCompletion { Completed, Skipped, Cancelled }
+
+    /// <summary>Display-only result; cannot issue gameplay commands.</summary>
+    public readonly struct DisplayAcknowledgement
+    {
+        public DisplayAcknowledgement(int sequence, DisplayCompletion completion) { Sequence = sequence; Completion = completion; }
+        public int Sequence { get; }
+        public DisplayCompletion Completion { get; }
+    }
 }

@@ -36,4 +36,7 @@ namespace SocialStim.Rules.Reasoning
         public int Night { get; }
         public NightActionClaim NightReport { get; }
     }
+
+    /// <summary>Observer-visible evidence categories, separate from whether an assertion is true.</summary>
+    public enum EvidenceKind { Statement, RoleClaim, InvestigationClaim, PrivateInvestigation, Nomination, Judgement, Death, RoleReveal, Contradiction, NightActionClaim, ClaimantLostAtNight }
 }

@@ -51,4 +51,10 @@ namespace SocialStim.Rules.Commands
         /// <summary>Acknowledges a defense, last words, dawn, or spectator turn.</summary>
         public static GameCommand Continue() => new GameCommand(CommandKind.Continue);
     }
+
+    /// <summary>Participant command families understood by the phase state machine.</summary>
+    public enum CommandKind { Speak, Nominate, Judge, ChooseNightTarget, Continue, ReportLastAction, Vote, Revenge }
+
+    /// <summary>Judgement options; abstentions do not count toward either side.</summary>
+    public enum Verdict { Guilty, Innocent, Abstain }
 }
