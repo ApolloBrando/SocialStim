@@ -37,12 +37,30 @@ namespace SocialStim.Tests.PlayMode
             adapter.Choose(adapter.Request.Options[0].Id);
             Assert.That(run.GetPlayerView().Revision, Is.EqualTo(1), "Disposed presenter must unsubscribe input.");
         }
+        [Test]
+        public void FailedInitialRenderDoesNotLeaveAnInputSubscriptionBehind()
+        {
+            var roles = new[] { new RoleSpec(new RoleId("town"), "Town", Faction.Town, RoleCategory.TownInvestigative, AbilityKind.Investigate, 0, 0, 0, -1, Faction.Town) };
+            var run = RunFactory.CreateScenario(new RunOptions(123, votingMode: VotingMode.Trial),
+                new[] { "A", "B", "C" }.Select(n => new CastMemberSpec(n, roles[0].Id)), roles,
+                Enum.GetValues(typeof(Personality)).Cast<Personality>().SelectMany(trait => Enum.GetValues(typeof(SpeechIntent)).Cast<SpeechIntent>()
+                    .Select(intent => new DialogueLine(trait + "." + intent, intent, "Line", requiredTrait: trait))));
+            var adapter = new FakeDisplay { FailRender = true };
+            Assert.Throws<InvalidOperationException>(() => new GamePresenter(new GameController(run, roles), adapter, adapter));
+            Assert.That(adapter.Listeners, Is.Zero);
+            adapter.FailRender = false;
+            using (var presenter = new GamePresenter(new GameController(run, roles), adapter, adapter))
+                Assert.That(adapter.Listeners, Is.EqualTo(1));
+            Assert.That(adapter.Listeners, Is.Zero);
+        }
         private sealed class FakeDisplay : IGameView, IPlayerInputProvider
         {
             public bool IsDisplaying { get; set; } = true;
             public PlayerInputRequest Request { get; private set; }
             public event Action<string> OptionChosen;
-            public void Render(PlayerInputRequest request) { Request = request; }
+            public bool FailRender;
+            public int Listeners => OptionChosen?.GetInvocationList().Length ?? 0;
+            public void Render(PlayerInputRequest request) { if (FailRender) throw new InvalidOperationException("Render failed"); Request = request; }
             public void ShowInputError(string message) { Assert.Fail(message); }
             public void Choose(string option) => OptionChosen?.Invoke(option);
         }

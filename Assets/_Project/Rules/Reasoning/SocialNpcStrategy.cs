@@ -84,7 +84,7 @@ namespace SocialStim.Rules.Reasoning
             {
                 int loyalty = (knowledge.Personality == Personality.Brave) ? _settings.LoyaltyBonus : 0;
                 candidates.Add((GameCommand.Speak(SpeechIntent.Vouch, trusted.Id), 10 + loyalty + trusted.Trust / 6));
-                EvidenceRecord statement = knowledge.Evidence.LastOrDefault(e => e.Actor == trusted.Id
+                EvidenceRecord statement = knowledge.Evidence.LastOrDefault(e => e.Day == knowledge.Day && e.Actor == trusted.Id
                     && (e.Intent == SpeechIntent.Accuse || e.Intent == SpeechIntent.Defend || e.Intent == SpeechIntent.Vouch || e.Intent == SpeechIntent.Deflect));
                 if (statement != null)
                 {

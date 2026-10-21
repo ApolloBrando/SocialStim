@@ -58,7 +58,8 @@ namespace SocialStim.Presentation.Text
             _focus.SetText(_label.text);
             _state.text = (words.Format(!participant.Alive ? "ui.dead" : participant.IsTeammate ? "ui.teammate" : "ui.alive"))
                 + (string.IsNullOrEmpty(annotation) ? "" : "\n" + annotation);
-            _claim.text = claimedRole == null ? "" : claimedRole.Name.Substring(0, System.Math.Min(3, claimedRole.Name.Length)).ToUpperInvariant();
+            _claim.text = claimedRole == null ? "" : words.Entries.TryGetValue("role.short." + claimedRole.Id.Value, out string abbreviation)
+                ? abbreviation : claimedRole.Name.Substring(0, System.Math.Min(3, claimedRole.Name.Length)).ToUpperInvariant();
             Theme(palette);
         }
 

@@ -102,13 +102,13 @@ namespace SocialStim.Rules.Reasoning
             if ((speech.Intent == SpeechIntent.Agree || speech.Intent == SpeechIntent.Disagree) && speech.Target.HasValue)
             {
                 bool agrees = speech.Intent == SpeechIntent.Agree;
-                if (speaker != _self && _stances.Add((day, speaker, speech.Target.Value, agrees)))
-                    TrustChange(speech.Target.Value, agrees ? 1 : -1);
-                EvidenceRecord statement = _evidence.LastOrDefault(e => e.Actor == speech.Target.Value
+                EvidenceRecord statement = _evidence.LastOrDefault(e => e.Day == day && e.Actor == speech.Target.Value
                     && (e.Intent == SpeechIntent.Accuse || e.Intent == SpeechIntent.Deflect
                         || e.Intent == SpeechIntent.Vouch || e.Intent == SpeechIntent.Defend));
                 if (statement != null)
                 {
+                    if (speaker != _self && _stances.Add((day, speaker, speech.Target.Value, agrees)))
+                        TrustChange(speech.Target.Value, agrees ? 1 : -1);
                     CharacterId subject = statement.Target ?? statement.Actor;
                     bool accusation = statement.Intent == SpeechIntent.Accuse || statement.Intent == SpeechIntent.Deflect;
                     bool pressure = (speech.Intent == SpeechIntent.Agree) == accusation;

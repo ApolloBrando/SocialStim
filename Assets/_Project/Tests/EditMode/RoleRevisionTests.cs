@@ -35,6 +35,14 @@ namespace SocialStim.Tests.EditMode
             public CharacterId? NightTarget(KnowledgeView view, IRandomSource random) => null;
         }
 
+        [Test]
+        public void RolesDisabledForPublicClaimsCannotBeChosenAsBluffCovers()
+        {
+            var hidden = new RoleSpec(new RoleId("hidden-town"), "Hidden", Faction.Town, RoleCategory.TownInvestigative,
+                AbilityKind.Investigate, 0, 0, 0, -1, Faction.Town, canClaimTruthfully: false);
+            Assert.That(Role("assassin").CanClaim(hidden), Is.False);
+        }
+
         [TestCase("assassin")]
         [TestCase("survivor")]
         [TestCase("provocateur")]

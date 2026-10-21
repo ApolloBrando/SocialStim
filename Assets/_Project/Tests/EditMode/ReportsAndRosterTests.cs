@@ -23,6 +23,74 @@ namespace SocialStim.Tests.EditMode
         private static CharacterId Id(int value) => new CharacterId(value);
         private static void Submit(RunSession run, GameCommand command) => Assert.That(run.TrySubmit(command, out string error), Is.True, error);
 
+        private sealed class CoverStrategy : INpcStrategy
+        {
+            internal RoleId Cover;
+            public GameCommand Speak(KnowledgeView k, IRandomSource r) => k.Self == Id(1) && !k.Characters.Single(c => c.Id == k.Self).ClaimedRole.HasValue
+                ? GameCommand.Speak(SpeechIntent.ClaimRole, role: Cover) : GameCommand.Speak(SpeechIntent.StaySilent);
+            public CharacterId? Nominate(KnowledgeView k, IRandomSource r) => null;
+            public Verdict Judge(KnowledgeView k, CharacterId d, IRandomSource r) => Verdict.Innocent;
+            public CharacterId? NightTarget(KnowledgeView k, IRandomSource r) => k.OwnRole.Ability == AbilityKind.SelfProtect ? k.Self : (CharacterId?)null;
+        }
+
+        [TestCase("vested", "inspector")] [TestCase("vested", "physician")]
+        [TestCase("vested", "coordinator")] [TestCase("vested", "vigilante")]
+        [TestCase("survivor", "inspector")] [TestCase("survivor", "physician")]
+        [TestCase("survivor", "coordinator")] [TestCase("survivor", "vigilante")]
+        [TestCase("provocateur", "inspector")] [TestCase("provocateur", "physician")]
+        [TestCase("provocateur", "coordinator")] [TestCase("provocateur", "vigilante")]
+        public void NpcCoverStoriesUsePlausibleOtherTargetsAfterSelfProtectionOrNoRealAbility(string realRole, string cover)
+        {
+            var roles = DiscussionRevisionTests.AuthoredRoles().Concat(new[] {
+                new RoleSpec(new RoleId("vested"), "Vested", Faction.Neutral, RoleCategory.NeutralBenign,
+                    AbilityKind.SelfProtect, 0, 0, 1, 2, Faction.Neutral) }).ToList();
+            var run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 1, votingMode: VotingMode.Trial),
+                new[] { "citizen", realRole, "assassin", "physician", "inspector", "citizen" }
+                    .Select((r, i) => new CastMemberSpec("N" + i, new RoleId(r))), roles, TestContent.AuthoredLines(),
+                new CoverStrategy { Cover = new RoleId(cover) });
+            Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(null));
+            Submit(run, GameCommand.Night(null)); Submit(run, GameCommand.Continue());
+            var report = run.GetPlayerView().Transcript.Single(o => o.NightReport != null && o.Speaker == Id(1)).NightReport;
+            Assert.That(report.Target.HasValue, Is.True, "NPC cover stories should not mechanically pass whenever their real role has no visit.");
+            Assert.That(report.Target, Is.Not.EqualTo(Id(1)), "Town cover roles cannot target themselves.");
+            Assert.That(FabricatedReportRules.IsLegal(report, roles.Single(r => r.Id.Value == cover), 1, Id(1),
+                run.GetPlayerView().ReportParticipants), Is.True);
+        }
+
+        [TestCase(false)] [TestCase(true)]
+        public void LegacyInvestigationReportsConsumeTheSameNightAllowanceAsStructuredReports(bool bluff)
+        {
+            var roles = DiscussionRevisionTests.AuthoredRoles();
+            var run = RunFactory.CreateScenario(new RunOptions(42, discussionRounds: 3, votingMode: VotingMode.Trial),
+                new[] { bluff ? "assassin" : "inspector", "citizen", "physician", "survivor", bluff ? "citizen" : "assassin" }
+                    .Select((r, i) => new CastMemberSpec("N" + i, new RoleId(r))), roles, TestContent.AuthoredLines(), new ScenarioStrategy());
+            Submit(run, GameCommand.Speak(SpeechIntent.ClaimRole, role: new RoleId("inspector")));
+            Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Speak(SpeechIntent.StaySilent));
+            Submit(run, GameCommand.Nominate(null)); Submit(run, GameCommand.Night(bluff ? (CharacterId?)null : Id(1)));
+            Submit(run, GameCommand.Continue());
+            var command = GameCommand.Speak(SpeechIntent.ReportInvestigation, Id(1), faction: Faction.Town);
+            Submit(run, command);
+            var view = run.GetPlayerView();
+            Assert.That(view.CanReportAction, Is.False);
+            var report = view.Transcript.Single(o => o.NightReport != null && o.Speaker == Id(0));
+            Assert.That(report.NightReport.Target, Is.EqualTo(Id(1)));
+            Assert.That(report.NightReport.Results.Single(r => r.Kind == ReportKind.Investigation).Alignment, Is.EqualTo(Faction.Town));
+            Assert.That(run.TrySubmit(command, out _), Is.False);
+            Assert.That(run.TrySubmit(GameCommand.ReportLastAction(), out _), Is.False);
+            Assert.That(run.GetPlayerView().Revision, Is.EqualTo(view.Revision));
+        }
+
+        [Test]
+        public void UnclaimedSheriffCannotUseTheLegacyReportCommandToBypassClaiming()
+        {
+            var run = TestContent.Scenario("inspector", "physician", "assassin", "survivor");
+            Submit(run, GameCommand.Speak(SpeechIntent.StaySilent)); Submit(run, GameCommand.Nominate(null));
+            Submit(run, GameCommand.Night(Id(1))); Submit(run, GameCommand.Continue());
+            int revision = run.GetPlayerView().Revision;
+            Assert.That(run.TrySubmit(GameCommand.Speak(SpeechIntent.ReportInvestigation, Id(1), faction: Faction.Town), out _), Is.False);
+            Assert.That(run.GetPlayerView().Revision, Is.EqualTo(revision));
+        }
+
         [Test]
         public void ActionOnlyReportContainsNoUnconfirmedResultFiller()
         {

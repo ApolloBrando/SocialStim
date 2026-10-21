@@ -19,6 +19,17 @@ namespace SocialStim.Tests.EditMode
             new CharacterId(0), TestContent.Roles()[0], new SetupKnowledge(3, 1, 1), TestContent.Roles(),
             Array.Empty<CharacterId>(), new ReasoningSettings());
 
+        [TestCase(SpeechIntent.Agree)] [TestCase(SpeechIntent.Disagree)]
+        public void YesterdayStatementsDoNotAcquireNewPressureOrCredibilityFromUnanchoredReplies(SpeechIntent intent)
+        {
+            var model = Model(); var speaker = new CharacterId(1); var responder = new CharacterId(2); var target = new CharacterId(3);
+            model.Observe(speaker, GameCommand.Speak(SpeechIntent.Accuse, target), 1);
+            float trust = model.TrustValue(speaker), suspicion = model.SuspicionValue(target);
+            model.Observe(responder, GameCommand.Speak(intent, speaker), 2);
+            Assert.That(model.TrustValue(speaker), Is.EqualTo(trust));
+            Assert.That(model.SuspicionValue(target), Is.EqualTo(suspicion));
+        }
+
         /// <summary>Disagreeing reports remain competing assertions; neither becomes a hidden truth flag.</summary>
         [Test]
         public void ConflictingWitnessesLoseCredibilityWithoutRevealingWhoLied()
