@@ -64,6 +64,7 @@ namespace SocialStim.Presentation.Text
         private Button _skip;
         private Button _effectsControl, _motionControl, _flashControl, _instantControl;
         private Button _intensityControl, _optionsControl;
+        private Button _mafiaLog;
         private TextSpeedControl _speedControl;
         private ConversationScrollFollower _scrollFollower;
         private bool _wasDisplaying;
@@ -202,6 +203,7 @@ namespace SocialStim.Presentation.Text
             Control(footer, _words.Format("ui.latest"), FollowLatest);
             if (_diagnostics != null) Control(footer, _words.Format("ui.debug"), ShowNightDebug);
             if (_socialDiagnostics != null) Control(footer, _words.Format("ui.relations"), ShowRelations);
+            _mafiaLog = Control(footer, _words.Format("mafia.log"), ShowMafiaLog); _mafiaLog.gameObject.SetActive(false);
             Control(_displayOptionsPanel, "Reset display defaults", ResetSettings);
             _displayOptionsPanel.gameObject.SetActive(false);
             RefreshSettingLabels();
@@ -274,6 +276,7 @@ namespace SocialStim.Presentation.Text
             TextUiFactory.Fill((RectTransform)_transcriptScroll.transform, Vector2.zero, new Vector2(0.51f, 1), new Vector2(32, 82), new Vector2(-10, -130));
             TextUiFactory.Fill((RectTransform)_choiceScroll.transform, new Vector2(0.51f, 0), new Vector2(0.79f, 1), new Vector2(10, 82), new Vector2(-32, -130));
             var view = request.View;
+            _mafiaLog.gameObject.SetActive(view.OwnRole.Faction == Faction.Antagonist);
             _roleBadge.gameObject.SetActive(true);
             _roleBadge.text = view.OwnRole.Name + "\n" + view.OwnRole.Faction;
             _roleBadge.color = _palette.RoleColor(view.OwnRole.Faction);
@@ -305,6 +308,7 @@ namespace SocialStim.Presentation.Text
             {
                 if (_information.IsOpen) _information.Close();
                 else if (_displayOptionsPanel.gameObject.activeSelf) ToggleDisplayOptions();
+                else if (_request?.CompositionPrompt != null && !IsDisplaying && _request.Options.Count > 0) SubmitOption(_request.Options[0].Id);
                 else if (_menuCategory != null) { _menuCategory = null; _menuPage = 0; BuildMenu(); }
             }
             if (!_information.IsOpen && !_displayOptionsPanel.gameObject.activeSelf && keyboard != null)
@@ -367,6 +371,8 @@ namespace SocialStim.Presentation.Text
                 else { _conversationHeading.text = "CONVERSATION"; _conversationHeading.color = _palette.Foreground; }
                 var pacing = new SpeechPacing(observation);
                 _playback.Begin(observation.Sequence, line, profile, _settings, _onAcknowledged, pacing.Pause, pacing.Speed);
+                RenderRoster(_next + 1);
+                _castScroll.gameObject.SetActive(true);
                 Canvas.ForceUpdateCanvases();
                 if (_scrollFollower.Following) _transcriptScroll.verticalNormalizedPosition = 0;
             }
@@ -386,6 +392,7 @@ namespace SocialStim.Presentation.Text
             if (_choiceScroll != null) _choiceScroll.viewport.offsetMax = new Vector2(-22, -48);
             _shown.Clear(); _spans.Clear(); _cues = new VisibleCueResolver(); _wasDisplaying = false;
             _autoAdvance = false; _displayDay = 1; _pendingStatus = null;
+            if (_mafiaLog != null) _mafiaLog.gameObject.SetActive(false);
             if (_information != null && _information.IsOpen) _information.Close();
             foreach (ParticipantCard card in _cards.Values) { card.gameObject.SetActive(false); Destroy(card.gameObject); }
             _cards.Clear();
@@ -510,7 +517,13 @@ namespace SocialStim.Presentation.Text
             var entries = new List<Tuple<string, string, Action>>();
             void Entry(string label, string detail, Action selected)
                 => entries.Add(Tuple.Create(label, detail, selected));
-            if (_menuCategory == null)
+            if (_request.CompositionPrompt != null)
+            {
+                _choiceHeading.text = _words.Format("fabricate.start");
+                foreach (var option in options.Where(o => !o.Target.HasValue))
+                { string id = option.Id; Entry(option.Label, option.Interpretation, () => SubmitOption(id)); }
+            }
+            else if (_menuCategory == null)
             {
                 _choiceHeading.text = _request.View.Phase == GamePhase.JesterRevenge ? _words.Format("ui.revengePrompt")
                     : _request.View.RespondTo.HasValue ? _copy.DefendSelf : _words.Format("ui.actionFirst");
@@ -562,17 +575,21 @@ namespace SocialStim.Presentation.Text
             if ((_menuPage + 1) * 6 < entries.Count) AddButton(_words.Format("ui.next"), "", () => { _menuPage++; BuildMenu(); });
             RenderRoster();
             _choiceScroll.verticalNormalizedPosition = 1;
-            string context = ReplyContext();
+            string context = _request.CompositionPrompt ?? ReplyContext();
             _replyContext.text = context; _replyContext.gameObject.SetActive(!string.IsNullOrEmpty(context));
-            _choiceScroll.viewport.offsetMax = new Vector2(-22, string.IsNullOrEmpty(context) ? -48 : -96);
+            TextUiFactory.Fill(_replyContext.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(22, _request.CompositionPrompt == null ? -85 : -122), new Vector2(-22, -38));
+            _choiceScroll.viewport.offsetMax = new Vector2(-22, _request.CompositionPrompt != null ? -134 : string.IsNullOrEmpty(context) ? -48 : -96);
             if (!_information.IsOpen) FocusChoicesOrTargets();
         }
 
-        private void RenderRoster()
+        private void RenderRoster(int? visibleObservations = null)
         {
             if (_request == null) return;
-            foreach (var participant in _request.View.Characters)
+            int visible = visibleObservations ?? Mathf.Min(_request.View.Transcript.Count, _next + (_playback.Busy ? 1 : 0));
+            bool spectator = !RosterInteractions.VisibleParticipant(_request.View, _request.View.PlayerId, visible).Alive;
+            foreach (var seat in _request.View.Characters)
             {
+                var participant = RosterInteractions.VisibleParticipant(_request.View, seat.Id, visible);
                 if (!_cards.TryGetValue(participant.Id, out ParticipantCard card))
                 {
                     RectTransform root = TextUiFactory.Rect("Participant " + participant.Id.Value, _castPanel);
@@ -582,8 +599,10 @@ namespace SocialStim.Presentation.Text
                 var action = RosterInteractions.DirectChoice(_request, participant.Id, _menuCategory);
                 bool selectable = !IsDisplaying && action != null;
                 string annotation = selectable ? _words.Format("ui.selectable") : "";
+                if (participant.IsTeammate && participant.TeamRole.HasValue && _roles.TryGetValue(participant.TeamRole.Value, out RoleSpec teamRole))
+                    annotation = _words.Format("mafia.teamRole", ("role", teamRole.Name)) + (annotation.Length == 0 ? "" : " · " + annotation);
                 RoleSpec claim = participant.ClaimedRole.HasValue && _roles.TryGetValue(participant.ClaimedRole.Value, out RoleSpec known) ? known : null;
-                RoleSpec spectatorRole = _request.View.SpectatorRoles.TryGetValue(participant.Id, out RoleId actual)
+                RoleSpec spectatorRole = spectator && _request.View.SpectatorRoles.TryGetValue(participant.Id, out RoleId actual)
                     && _roles.TryGetValue(actual, out RoleSpec actualRole) ? actualRole : null;
                 card.Render(participant, participant.Id == _request.View.PlayerId, _palette, claim, selectable, false, annotation, _words, spectatorRole);
             }
@@ -644,6 +663,15 @@ namespace SocialStim.Presentation.Text
             var chart = content.gameObject.AddComponent<RelationChartPanel>();
             chart.Initialize(_font, _words, _palette, records);
         }
+        private void ShowMafiaLog()
+        {
+            if (_request == null || _request.View.OwnRole.Faction != Faction.Antagonist) return;
+            var rows = _request.View.TeamReports.Select(r => Tuple.Create(r.Name,
+                NightReportFormatter.Format(r.Action, _roles[r.Action.Role].Name,
+                    id => _request.View.Characters.First(c => c.Id == id).Name, _words), _palette.Foreground)).ToList();
+            if (rows.Count == 0) rows.Add(Tuple.Create("", _words.Format("mafia.noReports"), _palette.Muted));
+            _information.Open(_words.Format("mafia.log"), rows, _palette, _request.View.Characters.Select(c => c.Name));
+        }
 
         private static string Plain(string text)
         {
@@ -658,7 +686,8 @@ namespace SocialStim.Presentation.Text
         private void FollowLatest() { _scrollFollower.Follow(); Canvas.ForceUpdateCanvases(); _transcriptScroll.verticalNormalizedPosition = 0; }
         private void FocusChoicesOrTargets()
         {
-            if (EventSystem.current != null && (_menuCategory == "Accuse" || _menuCategory == "Defend" || _menuCategory == "Targets"))
+            if (EventSystem.current != null && (_menuCategory == "Accuse" || _menuCategory == "Defend" || _menuCategory == "Targets"
+                || _request?.CompositionPrompt != null && _request.Options.Any(o => o.Target.HasValue)))
             {
                 var card = _cards.Values.OrderBy(c => c.Id.Value).FirstOrDefault(c => c.GetComponent<Button>().interactable);
                 if (card != null) { EventSystem.current.SetSelectedGameObject(card.gameObject); return; }

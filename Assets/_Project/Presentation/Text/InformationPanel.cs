@@ -74,6 +74,7 @@ namespace SocialStim.Presentation.Text
             foreach (var label in _close.GetComponentsInChildren<TextMeshProUGUI>()) label.color = palette.Foreground;
             gameObject.SetActive(true); transform.SetAsLastSibling();
             Canvas.ForceUpdateCanvases(); _scroll.verticalNormalizedPosition = 1;
+            ConfineNavigation();
             if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(_close.gameObject);
         }
         /// <summary>Opens native custom content inside the same scrolling modal and focus lifecycle.</summary>

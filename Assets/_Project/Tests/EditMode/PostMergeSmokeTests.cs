@@ -51,9 +51,10 @@ namespace SocialStim.Tests.EditMode
                 }
                 Assert.That(request.Options.Count, Is.GreaterThan(0), role + "/" + seed + "/" + request.View.Phase);
                 int revision = request.View.Revision;
-                string id = request.Options[choices.Next(request.Options.Count)].Id;
+                var option = request.Options[choices.Next(request.Options.Count)];
+                string id = option.Id;
                 Assert.That(controller.TryChoose(id, out string error), Is.True, error);
-                Assert.That(run.GetPlayerView().Revision, Is.EqualTo(revision + 1));
+                Assert.That(run.GetPlayerView().Revision, Is.EqualTo(revision + (option.IsNavigation ? 0 : 1)));
                 Assert.That(controller.TryChoose(id, out _), Is.False, "Completed-turn choices must expire.");
             }
             Assert.Fail("Stalled game: " + mode + "/" + role + "/" + seed);

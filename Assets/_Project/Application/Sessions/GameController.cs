@@ -16,6 +16,8 @@ namespace SocialStim.Application.Sessions
         private readonly InteractionLabels _copy;
         private readonly IReadOnlyList<RoleSpec> _catalog;
         private readonly GameText _text;
+        private ReportComposer _composer;
+        private int _menuVersion;
 
         /// <summary>Wires an isolated session to the public role catalog used for claims.</summary>
         public GameController(RunSession session, IEnumerable<RoleSpec> catalog, InteractionLabels copy = null, GameText text = null)
@@ -27,7 +29,16 @@ namespace SocialStim.Application.Sessions
             PlayerView view = _session.GetPlayerView();
             var options = new List<PlayerOption>();
             Action<string, string, GameCommand> add = (label, interpretation, command) =>
-                options.Add(new PlayerOption($"{view.Revision}:{options.Count}", label, interpretation, command));
+                options.Add(new PlayerOption($"{view.Revision}:{_menuVersion}:{options.Count}", label, interpretation, command));
+            if (_composer != null && (_composer.Revision != view.Revision || !view.CanReportAction || !view.Alive
+                || view.Phase != GamePhase.Discussion || view.CounterClaimRole.HasValue)) _composer = null;
+            if (_composer != null)
+            {
+                foreach (var choice in _composer.Choices())
+                    if (choice.Report != null) add(choice.Label, "", GameCommand.FabricateReport(choice.Report));
+                    else options.Add(new PlayerOption($"{view.Revision}:{_menuVersion}:{options.Count}", choice.Label, "", GameCommand.Continue(), choice.Navigate, choice.Target));
+                return new PlayerInputRequest(view, options.AsReadOnly(), _composer.Prompt);
+            }
             if (view.Phase == GamePhase.Ended) return new PlayerInputRequest(view, options.AsReadOnly());
             if (view.Phase == GamePhase.JesterRevenge)
             {
@@ -64,7 +75,7 @@ namespace SocialStim.Application.Sessions
                         add(_copy.Agree, "", GameCommand.Speak(SpeechIntent.Agree, view.FollowUpTo));
                         add(_copy.Disagree, "", GameCommand.Speak(SpeechIntent.Disagree, view.FollowUpTo));
                     }
-                    AddClaims(add, view);
+                    AddClaims(add, view, options);
                     break;
                 case GamePhase.Voting:
                     if (view.AllowAbstain) add("Abstain", "Cast no target vote.", GameCommand.Vote(null));
@@ -81,7 +92,7 @@ namespace SocialStim.Application.Sessions
                     break;
                 case GamePhase.Defense:
                     if (view.Defendant == view.PlayerId)
-                    { add(_copy.DefendSelf, "Make your case.", GameCommand.Speak(SpeechIntent.Defend)); AddClaims(add, view); }
+                    { add(_copy.DefendSelf, "Make your case.", GameCommand.Speak(SpeechIntent.Defend)); AddClaims(add, view, options); }
                     else add("Vote", "Hear the verdict.", GameCommand.Continue());
                     break;
                 case GamePhase.Judgement:
@@ -108,10 +119,11 @@ namespace SocialStim.Application.Sessions
         {
             PlayerOption option = Request().Options.FirstOrDefault(o => string.Equals(o.Id, optionId, StringComparison.Ordinal));
             if (option == null) { error = "That option is no longer available."; return false; }
+            if (option.Navigate != null) { option.Navigate(); _menuVersion++; error = null; return true; }
             return _session.TrySubmit(option.Command, out error);
         }
 
-        private void AddClaims(Action<string, string, GameCommand> add, PlayerView view)
+        private void AddClaims(Action<string, string, GameCommand> add, PlayerView view, List<PlayerOption> options)
         {
             if (view.CounterClaimRole.HasValue) return;
             foreach (RoleSpec role in _catalog.Where(r => view.OwnRole.CanClaim(r)
@@ -121,9 +133,10 @@ namespace SocialStim.Application.Sessions
             if (view.Phase == GamePhase.Discussion && view.CanReportAction)
             {
                 RoleSpec asserted = _catalog.First(r => r.Id == view.Characters.First(c => c.Id == view.PlayerId).ClaimedRole);
-                if (view.OwnRole.CanBluff && asserted.Ability == AbilityKind.Investigate && view.LastNightAction?.Target != null)
-                    foreach (Faction faction in Enum.GetValues(typeof(Faction)))
-                        add(_text.Format("ui.giveReport") + " — " + faction, "", GameCommand.ReportLastAction(faction));
+                if (view.OwnRole.CanBluff && view.OwnRole.Faction != Faction.Town)
+                    options.Add(new PlayerOption($"{view.Revision}:{_menuVersion}:{options.Count}", _text.Format("fabricate.start"),
+                        _text.Format("fabricate.help"), GameCommand.Continue(),
+                        () => _composer = new ReportComposer(view, asserted, _text, () => _composer = null)));
                 else add(_text.Format("ui.giveReport"), "", GameCommand.ReportLastAction());
             }
         }

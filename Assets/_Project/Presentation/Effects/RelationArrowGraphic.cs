@@ -10,9 +10,10 @@ namespace SocialStim.Presentation.Effects
     {
         private IReadOnlyList<Vector2> _targets;
         private IReadOnlyList<Color> _colors;
+        private float _sourceInset = 65, _targetInset = 70;
         /// <summary>Configures normalized target offsets from the central observer.</summary>
-        public void Configure(IReadOnlyList<Vector2> targets, IReadOnlyList<Color> colors)
-        { _targets = targets; _colors = colors; raycastTarget = false; SetVerticesDirty(); }
+        public void Configure(IReadOnlyList<Vector2> targets, IReadOnlyList<Color> colors, float sourceInset = 65, float targetInset = 70)
+        { _targets = targets; _colors = colors; _sourceInset = sourceInset; _targetInset = targetInset; raycastTarget = false; SetVerticesDirty(); }
         protected override void OnPopulateMesh(VertexHelper mesh)
         {
             mesh.Clear(); if (_targets == null) return;
@@ -21,8 +22,8 @@ namespace SocialStim.Presentation.Effects
                 Vector2 target = Vector2.Scale(_targets[i], rectTransform.rect.size);
                 Vector2 direction = target.normalized;
                 Vector2 normal = new Vector2(-direction.y, direction.x);
-                Vector2 start = direction * 65;
-                Vector2 end = target - direction * 70;
+                Vector2 start = direction * _sourceInset;
+                Vector2 end = target - direction * _targetInset;
                 int vertex = mesh.currentVertCount;
                 mesh.AddVert(start - normal, _colors[i], Vector2.zero);
                 mesh.AddVert(start + normal, _colors[i], Vector2.zero);

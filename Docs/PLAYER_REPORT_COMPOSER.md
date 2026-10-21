@@ -1,0 +1,11 @@
+# Player-authored cover reports and live roster timing
+
+A claimed non-Town player gets Fabricate report instead of an automatic cover story. The authoring menu selects a target from participants alive at the start of the previous night, including its casualties. Sheriff offers apparent faction results; Physician offers protection or blocked; Vigilante offers a shot/no confirmed result or failed attack; Lookout offers no visitors or an editable multi-visitor list. Every role also supports passing and a blocked attempt. The published structured report states its claimed role, night, target and selected results through the same formatter as other reports.
+
+Navigating, toggling visitors and Back/Escape do not spend a discussion turn or consume game randomness. Publishing does, and a report remains limited to once per night. Menu generations reject stale navigation IDs. Closing or returning to target selection leaves the authoritative night record intact. Honest Town players retain Give report and cannot submit an authored replacement.
+
+The rules validate claimant permission, exact claimed role/ability, previous night, participants present that night, self-target restrictions, legal result shapes, visitor uniqueness and once-per-night publication. Report listeners receive the same attributed evidence as NPC reports, with no private truth flag. Fabrication does not inspect someone else's actual night action. Existing automatic NPC cover reports are preserved.
+
+The roster now projects public claims and life state from the dialogue reached on screen. It refreshes when a claim/counterclaim begins, without waiting for player input. Claims and deaths still queued later in the same simulated turn are not exposed early; spectator truth waits until the player's death has been displayed.
+
+Portable tests cover four role-specific final reports, independent target selection, multi-visitor editing, cancel/no-turn navigation, stale IDs, real-action preservation, Town restrictions, malformed/old-night rejection, immediate claims/counterclaims and queued death privacy. Seeded complete-game drivers distinguish menu navigation from a spent action. Unity is unavailable: check direct roster targeting, Back/Escape, readable composer context, publishing, text playback and immediate claim badges in the native editor.

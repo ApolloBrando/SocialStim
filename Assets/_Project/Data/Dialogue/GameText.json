@@ -378,15 +378,15 @@
     },
     {
       "key": "role.assassin",
-      "text": "MAFIA — Mafioso\nAbility: Carry out the Mafia's shared basic night attack.\nLimits: One team kill each night. You know your teammates and cannot attack them. A living player Mafioso chooses the team target or pass.\nClaims: Bluff a Town role and give fabricated reports.\nGoal: Secure a Mafia victory."
+      "text": "MAFIA — Mafioso\nAbility: Carry out the Mafia's shared basic night attack.\nLimits: One team kill each night. You know your teammates and cannot attack them. A living player Mafioso chooses the team target or pass. If the last Mafioso dies, one surviving Mafia member inherits the role.\nClaims: Bluff a Town role and give fabricated reports.\nGoal: Secure a Mafia victory."
     },
     {
       "key": "role.interrupter",
-      "text": "MAFIA — Strongarm\nAbility: Block one other player's night action.\nLimits: Blocks resolve simultaneously; a blocked Strongarm still carries out its accepted block. You know your teammates.\nClaims: Bluff a Town role and give fabricated reports.\nGoal: Secure a Mafia victory."
+      "text": "MAFIA — Strongarm\nAbility: Block one other player's night action.\nLimits: Blocks resolve simultaneously; a blocked Strongarm still carries out its accepted block. You know your teammates and their recorded night actions. You may inherit Mafioso when the team loses its killer.\nClaims: Bluff a Town role and give fabricated reports.\nGoal: Secure a Mafia victory."
     },
     {
       "key": "role.forger",
-      "text": "MAFIA — Forger\nAbility: Forge evidence against one other player each night.\nLimits: The target appears Mafia to investigations for that night only. You know your teammates.\nClaims: Bluff a Town role and give fabricated reports.\nGoal: Secure a Mafia victory."
+      "text": "MAFIA — Forger\nAbility: Forge evidence against one other player each night.\nLimits: The target appears Mafia to investigations for that night only. You know your teammates and their recorded night actions. You may inherit Mafioso when the team loses its killer.\nClaims: Bluff a Town role and give fabricated reports.\nGoal: Secure a Mafia victory."
     },
     {
       "key": "role.lone-killer",
@@ -438,7 +438,7 @@
     },
     {
       "key": "ui.relationsHelp",
-      "text": "Choose an NPC viewpoint. Arrows point from that observer to others. S = suspicion; T = trust, both 0–100. These are opinions, not proof of roles. Open this menu again to refresh."
+      "text": "Read from the centre out: the centre NPC is judging each person an arrow points to. Longer Trust bars mean more credible; longer Suspicion bars mean more suspected. Both can be high together. Click an NPC card to switch viewpoint. Page through targets below. These are opinions, not confirmed roles."
     },
     {
       "key": "ui.relationsObserver",
@@ -446,7 +446,7 @@
     },
     {
       "key": "ui.relationsScores",
-      "text": "S {suspicion} · T {trust}"
+      "text": "Suspicion: {suspicion}/10\nTrust: {trust}/10"
     },
     {
       "key": "ui.relationsEstimates",
@@ -515,6 +515,138 @@
     {
       "key": "role.short.provocateur",
       "text": "JES"
+    },
+    {
+      "key": "ui.relationsCentre",
+      "text": "VIEWPOINT\n{name}"
+    },
+    {
+      "key": "fabricate.start",
+      "text": "Fabricate report"
+    },
+    {
+      "key": "fabricate.help",
+      "text": "Choose a cover story for your claimed role. Only publishing spends your turn."
+    },
+    {
+      "key": "fabricate.back",
+      "text": "Back"
+    },
+    {
+      "key": "fabricate.pickTarget",
+      "text": "{role} · Night {night}\nChoose your reported target from the player list."
+    },
+    {
+      "key": "fabricate.pickResult",
+      "text": "{role} · Night {night} · {target}\nChoose the result you want to report."
+    },
+    {
+      "key": "fabricate.pickVisitors",
+      "text": "{role} · Night {night} · {target}\nToggle visitors in the player list, then publish."
+    },
+    {
+      "key": "fabricate.pass",
+      "text": "Report that I passed"
+    },
+    {
+      "key": "fabricate.blocked",
+      "text": "Report that I was blocked"
+    },
+    {
+      "key": "fabricate.alignment",
+      "text": "Report {result}"
+    },
+    {
+      "key": "fabricate.protected",
+      "text": "Report protection applied"
+    },
+    {
+      "key": "fabricate.attack",
+      "text": "Report the shot with no confirmed result"
+    },
+    {
+      "key": "fabricate.failed",
+      "text": "Report that the attack failed"
+    },
+    {
+      "key": "fabricate.noVisitors",
+      "text": "Report no visitors"
+    },
+    {
+      "key": "fabricate.visitors",
+      "text": "Choose the visitors I claim to have seen"
+    },
+    {
+      "key": "fabricate.publishVisitors",
+      "text": "Publish report · {count} visitors"
+    },
+    {
+      "key": "fabricate.addVisitor",
+      "text": "Add {name} as a visitor"
+    },
+    {
+      "key": "fabricate.removeVisitor",
+      "text": "Remove {name} from visitors"
+    },
+    {
+      "key": "faction.Town",
+      "text": "Town"
+    },
+    {
+      "key": "faction.Antagonist",
+      "text": "Mafia"
+    },
+    {
+      "key": "faction.Neutral",
+      "text": "Neutral"
+    },
+    {
+      "key": "fabricate.selected",
+      "text": "Selected visitors: {names}"
+    },
+    {
+      "key": "fabricate.none",
+      "text": "None"
+    },
+    {
+      "key": "mafia.members",
+      "text": "Private Mafia teammates: {members}."
+    },
+    {
+      "key": "mafia.member",
+      "text": "{name} ({role})"
+    },
+    {
+      "key": "mafia.action",
+      "text": "Private Mafia action · {name}: {report}"
+    },
+    {
+      "key": "mafia.promotion",
+      "text": "Private Mafia update: {name} has become the {role} and now controls a Mafia kill."
+    },
+    {
+      "key": "mafia.log",
+      "text": "Mafia log (private)"
+    },
+    {
+      "key": "mafia.teamRole",
+      "text": "Team: {role}"
+    },
+    {
+      "key": "mafia.noReports",
+      "text": "Night actions will appear here after the first night."
+    },
+    {
+      "key": "mafia.solo",
+      "text": "Private Mafia update: you have no teammates this game."
+    },
+    {
+      "key": "ui.relationsTrust",
+      "text": "Trust: {value} / 10"
+    },
+    {
+      "key": "ui.relationsSuspicion",
+      "text": "Suspicion: {value} / 10"
     }
   ]
 }

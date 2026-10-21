@@ -36,6 +36,8 @@ namespace SocialStim.Rules.Commands
             => new GameCommand(CommandKind.Speak, target, intent, role, faction);
         /// <summary>Publicly reports the observer's recorded selection and legitimate results from last night.</summary>
         public static GameCommand ReportLastAction(Faction? claimedResult = null) => new GameCommand(CommandKind.ReportLastAction, faction: claimedResult);
+        /// <summary>Publishes a player-authored cover story, subject to role, night and once-per-night validation.</summary>
+        public static GameCommand FabricateReport(NightActionClaim report) => new GameCommand(CommandKind.ReportLastAction, nightReport: report);
         /// <summary>Nominates a participant, or abstains.</summary>
         public static GameCommand Nominate(CharacterId? target) => new GameCommand(CommandKind.Nominate, target);
         /// <summary>Casts a daily plurality ballot; null is an abstention when enabled.</summary>

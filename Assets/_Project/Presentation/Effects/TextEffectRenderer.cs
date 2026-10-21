@@ -2,6 +2,7 @@ using System;
 using SocialStim.Application.PresentationCues;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SocialStim.Presentation.Effects
 {
@@ -21,6 +22,7 @@ namespace SocialStim.Presentation.Effects
         private float _motionStarted;
         private bool _semanticColors = true;
         private bool _dirty = true;
+        private bool _underlineLayoutDirty;
         private bool _hasFear;
         private bool _wasMoving;
         private EffectsSettings _settings = new EffectsSettings();
@@ -67,13 +69,14 @@ namespace SocialStim.Presentation.Effects
             _wasMoving = moving;
             _visible = visibleUtf16; _frame = frame; _time = time; _dirty = false;
             Paint(_label.textInfo);
-            _underlines.Configure(_label, _document, _visible, _palette.Muted);
+            RefreshUnderlines();
             _label.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices | TMP_VertexDataUpdateFlags.Colors32);
         }
         private void Capture(TMP_TextInfo info)
         {
             if (_document == null) return;
             _dirty = true;
+            _underlineLayoutDirty = true;
             if (_vertices.Length < info.meshInfo.Length) Array.Resize(ref _vertices, info.meshInfo.Length);
             for (int mesh = 0; mesh < info.meshInfo.Length; mesh++)
             {
@@ -84,9 +87,18 @@ namespace SocialStim.Presentation.Effects
             if (_styles.Length < info.characterCount) Array.Resize(ref _styles, info.characterCount);
             for (int i = 0; i < info.characterCount; i++) _styles[i] = _document.StyleAt(info.characterInfo[i].index);
             Paint(info);
+        }
+        private void RefreshUnderlines()
+        {
+            if (_document == null || _underlines == null) return;
+            // TMP invokes Capture during the canvas graphic pass. Enqueue its sibling geometry only after that pass.
+            if (CanvasUpdateRegistry.IsRebuildingGraphics()) { _underlineLayoutDirty = true; return; }
             _underlines.Configure(_label, _document, _visible, _palette.Muted);
+            if (!_underlineLayoutDirty) return;
+            _underlineLayoutDirty = false;
             _underlines.SetVerticesDirty();
         }
+        private void LateUpdate() { if (_underlineLayoutDirty) RefreshUnderlines(); }
         private void Paint(TMP_TextInfo info)
         {
             for (int i = 0; i < info.characterCount; i++)

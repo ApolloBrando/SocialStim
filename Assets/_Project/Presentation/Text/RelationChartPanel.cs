@@ -33,8 +33,8 @@ namespace SocialStim.Presentation.Text
             foreach (Transform child in transform) { child.gameObject.SetActive(false); Destroy(child.gameObject); }
             if (_observers.Length == 0) return;
             var all = _records.Where(r => r.Observer == _observers[_observerIndex]).OrderBy(r => r.Subject.Value).ToArray();
-            int pages = Mathf.Max(1, (all.Length + 7) / 8); _page = Mathf.Clamp(_page, 0, pages - 1);
-            var records = all.Skip(_page * 8).Take(8).ToArray();
+            int pages = Mathf.Max(1, (all.Length + 3) / 4); _page = Mathf.Clamp(_page, 0, pages - 1);
+            var records = all.Skip(_page * 4).Take(4).ToArray();
             var help = TextUiFactory.Text("Relation chart help", transform, _font, 14);
             help.text = _words.Format("ui.relationsHelp"); help.color = _palette.Foreground;
             help.textWrappingMode = TextWrappingModes.Normal;
@@ -47,34 +47,37 @@ namespace SocialStim.Presentation.Text
             TextUiFactory.Fill(heading.rectTransform, new Vector2(0.29f, 0.80f), new Vector2(0.71f, 0.87f), Vector2.zero, Vector2.zero);
             var graph = TextUiFactory.Rect("Directed relations", transform);
             TextUiFactory.Fill(graph, new Vector2(0, 0.12f), new Vector2(1, 0.79f), Vector2.zero, Vector2.zero);
-            Vector2[] targets = Enumerable.Range(0, records.Length).Select(i =>
-            {
-                float angle = Mathf.PI * 0.5f - i * 2 * Mathf.PI / records.Length;
-                return new Vector2(Mathf.Cos(angle) * 0.35f, Mathf.Sin(angle) * 0.36f);
-            }).ToArray();
+            Vector2[] slots = { new Vector2(-0.32f, 0.29f), new Vector2(0.32f, 0.29f), new Vector2(-0.32f, -0.29f), new Vector2(0.32f, -0.29f) };
+            Vector2[] targets = slots.Take(records.Length).ToArray();
             var arrows = graph.gameObject.AddComponent<RelationArrowGraphic>();
-            arrows.Configure(targets, records.Select(r => r.Suspicion >= 60 ? _palette.RoleColor(SocialStim.Rules.Roles.Faction.Antagonist)
-                : r.Trust >= 60 ? _palette.RoleColor(SocialStim.Rules.Roles.Faction.Town) : _palette.Muted).ToArray());
-            var centre = TextUiFactory.Text("Central observer", graph, _font, 16); centre.text = all[0].ObserverName;
+            arrows.Configure(targets, records.Select(r => _palette.Muted).ToArray(), 80, 116);
+            var centreRoot = TextUiFactory.Rect("Observer card", graph);
+            centreRoot.anchorMin = centreRoot.anchorMax = new Vector2(0.5f, 0.5f); centreRoot.sizeDelta = new Vector2(150, 74); centreRoot.anchoredPosition = Vector2.zero;
+            centreRoot.gameObject.AddComponent<Image>().color = _palette.FocusBackground; TextUiFactory.Border(centreRoot);
+            centreRoot.GetComponent<Outline>().effectColor = _palette.Character(all[0].Observer.Value);
+            var centre = TextUiFactory.Text("Central observer", centreRoot, _font, 16);
+            centre.text = _words.Format("ui.relationsCentre", ("name", all[0].ObserverName));
             centre.alignment = TextAlignmentOptions.Center; centre.color = _palette.Character(all[0].Observer.Value);
-            centre.rectTransform.anchorMin = centre.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-            centre.rectTransform.sizeDelta = new Vector2(124, 58); centre.rectTransform.anchoredPosition = Vector2.zero;
+            TextUiFactory.Fill(centre.rectTransform, Vector2.zero, Vector2.one, new Vector2(6, 4), new Vector2(-6, -4));
             for (int i = 0; i < records.Length; i++)
             {
                 SocialDebugRecord edge = records[i];
-                string name = edge.SubjectName + (edge.SubjectAlive ? "" : " · " + _words.Format("ui.dead"));
+                string name = edge.SubjectName + (edge.Subject.Value == 0 ? " " + _words.Format("ui.you") : "")
+                    + (edge.SubjectAlive ? "" : " · " + _words.Format("ui.dead"));
                 Button node = TextUiFactory.Button(graph, _font, name, 58);
                 node.gameObject.name = "Relation " + edge.Subject.Value;
                 node.GetComponent<LayoutElement>().ignoreLayout = true;
                 var rect = (RectTransform)node.transform;
                 rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f) + targets[i];
-                rect.sizeDelta = new Vector2(136, 78); rect.anchoredPosition = Vector2.zero;
+                rect.sizeDelta = new Vector2(190, 118); rect.anchoredPosition = Vector2.zero;
                 var label = node.GetComponentsInChildren<TextMeshProUGUI>().Single();
-                label.fontSize = 12;
-                string details = _words.Format("ui.relationsScores", ("suspicion", edge.Suspicion.ToString()), ("trust", edge.Trust.ToString()));
-                if (edge.Estimate != null) details += "\n" + _words.Format("ui.relationsEstimates", ("town", Percent(edge.Estimate.Town)),
-                    ("mafia", Percent(edge.Estimate.Antagonist)), ("neutral", Percent(edge.Estimate.Neutral)));
-                node.GetComponent<ChoiceFocusIndicator>().SetText(name + "\n" + details);
+                label.fontSize = 14; label.alignment = TextAlignmentOptions.MidlineLeft; label.overflowMode = TextOverflowModes.Ellipsis;
+                TextUiFactory.Fill(label.rectTransform, new Vector2(0, 0.73f), Vector2.one, new Vector2(10, 0), new Vector2(-10, -3));
+                node.GetComponent<ChoiceFocusIndicator>().SetText(name);
+                ScoreBar(rect, "Trust", "ui.relationsTrust", edge.TrustValue, 0.40f,
+                    _palette.Night ? new Color(0.25f, 0.8f, 0.85f) : new Color(0.02f, 0.40f, 0.44f));
+                ScoreBar(rect, "Suspicion", "ui.relationsSuspicion", edge.SuspicionValue, 0.08f,
+                    _palette.Night ? new Color(1, 0.72f, 0.3f) : new Color(0.55f, 0.27f, 0.04f));
                 label.color = edge.SubjectAlive ? _palette.Character(edge.Subject.Value) : _palette.Muted;
                 node.GetComponent<ChoiceFocusIndicator>().SetSurfaceColors(_palette.ButtonBackground, _palette.FocusBackground);
                 node.interactable = edge.Subject.Value != 0;
@@ -88,7 +91,19 @@ namespace SocialStim.Presentation.Text
             GetComponentInParent<InformationPanel>().ConfineNavigation();
             if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(previous.gameObject);
         }
-        private static string Percent(int basisPoints) => (basisPoints / 100f).ToString("0", CultureInfo.InvariantCulture);
+        private void ScoreBar(RectTransform card, string name, string key, float value, float bottom, Color tint)
+        {
+            var label = TextUiFactory.Text(name + " score", card, _font, 12); label.color = _palette.Foreground;
+            label.text = _words.Format(key, ("value", value.ToString("0.0", CultureInfo.InvariantCulture)));
+            TextUiFactory.Fill(label.rectTransform, new Vector2(0.06f, bottom + 0.10f), new Vector2(0.94f, bottom + 0.29f), Vector2.zero, Vector2.zero);
+            var track = TextUiFactory.Rect(name + " track", card);
+            TextUiFactory.Fill(track, new Vector2(0.06f, bottom), new Vector2(0.94f, bottom + 0.07f), Vector2.zero, Vector2.zero);
+            var background = track.gameObject.AddComponent<Image>(); background.color = Color.Lerp(_palette.ButtonBackground, _palette.Foreground, 0.18f); background.raycastTarget = false;
+            var fill = TextUiFactory.Rect(name + " fill", track); TextUiFactory.Fill(fill, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            var image = fill.gameObject.AddComponent<Image>(); image.color = tint; image.raycastTarget = false;
+            image.sprite = card.GetComponent<Image>().sprite;
+            image.type = Image.Type.Filled; image.fillMethod = Image.FillMethod.Horizontal; image.fillOrigin = 0; image.fillAmount = Mathf.Clamp01(value / 10f);
+        }
         private void SelectObserver(int direction) { _observerIndex = (_observerIndex + direction + _observers.Length) % _observers.Length; _page = 0; Rebuild(); }
         private Button Control(string key, Vector2 minimum, Vector2 maximum, UnityEngine.Events.UnityAction action)
         {

@@ -18,6 +18,28 @@ namespace SocialStim.Tests.PlayMode
     public sealed class DisplayOptionsTests
     {
         [Test]
+        public void ReopeningReferenceAfterCustomContentRemovesStaleModalNavigation()
+        {
+            Assert.That(TMP_Settings.defaultFontAsset, Is.Not.Null, "Import TMP Essential Resources.");
+            var root = new GameObject("Reference navigation regression", typeof(RectTransform), typeof(Canvas));
+            try
+            {
+                var panelRoot = new GameObject("Information modal", typeof(RectTransform)); panelRoot.transform.SetParent(root.transform, false);
+                var panel = panelRoot.AddComponent<InformationPanel>(); panel.Initialize(TMP_Settings.defaultFontAsset, "Close");
+                var content = panel.OpenContent("Relations", new SocialStim.Presentation.Effects.TextPalette(false), 400);
+                var custom = new GameObject("Chart control", typeof(RectTransform), typeof(Image), typeof(Button)); custom.transform.SetParent(content, false);
+                panel.ConfineNavigation();
+                panel.Open("Roles", new[] { Tuple.Create("Sheriff", "Investigate a participant.", Color.white) }, new SocialStim.Presentation.Effects.TextPalette(false));
+                foreach (var control in panel.GetComponentsInChildren<Selectable>().Where(c => c.IsActive() && c.IsInteractable()))
+                {
+                    var links = new[] { control.navigation.selectOnUp, control.navigation.selectOnDown, control.navigation.selectOnLeft, control.navigation.selectOnRight };
+                    Assert.That(links.All(link => link != null && link.IsActive() && link.transform.IsChildOf(panel.transform)), Is.True);
+                }
+            }
+            finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
+        [Test]
         public void OptionsIncludeSpeedAndResetWithoutChangingTheRun()
         {
             Assert.That(TMP_Settings.defaultFontAsset, Is.Not.Null, "Import TMP Essential Resources.");
