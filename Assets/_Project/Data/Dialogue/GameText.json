@@ -519,6 +519,94 @@
     {
       "key": "ui.relationsCentre",
       "text": "VIEWPOINT\n{name}"
+    },
+    {
+      "key": "fabricate.start",
+      "text": "Fabricate report"
+    },
+    {
+      "key": "fabricate.help",
+      "text": "Choose a cover story for your claimed role. Only publishing spends your turn."
+    },
+    {
+      "key": "fabricate.back",
+      "text": "Back"
+    },
+    {
+      "key": "fabricate.pickTarget",
+      "text": "{role} · Night {night}\nChoose your reported target from the player list."
+    },
+    {
+      "key": "fabricate.pickResult",
+      "text": "{role} · Night {night} · {target}\nChoose the result you want to report."
+    },
+    {
+      "key": "fabricate.pickVisitors",
+      "text": "{role} · Night {night} · {target}\nToggle visitors in the player list, then publish."
+    },
+    {
+      "key": "fabricate.pass",
+      "text": "Report that I passed"
+    },
+    {
+      "key": "fabricate.blocked",
+      "text": "Report that I was blocked"
+    },
+    {
+      "key": "fabricate.alignment",
+      "text": "Report {result}"
+    },
+    {
+      "key": "fabricate.protected",
+      "text": "Report protection applied"
+    },
+    {
+      "key": "fabricate.attack",
+      "text": "Report the shot with no confirmed result"
+    },
+    {
+      "key": "fabricate.failed",
+      "text": "Report that the attack failed"
+    },
+    {
+      "key": "fabricate.noVisitors",
+      "text": "Report no visitors"
+    },
+    {
+      "key": "fabricate.visitors",
+      "text": "Choose the visitors I claim to have seen"
+    },
+    {
+      "key": "fabricate.publishVisitors",
+      "text": "Publish report · {count} visitors"
+    },
+    {
+      "key": "fabricate.addVisitor",
+      "text": "Add {name} as a visitor"
+    },
+    {
+      "key": "fabricate.removeVisitor",
+      "text": "Remove {name} from visitors"
+    },
+    {
+      "key": "faction.Town",
+      "text": "Town"
+    },
+    {
+      "key": "faction.Antagonist",
+      "text": "Mafia"
+    },
+    {
+      "key": "faction.Neutral",
+      "text": "Neutral"
+    },
+    {
+      "key": "fabricate.selected",
+      "text": "Selected visitors: {names}"
+    },
+    {
+      "key": "fabricate.none",
+      "text": "None"
     }
   ]
 }

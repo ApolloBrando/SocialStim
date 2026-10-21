@@ -109,7 +109,7 @@ namespace SocialStim.Rules.Phases
                 _voteCandidates.Where(id => id != Player.Id).ToList().AsReadOnly(), _options.AllowAbstain, _revoting,
                 _counterClaimRole, _followUpTo, OwnLastNight(Player), _revengeTargets.ToList().AsReadOnly(),
                 !Player.Alive && _phases.Phase != GamePhase.JesterRevenge
-                    ? _cast.ToDictionary(c => c.Id, c => c.Role.Id) : null);
+                    ? _cast.ToDictionary(c => c.Id, c => c.Role.Id) : null, _lastActions.Keys.ToList().AsReadOnly());
         }
 
         /// <summary>Applies one legal player command; invalid input leaves state and RNG untouched.</summary>
@@ -158,7 +158,7 @@ namespace SocialStim.Rules.Phases
                     _opening = false;
                     if (Player.Alive)
                     {
-                        if (command.Kind == CommandKind.ReportLastAction) SayActionReport(Player, command.ReportedFaction);
+                        if (command.Kind == CommandKind.ReportLastAction) SayActionReport(Player, command.ReportedFaction, command.NightReport);
                         else Say(Player, command);
                     }
                     foreach (Participant actor in Living().Where(c => c.Id != Player.Id).ToList()) SayNpc(actor);
@@ -201,10 +201,17 @@ namespace SocialStim.Rules.Phases
             {
                 case GamePhase.Discussion:
                     if (command.Kind == CommandKind.ReportLastAction)
+                    {
+                        if (command.NightReport != null)
+                            return CanGiveReport(Player) && Player.Role.CanBluff && Player.Role.Faction != Faction.Town
+                                && FabricatedReportRules.IsLegal(command.NightReport,
+                                    _catalog.FirstOrDefault(r => r.Id == _beliefs[Player.Id].Claim(Player.Id)),
+                                    _lastNight, Player.Id, _lastActions.Keys.ToList()) ? null : "Invalid fabricated report.";
                         return CanGiveReport(Player) && (!command.ReportedFaction.HasValue || Player.Role.CanBluff
                             && Enum.IsDefined(typeof(Faction), command.ReportedFaction.Value)
                             && _catalog.Any(r => r.Id == _beliefs[Player.Id].Claim(Player.Id) && r.Ability == AbilityKind.Investigate))
                             ? null : "Claim a role and report the previous night once.";
+                    }
                     if (_discussion?.RespondTo != null)
                         return SpeechLegal(Player, command) && (command.Intent == SpeechIntent.Defend || command.Intent == SpeechIntent.Accuse
                             || command.Intent == SpeechIntent.Deflect || command.Intent == SpeechIntent.Agree || command.Intent == SpeechIntent.Disagree
@@ -341,9 +348,9 @@ namespace SocialStim.Rules.Phases
             }
         }
 
-        private void SayActionReport(Participant actor, Faction? chosenResult = null)
+        private void SayActionReport(Participant actor, Faction? chosenResult = null, NightActionClaim authored = null)
         {
-            PublishReport(actor, BuildPublicReport(actor, chosenResult));
+            PublishReport(actor, authored ?? BuildPublicReport(actor, chosenResult));
         }
         private bool CanGiveReport(Participant actor) => actor.Alive && _lastNight > 0 && _lastActions.ContainsKey(actor.Id)
             && _beliefs[actor.Id].Claim(actor.Id).HasValue && !_givenReports.ContainsKey((actor.Id, _lastNight));
@@ -427,7 +434,7 @@ namespace SocialStim.Rules.Phases
             _discussion.PlayerActed(); _reactionBudget = 2; _reacted.Clear();
             if (Player.Alive)
             {
-                if (command.Kind == CommandKind.ReportLastAction) SayActionReport(Player, command.ReportedFaction);
+                if (command.Kind == CommandKind.ReportLastAction) SayActionReport(Player, command.ReportedFaction, command.NightReport);
                 else { Say(Player, command); FollowUps(Player, command); }
             }
             BeginNextExchange(command);

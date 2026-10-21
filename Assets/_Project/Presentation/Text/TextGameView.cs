@@ -305,6 +305,7 @@ namespace SocialStim.Presentation.Text
             {
                 if (_information.IsOpen) _information.Close();
                 else if (_displayOptionsPanel.gameObject.activeSelf) ToggleDisplayOptions();
+                else if (_request?.CompositionPrompt != null && !IsDisplaying && _request.Options.Count > 0) SubmitOption(_request.Options[0].Id);
                 else if (_menuCategory != null) { _menuCategory = null; _menuPage = 0; BuildMenu(); }
             }
             if (!_information.IsOpen && !_displayOptionsPanel.gameObject.activeSelf && keyboard != null)
@@ -367,6 +368,8 @@ namespace SocialStim.Presentation.Text
                 else { _conversationHeading.text = "CONVERSATION"; _conversationHeading.color = _palette.Foreground; }
                 var pacing = new SpeechPacing(observation);
                 _playback.Begin(observation.Sequence, line, profile, _settings, _onAcknowledged, pacing.Pause, pacing.Speed);
+                RenderRoster(_next + 1);
+                _castScroll.gameObject.SetActive(true);
                 Canvas.ForceUpdateCanvases();
                 if (_scrollFollower.Following) _transcriptScroll.verticalNormalizedPosition = 0;
             }
@@ -510,7 +513,13 @@ namespace SocialStim.Presentation.Text
             var entries = new List<Tuple<string, string, Action>>();
             void Entry(string label, string detail, Action selected)
                 => entries.Add(Tuple.Create(label, detail, selected));
-            if (_menuCategory == null)
+            if (_request.CompositionPrompt != null)
+            {
+                _choiceHeading.text = _words.Format("fabricate.start");
+                foreach (var option in options.Where(o => !o.Target.HasValue))
+                { string id = option.Id; Entry(option.Label, option.Interpretation, () => SubmitOption(id)); }
+            }
+            else if (_menuCategory == null)
             {
                 _choiceHeading.text = _request.View.Phase == GamePhase.JesterRevenge ? _words.Format("ui.revengePrompt")
                     : _request.View.RespondTo.HasValue ? _copy.DefendSelf : _words.Format("ui.actionFirst");
@@ -562,17 +571,21 @@ namespace SocialStim.Presentation.Text
             if ((_menuPage + 1) * 6 < entries.Count) AddButton(_words.Format("ui.next"), "", () => { _menuPage++; BuildMenu(); });
             RenderRoster();
             _choiceScroll.verticalNormalizedPosition = 1;
-            string context = ReplyContext();
+            string context = _request.CompositionPrompt ?? ReplyContext();
             _replyContext.text = context; _replyContext.gameObject.SetActive(!string.IsNullOrEmpty(context));
-            _choiceScroll.viewport.offsetMax = new Vector2(-22, string.IsNullOrEmpty(context) ? -48 : -96);
+            TextUiFactory.Fill(_replyContext.rectTransform, new Vector2(0, 1), Vector2.one, new Vector2(22, _request.CompositionPrompt == null ? -85 : -122), new Vector2(-22, -38));
+            _choiceScroll.viewport.offsetMax = new Vector2(-22, _request.CompositionPrompt != null ? -134 : string.IsNullOrEmpty(context) ? -48 : -96);
             if (!_information.IsOpen) FocusChoicesOrTargets();
         }
 
-        private void RenderRoster()
+        private void RenderRoster(int? visibleObservations = null)
         {
             if (_request == null) return;
-            foreach (var participant in _request.View.Characters)
+            int visible = visibleObservations ?? Mathf.Min(_request.View.Transcript.Count, _next + (_playback.Busy ? 1 : 0));
+            bool spectator = !RosterInteractions.VisibleParticipant(_request.View, _request.View.PlayerId, visible).Alive;
+            foreach (var seat in _request.View.Characters)
             {
+                var participant = RosterInteractions.VisibleParticipant(_request.View, seat.Id, visible);
                 if (!_cards.TryGetValue(participant.Id, out ParticipantCard card))
                 {
                     RectTransform root = TextUiFactory.Rect("Participant " + participant.Id.Value, _castPanel);
@@ -583,7 +596,7 @@ namespace SocialStim.Presentation.Text
                 bool selectable = !IsDisplaying && action != null;
                 string annotation = selectable ? _words.Format("ui.selectable") : "";
                 RoleSpec claim = participant.ClaimedRole.HasValue && _roles.TryGetValue(participant.ClaimedRole.Value, out RoleSpec known) ? known : null;
-                RoleSpec spectatorRole = _request.View.SpectatorRoles.TryGetValue(participant.Id, out RoleId actual)
+                RoleSpec spectatorRole = spectator && _request.View.SpectatorRoles.TryGetValue(participant.Id, out RoleId actual)
                     && _roles.TryGetValue(actual, out RoleSpec actualRole) ? actualRole : null;
                 card.Render(participant, participant.Id == _request.View.PlayerId, _palette, claim, selectable, false, annotation, _words, spectatorRole);
             }
@@ -658,7 +671,8 @@ namespace SocialStim.Presentation.Text
         private void FollowLatest() { _scrollFollower.Follow(); Canvas.ForceUpdateCanvases(); _transcriptScroll.verticalNormalizedPosition = 0; }
         private void FocusChoicesOrTargets()
         {
-            if (EventSystem.current != null && (_menuCategory == "Accuse" || _menuCategory == "Defend" || _menuCategory == "Targets"))
+            if (EventSystem.current != null && (_menuCategory == "Accuse" || _menuCategory == "Defend" || _menuCategory == "Targets"
+                || _request?.CompositionPrompt != null && _request.Options.Any(o => o.Target.HasValue)))
             {
                 var card = _cards.Values.OrderBy(c => c.Id.Value).FirstOrDefault(c => c.GetComponent<Button>().interactable);
                 if (card != null) { EventSystem.current.SetSelectedGameObject(card.gameObject); return; }
